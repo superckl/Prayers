@@ -1,0 +1,13 @@
+.classpath
+.gradle/*
+.project
+.settings/*
+eclipse/*
+bin/*
+Techne/*
+Logo/*
+/bin/
+build.bat
+desktop.ini
+eclipse.bat
+setup.bat
