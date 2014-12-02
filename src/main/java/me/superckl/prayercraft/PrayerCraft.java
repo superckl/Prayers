@@ -2,6 +2,7 @@ package me.superckl.prayercraft;
 
 import lombok.Getter;
 import me.superckl.prayercraft.common.reference.ModData;
+import me.superckl.prayercraft.common.reference.ModItems;
 import me.superckl.prayercraft.common.utility.LogHelper;
 import me.superckl.prayercraft.proxy.IProxy;
 import cpw.mods.fml.common.Mod;
@@ -29,6 +30,7 @@ public class PrayerCraft {
 		LogHelper.info("Please note, you are running a beta version! Please report any bugs you find.");
 		this.config = new Config(e.getSuggestedConfigurationFile());
 		this.config.loadValues();
+		ModItems.init();
 		PrayerCraft.proxy.registerHandlers();
 	}
 

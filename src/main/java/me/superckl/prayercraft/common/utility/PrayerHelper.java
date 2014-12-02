@@ -22,4 +22,11 @@ public class PrayerHelper {
 		return prayers;
 	}
 
+	public static int calculateXP(final int level){
+		int xp = 0;
+		for(int i = 1; i < level; i++)
+			xp += Math.pow(2D, (i)/7D);
+		return xp*75;
+	}
+
 }
