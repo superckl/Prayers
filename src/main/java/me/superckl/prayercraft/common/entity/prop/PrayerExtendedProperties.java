@@ -57,8 +57,8 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	public void playerTick(){
 
 	}
-	
-	public void addXP(int xp){
+
+	public void addXP(final int xp){
 		int newXP = this.getCurrentXP()+xp;
 		if(newXP >= this.nextXP){
 			newXP -= this.nextXP;
@@ -91,12 +91,12 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	public void setActivePrayers(final int prayers){
 		this.player.getDataWatcher().updateObject(29, new Integer(prayers));
 	}
-	
+
 	public int getCurrentXP(){
 		return this.player.getDataWatcher().getWatchableObjectInt(30);
 	}
-	
-	public void setCurrentXP(int xp){
+
+	public void setCurrentXP(final int xp){
 		this.player.getDataWatcher().updateObject(30, new Integer(xp));
 	}
 
