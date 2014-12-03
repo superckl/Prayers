@@ -1,8 +1,7 @@
 package me.superckl.prayercraft.common.handler;
 
 import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayercraft.common.reference.Prayers;
-import me.superckl.prayercraft.common.utility.PrayerHelper;
+import me.superckl.prayercraft.common.prayer.Prayers;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
@@ -23,7 +22,7 @@ public class EntityEventHandler {
 			return;
 		if(e.entityLiving instanceof EntityPlayer){
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityLiving.getExtendedProperties("prayer");
-			for(final Prayers prayer:PrayerHelper.transateBits(prop.getActivePrayers()))
+			for(final Prayers prayer:prop.getActivePrayers())
 				switch(prayer){
 				case PROTECT_MAGIC:
 				{

@@ -3,23 +3,27 @@ package me.superckl.prayercraft.common.utility;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.superckl.prayercraft.common.reference.Prayers;
+import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
+import me.superckl.prayercraft.common.prayer.Prayers;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class PrayerHelper {
 
-	public static List<Prayers> transateBits(int bits){
-		final List<Prayers> prayers = new ArrayList<Prayers>();
-		if(bits == 0)
-			return prayers;
-		int ordinal = 0;
-		final Prayers[] values = Prayers.values();
-		while(bits != 0){
-			if((bits & 1) == 1)
-				prayers.add(values[ordinal]);
-			bits >>= 1;
-			ordinal++;
-		}
-		return prayers;
+	public static List<Prayers> fromNBT(final NBTTagCompound comp){
+		final List<Prayers> list = new ArrayList<Prayers>();
+		final int i = 0;
+		while(comp.hasKey(Integer.toString(i)))
+			list.add(Prayers.getById(comp.getString(Integer.toString(i))));
+		return list;
+	}
+
+	public static NBTTagCompound toNBT(final List<Prayers> list){
+		final NBTTagCompound comp = new NBTTagCompound();
+		for(int i = 0; i < list.size(); i++)
+			comp.setString(Integer.toString(i), list.get(i).getId());
+		return comp;
 	}
 
 	public static int calculateXP(final int level){
@@ -27,6 +31,12 @@ public class PrayerHelper {
 		for(int i = 1; i < level; i++)
 			xp += Math.pow(2D, (i)/7D);
 		return xp*75;
+	}
+
+	public static List<Prayers> getActivePrayers(final EntityLivingBase entity){
+		if(entity instanceof EntityPlayer)
+			return ((PrayerExtendedProperties)((EntityPlayer)entity).getExtendedProperties("prayer")).getActivePrayers();
+		return new ArrayList<Prayers>();
 	}
 
 }

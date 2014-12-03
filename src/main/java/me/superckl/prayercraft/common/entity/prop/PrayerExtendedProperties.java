@@ -1,6 +1,10 @@
 package me.superckl.prayercraft.common.entity.prop;
 
+import java.util.List;
+
 import lombok.Getter;
+import lombok.Setter;
+import me.superckl.prayercraft.common.prayer.Prayers;
 import me.superckl.prayercraft.common.utility.PrayerHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +18,9 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	private EntityPlayer player;
 	@Getter
 	private int nextXP;
+	@Getter
+	@Setter
+	private List<Prayers> activePrayers;
 
 	@Override
 	public void saveNBTData(final NBTTagCompound compound) {
@@ -29,7 +36,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 		final NBTTagCompound comp = new NBTTagCompound();
 		comp.setInteger("level", this.getPrayerLevel());
 		comp.setFloat("points", this.getPrayerPoints());
-		comp.setInteger("activePrayers", this.getActivePrayers());
+		comp.setTag("activePrayers", PrayerHelper.toNBT(this.activePrayers));
 		comp.setInteger("xp", this.getCurrentXP());
 		return comp;
 	}
@@ -37,7 +44,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	public void readFromNBT(final NBTTagCompound comp){
 		this.setPrayerLevel(comp.getInteger("level"));
 		this.setPrayerPoints(comp.getFloat("points"));
-		this.setActivePrayers(comp.getInteger("activePrayers"));
+		this.activePrayers = PrayerHelper.fromNBT(comp.getCompoundTag("activePrayers"));
 		this.setCurrentXP(comp.getInteger("xp"));
 		this.nextXP = PrayerHelper.calculateXP(this.getPrayerLevel()+1);
 	}
@@ -51,7 +58,6 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 		this.player.getDataWatcher().addObject(27, new Integer(1));
 		this.player.getDataWatcher().addObject(28, new Float(100F));
 		this.player.getDataWatcher().addObject(29, new Integer(0));
-		this.player.getDataWatcher().addObject(30, new Integer(0));
 	}
 
 	public void playerTick(){
@@ -84,20 +90,12 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 		this.player.getDataWatcher().updateObject(28, new Float(points));
 	}
 
-	public int getActivePrayers(){
+	public int getCurrentXP(){
 		return this.player.getDataWatcher().getWatchableObjectInt(29);
 	}
 
-	public void setActivePrayers(final int prayers){
-		this.player.getDataWatcher().updateObject(29, new Integer(prayers));
-	}
-
-	public int getCurrentXP(){
-		return this.player.getDataWatcher().getWatchableObjectInt(30);
-	}
-
 	public void setCurrentXP(final int xp){
-		this.player.getDataWatcher().updateObject(30, new Integer(xp));
+		this.player.getDataWatcher().updateObject(29, new Integer(xp));
 	}
 
 }

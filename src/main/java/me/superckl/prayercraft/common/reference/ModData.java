@@ -1,5 +1,7 @@
 package me.superckl.prayercraft.common.reference;
 
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+
 public class ModData {
 
 	public static final String MOD_ID = "PrayerCraft";
@@ -8,5 +10,7 @@ public class ModData {
 	public static final String GUI_FACTORY = "me.superckl.prayercraft.common.gui.GuiFactory";
 	public static final String CLIENT_PROXY = "me.superckl.prayercraft.proxy.ClientProxy";
 	public static final String SERVER_PROXY = "me.superckl.prayercraft.proxy.ServerProxy";
+
+	public static SimpleNetworkWrapper PRAYER_UPDATE_CHANNEL;
 
 }
