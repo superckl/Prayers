@@ -16,7 +16,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-public class CommonProxy implements IProxy{
+public abstract class CommonProxy implements IProxy{
 
 	@Override
 	public void registerHandlers() {
@@ -29,8 +29,5 @@ public class CommonProxy implements IProxy{
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerDisablePrayerServer.class, MessageDisablePrayer.class, 1, Side.SERVER);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerOpenPrayerGui.class, MessageOpenPrayerGui.class, 2, Side.SERVER);
 	}
-
-	@Override
-	public void setupGuis() {}
 
 }

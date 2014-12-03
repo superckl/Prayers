@@ -4,6 +4,7 @@ import java.util.List;
 
 import me.superckl.prayercraft.client.gui.button.ButtonPrayer;
 import me.superckl.prayercraft.common.container.ContainerPrayers;
+import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayercraft.common.prayer.Prayers;
 import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.utility.PrayerHelper;
@@ -89,6 +90,9 @@ public class GuiContainerPrayers extends InventoryEffectRenderer{
 				message.setPrayer(prayer);
 				ModData.PRAYER_UPDATE_CHANNEL.sendToServer(message);
 			}else{
+				final PrayerExtendedProperties prop = (PrayerExtendedProperties) this.mc.thePlayer.getExtendedProperties("prayer");
+				if(prop.getPrayerPoints() <= 0F)
+					return;
 				list.add(prayer);
 				if(PrayerHelper.hasConflictions(list)){
 					list.remove(prayer);

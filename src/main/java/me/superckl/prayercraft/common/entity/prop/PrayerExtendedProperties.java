@@ -6,9 +6,12 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayercraft.common.prayer.Prayers;
+import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.utility.PrayerHelper;
+import me.superckl.prayercraft.network.MessageUpdatePrayers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
@@ -22,6 +25,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	@Getter
 	@Setter
 	private List<Prayers> activePrayers = new ArrayList<Prayers>();
+	private int tickDelay = 20;
 
 	@Override
 	public void saveNBTData(final NBTTagCompound compound) {
@@ -57,12 +61,34 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 		this.nextXP = PrayerHelper.calculateXP(2);
 		this.player = (EntityPlayer) entity;
 		this.player.getDataWatcher().addObject(27, new Integer(1));
-		this.player.getDataWatcher().addObject(28, new Float(100F));
+		this.player.getDataWatcher().addObject(28, new Float(10F));
 		this.player.getDataWatcher().addObject(29, new Integer(0));
 	}
 
 	public void playerTick(){
+		if(this.activePrayers.isEmpty())
+			return;
+		this.tickDelay--;
+		if(this.tickDelay <= 0){
+			float points = this.getPrayerPoints();
+			for(final Prayers prayer:this.activePrayers){
+				points -= prayer.getDrain();
+				if(points <= 0F){
+					points = 0F;
+					break;
+				}
+			}
+			this.setPrayerPoints(points);
+			if(points <= 0F)
+				this.disableAllPrayers(true);
+			this.tickDelay = 20;
+		}
+	}
 
+	public void disableAllPrayers(final boolean syncClient){
+		this.activePrayers.clear();
+		if(syncClient && (this.player instanceof EntityPlayerMP))
+			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(this.activePrayers), (EntityPlayerMP) this.player);
 	}
 
 	public void addXP(final int xp){
