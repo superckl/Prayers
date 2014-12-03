@@ -1,5 +1,6 @@
 package me.superckl.prayercraft.common.container;
 
+import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -13,7 +14,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ContainerPrayers extends Container{
 
+	@Getter
 	private final InventoryPlayer invPlayer;
+	@Getter
 	private final InventoryBasic invPrayer;
 
 	public ContainerPrayers(final InventoryPlayer invPlayer) {

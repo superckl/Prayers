@@ -2,6 +2,7 @@ package me.superckl.prayercraft.client.gui.button;
 
 import lombok.Getter;
 import me.superckl.prayercraft.common.prayer.Prayers;
+import me.superckl.prayercraft.common.utility.RenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
@@ -17,7 +18,7 @@ public class ButtonPrayer extends GuiButton{
 
 	@Override
 	public void drawButton(final Minecraft mc, final int mouseX, final int mouseY) {
-		// TODO Auto-generated method stub
+		RenderHelper.drawTexturedRect(this.prayer.getTexture(), this.xPosition, this.yPosition, 0, 0, 16, 16, 16, 16, 1D);
 	}
 
 

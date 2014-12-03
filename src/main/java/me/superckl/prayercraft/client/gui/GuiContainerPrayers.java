@@ -1,12 +1,21 @@
 package me.superckl.prayercraft.client.gui;
 
+import java.util.List;
+
+import me.superckl.prayercraft.client.gui.button.ButtonPrayer;
 import me.superckl.prayercraft.common.container.ContainerPrayers;
+import me.superckl.prayercraft.common.prayer.Prayers;
 import me.superckl.prayercraft.common.reference.ModData;
+import me.superckl.prayercraft.common.utility.PrayerHelper;
+import me.superckl.prayercraft.network.MessageDisablePrayer;
+import me.superckl.prayercraft.network.MessageEnablePrayer;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
@@ -37,6 +46,24 @@ public class GuiContainerPrayers extends InventoryEffectRenderer{
 
 		TabRegistry.updateTabValues(cornerX, cornerY, InventoryTabPrayers.class);
 		TabRegistry.addTabsToList(this.buttonList);
+
+		final Prayers[] prayers = Prayers.values();
+		final int width = 5;
+		final int excess = 94-(16*width)-(2*(width-1));
+		final int startX = 79+(excess/2);
+		int y = 10;
+		int x = startX;
+		int j = 0;
+		for(int i = 0; i < prayers.length; i++){
+			this.buttonList.add(new ButtonPrayer(i, x+this.guiLeft, y+this.guiTop, prayers[i]));
+			x += 18;
+			j++;
+			if(j == width){
+				j = 0;
+				y += 18;
+				x = startX;
+			}
+		}
 	}
 
 	@Override
@@ -45,6 +72,40 @@ public class GuiContainerPrayers extends InventoryEffectRenderer{
 		super.drawScreen(par1, par2, par3);
 		this.xSize_lo_2 = par1;
 		this.ySize_lo_2 = par2;
+	}
+
+
+
+	@Override
+	protected void actionPerformed(final GuiButton button) {
+		if(button instanceof ButtonPrayer){
+			final ButtonPrayer pButton = (ButtonPrayer) button;
+			final Prayers prayer = pButton.getPrayer();
+			final EntityPlayer player = ((ContainerPrayers)this.inventorySlots).getInvPlayer().player;
+			final List<Prayers> list = PrayerHelper.getActivePrayers(player);
+			if(list.contains(prayer)){
+				list.remove(prayer);
+				final MessageDisablePrayer message = new MessageDisablePrayer();
+				message.setPrayer(prayer);
+				ModData.PRAYER_UPDATE_CHANNEL.sendToServer(message);
+			}else{
+				list.add(prayer);
+				if(PrayerHelper.hasConflictions(list)){
+					list.remove(prayer);
+					return;
+				}
+				final MessageEnablePrayer message = new MessageEnablePrayer();
+				message.setPrayer(prayer);
+				ModData.PRAYER_UPDATE_CHANNEL.sendToServer(message);
+			}
+		}
+	}
+
+	@Override
+	protected void drawGuiContainerForegroundLayer(final int p_146979_1_,
+			final int p_146979_2_) {
+		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
+
 	}
 
 	@Override

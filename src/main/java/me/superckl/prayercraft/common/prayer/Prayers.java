@@ -9,7 +9,7 @@ public enum Prayers {
 
 	PROTECT_MELEE("pMelee", 2, true, new ResourceLocation("textures/items/diamond_sword.png")),
 	PROTECT_RANGE("pRange", 2, true, new ResourceLocation("textures/items/arrow.png")),
-	PROTECT_MAGIC("pMagic", 2, true, null); //TODO
+	PROTECT_MAGIC("pMagic", 2, true, new ResourceLocation("textures/items/fire.png")); //TODO
 
 	@Getter
 	private final String id;
