@@ -13,6 +13,7 @@ public class MessageHandlerDisablePrayerClient implements IMessageHandler<Messag
 	@Override
 	public IMessage onMessage(final MessageDisablePrayer message, final MessageContext ctx) {
 		((PrayerExtendedProperties)this.mc.thePlayer.getExtendedProperties("prayer")).getActivePrayers().remove(message.getPrayer());
+		//TODO player effects, etc.
 		return null;
 	}
 

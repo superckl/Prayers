@@ -23,7 +23,7 @@ public class EntityRenderHandler {
 				continue;
 			final double dist = e.entity.getDistanceSqToEntity(e.renderer.renderManager.livingPlayer);
 
-			if (dist <= 64D * 64D)
+			if (dist <= (64D * 64D))
 			{
 				final FontRenderer fontrenderer = e.renderer.getFontRendererFromRenderManager();
 				final float scale = 0.016666668F * 1.6F;

@@ -26,6 +26,17 @@ public class PrayerHelper {
 		return comp;
 	}
 
+	public static boolean hasConflictions(final List<Prayers> list){
+		boolean hasOverhead = false;
+		for(final Prayers prayer:list)
+			if(prayer.isOverhead()){
+				if(hasOverhead)
+					return true;
+				hasOverhead = true;
+			}
+		return false;
+	}
+
 	public static int calculateXP(final int level){
 		int xp = 0;
 		for(int i = 1; i < level; i++)

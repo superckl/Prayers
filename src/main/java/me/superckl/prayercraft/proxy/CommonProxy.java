@@ -9,6 +9,8 @@ import me.superckl.prayercraft.network.MessageDisablePrayer;
 import me.superckl.prayercraft.network.MessageEnablePrayer;
 import me.superckl.prayercraft.network.MessageHandlerDisablePrayerServer;
 import me.superckl.prayercraft.network.MessageHandlerEnablePrayerServer;
+import me.superckl.prayercraft.network.MessageHandlerOpenPrayerGui;
+import me.superckl.prayercraft.network.MessageOpenPrayerGui;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -25,6 +27,10 @@ public class CommonProxy implements IProxy{
 		ModData.PRAYER_UPDATE_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel("prayerUpdate");
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerServer.class, MessageEnablePrayer.class, 0, Side.SERVER);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerDisablePrayerServer.class, MessageDisablePrayer.class, 1, Side.SERVER);
+		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerOpenPrayerGui.class, MessageOpenPrayerGui.class, 2, Side.SERVER);
 	}
+
+	@Override
+	public void setupGuis() {}
 
 }

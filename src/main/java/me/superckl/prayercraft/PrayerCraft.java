@@ -32,6 +32,7 @@ public class PrayerCraft {
 		this.config.loadValues();
 		ModItems.init();
 		PrayerCraft.proxy.registerHandlers();
+		PrayerCraft.proxy.setupGuis();
 	}
 
 }

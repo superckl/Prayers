@@ -32,7 +32,7 @@ public class EntityEventHandler {
 				}
 				case PROTECT_RANGE:
 				{
-					if(e.source.isProjectile())
+					if(e.source.isProjectile() && !e.source.isMagicDamage())
 						e.ammount /= 2F;
 					break;
 				}

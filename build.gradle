@@ -17,6 +17,15 @@ buildscript {
 
 apply plugin: 'forge'
 
+sourceSets.main{
+    java{
+        srcDirs = ['src/main/java', 'dependencies/main/java']
+    }
+    resources{
+        srcDirs = ['src/main/resources']
+    }
+}
+
 version = "0.1.${System.env.BUILD_NUMBER}-Beta"
 group= "me.superckl.prayercraft"
 archivesBaseName = "PrayerCraft"

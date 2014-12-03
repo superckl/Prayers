@@ -1,5 +1,6 @@
 package me.superckl.prayercraft.common.entity.prop;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	private int nextXP;
 	@Getter
 	@Setter
-	private List<Prayers> activePrayers;
+	private List<Prayers> activePrayers = new ArrayList<Prayers>();
 
 	@Override
 	public void saveNBTData(final NBTTagCompound compound) {
