@@ -11,10 +11,20 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 
-public class SubCommandPrayerPoints implements ISubCommand{
+public class SubCommandPrayerLevel implements ISubCommand{
 
 	@Getter
-	private final List<String> aliases = Arrays.asList("prayerpoints", "points", "prayerpoint");
+	private final List<String> aliases = Arrays.asList("prayerlevel", "level", "lvl");
+
+	@Override
+	public String getName() {
+		return "PrayerLevel";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Used to set a player's prayer level.";
+	}
 
 	@Override
 	public void processCommand(final ICommandSender sender, final String[] args) {
@@ -39,11 +49,11 @@ public class SubCommandPrayerPoints implements ISubCommand{
 			final EntityPlayerMP player = (EntityPlayerMP) sender;
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 			if(args[0].equalsIgnoreCase("set"))
-				prop.setPrayerPoints(amount);
+				prop.setPrayerLevel(Math.max(1, amount));
 			else if(args[0].equalsIgnoreCase("add"))
-				prop.setPrayerPoints(prop.getPrayerPoints()+amount);
+				prop.setPrayerLevel(prop.getPrayerLevel()+amount);
 			else if(args[0].equalsIgnoreCase("subtract"))
-				prop.setPrayerPoints(Math.max(0F, prop.getPrayerPoints()-amount));
+				prop.setPrayerLevel(Math.max(1, prop.getPrayerLevel()-amount));
 			else{
 				final ChatComponentTranslation chat = new ChatComponentTranslation("msg.nomatch.text", "set, add, subtract.");
 				chat.getChatStyle().setColor(EnumChatFormatting.RED);
@@ -59,11 +69,11 @@ public class SubCommandPrayerPoints implements ISubCommand{
 			}
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 			if(args[1].equalsIgnoreCase("set"))
-				prop.setPrayerPoints(amount);
+				prop.setPrayerLevel(Math.max(1, amount));
 			else if(args[1].equalsIgnoreCase("add"))
-				prop.setPrayerPoints(prop.getPrayerPoints()+amount);
+				prop.setPrayerLevel(prop.getPrayerLevel()+amount);
 			else if(args[1].equalsIgnoreCase("subtract"))
-				prop.setPrayerPoints(Math.max(0F, prop.getPrayerPoints()-amount));
+				prop.setPrayerLevel(Math.max(1, prop.getPrayerLevel()-amount));
 			else{
 				final ChatComponentTranslation chat = new ChatComponentTranslation("msg.nomatch.text", "set, add, subtract.");
 				chat.getChatStyle().setColor(EnumChatFormatting.RED);
@@ -74,22 +84,11 @@ public class SubCommandPrayerPoints implements ISubCommand{
 			chat.getChatStyle().setColor(EnumChatFormatting.RED);
 			sender.addChatMessage(chat);
 		}
-
 	}
 
 	@Override
 	public boolean isUsernameIndex(final String[] args, final int index) {
 		return index == 0;
-	}
-
-	@Override
-	public String getName() {
-		return "PrayerPoints";
-	}
-
-	@Override
-	public String getDescription() {
-		return "Used to modify a player's prayer points.";
 	}
 
 }

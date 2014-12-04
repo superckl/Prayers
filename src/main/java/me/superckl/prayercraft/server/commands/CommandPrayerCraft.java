@@ -13,7 +13,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class CommandPrayerCraft implements ICommand{
 
-	public static final ISubCommand[] COMMAND_INSTANCES =new ISubCommand[] {new SubCommandPrayerPoints(), new SubCommandHelp()};
+	public static final ISubCommand[] COMMAND_INSTANCES =new ISubCommand[] {new SubCommandPrayerPoints(), new SubCommandPrayerLevel(), new SubCommandHelp()};
 
 	private final List<String> aliases = Arrays.asList("prayercraft", "pc", "prayer");
 	@Getter
@@ -55,7 +55,7 @@ public class CommandPrayerCraft implements ICommand{
 		}
 		final ISubCommand com = this.findCommand(args[0]);
 		if(com != null)
-			com.processCommand(sender, args);
+			com.processCommand(sender, Arrays.copyOfRange(args, 1, args.length));
 	}
 
 	@Override
