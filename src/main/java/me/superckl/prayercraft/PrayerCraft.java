@@ -1,6 +1,7 @@
 package me.superckl.prayercraft;
 
 import lombok.Getter;
+import me.superckl.prayercraft.common.reference.ModBlocks;
 import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.reference.ModItems;
 import me.superckl.prayercraft.common.utility.LogHelper;
@@ -31,8 +32,10 @@ public class PrayerCraft {
 		this.config = new Config(e.getSuggestedConfigurationFile());
 		this.config.loadValues();
 		ModItems.init();
+		ModBlocks.init();
 		PrayerCraft.proxy.registerHandlers();
 		PrayerCraft.proxy.setupGuis();
+		PrayerCraft.proxy.registerBindings();
 	}
 
 }

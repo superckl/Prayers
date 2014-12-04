@@ -54,11 +54,12 @@ public class ItemBasicBone extends ItemPrayerCraft implements IBuryable{
 	public ItemStack onItemRightClick(final ItemStack stack, final World world, final EntityPlayer player) {
 		if(player.isSneaking())
 			return stack;
-		final int xp = this.getXPFromStack(stack);
+		int xp = this.getXPFromStack(stack);
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
+		xp/=Math.max(1, Math.log10(Math.max(1, prop.getPrayerLevel()-15))*1.17D); //The gods grow tired of your lazy offerings!!!
 		prop.addXP(xp);
 		stack.stackSize--;
-		return stack.stackSize <= 0 ? null:stack;
+		return stack;
 	}
 
 	@Override

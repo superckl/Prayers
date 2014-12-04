@@ -2,7 +2,7 @@ package me.superckl.prayercraft.common.reference;
 
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
-public class ModData {
+public final class ModData {
 
 	public static final String MOD_ID = "PrayerCraft";
 	public static final String MOD_NAME= "PrayerCraft";

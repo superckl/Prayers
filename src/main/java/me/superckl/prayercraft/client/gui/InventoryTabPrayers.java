@@ -2,7 +2,6 @@ package me.superckl.prayercraft.client.gui;
 
 import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.reference.ModItems;
-import me.superckl.prayercraft.common.utility.LogHelper;
 import me.superckl.prayercraft.network.MessageOpenPrayerGui;
 import net.minecraft.item.ItemStack;
 import tconstruct.client.tabs.AbstractTab;
@@ -15,9 +14,7 @@ public class InventoryTabPrayers extends AbstractTab{
 
 	@Override
 	public void onTabClicked() {
-		LogHelper.info("sending to server");
 		ModData.PRAYER_UPDATE_CHANNEL.sendToServer(new MessageOpenPrayerGui());
-		//player.openGui(PrayerCraft.getInstance(), 0, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 	}
 
 	@Override

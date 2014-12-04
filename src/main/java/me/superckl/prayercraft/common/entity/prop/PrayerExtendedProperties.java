@@ -61,7 +61,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 		this.nextXP = PrayerHelper.calculateXP(2);
 		this.player = (EntityPlayer) entity;
 		this.player.getDataWatcher().addObject(27, new Integer(1));
-		this.player.getDataWatcher().addObject(28, new Float(10F));
+		this.player.getDataWatcher().addObject(28, new Float(this.getMaxPrayerPoints()));
 		this.player.getDataWatcher().addObject(29, new Integer(0));
 	}
 
@@ -99,6 +99,10 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 			this.nextXP = PrayerHelper.calculateXP(this.getPrayerLevel()+1);
 		}
 		this.setCurrentXP(newXP);
+	}
+
+	public float getMaxPrayerPoints(){
+		return this.getPrayerLevel()*10F;
 	}
 
 	public int getPrayerLevel(){
