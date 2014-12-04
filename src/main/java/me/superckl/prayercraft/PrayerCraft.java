@@ -6,11 +6,13 @@ import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.reference.ModItems;
 import me.superckl.prayercraft.common.utility.LogHelper;
 import me.superckl.prayercraft.proxy.IProxy;
+import me.superckl.prayercraft.server.commands.CommandPrayerCraft;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
 @Mod(modid=ModData.MOD_ID, name=ModData.MOD_NAME, version=ModData.VERSION, guiFactory=ModData.GUI_FACTORY)
 public class PrayerCraft {
@@ -36,6 +38,11 @@ public class PrayerCraft {
 		PrayerCraft.proxy.registerHandlers();
 		PrayerCraft.proxy.setupGuis();
 		PrayerCraft.proxy.registerBindings();
+	}
+
+	@EventHandler
+	public void onServerStarting(final FMLServerStartingEvent e){
+		e.registerServerCommand(new CommandPrayerCraft());
 	}
 
 }

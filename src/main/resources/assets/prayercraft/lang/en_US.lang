@@ -5,3 +5,4 @@ item.prayercraft:basicbone:1.name=Large Bones
 tile.prayercraft:basicaltar.name=Basic Altar
 key.prayercraft.openprayers=Open Prayers GUI
 key.categories.prayercraft=PrayerCraft
+msg.usage.text=Use '/PrayerCraft help' for a list of commands.
