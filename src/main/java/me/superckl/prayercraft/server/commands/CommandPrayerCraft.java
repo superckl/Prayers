@@ -13,12 +13,16 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class CommandPrayerCraft implements ICommand{
 
+	public static final ISubCommand[] COMMAND_INSTANCES =new ISubCommand[] {new SubCommandPrayerPoints(), new SubCommandHelp()};
+
 	private final List<String> aliases = Arrays.asList("prayercraft", "pc", "prayer");
 	@Getter
 	private final Map<String, ISubCommand> subCommands = new HashMap<String, ISubCommand>();
 
 	public CommandPrayerCraft() {
-
+		for(final ISubCommand command:CommandPrayerCraft.COMMAND_INSTANCES)
+			for(final String alias:command.getAliases())
+				this.subCommands.put(alias, command);
 	}
 
 	@Override
