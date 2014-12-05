@@ -3,6 +3,7 @@ package me.superckl.prayercraft.common.entity.tile;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import me.superckl.prayercraft.common.prayer.IPrayerAltar;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -10,7 +11,7 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 @AllArgsConstructor
-public class TileEntityBasicAltar extends TileEntity{
+public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 
 	@Getter
 	@Setter
