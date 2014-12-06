@@ -1,5 +1,6 @@
 package me.superckl.prayercraft.common.entity.prop;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,11 +8,14 @@ import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayercraft.common.prayer.Prayers;
 import me.superckl.prayercraft.common.reference.ModData;
+import me.superckl.prayercraft.common.utility.ItemStackHelper;
 import me.superckl.prayercraft.common.utility.PrayerHelper;
 import me.superckl.prayercraft.network.MessageUpdatePrayers;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
@@ -93,10 +97,15 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 
 	public void addXP(final int xp){
 		int newXP = this.getCurrentXP()+xp;
-		if(newXP >= this.nextXP){
+		while(newXP >= this.nextXP){
 			newXP -= this.nextXP;
 			this.setPrayerLevel(this.getPrayerLevel()+1);
 			this.nextXP = PrayerHelper.calculateXP(this.getPrayerLevel()+1);
+			if(!this.player.worldObj.isRemote){
+				final ItemStack stack = ItemStackHelper.addExplosion(ItemStackHelper.makeBlankFirework((byte) 0), (byte) 1, (byte) 1, (byte) 0, Color.YELLOW.getRGB(), Color.BLUE.getRGB(), Color.WHITE.getRGB());
+				final EntityFireworkRocket rocket = new EntityFireworkRocket(this.player.worldObj, this.player.posX, this.player.posY+this.player.eyeHeight, this.player.posZ, stack);
+				this.player.worldObj.spawnEntityInWorld(rocket);
+			}
 		}
 		this.setCurrentXP(newXP);
 	}
@@ -111,6 +120,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 
 	public void setPrayerLevel(final int level){
 		this.player.getDataWatcher().updateObject(27, new Integer(level));
+		this.nextXP = PrayerHelper.calculateXP(level+1);
 	}
 
 	public float getPrayerPoints(){

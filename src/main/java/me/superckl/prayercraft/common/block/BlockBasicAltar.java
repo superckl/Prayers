@@ -39,7 +39,7 @@ public class BlockBasicAltar extends BlockPrayerCraft implements ITileEntityProv
 			final ItemStack stack = player.getHeldItem();
 			if((stack != null) && (stack.getItem() instanceof IBuryable)){
 				final int xp = ((IBuryable)stack.getItem()).getXPFromStack(stack);
-				prop.addXP(xp);
+				prop.addXP((int) (xp*1.5));
 				stack.stackSize--;
 			}
 		}

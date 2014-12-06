@@ -40,8 +40,8 @@ public class PrayerHelper {
 	public static int calculateXP(final int level){
 		int xp = 0;
 		for(int i = 1; i < level; i++)
-			xp += Math.pow(2D, (i)/7D);
-		return xp*75;
+			xp += Math.pow(2D, (i)/10D);
+		return xp*35;
 	}
 
 	public static List<Prayers> getActivePrayers(final EntityLivingBase entity){

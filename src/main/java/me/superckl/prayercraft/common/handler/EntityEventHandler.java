@@ -2,9 +2,13 @@ package me.superckl.prayercraft.common.handler;
 
 import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayercraft.common.prayer.Prayers;
+import me.superckl.prayercraft.common.reference.ModItems;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -46,6 +50,16 @@ public class EntityEventHandler {
 					break;
 				}
 		}
+	}
+
+	@SubscribeEvent
+	public void onLivingDeath(final LivingDropsEvent e){
+		if(e.entityLiving.getRNG().nextInt(4) == 0)
+			return;
+		if((e.entityLiving.width*e.entityLiving.height) < 2.0F)
+			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, 0)));
+		else
+			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, 1)));
 	}
 
 }
