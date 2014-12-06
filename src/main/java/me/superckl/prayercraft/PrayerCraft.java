@@ -11,6 +11,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
@@ -35,10 +36,15 @@ public class PrayerCraft {
 		this.config.loadValues();
 		ModItems.init();
 		ModBlocks.init();
-		PrayerCraft.proxy.registerHandlers();
 		PrayerCraft.proxy.registerEntities();
 		PrayerCraft.proxy.setupGuis();
 		PrayerCraft.proxy.registerBindings();
+	}
+
+	@EventHandler
+	public void init(final FMLInitializationEvent e){
+		PrayerCraft.proxy.registerHandlers();
+		ModItems.addChestLoot();
 	}
 
 	@EventHandler
