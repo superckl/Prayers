@@ -13,9 +13,9 @@ public class PrayerHelper {
 
 	public static List<Prayers> fromNBT(final NBTTagCompound comp){
 		final List<Prayers> list = new ArrayList<Prayers>();
-		final int i = 0;
+		int i = 0;
 		while(comp.hasKey(Integer.toString(i)))
-			list.add(Prayers.getById(comp.getString(Integer.toString(i))));
+			list.add(Prayers.getById(comp.getString(Integer.toString(i++))));
 		return list;
 	}
 

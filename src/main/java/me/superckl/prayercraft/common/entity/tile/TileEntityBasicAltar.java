@@ -17,6 +17,8 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 	@Setter
 	private boolean activated;
 
+	public TileEntityBasicAltar() {}
+
 	@Override
 	public void readFromNBT(final NBTTagCompound comp) {
 		super.readFromNBT(comp);

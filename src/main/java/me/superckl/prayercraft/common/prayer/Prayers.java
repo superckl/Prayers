@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 @RequiredArgsConstructor
 public enum Prayers {
 
+	ENHANCE_POTION("ePotion", 1F, false, new ResourceLocation("textures/items/fire.png")),
 	PROTECT_MELEE("pMelee", 2.5F, true, new ResourceLocation("textures/items/diamond_sword.png")),
 	PROTECT_RANGE("pRange", 2.5F, true, new ResourceLocation("textures/items/arrow.png")),
 	PROTECT_MAGIC("pMagic", 2.5F, true, new ResourceLocation("textures/items/fire.png")); //TODO

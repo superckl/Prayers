@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.superckl.prayercraft.common.prayer.IPrayerAltar;
-import me.superckl.prayercraft.common.utility.LogHelper;
 import me.superckl.prayercraft.common.utility.PlayerHelper;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -60,8 +59,6 @@ public class SubCommandAltar implements ISubCommand{
 				sender.sendTranlsatedError("msg.noaltarinrange.text");
 				return;
 			}
-			LogHelper.info(String.format("%d:%d:%d", pos.blockX, pos.blockY, pos.blockZ));
-			//TODO gives wrong block...
 			final TileEntity te = player.worldObj.getTileEntity(pos.blockX, pos.blockY, pos.blockZ);
 			if((te == null) || ((te instanceof IPrayerAltar) == false)){
 				sender.sendTranlsatedError("msg.notaltar.text");

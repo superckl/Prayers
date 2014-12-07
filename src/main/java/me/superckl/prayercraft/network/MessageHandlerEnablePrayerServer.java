@@ -16,7 +16,7 @@ public class MessageHandlerEnablePrayerServer implements IMessageHandler<Message
 		final List<Prayers> list = ((PrayerExtendedProperties)ctx.getServerHandler().playerEntity.getExtendedProperties("prayer")).getActivePrayers();
 		final List<Prayers> temp = new ArrayList<Prayers>(list);
 		temp.add(message.getPrayer());
-		if(PrayerHelper.hasConflictions(temp)){
+		if(list.contains(message.getPrayer()) || PrayerHelper.hasConflictions(temp)){
 			final MessageDisablePrayer disable = new MessageDisablePrayer();
 			disable.setPrayer(message.getPrayer());
 			return disable;
