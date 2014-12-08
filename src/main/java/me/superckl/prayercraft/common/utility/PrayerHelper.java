@@ -50,4 +50,113 @@ public class PrayerHelper {
 		return new ArrayList<Prayers>();
 	}
 
+	public static float handlePotency(float amount, final List<Prayers> prayers){
+		for(final Prayers prayer:prayers)
+			switch(prayer){
+			case POTENCY_1:
+			{
+				amount *= 1.3F;
+				break;
+			}
+			case POTENCY_2:
+			{
+				amount *= 1.5F;
+				break;
+			}
+			default:
+				break;
+			}
+		return amount;
+	}
+
+	public static float handleEnhanceMelee(float amount, final List<Prayers> prayers){
+		amount = PrayerHelper.handlePotency(amount, prayers);
+		for(final Prayers prayer:prayers)
+			switch(prayer){
+			case ENHANCE_MELEE_1:
+			{
+				amount *= 1.05;
+				break;
+			}
+			case ENHANCE_MELEE_2:
+			{
+				amount *= 1.1;
+				break;
+			}
+			case ENHANCE_MELEE_3:
+			{
+				amount *= 1.15;
+				break;
+			}
+			case ENHANCE_MELEE_4:
+			{
+				amount *= 1.25;
+				break;
+			}
+			default:
+				break;
+			}
+		return amount;
+	}
+
+	public static float handleEnhanceRange(float amount, final List<Prayers> prayers){
+		amount = PrayerHelper.handlePotency(amount, prayers);
+		for(final Prayers prayer:prayers)
+			switch(prayer){
+			case ENHANCE_RANGE_1:
+			{
+				amount *= 1.05;
+				break;
+			}
+			case ENHANCE_RANGE_2:
+			{
+				amount *= 1.1;
+				break;
+			}
+			case ENHANCE_RANGE_3:
+			{
+				amount *= 1.15;
+				break;
+			}
+			case ENHANCE_RANGE_4:
+			{
+				amount *= 1.25;
+				break;
+			}
+			default:
+				break;
+			}
+		return amount;
+	}
+
+	public static float handleEnhanceMagic(float amount, final List<Prayers> prayers){
+		amount = PrayerHelper.handlePotency(amount, prayers);
+		for(final Prayers prayer:prayers)
+			switch(prayer){
+			case ENHANCE_MAGIC_1:
+			{
+				amount *= 1.05;
+				break;
+			}
+			case ENHANCE_MAGIC_2:
+			{
+				amount *= 1.1;
+				break;
+			}
+			case ENHANCE_MAGIC_3:
+			{
+				amount *= 1.15;
+				break;
+			}
+			case ENHANCE_MAGIC_4:
+			{
+				amount *= 1.25;
+				break;
+			}
+			default:
+				break;
+			}
+		return amount;
+	}
+
 }

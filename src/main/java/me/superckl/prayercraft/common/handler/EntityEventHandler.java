@@ -8,11 +8,11 @@ import me.superckl.prayercraft.common.utility.PCReflectionHelper;
 import me.superckl.prayercraft.common.utility.PotionEffectHashMap;
 import me.superckl.prayercraft.common.utility.PrayerHelper;
 import me.superckl.prayercraft.network.MessageUpdatePrayers;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -47,20 +47,48 @@ public class EntityEventHandler {
 				switch(prayer){
 				case PROTECT_MAGIC:
 				{
-					if(e.source.isMagicDamage())
+					if(e.source.isMagicDamage()){
 						e.ammount /= 2F;
+						if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityThrowable) && (((EntityThrowable)e.source.getSourceOfDamage()).getThrower() != null))
+							e.ammount = PrayerHelper.handleEnhanceMagic(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
+					}
 					break;
 				}
 				case PROTECT_RANGE:
 				{
-					if(e.source.isProjectile() && !e.source.isMagicDamage())
+					if(e.source.isProjectile() && !e.source.isMagicDamage()){
 						e.ammount /= 2F;
+						if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityThrowable) && (((EntityThrowable)e.source.getSourceOfDamage()).getThrower() != null))
+							e.ammount = PrayerHelper.handleEnhanceRange(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
+					}
 					break;
 				}
 				case PROTECT_MELEE:
 				{
-					if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityLiving))
+					if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityLivingBase)){
 						e.ammount /= 2F;
+						e.ammount = PrayerHelper.handleEnhanceMelee(e.ammount, PrayerHelper.getActivePrayers((EntityLivingBase) e.source.getSourceOfDamage()));
+					}
+					break;
+				}
+				case ENCHANCE_DEFENCE_1:
+				{
+					e.ammount*=.95;
+					break;
+				}
+				case ENCHANCE_DEFENCE_2:
+				{
+					e.ammount*=.9;
+					break;
+				}
+				case ENCHANCE_DEFENCE_3:
+				{
+					e.ammount*=.85;
+					break;
+				}
+				case ENCHANCE_DEFENCE_4:
+				{
+					e.ammount*=.75;
 					break;
 				}
 				default:
