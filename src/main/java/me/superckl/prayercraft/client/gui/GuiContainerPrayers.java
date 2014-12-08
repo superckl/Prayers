@@ -1,5 +1,6 @@
 package me.superckl.prayercraft.client.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.superckl.prayercraft.client.gui.button.ButtonPrayer;
@@ -11,7 +12,7 @@ import me.superckl.prayercraft.common.utility.PrayerHelper;
 import me.superckl.prayercraft.network.MessageDisablePrayer;
 import me.superckl.prayercraft.network.MessageEnablePrayer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.InventoryEffectRenderer;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -20,12 +21,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import tconstruct.client.tabs.TabRegistry;
 
-public class GuiContainerPrayers extends InventoryEffectRenderer{
+public class GuiContainerPrayers extends GuiContainer{
 
 	private static final ResourceLocation inventoryTexture = new ResourceLocation(ModData.MOD_ID+":textures/gui/prayerinventory.png");
 
@@ -39,7 +41,6 @@ public class GuiContainerPrayers extends InventoryEffectRenderer{
 	@Override
 	public void initGui() {
 		super.initGui();
-
 		this.guiLeft = (this.width - this.xSize) / 2;
 
 		final int cornerX = this.guiLeft;
@@ -48,6 +49,7 @@ public class GuiContainerPrayers extends InventoryEffectRenderer{
 		TabRegistry.updateTabValues(cornerX, cornerY, InventoryTabPrayers.class);
 		TabRegistry.addTabsToList(this.buttonList);
 
+		final PrayerExtendedProperties prop = (PrayerExtendedProperties) this.mc.thePlayer.getExtendedProperties("prayer");
 		final Prayers[] prayers = Prayers.values();
 		final int width = 5;
 		final int excess = 94-(16*width)-(2*(width-1));
@@ -56,6 +58,8 @@ public class GuiContainerPrayers extends InventoryEffectRenderer{
 		int x = startX;
 		int j = 0;
 		for(int i = 0; i < prayers.length; i++){
+			if(prop.getPrayerLevel() < prayers[i].getLevel())
+				continue;
 			this.buttonList.add(new ButtonPrayer(i, x+this.guiLeft, y+this.guiTop, prayers[i]));
 			x += 18;
 			j++;
@@ -109,7 +113,19 @@ public class GuiContainerPrayers extends InventoryEffectRenderer{
 	protected void drawGuiContainerForegroundLayer(final int p_146979_1_,
 			final int p_146979_2_) {
 		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
-
+		for(final Object obj:this.buttonList){
+			if((obj instanceof ButtonPrayer) == false)
+				continue;
+			final ButtonPrayer button = (ButtonPrayer) obj;
+			final int i = (Mouse.getEventX() * this.width) / this.mc.displayWidth;
+			final int j = this.height - ((Mouse.getEventY() * this.height) / this.mc.displayHeight) - 1;
+			if(button.mousePressed(this.mc, i, j)){
+				final List<String> list = new ArrayList<String>(button.getPrayer().getDescription());
+				list.add(0, button.getPrayer().getDisplayName());
+				this.drawHoveringText(list, i-this.guiLeft, j-this.guiTop, this.fontRendererObj);
+				break;
+			}
+		}
 	}
 
 	@Override

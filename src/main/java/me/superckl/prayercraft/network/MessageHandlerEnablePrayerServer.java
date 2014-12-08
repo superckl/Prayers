@@ -13,10 +13,11 @@ public class MessageHandlerEnablePrayerServer implements IMessageHandler<Message
 
 	@Override
 	public MessageDisablePrayer onMessage(final MessageEnablePrayer message, final MessageContext ctx) {
-		final List<Prayers> list = ((PrayerExtendedProperties)ctx.getServerHandler().playerEntity.getExtendedProperties("prayer")).getActivePrayers();
+		final PrayerExtendedProperties prop = ((PrayerExtendedProperties)ctx.getServerHandler().playerEntity.getExtendedProperties("prayer"));
+		final List<Prayers> list = prop.getActivePrayers();
 		final List<Prayers> temp = new ArrayList<Prayers>(list);
 		temp.add(message.getPrayer());
-		if(list.contains(message.getPrayer()) || PrayerHelper.hasConflictions(temp)){
+		if((message.getPrayer().getLevel() > prop.getPrayerLevel()) || list.contains(message.getPrayer()) || PrayerHelper.hasConflictions(temp)){
 			final MessageDisablePrayer disable = new MessageDisablePrayer();
 			disable.setPrayer(message.getPrayer());
 			return disable;
