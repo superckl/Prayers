@@ -39,6 +39,14 @@ public class EntityEventHandler {
 
 	@SubscribeEvent
 	public void onLivingHurt(final LivingHurtEvent e){
+		if((e.source.getSourceOfDamage() != null))
+			if((e.source.getSourceOfDamage() instanceof EntityThrowable) && (((EntityThrowable)e.source.getSourceOfDamage()).getThrower() != null)){
+				if(e.source.isMagicDamage()) //Compute it if projectile for now, mod compat later
+					e.ammount = PrayerHelper.handleEnhanceMagic(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
+				else
+					e.ammount = PrayerHelper.handleEnhanceRange(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
+			}else if(e.source.getSourceOfDamage() instanceof EntityLivingBase)
+				e.ammount = PrayerHelper.handleEnhanceMelee(e.ammount, PrayerHelper.getActivePrayers((EntityLivingBase) e.source.getSourceOfDamage()));
 		if(e.source.isUnblockable())
 			return;
 		if(e.entityLiving instanceof EntityPlayer){
@@ -47,20 +55,14 @@ public class EntityEventHandler {
 				switch(prayer){
 				case PROTECT_MAGIC:
 				{
-					if(e.source.isMagicDamage()){
+					if(e.source.isMagicDamage())
 						e.ammount /= 2F;
-						if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityThrowable) && (((EntityThrowable)e.source.getSourceOfDamage()).getThrower() != null))
-							e.ammount = PrayerHelper.handleEnhanceMagic(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
-					}
 					break;
 				}
 				case PROTECT_RANGE:
 				{
-					if(e.source.isProjectile() && !e.source.isMagicDamage()){
+					if(e.source.isProjectile() && !e.source.isMagicDamage())
 						e.ammount /= 2F;
-						if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityThrowable) && (((EntityThrowable)e.source.getSourceOfDamage()).getThrower() != null))
-							e.ammount = PrayerHelper.handleEnhanceRange(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
-					}
 					break;
 				}
 				case PROTECT_MELEE:
