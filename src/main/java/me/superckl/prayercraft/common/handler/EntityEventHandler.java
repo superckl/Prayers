@@ -32,7 +32,7 @@ public class EntityEventHandler {
 	public void onEntitySpawn(final EntityJoinWorldEvent e){
 		if((e.entity instanceof EntityLivingBase) == false)
 			return;
-		PCReflectionHelper.setPrivateFinalValue(EntityLivingBase.class, (EntityLivingBase) e.entity, new PotionEffectHashMap((EntityLivingBase) e.entity), "activePotionsMap", "field_70713_bf");
+		PCReflectionHelper.setPrivateFinalValue(EntityLivingBase.class, (EntityLivingBase) e.entity, new PotionEffectHashMap((EntityLivingBase) e.entity, ((EntityLivingBase)e.entity).activePotionsMap), "activePotionsMap", "field_70713_bf");
 		if(!e.world.isRemote && (e.entity instanceof EntityPlayerMP))
 			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(PrayerHelper.getActivePrayers((EntityLivingBase) e.entity)), (EntityPlayerMP) e.entity);
 	}

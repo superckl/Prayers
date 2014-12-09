@@ -13,6 +13,11 @@ public class PotionEffectHashMap extends HashMap<Integer, PotionEffect>{
 
 	private final EntityLivingBase entity;
 
+	public PotionEffectHashMap(final EntityLivingBase entity, final Map<Integer, PotionEffect> m) {
+		super(m);
+		this.entity = entity;
+	}
+
 	@Override
 	public PotionEffect put(final Integer key, final PotionEffect value) {
 		LogHelper.info("putting");
