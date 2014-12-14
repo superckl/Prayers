@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.superckl.prayercraft.common.prayer.IPrayerAltar;
 import me.superckl.prayercraft.common.utility.PlayerHelper;
+import me.superckl.prayercraft.common.utility.PrayerHelper;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -59,12 +60,12 @@ public class SubCommandAltar implements ISubCommand{
 				sender.sendTranlsatedError("msg.noaltarinrange.text");
 				return;
 			}
-			final TileEntity te = player.worldObj.getTileEntity(pos.blockX, pos.blockY, pos.blockZ);
-			if((te == null) || ((te instanceof IPrayerAltar) == false)){
+			IPrayerAltar altar = PrayerHelper.findAltar(player.worldObj, pos.blockX, pos.blockY, pos.blockZ);
+			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
 			}
-			((IPrayerAltar)te).setActivated(activate);
+			altar.setActivated(activate);
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 4){
 			if((sender instanceof EntityPlayer) == false){

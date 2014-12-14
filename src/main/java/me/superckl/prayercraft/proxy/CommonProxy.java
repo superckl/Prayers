@@ -3,6 +3,7 @@ package me.superckl.prayercraft.proxy;
 import me.superckl.prayercraft.PrayerCraft;
 import me.superckl.prayercraft.common.entity.tile.TileEntityBasicAltar;
 import me.superckl.prayercraft.common.gui.GuiHandler;
+import me.superckl.prayercraft.common.handler.BucketEventHandler;
 import me.superckl.prayercraft.common.handler.EntityEventHandler;
 import me.superckl.prayercraft.common.handler.PlayerTickHandler;
 import me.superckl.prayercraft.common.reference.ModData;
@@ -25,6 +26,7 @@ public abstract class CommonProxy implements IProxy{
 		FMLCommonHandler.instance().bus().register(PrayerCraft.getInstance().getConfig());
 		FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
 		MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
+		MinecraftForge.EVENT_BUS.register(new BucketEventHandler());
 		NetworkRegistry.INSTANCE.registerGuiHandler(PrayerCraft.getInstance(), new GuiHandler());
 		ModData.PRAYER_UPDATE_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel("prayerUpdate");
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerServer.class, MessageEnablePrayer.class, 0, Side.SERVER);
