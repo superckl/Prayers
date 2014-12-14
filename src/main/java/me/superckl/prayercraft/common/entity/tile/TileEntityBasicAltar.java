@@ -43,6 +43,9 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 		this.readFromNBT(pkt.func_148857_g());
 	}
 
-
+	@Override
+	public boolean canBlessWater() {
+		return this.activated;
+	}
 
 }

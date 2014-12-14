@@ -1,7 +1,5 @@
 package me.superckl.prayercraft.common.handler;
 
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import me.superckl.prayercraft.common.reference.ModFluids;
 import me.superckl.prayercraft.common.reference.ModItems;
 import net.minecraft.item.ItemStack;
@@ -11,6 +9,8 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import cpw.mods.fml.common.eventhandler.Event.Result;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class BucketEventHandler {
 
@@ -23,7 +23,7 @@ public class BucketEventHandler {
 		final int z = e.target.blockZ;
 
 		final Fluid fluid = FluidRegistry.lookupFluidForBlock(world.getBlock(x, y, z));
-		if(fluid != null && fluid == ModFluids.holyWater){
+		if((fluid != null) && (fluid == ModFluids.holyWater)){
 			final ItemStack stack = new ItemStack(ModItems.bucket);
 			ModItems.bucket.fill(stack, new FluidStack(fluid, FluidContainerRegistry.BUCKET_VOLUME), true);
 			world.setBlockToAir(x, y, z);
@@ -31,5 +31,5 @@ public class BucketEventHandler {
 			e.setResult(Result.ALLOW);
 		}
 	}
-	
+
 }

@@ -17,8 +17,8 @@ public class ModItems {
 
 	public static void init(){
 		GameRegistry.registerItem(ModItems.basicBone, Names.BASIC_BONE);
-		GameRegistry.registerItem(bucket, Names.BUCKET);
-		GameRegistry.registerItem(bottle, Names.BOTTLE);
+		GameRegistry.registerItem(ModItems.bucket, Names.BUCKET);
+		GameRegistry.registerItem(ModItems.bottle, Names.BOTTLE);
 	}
 
 	public static void addChestLoot(){

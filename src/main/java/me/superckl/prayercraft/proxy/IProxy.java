@@ -7,5 +7,6 @@ public interface IProxy {
 	public void registerEntities();
 	public void setupGuis();
 	public void registerBindings();
+	public void registerRecipes();
 
 }

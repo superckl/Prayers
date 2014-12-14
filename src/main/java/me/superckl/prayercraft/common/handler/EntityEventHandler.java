@@ -2,9 +2,12 @@ package me.superckl.prayercraft.common.handler;
 
 import me.superckl.prayercraft.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
+import me.superckl.prayercraft.common.prayer.IPrayerAltar;
 import me.superckl.prayercraft.common.prayer.Prayers;
 import me.superckl.prayercraft.common.reference.ModData;
+import me.superckl.prayercraft.common.reference.ModFluids;
 import me.superckl.prayercraft.common.reference.ModItems;
+import me.superckl.prayercraft.common.utility.ChatHelper;
 import me.superckl.prayercraft.common.utility.PCReflectionHelper;
 import me.superckl.prayercraft.common.utility.PotionEffectHashMap;
 import me.superckl.prayercraft.common.utility.PrayerHelper;
@@ -14,13 +17,20 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EntityEventHandler {
@@ -123,6 +133,27 @@ public class EntityEventHandler {
 				stack.setTagCompound(new NBTTagCompound());
 			final NBTTagCompound comp = stack.getTagCompound();
 			comp.setInteger("progress", ent.getProgress());
+		}
+	}
+
+	@SubscribeEvent
+	public void onPlayerInteract(final PlayerInteractEvent e){
+		if(e.action == Action.RIGHT_CLICK_BLOCK){
+			final IPrayerAltar altar = PrayerHelper.findAltar(e.world, e.x, e.y, e.z);
+			if((altar == null) || !altar.canBlessWater() || (e.entityPlayer.getHeldItem() == null) || (e.entityPlayer.getHeldItem().getItem() != Items.potionitem) || (e.entityPlayer.getHeldItem().getItemDamage() != 0) || (e.entityPlayer.getHeldItem().stackSize <= 0))
+				return;
+			final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityPlayer.getExtendedProperties("prayer");
+			if(prop.getPrayerLevel() < 20){
+				if(!e.world.isRemote)
+					ChatHelper.sendFormattedDoubleMessage(e.entityPlayer, "msg.whisper.text", ChatHelper.createTranslatedChatWithStyle("msg.lvltoolow:water.text", new ChatStyle().setItalic(false)), new ChatStyle().setColor(EnumChatFormatting.RED).setItalic(true));
+				return;
+			}
+			final ItemStack filledBottle = new ItemStack(ModItems.bottle);
+			ModItems.bottle.fill(filledBottle, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4), true);
+			if(e.entityPlayer.getHeldItem().stackSize == 1)
+				e.entityPlayer.inventory.setInventorySlotContents(e.entityPlayer.inventory.currentItem, filledBottle);
+			else if(e.entityPlayer.getHeldItem().stackSize > 1)
+				e.entityPlayer.inventory.addItemStackToInventory(filledBottle);
 		}
 	}
 

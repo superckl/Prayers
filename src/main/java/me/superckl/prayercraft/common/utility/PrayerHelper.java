@@ -162,16 +162,16 @@ public class PrayerHelper {
 			}
 		return amount;
 	}
-	
+
 	/**
 	 * Attempts to find a prayer altar at the given coordinates
 	 */
-	public static IPrayerAltar findAltar(World world, int x, int y, int z){
-		Block block = world.getBlock(x, y, z);
+	public static IPrayerAltar findAltar(final World world, final int x, final int y, final int z){
+		final Block block = world.getBlock(x, y, z);
 		if(block instanceof IPrayerAltar)
 			return (IPrayerAltar) block;
-		TileEntity te = world.getTileEntity(x, y, z);
-		if(te != null && te instanceof IPrayerAltar)
+		final TileEntity te = world.getTileEntity(x, y, z);
+		if((te != null) && (te instanceof IPrayerAltar))
 			return (IPrayerAltar) te;
 		return null;
 	}

@@ -125,6 +125,4 @@ public class ItemBasicBone extends ItemPrayerCraft implements IBuryable{
 		return stack.getItemDamage() == 2;
 	}
 
-
-
 }

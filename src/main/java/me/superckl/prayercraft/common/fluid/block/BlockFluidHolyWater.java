@@ -2,8 +2,6 @@ package me.superckl.prayercraft.common.fluid.block;
 
 import java.util.Random;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.reference.ModFluids;
 import net.minecraft.block.material.Material;
@@ -12,10 +10,12 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockFluidHolyWater extends BlockFluidClassicPrayerCraft{
 
-	public BlockFluidHolyWater(Fluid fluid, Material material) {
+	public BlockFluidHolyWater(final Fluid fluid, final Material material) {
 		super(fluid, material);
 		this.setBlockName("holywater");
 	}
@@ -23,7 +23,7 @@ public class BlockFluidHolyWater extends BlockFluidClassicPrayerCraft{
 	@Override
 	public IIcon getIcon(final int side, final int meta)
 	{
-		return side != 0 && side != 1 ? this.icons[1]:this.icons[0];
+		return (side != 0) && (side != 1) ? this.icons[1]:this.icons[0];
 	}
 
 	private final IIcon[] icons = new IIcon[2];
@@ -49,7 +49,7 @@ public class BlockFluidHolyWater extends BlockFluidClassicPrayerCraft{
 			return false;
 		return super.displaceIfPossible(world, x, y, z);
 	}
-	
+
 	//Emulate vanilla water particles
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -64,7 +64,7 @@ public class BlockFluidHolyWater extends BlockFluidClassicPrayerCraft{
 			{
 				l = world.getBlockMetadata(x, y, z);
 
-				if (l <= 0 || l >= 8)
+				if ((l <= 0) || (l >= 8))
 					world.spawnParticle("suspended", x + random.nextFloat(), y + random.nextFloat(), z + random.nextFloat(), 0.0D, 0.0D, 0.0D);
 			}
 
@@ -86,7 +86,7 @@ public class BlockFluidHolyWater extends BlockFluidClassicPrayerCraft{
 				if (i1 == 3)
 					++k1;
 
-				if (world.getBlock(j1, y, k1).getMaterial() == Material.air && (world.getBlock(j1, y - 1, k1).getMaterial().blocksMovement() || world.getBlock(j1, y - 1, k1).getMaterial().isLiquid()))
+				if ((world.getBlock(j1, y, k1).getMaterial() == Material.air) && (world.getBlock(j1, y - 1, k1).getMaterial().blocksMovement() || world.getBlock(j1, y - 1, k1).getMaterial().isLiquid()))
 				{
 					final float f = 0.0625F;
 					double d0 = x + random.nextFloat();
@@ -125,19 +125,19 @@ public class BlockFluidHolyWater extends BlockFluidClassicPrayerCraft{
 			}
 		}
 
-		if (this.blockMaterial == Material.water && random.nextInt(64) == 0)
+		if ((this.blockMaterial == Material.water) && (random.nextInt(64) == 0))
 		{
 			l = world.getBlockMetadata(x, y, z);
 
-			if (l > 0 && l < 8)
-				world.playSound(x + 0.5F, y + 0.5F, z + 0.5F, "liquid.water", random.nextFloat() * 0.25F + 0.75F, random.nextFloat() * 1.0F + 0.5F, false);
+			if ((l > 0) && (l < 8))
+				world.playSound(x + 0.5F, y + 0.5F, z + 0.5F, "liquid.water", (random.nextFloat() * 0.25F) + 0.75F, (random.nextFloat() * 1.0F) + 0.5F, false);
 		}
 
 		double d5;
 		double d6;
 		double d7;
 
-		if (random.nextInt(10) == 0 && World.doesBlockHaveSolidTopSurface(world, x, y - 1, z) && !world.getBlock(x, y - 2, z).getMaterial().blocksMovement())
+		if ((random.nextInt(10) == 0) && World.doesBlockHaveSolidTopSurface(world, x, y - 1, z) && !world.getBlock(x, y - 2, z).getMaterial().blocksMovement())
 		{
 			d5 = x + random.nextFloat();
 			d6 = y - 1.05D;
@@ -147,5 +147,5 @@ public class BlockFluidHolyWater extends BlockFluidClassicPrayerCraft{
 				world.spawnParticle("dripWater", d5, d6, d7, 0.0D, 0.0D, 0.0D);
 		}
 	}
-	
+
 }

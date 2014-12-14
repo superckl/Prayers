@@ -38,6 +38,7 @@ public class PrayerCraft {
 		ModItems.init();
 		ModFluids.init();
 		ModBlocks.init();
+		PrayerCraft.proxy.registerRecipes();
 		PrayerCraft.proxy.registerEntities();
 		PrayerCraft.proxy.setupGuis();
 		PrayerCraft.proxy.registerBindings();

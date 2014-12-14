@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.superckl.prayercraft.common.prayer.IPrayerAltar;
-import me.superckl.prayercraft.common.utility.PlayerHelper;
+import me.superckl.prayercraft.common.utility.ChatHelper;
 import me.superckl.prayercraft.common.utility.PrayerHelper;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +17,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
-@ExtensionMethod(PlayerHelper.class)
+@ExtensionMethod(ChatHelper.class)
 public class SubCommandAltar implements ISubCommand{
 
 	@Getter
@@ -60,7 +60,7 @@ public class SubCommandAltar implements ISubCommand{
 				sender.sendTranlsatedError("msg.noaltarinrange.text");
 				return;
 			}
-			IPrayerAltar altar = PrayerHelper.findAltar(player.worldObj, pos.blockX, pos.blockY, pos.blockZ);
+			final IPrayerAltar altar = PrayerHelper.findAltar(player.worldObj, pos.blockX, pos.blockY, pos.blockZ);
 			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
@@ -73,15 +73,15 @@ public class SubCommandAltar implements ISubCommand{
 				return;
 			}
 			if(!args[1].matches("^(\\+|-)?\\d+$")){
-				PlayerHelper.sendTranlsatedError(sender, "msg.notint.text", 2);
+				ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 2);
 				return;
 			}
 			if(!args[2].matches("^(\\+|-)?\\d+$")){
-				PlayerHelper.sendTranlsatedError(sender, "msg.notint.text", 3);
+				ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 3);
 				return;
 			}
 			if(!args[3].matches("^(\\+|-)?\\d+$")){
-				PlayerHelper.sendTranlsatedError(sender, "msg.notint.text", 4);
+				ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 4);
 				return;
 			}
 			final int x = Integer.parseInt(args[1]);
@@ -96,24 +96,24 @@ public class SubCommandAltar implements ISubCommand{
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 5){
 			if(!args[1].matches("^(\\+|-)?\\d+$")){
-				PlayerHelper.sendTranlsatedError(sender, "msg.notint.text", 2);
+				ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 2);
 				return;
 			}
 			if(!args[2].matches("^(\\+|-)?\\d+$")){
-				PlayerHelper.sendTranlsatedError(sender, "msg.notint.text", 3);
+				ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 3);
 				return;
 			}
 			if(!args[3].matches("^(\\+|-)?\\d+$")){
-				PlayerHelper.sendTranlsatedError(sender, "msg.notint.text", 4);
+				ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 4);
 				return;
 			}
 			if(!args[4].matches("^(\\+|-)?\\d+$")){
-				PlayerHelper.sendTranlsatedError(sender, "msg.notint.text", 5);
+				ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 5);
 				return;
 			}
 			final int dim = Integer.parseInt(args[1]);
 			if(!DimensionManager.isDimensionRegistered(dim)){
-				PlayerHelper.sendTranlsatedError(sender, "msg.nodim.text", dim);
+				ChatHelper.sendTranlsatedError(sender, "msg.nodim.text", dim);
 				return;
 			}
 			final World world = DimensionManager.getWorld(dim);

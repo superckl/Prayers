@@ -7,11 +7,11 @@ import net.minecraftforge.fluids.ItemFluidContainer;
 
 public abstract class ItemFluidContainerPrayerCraft extends ItemFluidContainer{
 
-	public ItemFluidContainerPrayerCraft(int itemID) {
+	public ItemFluidContainerPrayerCraft(final int itemID) {
 		super(itemID);
 	}
-	
-	public ItemFluidContainerPrayerCraft(int itemID, int capacity) {
+
+	public ItemFluidContainerPrayerCraft(final int itemID, final int capacity) {
 		super(itemID, capacity);
 	}
 
@@ -23,5 +23,5 @@ public abstract class ItemFluidContainerPrayerCraft extends ItemFluidContainer{
 	protected String getUnwrappedUnlocalizedName(final String unlocalizedName, final Fluid fluid){
 		return unlocalizedName.substring(unlocalizedName.indexOf(".")+1).concat(":").concat(fluid.getName());
 	}
-	
+
 }

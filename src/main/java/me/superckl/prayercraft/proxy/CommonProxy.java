@@ -7,13 +7,19 @@ import me.superckl.prayercraft.common.handler.BucketEventHandler;
 import me.superckl.prayercraft.common.handler.EntityEventHandler;
 import me.superckl.prayercraft.common.handler.PlayerTickHandler;
 import me.superckl.prayercraft.common.reference.ModData;
+import me.superckl.prayercraft.common.reference.ModFluids;
+import me.superckl.prayercraft.common.reference.ModItems;
 import me.superckl.prayercraft.network.MessageDisablePrayer;
 import me.superckl.prayercraft.network.MessageEnablePrayer;
 import me.superckl.prayercraft.network.MessageHandlerDisablePrayerServer;
 import me.superckl.prayercraft.network.MessageHandlerEnablePrayerServer;
 import me.superckl.prayercraft.network.MessageHandlerOpenPrayerGui;
 import me.superckl.prayercraft.network.MessageOpenPrayerGui;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -39,6 +45,13 @@ public abstract class CommonProxy implements IProxy{
 		GameRegistry.registerTileEntity(TileEntityBasicAltar.class, "tileEntityBasicAltar");
 	}
 
-
+	@Override
+	public void registerRecipes(){
+		final ItemStack filledBucket = new ItemStack(ModItems.bucket);
+		ModItems.bucket.fill(filledBucket, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME), true);
+		final ItemStack filledBottle = new ItemStack(ModItems.bottle);
+		ModItems.bottle.fill(filledBottle, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4), true);
+		GameRegistry.addShapelessRecipe(filledBucket, Items.bucket, filledBottle, filledBottle, filledBottle, filledBottle);
+	}
 
 }

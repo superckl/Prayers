@@ -5,10 +5,10 @@ import net.minecraftforge.fluids.Fluid;
 
 public abstract class FluidPrayerCraft extends Fluid{
 
-	public FluidPrayerCraft(String fluidName) {
+	public FluidPrayerCraft(final String fluidName) {
 		super(fluidName);
 	}
-	
+
 	@Override
 	public String getUnlocalizedName(){
 		return String.format("fluid.%s%s%s", ModData.MOD_ID.toLowerCase(), ":", this.getUnwrappedUnlocalizedName(super.getUnlocalizedName()));

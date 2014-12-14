@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.reference.ModFluids;
 import me.superckl.prayercraft.common.reference.ModTabs;
@@ -21,11 +19,13 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemBucketPrayerCraft extends ItemFluidContainerPrayerCraft{
 
 	private final Map<String, IIcon> icons = new HashMap<String, IIcon>();
-	
+
 	public ItemBucketPrayerCraft() {
 		super(0, FluidContainerRegistry.BUCKET_VOLUME);
 		this.setMaxStackSize(1).setUnlocalizedName("bucketprayercraft").setCreativeTab(ModTabs.TAB_PRAYER_ITEMS).setHasSubtypes(true);
@@ -74,11 +74,11 @@ public class ItemBucketPrayerCraft extends ItemFluidContainerPrayerCraft{
 
 		return itemStack;
 	}
-	
+
 	@Override
 	public void getSubItems(final Item item, final CreativeTabs creativeTabs, final List list)
 	{
-		ItemStack fluid = new ItemStack(item);
+		final ItemStack fluid = new ItemStack(item);
 
 		this.fill(fluid, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME), true);
 		list.add(fluid);
@@ -102,7 +102,7 @@ public class ItemBucketPrayerCraft extends ItemFluidContainerPrayerCraft{
 	{
 		final FluidStack fluid = this.getFluid(itemStack);
 
-		if (fluid != null && fluid.amount != 0)
+		if ((fluid != null) && (fluid.amount != 0))
 		{
 			final IIcon icon = this.icons.get(fluid.getFluid().getName());
 
@@ -111,12 +111,12 @@ public class ItemBucketPrayerCraft extends ItemFluidContainerPrayerCraft{
 
 		return Items.bucket.getIconFromDamage(0);
 	}
-	
+
 	public boolean tryPlaceContainedLiquid(final ItemStack itemStack, final World world, final int x, final int y, final int z)
 	{
 		final FluidStack fluid = this.getFluid(itemStack);
 
-		if (fluid == null || fluid.amount == 0)
+		if ((fluid == null) || (fluid.amount == 0))
 			return false;
 		else
 		{
@@ -136,7 +136,7 @@ public class ItemBucketPrayerCraft extends ItemFluidContainerPrayerCraft{
 			return true;
 		}
 	}
-	
+
 	@Override
 	public int fill(final ItemStack container, final FluidStack resource, final boolean doFill) {
 		if(resource.amount < FluidContainerRegistry.BUCKET_VOLUME)
@@ -150,5 +150,5 @@ public class ItemBucketPrayerCraft extends ItemFluidContainerPrayerCraft{
 			return null;
 		return super.drain(container, maxDrain, doDrain);
 	}
-	
+
 }
