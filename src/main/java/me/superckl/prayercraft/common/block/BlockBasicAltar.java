@@ -2,9 +2,10 @@ package me.superckl.prayercraft.common.block;
 
 import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayercraft.common.entity.tile.TileEntityBasicAltar;
-import me.superckl.prayercraft.common.prayer.IBuryable;
+import me.superckl.prayercraft.common.prayer.IPrayerAltar;
 import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.reference.ModTabs;
+import me.superckl.prayercraft.common.utility.PrayerHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -31,17 +32,21 @@ public class BlockBasicAltar extends BlockPrayerCraft implements ITileEntityProv
 	public boolean onBlockActivated(final World world, final int x, final int y, final int z, final EntityPlayer player, final int p_149727_6_, final float p_149727_7_, final float p_149727_8_, final float p_149727_9_)
 	{
 		final TileEntity tileEntity = world.getTileEntity(x, y, z);
-		if ((tileEntity == null) || !(tileEntity instanceof TileEntityBasicAltar) || player.isSneaking())
+		if ((tileEntity == null) || !(tileEntity instanceof IPrayerAltar) || player.isSneaking())
 			return false;
-		if(((TileEntityBasicAltar)tileEntity).isActivated()){
+		final IPrayerAltar altar = (IPrayerAltar) tileEntity;
+		if(altar.isActivated()){
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
-			prop.setPrayerPoints(prop.getMaxPrayerPoints());
-			final ItemStack stack = player.getHeldItem();
-			if((stack != null) && (stack.getItem() instanceof IBuryable)){
-				final int xp = ((IBuryable)stack.getItem()).getXPFromStack(stack);
-				prop.addXP((int) (xp*1.5));
-				stack.stackSize--;
+			final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
+			float toRecharge = altar.onRechargePlayer(diff, player, false);
+			if((diff <= 0) || (toRecharge <= 0)){
+				final ItemStack stack = player.getHeldItem();
+				PrayerHelper.handleOfferBones(altar, player, stack);
+			}else{
+				toRecharge = altar.onRechargePlayer(diff, player, true);
+				prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
 			}
+			return true;
 		}
 		return true;
 	}

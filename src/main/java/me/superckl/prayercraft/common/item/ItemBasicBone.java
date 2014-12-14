@@ -6,6 +6,7 @@ import java.util.Random;
 import me.superckl.prayercraft.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayercraft.common.prayer.IBuryable;
+import me.superckl.prayercraft.common.prayer.IPrayerAltar;
 import me.superckl.prayercraft.common.reference.ModData;
 import me.superckl.prayercraft.common.reference.ModTabs;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -39,8 +40,6 @@ public class ItemBasicBone extends ItemPrayerCraft implements IBuryable{
 				list.add("Cleaning progress: "+(int)(((comp.getInteger("progress"))/1200F)*100F)+"%");
 		}
 	}
-
-
 
 	@Override
 	protected boolean isNameDamageReliant() {
@@ -83,7 +82,8 @@ public class ItemBasicBone extends ItemPrayerCraft implements IBuryable{
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 		xp/=Math.max(1, Math.log10(Math.max(1, prop.getPrayerLevel()-15))*1.17D); //The gods grow tired of your lazy offerings!!!
 		prop.addXP(xp);
-		stack.stackSize--;
+		if(!player.capabilities.isCreativeMode)
+			stack.stackSize--;
 		return stack;
 	}
 
@@ -123,6 +123,23 @@ public class ItemBasicBone extends ItemPrayerCraft implements IBuryable{
 	@Override
 	public boolean hasCustomEntity(final ItemStack stack) {
 		return stack.getItemDamage() == 2;
+	}
+
+
+
+	@Override
+	public float getPointsRequiredToOffer(final ItemStack stack, final IPrayerAltar altar) {
+		switch(stack.getItemDamage()){
+		case 0:
+			return 2;
+		case 1:
+			return 4;
+		case 2:
+			return 2;
+		case 3:
+			return 5;
+		}
+		return 0;
 	}
 
 }

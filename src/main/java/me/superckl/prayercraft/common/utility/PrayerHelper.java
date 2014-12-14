@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
+import me.superckl.prayercraft.common.prayer.IBuryable;
 import me.superckl.prayercraft.common.prayer.IPrayerAltar;
 import me.superckl.prayercraft.common.prayer.Prayers;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -174,6 +176,32 @@ public class PrayerHelper {
 		if((te != null) && (te instanceof IPrayerAltar))
 			return (IPrayerAltar) te;
 		return null;
+	}
+
+	public static IBuryable findBuryable(final ItemStack stack){
+		if((stack != null) && (stack.getItem() instanceof IBuryable))
+			return (IBuryable) stack.getItem();
+		return null;
+	}
+
+	public static boolean handleOfferBones(final IPrayerAltar altar, final EntityPlayer player, final ItemStack stack){
+		final IBuryable bury = PrayerHelper.findBuryable(stack);
+		if(bury != null){
+			final float reqPoints = bury.getPointsRequiredToOffer(stack, altar);
+			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
+			if(altar.getPrayerPoints() >= reqPoints)
+				altar.setPrayerPoints(altar.getPrayerPoints()-reqPoints);
+			else if(prop.getPrayerPoints() >= reqPoints)
+				prop.setPrayerPoints(prop.getPrayerPoints()-reqPoints);
+			else
+				return false;
+			final int xp = bury.getXPFromStack(stack);
+			prop.addXP((int) (xp*altar.getOfferXPBoost(stack)));
+			if(!player.capabilities.isCreativeMode)
+				stack.stackSize--;
+			return true;
+		}
+		return false;
 	}
 
 }
