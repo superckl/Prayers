@@ -1,5 +1,6 @@
 package me.superckl.prayercraft.common.handler;
 
+import me.superckl.prayercraft.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayercraft.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayercraft.common.prayer.Prayers;
 import me.superckl.prayercraft.common.reference.ModData;
@@ -14,10 +15,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EntityEventHandler {
@@ -104,9 +107,23 @@ public class EntityEventHandler {
 		if(e.entityLiving.getRNG().nextInt(4) == 0)
 			return;
 		if((e.entityLiving.width*e.entityLiving.height) < 2.0F)
-			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, 0)));
+			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(50) == 0 ? 2:0)));
 		else
-			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, 1)));
+			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(50) == 0 ? 2:1)));
+	}
+
+	@SubscribeEvent
+	public void onItemPickup(final EntityItemPickupEvent e){
+		if(e.item instanceof EntityCleaningDirtyBone){
+			final EntityCleaningDirtyBone ent = (EntityCleaningDirtyBone) e.item;
+			final ItemStack stack = ent.getEntityItem();
+			if((stack.getItem() != ModItems.basicBone) || (stack.getItemDamage() != 2))
+				return;
+			if(!stack.hasTagCompound())
+				stack.setTagCompound(new NBTTagCompound());
+			final NBTTagCompound comp = stack.getTagCompound();
+			comp.setInteger("progress", ent.getProgress());
+		}
 	}
 
 }
