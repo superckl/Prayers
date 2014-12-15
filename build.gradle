@@ -27,8 +27,8 @@ sourceSets.main{
 }
 
 version = "0.1.${System.env.BUILD_NUMBER}-Beta"
-group= "me.superckl.prayercraft"
-archivesBaseName = "PrayerCraft"
+group= "me.superckl.prayers"
+archivesBaseName = "Prayers"
 
 minecraft {
     version = "1.7.10-10.13.2.1230"
