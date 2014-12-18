@@ -5,6 +5,7 @@ import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
+import me.superckl.prayers.common.reference.ModPotions;
 import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.proxy.IProxy;
 import me.superckl.prayers.server.commands.CommandPrayers;
@@ -38,6 +39,7 @@ public class Prayers {
 		ModItems.init();
 		ModFluids.init();
 		ModBlocks.init();
+		ModPotions.init();
 		Prayers.proxy.registerRecipes();
 		Prayers.proxy.registerEntities();
 		Prayers.proxy.setupGuis();

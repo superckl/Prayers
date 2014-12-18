@@ -20,12 +20,9 @@ public class PotionEffectHashMap extends HashMap<Integer, PotionEffect>{
 
 	@Override
 	public PotionEffect put(final Integer key, final PotionEffect value) {
-		LogHelper.info("putting");
-		if(PrayerHelper.getActivePrayers(this.entity).contains(Prayers.ENHANCE_POTION)){
+		if(PrayerHelper.getActivePrayers(this.entity).contains(Prayers.ENHANCE_POTION))
 			//value = new PotionEffect(value);
 			value.duration *= 1.2;
-			LogHelper.info("Extended to "+value.duration);
-		}
 		return super.put(key, value);
 	}
 

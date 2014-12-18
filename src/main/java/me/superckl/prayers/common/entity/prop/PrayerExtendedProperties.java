@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.common.prayer.Prayers;
 import me.superckl.prayers.common.reference.ModData;
+import me.superckl.prayers.common.reference.ModPotions;
 import me.superckl.prayers.common.utility.ItemStackHelper;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import me.superckl.prayers.network.MessageUpdatePrayers;
@@ -111,7 +112,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	}
 
 	public float getMaxPrayerPoints(){
-		return this.getPrayerLevel()*10F;
+		return (this.getPrayerLevel()*10F)+((this.player.activePotionsMap != null) && this.player.isPotionActive(ModPotions.prayerBoost) ? (this.player.getActivePotionEffect(ModPotions.prayerBoost).getAmplifier()+1)*200F:0F);
 	}
 
 	public int getPrayerLevel(){

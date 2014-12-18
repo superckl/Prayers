@@ -3,7 +3,6 @@ package me.superckl.prayers.common.entity.item;
 import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.common.reference.ModItems;
-import me.superckl.prayers.common.utility.LogHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
@@ -35,11 +34,8 @@ public class EntityCleaningDirtyBone extends EntityItem{
 			if((this.progress % 50) == 0)
 				this.getEntityItem().getTagCompound().setInteger("progress", this.progress);
 		}
-		LogHelper.info(this.progress);
-		if(this.progress == 1200){
+		if(this.progress == 1200)
 			this.setEntityItemStack(new ItemStack(ModItems.basicBone, this.getEntityItem().stackSize, 3));
-			LogHelper.info("Setting item");
-		}
 	}
 
 
