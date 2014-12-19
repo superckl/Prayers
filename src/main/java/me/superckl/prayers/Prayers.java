@@ -36,10 +36,11 @@ public class Prayers {
 		LogHelper.info("Please note, you are running a beta version! Please report any bugs you find.");
 		this.config = new Config(e.getSuggestedConfigurationFile());
 		this.config.loadValues();
+		//The order of init calls is important. Don't change it.
+		ModPotions.init();
 		ModItems.init();
 		ModFluids.init();
 		ModBlocks.init();
-		ModPotions.init();
 		Prayers.proxy.registerRecipes();
 		Prayers.proxy.registerEntities();
 		Prayers.proxy.setupGuis();

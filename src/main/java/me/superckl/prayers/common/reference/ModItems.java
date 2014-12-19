@@ -3,6 +3,7 @@ package me.superckl.prayers.common.reference;
 import me.superckl.prayers.common.item.ItemBasicBone;
 import me.superckl.prayers.common.item.ItemBottlePrayers;
 import me.superckl.prayers.common.item.ItemBucketPrayers;
+import me.superckl.prayers.common.item.ItemPotionPrayers;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -14,11 +15,13 @@ public class ModItems {
 	public static final ItemBasicBone basicBone = new ItemBasicBone();
 	public static final ItemBucketPrayers bucket = new ItemBucketPrayers();
 	public static final ItemBottlePrayers bottle = new ItemBottlePrayers();
+	public static ItemPotionPrayers potion;
 
 	public static void init(){
 		GameRegistry.registerItem(ModItems.basicBone, Names.BASIC_BONE);
 		GameRegistry.registerItem(ModItems.bucket, Names.BUCKET);
 		GameRegistry.registerItem(ModItems.bottle, Names.BOTTLE);
+		GameRegistry.registerItem(ModItems.potion, Names.POTION);
 	}
 
 	public static void addChestLoot(){
@@ -49,6 +52,7 @@ public class ModItems {
 		public static final String BASIC_BONE = "basicBone";
 		public static final String BUCKET = "bucket";
 		public static final String BOTTLE = "bottle";
+		public static final String POTION = "potion";
 	}
 
 }

@@ -1,5 +1,6 @@
 package me.superckl.prayers.common.reference;
 
+import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.potion.PotionPrayerBoost;
 import me.superckl.prayers.common.potion.PotionPrayerRestore;
 import me.superckl.prayers.common.potion.PotionPrayerRestoreInstant;
@@ -27,6 +28,8 @@ public class ModPotions {
 		ModPotions.prayerBoost = new PotionPrayerBoost(ModPotions.offset++);
 		ModPotions.prayerRestore = new PotionPrayerRestore(ModPotions.offset++);
 		ModPotions.prayerRestoreInstant = new PotionPrayerRestoreInstant(ModPotions.offset++);
+
+		ModItems.potion = new ItemPotionPrayers();
 	}
 
 }
