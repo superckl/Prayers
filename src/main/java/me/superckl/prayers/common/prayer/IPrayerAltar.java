@@ -21,6 +21,10 @@ public interface IPrayerAltar {
 	public float getMaxPrayerPoints();
 	public boolean canBlessWater();
 	/**
+	 * If this altar can bless water, this will be checked. If true, Prayers will handle blessing water bottles used on your altar in an instant manner. If it is false, you must decide how to implement it.
+	 */
+	public boolean canBlessInstantly();
+	/**
 	 * Retrive the boost received when offering the given stack on this altar. You can retrieve the IBuryable instance being used by Prayers with {@link #PrayerHelper.findBuryable(ItemStack)}.
 	 * @param stack The stack being offered. Only one item is to be used per offering. The subtraction is handled by Prayers.
 	 * @return The xp modifier.

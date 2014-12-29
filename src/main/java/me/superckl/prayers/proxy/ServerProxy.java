@@ -8,4 +8,7 @@ public class ServerProxy extends CommonProxy{
 	@Override
 	public void registerBindings() {}
 
+	@Override
+	public void renderEffect(final String name, final Object ... args) {}
+
 }

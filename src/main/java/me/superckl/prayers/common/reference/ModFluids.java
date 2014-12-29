@@ -17,12 +17,22 @@ public class ModFluids {
 		FluidRegistry.registerFluid(ModFluids.holyWater);
 		ModBlocks.holyWater = new BlockFluidHolyWater(ModFluids.holyWater, Material.water);
 		GameRegistry.registerBlock(ModBlocks.holyWater, ModBlocks.Names.HOLY_WATER);
+		final ItemStack filledBucket = ModFluids.filledHolyBucket();
+		FluidContainerRegistry.registerFluidContainer(ModFluids.holyWater, filledBucket, FluidContainerRegistry.EMPTY_BUCKET);
+		final ItemStack filledBottle = ModFluids.filledHolyBottle();
+		FluidContainerRegistry.registerFluidContainer(ModFluids.holyWater, filledBottle, FluidContainerRegistry.EMPTY_BUCKET);
+	}
+
+	public static ItemStack filledHolyBucket(){
 		final ItemStack filledBucket = new ItemStack(ModItems.bucket);
 		ModItems.bucket.fill(filledBucket, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME), true);
-		FluidContainerRegistry.registerFluidContainer(ModFluids.holyWater, filledBucket, FluidContainerRegistry.EMPTY_BUCKET);
+		return filledBucket;
+	}
+
+	public static ItemStack filledHolyBottle(){
 		final ItemStack filledBottle = new ItemStack(ModItems.bottle);
 		ModItems.bottle.fill(filledBottle, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4), true);
-		FluidContainerRegistry.registerFluidContainer(ModFluids.holyWater, filledBottle, FluidContainerRegistry.EMPTY_BUCKET);
+		return filledBottle;
 	}
 
 }

@@ -1,5 +1,8 @@
 package me.superckl.prayers.common.block;
 
+import java.util.Random;
+
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.entity.tile.TileEntityBasicAltar;
 import me.superckl.prayers.common.prayer.IPrayerAltar;
@@ -26,29 +29,66 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 		this.setHarvestLevel("pickaxe", 1, 0);
 	}
 
-
-
 	@Override
 	public boolean onBlockActivated(final World world, final int x, final int y, final int z, final EntityPlayer player, final int p_149727_6_, final float p_149727_7_, final float p_149727_8_, final float p_149727_9_)
 	{
-		final TileEntity tileEntity = world.getTileEntity(x, y, z);
-		if ((tileEntity == null) || !(tileEntity instanceof IPrayerAltar) || player.isSneaking())
+		final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+		if((altar == null) || player.isSneaking())
 			return false;
-		final IPrayerAltar altar = (IPrayerAltar) tileEntity;
 		if(altar.isActivated()){
-			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
-			final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
-			float toRecharge = altar.onRechargePlayer(diff, player, false);
-			if((diff <= 0) || (toRecharge <= 0)){
-				final ItemStack stack = player.getHeldItem();
-				PrayerHelper.handleOfferBones(altar, player, stack);
-			}else{
+			final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;
+			if(te.getCurrentItem() != null){
+				player.inventory.addItemStackToInventory(te.getCurrentItem());
+				te.setCurrentItem(null, player);
+			}else if(player.getHeldItem() == null){
+				final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
+				final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
+				float toRecharge = altar.onRechargePlayer(diff, player, false);
+				if((diff <= 0) || (toRecharge <= 0))
+					return false;
 				toRecharge = altar.onRechargePlayer(diff, player, true);
 				prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
+				return true;
+			}else if(te.isItemValid(player.getHeldItem())){
+				final ItemStack clone = player.getHeldItem().copy();
+				clone.stackSize = 1;
+				te.setCurrentItem(clone, player);
+				if(!player.capabilities.isCreativeMode)
+					player.getHeldItem().stackSize--;
 			}
-			return true;
+		}else{
+			//TODO exquisite bones, and holy water
 		}
 		return true;
+	}
+
+	@Override
+	public void onBlockClicked(final World world, final int x, final int y, final int z, final EntityPlayer player) {
+		final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+		if((altar == null) || !player.isSneaking())
+			return;
+		if(altar.getMaxPrayerPoints() <= altar.getPrayerPoints())
+			return;
+		float diff = Math.min(100F, altar.getMaxPrayerPoints()-altar.getPrayerPoints());
+		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
+		if(prop.getPrayerPoints() <= 0)
+			return;
+		if(prop.getPrayerPoints() < diff)
+			diff = prop.getPrayerPoints();
+		altar.setPrayerPoints(altar.getPrayerPoints()+diff);
+		prop.setPrayerPoints(prop.getPrayerPoints()-diff);
+
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
+		final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+		if((altar == null) || ((altar instanceof TileEntityBasicAltar) == false))
+			return;
+		final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;
+		if(te.isBlessingWater())
+			Prayers.getProxy().renderEffect("waterBless", world, x ,y ,z, rand);
 	}
 
 	private IIcon[][] icons;

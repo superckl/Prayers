@@ -140,7 +140,7 @@ public class EntityEventHandler {
 	public void onPlayerInteract(final PlayerInteractEvent e){
 		if(e.action == Action.RIGHT_CLICK_BLOCK){
 			final IPrayerAltar altar = PrayerHelper.findAltar(e.world, e.x, e.y, e.z);
-			if((altar == null) || !altar.canBlessWater() || (e.entityPlayer.getHeldItem() == null) || (e.entityPlayer.getHeldItem().getItem() != Items.potionitem) || (e.entityPlayer.getHeldItem().getItemDamage() != 0) || (e.entityPlayer.getHeldItem().stackSize <= 0))
+			if((altar == null) || !altar.canBlessWater() || !altar.canBlessInstantly() || (e.entityPlayer.getHeldItem() == null) || (e.entityPlayer.getHeldItem().getItem() != Items.potionitem) || (e.entityPlayer.getHeldItem().getItemDamage() != 0) || (e.entityPlayer.getHeldItem().stackSize <= 0))
 				return;
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityPlayer.getExtendedProperties("prayer");
 			if(prop.getPrayerLevel() < 20){

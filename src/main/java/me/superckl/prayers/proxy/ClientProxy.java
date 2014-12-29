@@ -1,5 +1,7 @@
 package me.superckl.prayers.proxy;
 
+import java.util.Random;
+
 import me.superckl.prayers.client.gui.InventoryTabPrayers;
 import me.superckl.prayers.client.handler.EntityRenderHandler;
 import me.superckl.prayers.client.handler.InputHandler;
@@ -12,7 +14,10 @@ import me.superckl.prayers.network.MessageHandlerDisablePrayerClient;
 import me.superckl.prayers.network.MessageHandlerEnablePrayerClient;
 import me.superckl.prayers.network.MessageHandlerUpdatePrayers;
 import me.superckl.prayers.network.MessageUpdatePrayers;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EntityFireworkSparkFX;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.lwjgl.input.Keyboard;
@@ -26,6 +31,8 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
 
 public class ClientProxy extends CommonProxy{
+
+	private final Minecraft mc = Minecraft.getMinecraft();
 
 	@Override
 	public void registerHandlers() {
@@ -59,6 +66,23 @@ public class ClientProxy extends CommonProxy{
 	public void registerBindings() {
 		KeyBindings.OPEN_PRAYERS = new KeyBinding("key.prayers.openprayers", Keyboard.KEY_P, "key.categories.prayers");
 		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYERS);
+	}
+
+	@Override
+	public void renderEffect(final String name, final Object ... args) {
+		if(name.equalsIgnoreCase("waterBless")){
+			final int x = ((Integer)args[1]).intValue();
+			final int y = ((Integer)args[2]).intValue();
+			final int z = ((Integer)args[3]).intValue();
+			final Random rand = (Random) args[4];
+			final float startX = (x+(rand.nextFloat()*3))-1;
+			final float startY = y+(rand.nextFloat()*.5F)+1;//TODO actual height
+			final float startZ = (z+(rand.nextFloat()*3))-1;
+			final EntityFireworkSparkFX ent = new EntityFireworkSparkFX((World) args[0], startX, startY, startZ, ((x+.5F)-startX)*.05F, (y-startY)*.05F, ((z+.5F)-startZ)*.05F, this.mc.effectRenderer);
+			ent.setRBGColorF(251F/255F, 253F/255F, 219F/255F);
+			ent.noClip = true;
+			this.mc.effectRenderer.addEffect(ent);
+		}
 	}
 
 }
