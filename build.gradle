@@ -26,14 +26,27 @@ sourceSets.main{
     }
 }
 
-version = "0.1.${System.env.BUILD_NUMBER}-Beta"
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
+version = config.mod_version
 group= "me.superckl.prayers"
 archivesBaseName = "Prayers"
 
 minecraft {
-    version = "1.7.10-10.13.2.1230"
+    version = config.minecraft_version + "-" + config.forge_version
+
+    replaceIn "reference/ModData.java"
+    replace "@VERSION@", "${config.mod_version}.${System.env.BUILD_NUMBER} ?: 0}"
     runDir = "eclipse"
 }
+
+version = "${config.minecraft_version}-${config.mod_version}.${System.getenv("BUILD_NUMBER") ?: 0}"
 
 dependencies {
     
