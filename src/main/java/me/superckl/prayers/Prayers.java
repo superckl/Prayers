@@ -14,10 +14,11 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid=ModData.MOD_ID, name=ModData.MOD_NAME, version=ModData.VERSION, guiFactory=ModData.GUI_FACTORY)
+@Mod(modid=ModData.MOD_ID, name=ModData.MOD_NAME, version=ModData.VERSION, guiFactory=ModData.GUI_FACTORY, dependencies = "after:Waila")
 public class Prayers {
 
 	@Instance(ModData.MOD_ID)
@@ -51,6 +52,8 @@ public class Prayers {
 	public void init(final FMLInitializationEvent e){
 		Prayers.proxy.registerHandlers();
 		ModItems.addChestLoot();
+
+		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.WailaDataProvider.callbackRegister");
 	}
 
 	@EventHandler

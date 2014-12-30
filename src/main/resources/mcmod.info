@@ -3,8 +3,8 @@
   "modid": "Prayers",
   "name": "Prayers",
   "description": "Adds a system of prayers to Minecraft!",
-  "version": "0.1",
-  "mcversion": "1.7.10",
+  "version": "${mod_version}",
+  "mcversion": "${minecraft_version}",
   "url": "",
   "updateUrl": "",
   "authorList": [

@@ -5,11 +5,14 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
+import me.superckl.prayers.common.entity.tile.TileEntityBasicAltar;
 import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.utility.ChatHelper;
+import me.superckl.prayers.common.utility.PlayerHelper;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
@@ -47,11 +50,11 @@ public class SubCommandAltar implements ISubCommand{
 			return;
 		}
 		if(args.length == 1){
-			if((sender instanceof EntityPlayer) == false){
+			if((sender instanceof EntityPlayerMP) == false){
 				sender.sendTranlsatedError("msg.notplayer.text");
 				return;
 			}
-			final EntityPlayer player = (EntityPlayer) sender;
+			final EntityPlayerMP player = (EntityPlayerMP) sender;
 			final Vec3 vec3 = Vec3.createVectorHelper(player.posX, player.posY+player.eyeHeight, player.posZ);
 			final Vec3 vec31 = player.getLook(1F);
 			final Vec3 vec32 = vec3.addVector(vec31.xCoord * 20D, vec31.yCoord * 20D, vec31.zCoord * 20D);
@@ -66,6 +69,8 @@ public class SubCommandAltar implements ISubCommand{
 				return;
 			}
 			altar.setActivated(activate);
+			if(altar instanceof TileEntityBasicAltar)
+				PlayerHelper.sendTileUpdateDim((TileEntity) altar);
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 4){
 			if((sender instanceof EntityPlayer) == false){
@@ -87,12 +92,16 @@ public class SubCommandAltar implements ISubCommand{
 			final int x = Integer.parseInt(args[1]);
 			final int y = Integer.parseInt(args[2]);
 			final int z = Integer.parseInt(args[3]);
-			final TileEntity te = ((EntityPlayer)sender).worldObj.getTileEntity(x, y, z);
-			if((te == null) || ((te instanceof IPrayerAltar) == false)){
+
+
+			final IPrayerAltar altar = PrayerHelper.findAltar(((EntityPlayer)sender).worldObj, x, y, z);
+			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
 			}
-			((IPrayerAltar)te).setActivated(activate);
+			altar.setActivated(activate);
+			if(altar instanceof TileEntityBasicAltar)
+				PlayerHelper.sendTileUpdateDim((TileEntity) altar);
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 5){
 			if(!args[1].matches("^(\\+|-)?\\d+$")){
@@ -120,12 +129,15 @@ public class SubCommandAltar implements ISubCommand{
 			final int x = Integer.parseInt(args[1]);
 			final int y = Integer.parseInt(args[2]);
 			final int z = Integer.parseInt(args[3]);
-			final TileEntity te = world.getTileEntity(x, y, z);
-			if((te == null) || ((te instanceof IPrayerAltar) == false)){
+
+			final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
 			}
-			((IPrayerAltar)te).setActivated(activate);
+			altar.setActivated(activate);
+			if(altar instanceof TileEntityBasicAltar)
+				PlayerHelper.sendTileUpdateDim((TileEntity) altar);
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else
 			sender.sendTranlsatedError("msg.noargs.text");
