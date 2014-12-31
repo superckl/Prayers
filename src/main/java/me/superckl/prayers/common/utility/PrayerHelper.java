@@ -184,7 +184,7 @@ public class PrayerHelper {
 		return null;
 	}
 
-	public static boolean handleOfferBones(final IPrayerAltar altar, final EntityPlayer player, final ItemStack stack){
+	/*public static boolean handleOfferBones(final IPrayerAltar altar, final EntityPlayer player, final ItemStack stack){
 		final IBuryable bury = PrayerHelper.findBuryable(stack);
 		if(bury != null){
 			final float reqPoints = bury.getPointsRequiredToOffer(stack, altar);
@@ -202,6 +202,6 @@ public class PrayerHelper {
 			return true;
 		}
 		return false;
-	}
+	}*/
 
 }

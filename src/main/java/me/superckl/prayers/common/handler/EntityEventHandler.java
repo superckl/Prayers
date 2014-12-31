@@ -2,12 +2,9 @@ package me.superckl.prayers.common.handler;
 
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.prayer.Prayers;
 import me.superckl.prayers.common.reference.ModData;
-import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
-import me.superckl.prayers.common.utility.ChatHelper;
 import me.superckl.prayers.common.utility.PCReflectionHelper;
 import me.superckl.prayers.common.utility.PotionEffectHashMap;
 import me.superckl.prayers.common.utility.PrayerHelper;
@@ -17,20 +14,13 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
-import net.minecraftforge.fluids.FluidContainerRegistry;
-import net.minecraftforge.fluids.FluidStack;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EntityEventHandler {
@@ -136,7 +126,7 @@ public class EntityEventHandler {
 		}
 	}
 
-	@SubscribeEvent
+	/*@SubscribeEvent
 	public void onPlayerInteract(final PlayerInteractEvent e){
 		if(e.action == Action.RIGHT_CLICK_BLOCK){
 			final IPrayerAltar altar = PrayerHelper.findAltar(e.world, e.x, e.y, e.z);
@@ -155,6 +145,6 @@ public class EntityEventHandler {
 			else if(e.entityPlayer.getHeldItem().stackSize > 1)
 				e.entityPlayer.inventory.addItemStackToInventory(filledBottle);
 		}
-	}
+	}*/
 
 }

@@ -30,12 +30,17 @@ public class WailaDataProvider implements IWailaDataProvider{
 			altar = (IPrayerAltar) accessor.getBlock();
 		else if((accessor.getTileEntity() != null) && (accessor.getTileEntity() instanceof IPrayerAltar))
 			altar = (IPrayerAltar) accessor.getTileEntity();
-		if(altar != null)
+		if(altar != null){
 			if(altar.isActivated()){
 				currenttip.add("Active");
 				currenttip.add(StringHelper.build("Points: ", altar.getPrayerPoints(), "/", altar.getMaxPrayerPoints()));
-			}else
+			}else if(altar.isInRitual())
+				currenttip.add("Activating");
+			else
 				currenttip.add("Inactive");
+			if(altar.getCurrentItem() != null)
+				currenttip.add("Current Item: "+altar.getCurrentItem().getDisplayName());
+		}
 		return currenttip;
 	}
 

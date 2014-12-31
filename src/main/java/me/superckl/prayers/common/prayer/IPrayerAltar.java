@@ -6,8 +6,10 @@ import net.minecraft.item.ItemStack;
 public interface IPrayerAltar {
 
 	public boolean isActivated();
+	public boolean isInRitual();
 	public void setActivated(final boolean activated);
 	public float getPrayerPoints();
+	public ItemStack getCurrentItem();
 	public void setPrayerPoints(final float points);
 	/**
 	 * Called when a player attempts to recharge their prayer points at this altar. All subtraction math should be done in this method.

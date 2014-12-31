@@ -38,6 +38,8 @@ public class ItemBasicBone extends ItemPrayers implements IBuryable{
 			final NBTTagCompound comp = stack.getTagCompound();
 			if(comp.hasKey("progress"))
 				list.add("Cleaning progress: "+(int)(((comp.getInteger("progress"))/1200F)*100F)+"%");
+			if(comp.getBoolean("soaked"))
+				list.add("Soaked");
 		}
 	}
 

@@ -8,6 +8,7 @@ import me.superckl.prayers.common.handler.EntityEventHandler;
 import me.superckl.prayers.common.handler.PlayerTickHandler;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModFluids;
+import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.network.MessageDisablePrayer;
 import me.superckl.prayers.network.MessageEnablePrayer;
 import me.superckl.prayers.network.MessageHandlerDisablePrayerServer;
@@ -16,6 +17,7 @@ import me.superckl.prayers.network.MessageHandlerOpenPrayerGui;
 import me.superckl.prayers.network.MessageOpenPrayerGui;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -47,6 +49,11 @@ public abstract class CommonProxy implements IProxy{
 		final ItemStack filledBucket = ModFluids.filledHolyBucket();
 		final ItemStack filledBottle = ModFluids.filledHolyBottle();
 		GameRegistry.addShapelessRecipe(filledBucket, Items.bucket, filledBottle, filledBottle, filledBottle, filledBottle);
+		final ItemStack soakedBones = new ItemStack(ModItems.basicBone, 1, 3);
+		final NBTTagCompound comp = new NBTTagCompound();
+		comp.setBoolean("soaked", true);
+		soakedBones.setTagCompound(comp);
+		GameRegistry.addShapelessRecipe(soakedBones, new ItemStack(ModItems.basicBone, 1, 3), filledBottle);
 	}
 
 }

@@ -1,10 +1,12 @@
 package me.superckl.prayers.common.entity.tile;
 
 import java.lang.ref.WeakReference;
+import java.util.Random;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.IBuryable;
 import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.reference.ModFluids;
@@ -23,9 +25,15 @@ import net.minecraft.tileentity.TileEntity;
 @AllArgsConstructor
 public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 
+	private final Random random = new Random();
 	@Getter
 	@Setter
 	private boolean activated;
+	@Getter
+	private boolean inRitual;
+	@Getter
+	@Setter
+	private int ritualTimer = 72000; //3 day-night cycles
 	@Getter
 	@Setter
 	private float prayerPoints = 500F;
@@ -36,6 +44,8 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 	private WeakReference<EntityPlayer> placingPlayer;
 	@Getter
 	private int waterTimer = 200;
+	@Getter
+	private int boneTimer = 40;
 
 	public TileEntityBasicAltar() {}
 
@@ -50,7 +60,10 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 		this.prayerPoints = comp.getFloat("prayerPoints");
 		if(comp.hasKey("currentItem"))
 			this.currentItem = ItemStack.loadItemStackFromNBT(comp.getCompoundTag("currentItem"));
+		this.inRitual = comp.getBoolean("inRitual");
+		this.ritualTimer = comp.getInteger("ritualTimer");
 		this.waterTimer = comp.getInteger("waterTimer");
+		this.boneTimer = comp.getInteger("boneTimer");
 	}
 
 	@Override
@@ -60,7 +73,10 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 		comp.setFloat("prayerPoints", this.prayerPoints);
 		if(this.currentItem != null)
 			comp.setTag("currentItem", this.currentItem.writeToNBT(new NBTTagCompound()));
+		comp.setBoolean("inRitual", this.inRitual);
+		comp.setInteger("ritualTimer", this.ritualTimer);
 		comp.setInteger("waterTimer", this.waterTimer);
+		comp.setInteger("boneTimer", this.boneTimer);
 	}
 
 	@Override
@@ -100,19 +116,78 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 			}
 		}else
 			this.regenTimer = 200;
-		if(this.currentItem != null)
-			if((this.currentItem.getItem() == Items.potionitem) && (this.currentItem.getItemDamage() == 0) && this.activated){
-				if(this.prayerPoints >= 0.5F)
-					this.waterTimer--;
-				if(this.waterTimer <= 0){
-					this.waterTimer = 200;
-					this.currentItem = ModFluids.filledHolyBottle();
-				}
+		this.manageWaterBless();
+		this.manageBoneOffer();
+		if(this.inRitual)
+			this.manageRitual();
+	}
+
+	private void manageWaterBless(){
+		if((this.currentItem != null) && (this.currentItem.getItem() == Items.potionitem) && (this.currentItem.getItemDamage() == 0) && this.activated){
+			if(this.prayerPoints >= 0.5F){
+				this.waterTimer--;
+				this.prayerPoints -= 0.5F;
 			}
+			if(this.waterTimer <= 0){
+				this.waterTimer = 200;
+				this.currentItem = ModFluids.filledHolyBottle();
+			}
+		}
+	}
+
+	private void manageBoneOffer(){
+		if((this.currentItem != null) && (this.currentItem.getItem() instanceof IBuryable))
+			if(this.activated){
+				this.boneTimer--;
+				if(this.boneTimer <= 0){
+					this.boneTimer = 40;
+					if(this.placingPlayer.get() != null){
+						final IBuryable bury = (IBuryable) this.currentItem.getItem();
+						final PrayerExtendedProperties prop = (PrayerExtendedProperties) this.placingPlayer.get().getExtendedProperties("prayer");
+						prop.addXP((int) (bury.getXPFromStack(this.currentItem)*this.getOfferXPBoost(this.currentItem)));
+					}
+					this.currentItem = null;
+				}
+			}else if(!this.inRitual && (this.currentItem.getItem() == ModItems.basicBone) && (this.currentItem.getItemDamage() == 3))
+				this.inRitual = true;
+	}
+
+	private void manageRitual(){
+		if(this.activated){
+			this.inRitual = false;
+			return;
+		}
+		if(this.ritualTimer <= 0){
+			this.activated = true;
+			this.inRitual = false;
+			//TODO effect
+			return;
+		}
+		this.ritualTimer--;
+		if((this.currentItem != null) && (this.currentItem.getItem() == ModItems.basicBone) && (this.currentItem.getItemDamage() == 3)){
+			if(this.currentItem.hasTagCompound())
+				if(this.currentItem.getTagCompound().getBoolean("soaked")){
+					this.ritualTimer -= this.random.nextInt(2);
+					if(this.random.nextInt(2400) == 0){
+						this.currentItem.getTagCompound().setBoolean("soaked", false);
+						this.getWorldObj().spawnParticle("largesmoke", this.xCoord+.5D, this.yCoord+1.2D, this.zCoord+.5D, 0D, 0D, 0D);
+					}
+				}
+			if(this.random.nextInt(7000) == 0)
+				this.currentItem = null;
+			//TODO effect
+		}else
+			this.ritualTimer += 1+(this.random.nextInt(8)/7);
+		if(this.ritualTimer >= 100000){
+			this.inRitual = false;
+			this.ritualTimer = 72000;
+		}
 	}
 
 	@Override
 	public float onRechargePlayer(float points, final EntityPlayer player, final boolean shouldSubtract) {
+		if(!this.activated)
+			return 0F;
 		if(points > this.prayerPoints)
 			points = this.prayerPoints;
 		if(shouldSubtract)
@@ -137,20 +212,26 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 		}
 		this.currentItem = item;
 		this.placingPlayer = new WeakReference<EntityPlayer>(player);
+		this.waterTimer = 200;
+		this.boneTimer = 40;
 	}
 
 	public boolean isItemValid(final ItemStack item){
 		if(item != null)
 			if(!((item.getItem() == Items.potionitem) && (item.getItemDamage() == 0)))
-				if(!((item.getItem() instanceof IBuryable) && this.activated))
-					return false;
-				else if((item.getItem() == ModItems.basicBone) && (item.getItemDamage() != 2))
+				if((item.getItem() == ModItems.basicBone) && (item.getItemDamage() == 3))
+					return true;
+				else if(!((item.getItem() instanceof IBuryable) && this.activated))
 					return false;
 		return true;
 	}
 
 	public boolean isBlessingWater(){
 		return this.activated && (this.currentItem != null) && (this.currentItem.getItem() == Items.potionitem) && (this.currentItem.getItemDamage() == 0) && (this.prayerPoints >= 0.5F) && (this.waterTimer > 0);
+	}
+
+	public boolean isOfferingBones(){
+		return (this.currentItem != null) && (this.currentItem.getItem() == ModItems.basicBone) && this.activated && (this.boneTimer > 0);
 	}
 
 }

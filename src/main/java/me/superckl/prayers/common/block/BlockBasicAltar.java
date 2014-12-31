@@ -8,6 +8,7 @@ import me.superckl.prayers.common.entity.tile.TileEntityBasicAltar;
 import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModTabs;
+import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -35,29 +36,27 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 		final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
 		if((altar == null) || player.isSneaking())
 			return false;
-		if(altar.isActivated()){
-			final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;
-			if(te.getCurrentItem() != null){
-				player.inventory.addItemStackToInventory(te.getCurrentItem());
-				te.setCurrentItem(null, player);
-			}else if(player.getHeldItem() == null){
-				final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
-				final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
-				float toRecharge = altar.onRechargePlayer(diff, player, false);
-				if((diff <= 0) || (toRecharge <= 0))
-					return false;
-				toRecharge = altar.onRechargePlayer(diff, player, true);
-				prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
-				return true;
-			}else if(te.isItemValid(player.getHeldItem())){
-				final ItemStack clone = player.getHeldItem().copy();
+		final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;
+		LogHelper.info(te.isItemValid(player.getHeldItem()));
+		if(te.getCurrentItem() != null){
+			player.inventory.addItemStackToInventory(te.getCurrentItem());
+			te.setCurrentItem(null, player);
+		}else if((player.getHeldItem() == null) && altar.isActivated()){
+			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
+			final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
+			float toRecharge = altar.onRechargePlayer(diff, player, false);
+			if((diff <= 0) || (toRecharge <= 0))
+				return false;
+			toRecharge = altar.onRechargePlayer(diff, player, true);
+			prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
+			return true;
+		}else if(te.isItemValid(player.getHeldItem())){
+			final ItemStack clone = player.getHeldItem() == null ? null:player.getHeldItem().copy();
+			if(clone != null)
 				clone.stackSize = 1;
-				te.setCurrentItem(clone, player);
-				if(!player.capabilities.isCreativeMode)
-					player.getHeldItem().stackSize--;
-			}
-		}else{
-			//TODO exquisite bones, and holy water
+			te.setCurrentItem(clone, player);
+			if(!player.capabilities.isCreativeMode && player.getHeldItem() != null)
+				player.getHeldItem().stackSize--;
 		}
 		return true;
 	}
