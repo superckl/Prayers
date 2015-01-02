@@ -44,6 +44,8 @@ public class ClientProxy extends CommonProxy{
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerClient.class, MessageEnablePrayer.class, 0, Side.CLIENT);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerDisablePrayerClient.class, MessageDisablePrayer.class, 1, Side.CLIENT);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerUpdatePrayers.class, MessageUpdatePrayers.class, 4, Side.CLIENT);
+
+		//ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBasicAltar.class, new RenderBasicAltar());
 	}
 
 	@Override

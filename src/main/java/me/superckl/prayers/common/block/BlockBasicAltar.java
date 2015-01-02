@@ -55,7 +55,7 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 			if(clone != null)
 				clone.stackSize = 1;
 			te.setCurrentItem(clone, player);
-			if(!player.capabilities.isCreativeMode && player.getHeldItem() != null)
+			if(!player.capabilities.isCreativeMode && (player.getHeldItem() != null))
 				player.getHeldItem().stackSize--;
 		}
 		return true;

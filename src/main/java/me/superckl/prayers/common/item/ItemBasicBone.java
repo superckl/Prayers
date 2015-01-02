@@ -50,8 +50,20 @@ public class ItemBasicBone extends ItemPrayers implements IBuryable{
 
 	@Override
 	public IIcon getIconFromDamage(final int meta) {
-		return this.icons[meta];
+		return this.icons[meta+1];
 	}
+
+
+
+	@Override
+	public IIcon getIcon(final ItemStack stack, final int pass) {
+		if(stack.hasTagCompound() && stack.getTagCompound().getBoolean("soaked"))
+			return this.icons[0];
+		else
+			return super.getIcon(stack, pass);
+	}
+
+
 
 	@Override
 	public int getMetadata(final int meta) {
@@ -71,7 +83,7 @@ public class ItemBasicBone extends ItemPrayers implements IBuryable{
 
 	@Override
 	public void registerIcons(final IIconRegister register) {
-		this.icons = new IIcon[] {register.registerIcon(ModData.MOD_ID+":smallbones"),
+		this.icons = new IIcon[] {register.registerIcon(ModData.MOD_ID+":wetbones"), register.registerIcon(ModData.MOD_ID+":smallbones"),
 				register.registerIcon(ModData.MOD_ID+":largebones"), register.registerIcon(ModData.MOD_ID+":dirtybones"),
 				register.registerIcon(ModData.MOD_ID+":exquisitebones")};
 	}
