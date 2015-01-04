@@ -7,6 +7,11 @@ public interface IPrayerAltar {
 
 	public boolean isActivated();
 	public boolean isInRitual();
+	/**
+	 * This is called by the Prayers Waila data provider if {@link #isInRitual()} returns true and the block is registered.
+	 * @return The timer for the ritual.
+	 */
+	public int getRitualTimer();
 	public void setActivated(final boolean activated);
 	public float getPrayerPoints();
 	public ItemStack getCurrentItem();

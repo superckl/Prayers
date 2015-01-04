@@ -37,7 +37,7 @@ public class Prayers {
 		LogHelper.info("Please note, you are running a beta version! Please report any bugs you find.");
 		this.config = new Config(e.getSuggestedConfigurationFile());
 		this.config.loadValues();
-		//The order of init calls is important. Don't change it.
+		//The order of init calls is important. Don't randomly change it.
 		ModPotions.init();
 		ModItems.init();
 		ModFluids.init();
@@ -53,7 +53,7 @@ public class Prayers {
 		Prayers.proxy.registerHandlers();
 		ModItems.addChestLoot();
 
-		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.WailaDataProvider.callbackRegister");
+		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaDataProvider.callbackRegister");
 	}
 
 	@EventHandler

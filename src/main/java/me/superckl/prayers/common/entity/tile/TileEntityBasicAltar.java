@@ -3,7 +3,6 @@ package me.superckl.prayers.common.entity.tile;
 import java.lang.ref.WeakReference;
 import java.util.Random;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
@@ -22,9 +21,11 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
-@AllArgsConstructor
 public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 
+	/**
+	 * Only to be used on the server side.
+	 */
 	private final Random random = new Random();
 	@Getter
 	@Setter
@@ -60,6 +61,8 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 		this.prayerPoints = comp.getFloat("prayerPoints");
 		if(comp.hasKey("currentItem"))
 			this.currentItem = ItemStack.loadItemStackFromNBT(comp.getCompoundTag("currentItem"));
+		else
+			this.currentItem = null;
 		this.inRitual = comp.getBoolean("inRitual");
 		this.ritualTimer = comp.getInteger("ritualTimer");
 		this.waterTimer = comp.getInteger("waterTimer");
@@ -118,7 +121,7 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 			this.regenTimer = 200;
 		this.manageWaterBless();
 		this.manageBoneOffer();
-		if(this.inRitual)
+		if(this.inRitual && !this.getWorldObj().isRemote)
 			this.manageRitual();
 	}
 
@@ -152,14 +155,19 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 				this.inRitual = true;
 	}
 
+	/**
+	 * Only to be called on the server side
+	 */
 	private void manageRitual(){
 		if(this.activated){
 			this.inRitual = false;
+			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 			return;
 		}
 		if(this.ritualTimer <= 0){
 			this.activated = true;
 			this.inRitual = false;
+			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 			//TODO effect
 			return;
 		}
@@ -169,19 +177,43 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 				if(this.currentItem.getTagCompound().getBoolean("soaked")){
 					this.ritualTimer -= this.random.nextInt(2);
 					if(this.random.nextInt(2400) == 0){
-						this.currentItem.getTagCompound().setBoolean("soaked", false);
+						this.currentItem.setTagCompound(null);
+						this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 						this.getWorldObj().spawnParticle("largesmoke", this.xCoord+.5D, this.yCoord+1.2D, this.zCoord+.5D, 0D, 0D, 0D);
+						this.getWorldObj().spawnParticle("largesmoke", this.xCoord+.5D, this.yCoord+.8D, this.zCoord+.5D, 0D, 0D, 0D);
+						this.getWorldObj().playSoundEffect(this.xCoord + 0.5F, this.yCoord + 0.5F, this.zCoord + 0.5F, "random.fizz", 0.5F, 2.6F + ((this.random.nextFloat() - this.random.nextFloat()) * 0.8F));
 					}
 				}
-			if(this.random.nextInt(7000) == 0)
+			if(this.random.nextInt(7000) == 0){
 				this.currentItem = null;
-			//TODO effect
+				LogHelper.info("Removed bones");
+				this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+				this.getWorldObj().playSoundEffect(this.xCoord+0.5F, this.yCoord+0.5F, this.zCoord+0.5F, "mob.endermen.portal", 1.0F, 1.0F);
+				for (int l = 0; l < 4; ++l)
+				{
+					final double d0 = this.xCoord + this.random.nextFloat();
+					final double d1 = this.yCoord + this.random.nextFloat();
+					final double d2 = this.zCoord + this.random.nextFloat();
+					double d3 = 0.0D;
+					double d4 = 0.0D;
+					double d5 = 0.0D;
+					final int i1 = (this.random.nextInt(2) * 2) - 1;
+					d3 = (this.random.nextFloat() - 0.5D) * 0.5D;
+					d4 = (this.random.nextFloat() - 0.5D) * 0.5D;
+					d5 = (this.random.nextFloat() - 0.5D) * 0.5D;
+
+					this.getWorldObj().spawnParticle("portal", d0, d1, d2, d3, d4, d5);
+				}
+			}
 		}else
-			this.ritualTimer += 1+(this.random.nextInt(8)/7);
+			this.ritualTimer += 1+(this.random.nextInt(9)/8);
 		if(this.ritualTimer >= 100000){
 			this.inRitual = false;
 			this.ritualTimer = 72000;
+			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 		}
+		if((this.ritualTimer % 40) == 0)
+			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord); //TODO Meh... It only happens during the ritual I guess...
 	}
 
 	@Override
