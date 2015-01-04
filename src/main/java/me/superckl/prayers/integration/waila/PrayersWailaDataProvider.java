@@ -10,7 +10,12 @@ import me.superckl.prayers.common.block.BlockBasicAltar;
 import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.utility.DateHelper;
 import me.superckl.prayers.common.utility.StringHelper;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
 
 public class PrayersWailaDataProvider implements IWailaDataProvider{
 
@@ -41,7 +46,8 @@ public class PrayersWailaDataProvider implements IWailaDataProvider{
 				currenttip.add(StringHelper.build("Points: ", altar.getPrayerPoints(), "/", altar.getMaxPrayerPoints()));
 			}else if(altar.isInRitual()){
 				currenttip.add("Activating");
-				currenttip.add(StringHelper.build("Time Left: ", DateHelper.toDateString(altar.getRitualTimer())));
+				if((accessor.getNBTData() != null) && accessor.getNBTData().hasKey("ritualTimer"))
+					currenttip.add(StringHelper.build(EnumChatFormatting.RESET, "Time Left: ", altar.getCurrentItem() == null ? EnumChatFormatting.OBFUSCATED:"", DateHelper.toDateString(accessor.getNBTData().getInteger("ritualTimer"))));
 			}else
 				currenttip.add("Inactive");
 			if(altar.getCurrentItem() != null)
@@ -55,9 +61,21 @@ public class PrayersWailaDataProvider implements IWailaDataProvider{
 		return currenttip;
 	}
 
+	@Override
+	public NBTTagCompound getNBTData(final EntityPlayerMP player, final TileEntity te,
+			final NBTTagCompound tag, final World world, final int x, final int y, final int z) {
+		if((te != null) && (te instanceof IPrayerAltar)){
+			final IPrayerAltar altar = (IPrayerAltar) te;
+			if(altar.isInRitual() && !altar.isActivated())
+				tag.setInteger("ritualTimer", altar.getRitualTimer());
+		}
+		return tag;
+	}
+
 	public static void callbackRegister(final IWailaRegistrar registrar){
 		registrar.addConfig("Prayers", "showaltarinfo", "Show Altar Info", true);
 		registrar.registerBodyProvider(PrayersWailaDataProvider.INSTANCE, BlockBasicAltar.class);
+		registrar.registerNBTProvider(PrayersWailaDataProvider.INSTANCE, BlockBasicAltar.class);
 	}
 
 }

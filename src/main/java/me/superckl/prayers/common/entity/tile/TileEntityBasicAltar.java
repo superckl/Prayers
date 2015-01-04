@@ -12,6 +12,7 @@ import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PCReflectionHelper;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -156,9 +157,13 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 	}
 
 	/**
-	 * Only to be called on the server side
+	 * Only to be called on the server side.
+	 *
+	 * This client actually has no idea what the ritual timer is at any given moment. The timer that appears in WAILA is handled by a special method in WAILA.
 	 */
 	private void manageRitual(){
+		if(this.getWorldObj().isRemote)
+			return;
 		if(this.activated){
 			this.inRitual = false;
 			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
@@ -168,7 +173,8 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 			this.activated = true;
 			this.inRitual = false;
 			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
-			//TODO effect
+			this.getWorldObj().spawnEntityInWorld(new EntityLightningBolt(this.getWorldObj(), this.xCoord+0.5D, this.yCoord+0.5D, this.zCoord+0.5D));
+			//TODO more effects?
 			return;
 		}
 		this.ritualTimer--;
@@ -211,9 +217,11 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 			this.inRitual = false;
 			this.ritualTimer = 72000;
 			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+			//TODO effect
 		}
-		if((this.ritualTimer % 40) == 0)
-			this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord); //TODO Meh... It only happens during the ritual I guess...
+		//if((this.ritualTimer % 40) == 0)
+		//	this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord); //TODO Meh... It only happens during the ritual I guess...
+		//Fixed by WAILA getNBTTag method
 	}
 
 	@Override
