@@ -5,13 +5,11 @@ import java.util.Random;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayers.common.prayer.IBuryable;
 import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.LogHelper;
-import me.superckl.prayers.common.utility.PCReflectionHelper;
+import me.superckl.prayers.common.utility.PSReflectionHelper;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -121,7 +119,6 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 		}else
 			this.regenTimer = 200;
 		this.manageWaterBless();
-		this.manageBoneOffer();
 		if(this.inRitual && !this.getWorldObj().isRemote)
 			this.manageRitual();
 	}
@@ -137,23 +134,6 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 				this.currentItem = ModFluids.filledHolyBottle();
 			}
 		}
-	}
-
-	private void manageBoneOffer(){
-		if((this.currentItem != null) && (this.currentItem.getItem() instanceof IBuryable))
-			if(this.activated){
-				this.boneTimer--;
-				if(this.boneTimer <= 0){
-					this.boneTimer = 40;
-					if(this.placingPlayer.get() != null){
-						final IBuryable bury = (IBuryable) this.currentItem.getItem();
-						final PrayerExtendedProperties prop = (PrayerExtendedProperties) this.placingPlayer.get().getExtendedProperties("prayer");
-						prop.addXP((int) (bury.getXPFromStack(this.currentItem)*this.getOfferXPBoost(this.currentItem)));
-					}
-					this.currentItem = null;
-				}
-			}else if(!this.inRitual && (this.currentItem.getItem() == ModItems.basicBone) && (this.currentItem.getItemDamage() == 3))
-				this.inRitual = true;
 	}
 
 	/**
@@ -247,7 +227,7 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 
 	public void setCurrentItem(final ItemStack item, final EntityPlayer player){
 		if(!this.isItemValid(item)){
-			LogHelper.error("Incompatible object was placed on an altar! Call isItemValid before calling setCurrentItem! Calling class: "+PCReflectionHelper.retrieveCallingStackTraceElement().getClassName());
+			LogHelper.error("Incompatible object was placed on an altar! Call isItemValid before calling setCurrentItem! Calling class: "+PSReflectionHelper.retrieveCallingStackTraceElement().getClassName());
 			return;
 		}
 		this.currentItem = item;
@@ -261,8 +241,6 @@ public class TileEntityBasicAltar extends TileEntity implements IPrayerAltar{
 			if(!((item.getItem() == Items.potionitem) && (item.getItemDamage() == 0)))
 				if((item.getItem() == ModItems.basicBone) && (item.getItemDamage() == 3))
 					return true;
-				else if(!((item.getItem() instanceof IBuryable) && this.activated))
-					return false;
 		return true;
 	}
 

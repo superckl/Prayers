@@ -11,14 +11,14 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 //@ExtensionMethod(PlayerHelper.class)
-public class SubCommandPrayerLevel implements ISubCommand{
+public class SubCommandMaxPrayerPoints implements ISubCommand{
 
 	@Getter
-	private final List<String> aliases = Arrays.asList("prayerlevel", "level", "lvl");
+	private final List<String> aliases = Arrays.asList("maxprayerpoints", "maxpoints", "maxps");
 
 	@Override
 	public String getName() {
-		return "PrayerLevel";
+		return "MaxPrayerPoints";
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class SubCommandPrayerLevel implements ISubCommand{
 			ChatHelper.sendTranlsatedError(sender, "msg.notint.text", 2);
 			return;
 		}
-		final int amount = Integer.parseInt(args[args.length == 2 ? 1:2]);
+		final float amount = Integer.parseInt(args[args.length == 2 ? 1:2]);
 		if(args.length == 2){
 			if(!(sender instanceof EntityPlayerMP)){
 				ChatHelper.sendTranlsatedError(sender, "msg.notplayer.text");
@@ -45,11 +45,11 @@ public class SubCommandPrayerLevel implements ISubCommand{
 			final EntityPlayerMP player = (EntityPlayerMP) sender;
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 			if(args[0].equalsIgnoreCase("set"))
-				prop.setPrayerLevel(Math.max(1, amount));
+				prop.setBaseMaxPrayerPoints(Math.max(1F, amount));
 			else if(args[0].equalsIgnoreCase("add"))
-				prop.setPrayerLevel(prop.getPrayerLevel()+amount);
+				prop.setBaseMaxPrayerPoints(prop.getBaseMaxPrayerPoints()+amount);
 			else if(args[0].equalsIgnoreCase("subtract"))
-				prop.setPrayerLevel(Math.max(1, prop.getPrayerLevel()-amount));
+				prop.setBaseMaxPrayerPoints(Math.max(1F, prop.getBaseMaxPrayerPoints()-amount));
 			else
 				ChatHelper.sendTranlsatedError(sender, "msg.nomatch.text", "set, add, subtract.");
 		}else if(args.length == 3){
@@ -60,11 +60,11 @@ public class SubCommandPrayerLevel implements ISubCommand{
 			}
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 			if(args[1].equalsIgnoreCase("set"))
-				prop.setPrayerLevel(Math.max(1, amount));
+				prop.setBaseMaxPrayerPoints(Math.max(1F, amount));
 			else if(args[1].equalsIgnoreCase("add"))
-				prop.setPrayerLevel(prop.getPrayerLevel()+amount);
+				prop.setBaseMaxPrayerPoints(prop.getBaseMaxPrayerPoints()+amount);
 			else if(args[1].equalsIgnoreCase("subtract"))
-				prop.setPrayerLevel(Math.max(1, prop.getPrayerLevel()-amount));
+				prop.setBaseMaxPrayerPoints(Math.max(1F, prop.getBaseMaxPrayerPoints()-amount));
 			else
 				ChatHelper.sendTranlsatedError(sender, "msg.nomatch.text", "set, add, subtract.");
 		} else

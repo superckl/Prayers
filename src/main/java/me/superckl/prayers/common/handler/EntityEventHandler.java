@@ -2,10 +2,11 @@ package me.superckl.prayers.common.handler;
 
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayers.common.prayer.Prayers;
+import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
-import me.superckl.prayers.common.utility.PCReflectionHelper;
+import me.superckl.prayers.common.utility.PSReflectionHelper;
+import me.superckl.prayers.common.utility.PlayerHelper;
 import me.superckl.prayers.common.utility.PotionEffectHashMap;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import me.superckl.prayers.network.MessageUpdatePrayers;
@@ -13,7 +14,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
@@ -35,26 +35,28 @@ public class EntityEventHandler {
 	public void onEntitySpawn(final EntityJoinWorldEvent e){
 		if((e.entity instanceof EntityLivingBase) == false)
 			return;
-		PCReflectionHelper.setPrivateFinalValue(EntityLivingBase.class, (EntityLivingBase) e.entity, new PotionEffectHashMap((EntityLivingBase) e.entity, ((EntityLivingBase)e.entity).activePotionsMap), "activePotionsMap", "field_70713_bf");
+		PSReflectionHelper.setPrivateFinalValue(EntityLivingBase.class, (EntityLivingBase) e.entity, new PotionEffectHashMap((EntityLivingBase) e.entity, ((EntityLivingBase)e.entity).activePotionsMap), "activePotionsMap", "field_70713_bf");
 		if(!e.world.isRemote && (e.entity instanceof EntityPlayerMP))
 			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(PrayerHelper.getActivePrayers((EntityLivingBase) e.entity)), (EntityPlayerMP) e.entity);
 	}
 
 	@SubscribeEvent
 	public void onLivingHurt(final LivingHurtEvent e){
-		if((e.source.getSourceOfDamage() != null))
-			if((e.source.getSourceOfDamage() instanceof EntityThrowable) && (((EntityThrowable)e.source.getSourceOfDamage()).getThrower() != null)){
+		if((e.source.getSourceOfDamage() != null)){
+			final EntityLivingBase shooter = PlayerHelper.getShooter(e.source.getSourceOfDamage());
+			if(shooter != null){
 				if(e.source.isMagicDamage()) //Compute it if projectile for now, mod compat later
-					e.ammount = PrayerHelper.handleEnhanceMagic(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
-				else
-					e.ammount = PrayerHelper.handleEnhanceRange(e.ammount, PrayerHelper.getActivePrayers(((EntityThrowable)e.source.getSourceOfDamage()).getThrower()));
+					e.ammount = PrayerHelper.handleEnhanceMagic(e.ammount, PrayerHelper.getActivePrayers(shooter));
+				else if (e.source.isProjectile())
+					e.ammount = PrayerHelper.handleEnhanceRange(e.ammount, PrayerHelper.getActivePrayers(shooter));
 			}else if(e.source.getSourceOfDamage() instanceof EntityLivingBase)
 				e.ammount = PrayerHelper.handleEnhanceMelee(e.ammount, PrayerHelper.getActivePrayers((EntityLivingBase) e.source.getSourceOfDamage()));
+		}
 		if(e.source.isUnblockable())
 			return;
 		if(e.entityLiving instanceof EntityPlayer){
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityLiving.getExtendedProperties("prayer");
-			for(final Prayers prayer:prop.getActivePrayers())
+			for(final EnumPrayers prayer:prop.getActivePrayers())
 				switch(prayer){
 				case PROTECT_MAGIC:
 				{
@@ -70,10 +72,8 @@ public class EntityEventHandler {
 				}
 				case PROTECT_MELEE:
 				{
-					if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityLivingBase)){
+					if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityLivingBase))
 						e.ammount /= 2F;
-						e.ammount = PrayerHelper.handleEnhanceMelee(e.ammount, PrayerHelper.getActivePrayers((EntityLivingBase) e.source.getSourceOfDamage()));
-					}
 					break;
 				}
 				case ENCHANCE_DEFENCE_1:

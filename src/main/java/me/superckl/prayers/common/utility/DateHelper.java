@@ -14,33 +14,6 @@ public class DateHelper {
 		final Calendar begin = new GregorianCalendar();
 		begin.setTimeInMillis(0L);
 		return DateHelper.formatDateDiff(begin, cal);
-		/*cal.add(Calendar.SECOND, ticks/20);
-		StringBuilder build = new StringBuilder();
-		boolean flag = false;
-		if(cal.get(Calendar.YEAR)-1 > 0){
-			build.append(cal.get(Calendar.YEAR)).append("y ");
-			flag = true;
-		}
-		if(cal.get(Calendar.MONTH)-1 > 0 || flag){
-			build.append(cal.get(Calendar.MONTH)).append("m ");
-			flag = true;
-		}
-		if(cal.get(Calendar.WEEK_OF_MONTH)-1 > 0 || flag){
-			build.append(cal.get(Calendar.WEEK_OF_MONTH)).append("w ");
-			flag = true;
-		}
-		if(cal.get(Calendar.DAY_OF_WEEK)-1 > 0 || flag){
-			build.append(cal.get(Calendar.DAY_OF_WEEK)).append("d ");
-			flag = true;
-		}
-		if(cal.get(Calendar.HOUR_OF_DAY)-1 > 0 || flag){
-			build.append(cal.get(Calendar.HOUR_OF_DAY)).append("h ");
-			flag = true;
-		}
-		if(cal.get(Calendar.MINUTE)-1 > 0 || flag){
-			build.append(cal.get(Calendar.MINUTE)).append("m ");
-			flag = true;
-		}*/
 	}
 
 	public static String formatDateDiff(final Calendar fromDate, final Calendar toDate)

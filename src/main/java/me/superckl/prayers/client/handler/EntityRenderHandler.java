@@ -1,6 +1,6 @@
 package me.superckl.prayers.client.handler;
 
-import me.superckl.prayers.common.prayer.Prayers;
+import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -17,7 +17,7 @@ public class EntityRenderHandler {
 
 	@SubscribeEvent
 	public void onLivingRender(final RenderLivingEvent.Post e){
-		for(final Prayers prayer:PrayerHelper.getActivePrayers(e.entity)){
+		for(final EnumPrayers prayer:PrayerHelper.getActivePrayers(e.entity)){
 			if(!prayer.isOverhead())
 				continue;
 			final double dist = e.entity.getDistanceSqToEntity(e.renderer.renderManager.livingPlayer);

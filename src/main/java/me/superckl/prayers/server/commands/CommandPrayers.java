@@ -13,7 +13,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class CommandPrayers implements ICommand{
 
-	public static final ISubCommand[] COMMAND_INSTANCES =new ISubCommand[] {new SubCommandPrayerPoints(), new SubCommandPrayerLevel(), new SubCommandAltar(), new SubCommandHelp()};
+	public static final ISubCommand[] COMMAND_INSTANCES =new ISubCommand[] {new SubCommandPrayerPoints(), new SubCommandMaxPrayerPoints(), new SubCommandAltar(), new SubCommandHelp()};
 
 	private final List<String> aliases = Arrays.asList("prayers", "ps", "prayer");
 	@Getter

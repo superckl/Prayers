@@ -10,7 +10,7 @@ import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.reference.ModTabs;
-import me.superckl.prayers.common.utility.PrayerHelper;
+import me.superckl.prayers.common.utility.PSReflectionHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -37,7 +37,7 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 	@Override
 	public boolean onBlockActivated(final World world, final int x, final int y, final int z, final EntityPlayer player, final int p_149727_6_, final float p_149727_7_, final float p_149727_8_, final float p_149727_9_)
 	{
-		final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+		final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
 		if((altar == null) || player.isSneaking())
 			return false;
 		final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;
@@ -80,7 +80,7 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 
 	@Override
 	public void onBlockClicked(final World world, final int x, final int y, final int z, final EntityPlayer player) {
-		final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+		final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
 		if((altar == null) || !player.isSneaking())
 			return;
 		if(altar.getMaxPrayerPoints() <= altar.getPrayerPoints())
@@ -99,7 +99,7 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
-		final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+		final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
 		if((altar == null) || ((altar instanceof TileEntityBasicAltar) == false))
 			return;
 		final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;

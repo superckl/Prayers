@@ -9,6 +9,8 @@ import me.superckl.prayers.common.handler.PlayerTickHandler;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
+import me.superckl.prayers.common.worldgen.ComponentAltarRoom;
+import me.superckl.prayers.common.worldgen.PrayersVillageCreationHandler;
 import me.superckl.prayers.network.MessageDisablePrayer;
 import me.superckl.prayers.network.MessageEnablePrayer;
 import me.superckl.prayers.network.MessageHandlerDisablePrayerServer;
@@ -18,10 +20,12 @@ import me.superckl.prayers.network.MessageOpenPrayerGui;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.relauncher.Side;
 
 public abstract class CommonProxy implements IProxy{
@@ -37,6 +41,8 @@ public abstract class CommonProxy implements IProxy{
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerServer.class, MessageEnablePrayer.class, 0, Side.SERVER);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerDisablePrayerServer.class, MessageDisablePrayer.class, 1, Side.SERVER);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerOpenPrayerGui.class, MessageOpenPrayerGui.class, 2, Side.SERVER);
+		MapGenStructureIO.func_143031_a(ComponentAltarRoom.class, "altarRoom");
+		VillagerRegistry.instance().registerVillageCreationHandler(new PrayersVillageCreationHandler());
 	}
 
 	@Override

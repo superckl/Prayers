@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.common.prayer.Prayers;
+import me.superckl.prayers.common.prayer.EnumPrayers;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.PotionEffect;
 
@@ -20,7 +20,7 @@ public class PotionEffectHashMap extends HashMap<Integer, PotionEffect>{
 
 	@Override
 	public PotionEffect put(final Integer key, final PotionEffect value) {
-		if(PrayerHelper.getActivePrayers(this.entity).contains(Prayers.ENHANCE_POTION))
+		if(PrayerHelper.getActivePrayers(this.entity).contains(EnumPrayers.ENHANCE_POTION))
 			//value = new PotionEffect(value);
 			value.duration *= 1.2;
 		return super.put(key, value);
@@ -28,7 +28,7 @@ public class PotionEffectHashMap extends HashMap<Integer, PotionEffect>{
 
 	@Override
 	public void putAll(final Map<? extends Integer, ? extends PotionEffect> m) {
-		if(PrayerHelper.getActivePrayers(this.entity).contains(Prayers.ENHANCE_POTION))
+		if(PrayerHelper.getActivePrayers(this.entity).contains(EnumPrayers.ENHANCE_POTION))
 			for(final PotionEffect value:m.values())
 				//value = new PotionEffect(value);
 				value.duration *= 1.2;

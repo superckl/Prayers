@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
-import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayers.common.prayer.IBuryable;
-import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModTabs;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -22,7 +19,7 @@ import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemBasicBone extends ItemPrayers implements IBuryable{
+public class ItemBasicBone extends ItemPrayers{
 
 	private final Random random = new Random();
 
@@ -63,8 +60,6 @@ public class ItemBasicBone extends ItemPrayers implements IBuryable{
 			return super.getIcon(stack, pass);
 	}
 
-
-
 	@Override
 	public int getMetadata(final int meta) {
 		return meta;
@@ -89,34 +84,6 @@ public class ItemBasicBone extends ItemPrayers implements IBuryable{
 	}
 
 	@Override
-	public ItemStack onItemRightClick(final ItemStack stack, final World world, final EntityPlayer player) {
-		if(player.isSneaking() || world.isRemote)
-			return stack;
-		int xp = this.getXPFromStack(stack);
-		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
-		xp/=Math.max(1, Math.log10(Math.max(1, prop.getPrayerLevel()-15))*1.17D); //The gods grow tired of your lazy offerings!!!
-		prop.addXP(xp);
-		if(!player.capabilities.isCreativeMode)
-			stack.stackSize--;
-		return stack;
-	}
-
-	@Override
-	public int getXPFromStack(final ItemStack stack) {
-		switch(stack.getItemDamage()){
-		case 0:
-			return this.random.nextInt(4)+6;
-		case 1:
-			return this.random.nextInt(6)+15;
-		case 2:
-			return this.random.nextInt(4)+6;
-		case 3:
-			return 30;
-		}
-		return 0;
-	}
-
-	@Override
 	public Entity createEntity(final World world, final Entity location, final ItemStack itemstack) {
 		if(itemstack.getItemDamage() == 2){
 			final EntityCleaningDirtyBone entity = new EntityCleaningDirtyBone(world, location.posX, location.posY, location.posZ, new ItemStack(this, itemstack.stackSize, 2));
@@ -137,23 +104,6 @@ public class ItemBasicBone extends ItemPrayers implements IBuryable{
 	@Override
 	public boolean hasCustomEntity(final ItemStack stack) {
 		return stack.getItemDamage() == 2;
-	}
-
-
-
-	@Override
-	public float getPointsRequiredToOffer(final ItemStack stack, final IPrayerAltar altar) {
-		switch(stack.getItemDamage()){
-		case 0:
-			return 2;
-		case 1:
-			return 4;
-		case 2:
-			return 2;
-		case 3:
-			return 5;
-		}
-		return 0;
 	}
 
 }

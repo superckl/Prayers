@@ -8,7 +8,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import me.superckl.prayers.common.prayer.Prayers;
+import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.network.PacketBuffer;
@@ -19,7 +19,7 @@ public class MessageUpdatePrayers implements IMessage{
 
 	@Getter
 	@Setter
-	private List<Prayers> prayers;
+	private List<EnumPrayers> prayers;
 
 	public MessageUpdatePrayers() {}
 

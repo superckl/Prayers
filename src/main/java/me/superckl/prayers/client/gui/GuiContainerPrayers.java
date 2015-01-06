@@ -6,8 +6,9 @@ import java.util.List;
 import me.superckl.prayers.client.gui.button.ButtonPrayer;
 import me.superckl.prayers.common.container.ContainerPrayers;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayers.common.prayer.Prayers;
+import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModData;
+import me.superckl.prayers.common.reference.RenderData;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import me.superckl.prayers.network.MessageDisablePrayer;
 import me.superckl.prayers.network.MessageEnablePrayer;
@@ -19,7 +20,6 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -28,8 +28,6 @@ import org.lwjgl.opengl.GL12;
 import tconstruct.client.tabs.TabRegistry;
 
 public class GuiContainerPrayers extends GuiContainer{
-
-	private static final ResourceLocation inventoryTexture = new ResourceLocation(ModData.MOD_ID+":textures/gui/prayerinventory.png");
 
 	private float xSize_lo_2;
 	private float ySize_lo_2;
@@ -50,7 +48,7 @@ public class GuiContainerPrayers extends GuiContainer{
 		TabRegistry.addTabsToList(this.buttonList);
 
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) this.mc.thePlayer.getExtendedProperties("prayer");
-		final Prayers[] prayers = Prayers.values();
+		final EnumPrayers[] prayers = EnumPrayers.values();
 		final int width = 5;
 		final int excess = 94-(16*width)-(2*(width-1));
 		final int startX = 79+(excess/2);
@@ -58,8 +56,6 @@ public class GuiContainerPrayers extends GuiContainer{
 		int x = startX;
 		int j = 0;
 		for(int i = 0; i < prayers.length; i++){
-			if(prop.getPrayerLevel() < prayers[i].getLevel())
-				continue;
 			this.buttonList.add(new ButtonPrayer(i, x+this.guiLeft, y+this.guiTop, prayers[i]));
 			x += 18;
 			j++;
@@ -85,9 +81,9 @@ public class GuiContainerPrayers extends GuiContainer{
 	protected void actionPerformed(final GuiButton button) {
 		if(button instanceof ButtonPrayer){
 			final ButtonPrayer pButton = (ButtonPrayer) button;
-			final Prayers prayer = pButton.getPrayer();
+			final EnumPrayers prayer = pButton.getPrayer();
 			final EntityPlayer player = ((ContainerPrayers)this.inventorySlots).getInvPlayer().player;
-			final List<Prayers> list = PrayerHelper.getActivePrayers(player);
+			final List<EnumPrayers> list = PrayerHelper.getActivePrayers(player);
 			if(list.contains(prayer)){
 				list.remove(prayer);
 				final MessageDisablePrayer message = new MessageDisablePrayer();
@@ -132,7 +128,7 @@ public class GuiContainerPrayers extends GuiContainer{
 	protected void drawGuiContainerBackgroundLayer(final float p_146976_1_,
 			final int p_146976_2_, final int p_146976_3_) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(GuiContainerPrayers.inventoryTexture);
+		this.mc.getTextureManager().bindTexture(RenderData.PRAYERS_GUI);
 		final int k = this.guiLeft;
 		final int l = this.guiTop;
 		this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);

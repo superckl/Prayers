@@ -8,8 +8,8 @@ import lombok.experimental.ExtensionMethod;
 import me.superckl.prayers.common.entity.tile.TileEntityBasicAltar;
 import me.superckl.prayers.common.prayer.IPrayerAltar;
 import me.superckl.prayers.common.utility.ChatHelper;
+import me.superckl.prayers.common.utility.PSReflectionHelper;
 import me.superckl.prayers.common.utility.PlayerHelper;
-import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -63,7 +63,7 @@ public class SubCommandAltar implements ISubCommand{
 				sender.sendTranlsatedError("msg.noaltarinrange.text");
 				return;
 			}
-			final IPrayerAltar altar = PrayerHelper.findAltar(player.worldObj, pos.blockX, pos.blockY, pos.blockZ);
+			final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, player.worldObj, pos.blockX, pos.blockY, pos.blockZ);
 			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
@@ -93,8 +93,7 @@ public class SubCommandAltar implements ISubCommand{
 			final int y = Integer.parseInt(args[2]);
 			final int z = Integer.parseInt(args[3]);
 
-
-			final IPrayerAltar altar = PrayerHelper.findAltar(((EntityPlayer)sender).worldObj, x, y, z);
+			final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, ((EntityPlayer)sender).worldObj, x, y, z);
 			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
@@ -130,7 +129,7 @@ public class SubCommandAltar implements ISubCommand{
 			final int y = Integer.parseInt(args[2]);
 			final int z = Integer.parseInt(args[3]);
 
-			final IPrayerAltar altar = PrayerHelper.findAltar(world, x, y, z);
+			final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
 			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;

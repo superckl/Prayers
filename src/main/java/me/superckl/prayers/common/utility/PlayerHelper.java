@@ -1,10 +1,16 @@
 package me.superckl.prayers.common.utility;
 
+import java.lang.reflect.Field;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 
 public class PlayerHelper {
 
@@ -19,16 +25,27 @@ public class PlayerHelper {
 		return null;
 	}
 
-	public static void sendTileUpdateDim(final TileEntity te) {
-		if((te == null) || te.getWorldObj().isRemote)
-			return;
-		for(final Object obj:DimensionManager.getWorld(te.getWorldObj().provider.dimensionId).playerEntities){
-			if((obj instanceof EntityPlayerMP) == false)
-				return;
-			final EntityPlayerMP player = (EntityPlayerMP) obj;
-			player.playerNetServerHandler.sendPacket(te.getDescriptionPacket());
-			//I could make a long process to only send it to players with this chunk loaded, but I'm not going to.
+	public static EntityLivingBase getShooter(final Entity ent){
+		if(ent instanceof EntityThrowable)
+			return ((EntityThrowable)ent).getThrower();
+		try{
+			final Field field = ReflectionHelper.findField(ent.getClass(), ObfuscationReflectionHelper.remapFieldNames(ent.getClass().getName(), "shootingEntity", "field_70235_a", "field_70250_c"));
+			if(field == null)
+				return null;
+			field.setAccessible(true);
+			if(!EntityLivingBase.class.isAssignableFrom(field.getType()))
+				return null;
+			return EntityLivingBase.class.cast(field.get(ent));
+		}catch(final Exception e){
+			//No existo
 		}
+		return null;
+	}
+
+	public static void sendTileUpdateDim(final TileEntity te){
+		if(te == null)
+			return;
+		te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
 	}
 
 }

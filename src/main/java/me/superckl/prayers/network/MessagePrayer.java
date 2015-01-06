@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import me.superckl.prayers.common.prayer.Prayers;
+import me.superckl.prayers.common.prayer.EnumPrayers;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 @AllArgsConstructor
@@ -15,13 +15,13 @@ public abstract class MessagePrayer implements IMessage{
 
 	@Getter
 	@Setter
-	private Prayers prayer;
+	private EnumPrayers prayer;
 
 	public MessagePrayer() {}
 
 	@Override
 	public void fromBytes(final ByteBuf buf) {
-		this.prayer = Prayers.getById(buf.readBytes(buf.readInt()).toString(Charset.defaultCharset()));
+		this.prayer = EnumPrayers.getById(buf.readBytes(buf.readInt()).toString(Charset.defaultCharset()));
 	}
 
 	@Override

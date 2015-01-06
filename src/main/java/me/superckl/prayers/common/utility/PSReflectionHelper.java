@@ -3,10 +3,13 @@ package me.superckl.prayers.common.utility;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
-public class PCReflectionHelper {
+public class PSReflectionHelper {
 
 	public static <T> Field removeFinal(final Class <? super T > clazz, final String... fieldNames)
 	{
@@ -52,27 +55,26 @@ public class PCReflectionHelper {
 	}
 
 	public static StackTraceElement retrieveCallingStackTraceElement(){
-		return PCReflectionHelper.retrieveCallingStackTraceElement(3);
+		return PSReflectionHelper.retrieveCallingStackTraceElement(3);
 	}
 
 	public static StackTraceElement retrieveCallingStackTraceElement(final int depth){
 		return new Throwable().getStackTrace()[depth];
 	}
 
-	public static final String[] field_ocean = {"ocean", "field_76771_b"};
-	public static final String[] field_deepOcean = {"deepOcean", "field_150575_M"};
-	public static final String[] field_water = {"water", "field_150355_j"};
-	public static final String[] field_gravel = {"gravel", "field_150351_n"};
-	public static final String[] field_sand = {"sand", "field_150354_m"};
-	public static final String[] field_worldObj = {"worldObj", "field_73230_p"};
-
-	public static final String[] method_genBiomeTerrain = {"genBiomeTerrain", "func_150560_b"};
-	public static final String[] method_func_147424_a = {"func_147424_a"};
-
-	public static final String[] desc_genBiomeTerrain = {"(Lnet/minecraft/world/World;Ljava/util/Random;[Lnet/minecraft/block/Block;[BIID)V", "(Lahb;Ljava/util/Random;[Laji;[BIID)V"};
-	public static final String[] desc_func_147424_a = {"(II[Lnet/minecraft/block/Block;)V", "(II[Laji;)V"};
-
-	public static final String[] class_biomeGenBase = {"net.minecraft.world.biome.BiomeGenBase", "ahu"};
-	public static final String[] class_chunkProviderGenerate = {"net.minecraft.world.gen.ChunkProviderGenerate", "aqz"};
+	/**
+	 * Attempts to find something with the given class at the given coordinates. First checks the Block and then the TileEntity.
+	 * @param clazz The Class to find
+	 * @return The found object, or null if it was not found;
+	 */
+	public static <T> T findAt(final Class<T> clazz, final World world, final int x, final int y, final int z){
+		final Block block = world.getBlock(x, y, z);
+		if(clazz.isAssignableFrom(block.getClass()))
+			return clazz.cast(block);
+		final TileEntity te = world.getTileEntity(x, y, z);
+		if((te != null) && clazz.isAssignableFrom(te.getClass()))
+			return clazz.cast(te);
+		return null;
+	}
 
 }
