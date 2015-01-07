@@ -14,6 +14,7 @@ import me.superckl.prayers.common.item.ItemPrayerTome;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -38,42 +39,29 @@ public class ModItems {
 
 	public static void addChestLoot(){
 		//Small bones
-		WeightedRandomChestContent content = new WeightedRandomChestContent(ModItems.basicBone, 0, 0, 12, 20);
-		ChestGenHooks.addItem(ChestGenHooks.BONUS_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.MINESHAFT_CORRIDOR, content);
-		ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, content);
-		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING, content);
-		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY, content);
+		WeightedRandomChestContent content = new WeightedRandomChestContent(ModItems.basicBone, 0, 1, 12, 8);
+		ModItems.addLootToAll(content);
 
 		//Large bones
-		content = new WeightedRandomChestContent(ModItems.basicBone, 1, 0, 6, 20);
-		ChestGenHooks.addItem(ChestGenHooks.BONUS_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.MINESHAFT_CORRIDOR, content);
-		ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, content);
-		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, content);
-		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING, content);
-		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY, content);
+		content = new WeightedRandomChestContent(ModItems.basicBone, 1, 1, 6, 8);
+		ModItems.addLootToAll(content);
 
+		//Prayer tomes
 		final Random random = new Random();
 		final List<EnumPrayers> prayers = new ArrayList<EnumPrayers>(Arrays.asList(EnumPrayers.values()));
 		final Iterator<EnumPrayers> it = prayers.iterator();
 		while(it.hasNext())
 			if(!it.next().isRequiresTome())
 				it.remove();
-		final float modifier = 15F/EnumPrayers.MAX_DRAIN;
-		final ItemStack stack = new ItemStack(ModItems.tome);
+		final float modifier = 5F/EnumPrayers.MAX_DRAIN;
+		ItemStack stack = new ItemStack(ModItems.tome);
 		ItemStack temp;
 		for(final EnumPrayers prayer:prayers){
 			temp = stack.copy();
 			final NBTTagCompound comp = new NBTTagCompound();
 			comp.setString("prayer", prayer.getId());
 			temp.setTagCompound(comp);
-			final int weight = (int) (15F-(prayer.getDrain()*modifier));
+			final int weight = (int) (5F-(prayer.getDrain()*modifier));
 			content = new WeightedRandomChestContent(temp, 1, 1, weight);
 			ChestGenHooks.addItem(ChestGenHooks.BONUS_CHEST, content);
 			ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, content);
@@ -84,6 +72,47 @@ public class ModItems {
 			ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING, content);
 			ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY, new WeightedRandomChestContent(temp, 1, 1, weight+2));
 		}
+
+		//Potions
+		stack = new ItemStack(ModItems.potion);
+		temp = stack.copy();
+		final PotionEffect basic = new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0, 0);
+		final PotionEffect adv = new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0, 1);
+		final PotionEffect uber = new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0, 3);
+		NBTTagCompound comp = new NBTTagCompound();
+		NBTTagCompound sub = new NBTTagCompound();
+		basic.writeCustomPotionEffectToNBT(sub);
+		comp.setTag("effect", sub);
+		temp.setTagCompound(comp);
+		content = new WeightedRandomChestContent(temp, 1, 3, 8);
+		ModItems.addLootToAll(content);
+		temp = stack.copy();
+		comp = new NBTTagCompound();
+		sub = new NBTTagCompound();
+		adv.writeCustomPotionEffectToNBT(sub);
+		comp.setTag("effect", sub);
+		temp.setTagCompound(comp);
+		content = new WeightedRandomChestContent(temp, 1, 2, 5);
+		ModItems.addLootToAll(content);
+		temp = stack.copy();
+		comp = new NBTTagCompound();
+		sub = new NBTTagCompound();
+		uber.writeCustomPotionEffectToNBT(sub);
+		comp.setTag("effect", sub);
+		temp.setTagCompound(comp);
+		content = new WeightedRandomChestContent(temp, 1, 1, 3);
+		ModItems.addLootToAll(content);
+	}
+
+	private static void addLootToAll(final WeightedRandomChestContent content){
+		ChestGenHooks.addItem(ChestGenHooks.BONUS_CHEST, content);
+		ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, content);
+		ChestGenHooks.addItem(ChestGenHooks.MINESHAFT_CORRIDOR, content);
+		ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST, content);
+		ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, content);
+		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, content);
+		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING, content);
+		ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY, content);
 	}
 
 	public static final class Names{
