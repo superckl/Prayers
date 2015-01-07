@@ -23,12 +23,25 @@ public class ModTabs {
 
 		@Override
 		public Item getTabIconItem() {
-			return Item.getItemFromBlock(ModBlocks.basicAltar);
+			return Item.getItemFromBlock(ModBlocks.altarBase);
 		}
 
 		@Override
 		public String getTranslatedTabLabel() {
 			return "Prayers Blocks";
+		}
+	};
+
+	public static final CreativeTabs TAB_PRAYER_TOMES = new CreativeTabs(ModData.MOD_ID+":tomes") {
+
+		@Override
+		public Item getTabIconItem() {
+			return ModItems.tome;
+		}
+
+		@Override
+		public String getTranslatedTabLabel() {
+			return "Prayer Tomes";
 		}
 	};
 

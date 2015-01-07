@@ -27,8 +27,6 @@ public class ItemBasicBone extends ItemPrayers{
 		this.setMaxStackSize(16).setUnlocalizedName("basicbone").setCreativeTab(ModTabs.TAB_PRAYER_ITEMS).setHasSubtypes(true);
 	}
 
-
-
 	@Override
 	public void addInformation(final ItemStack stack, final EntityPlayer player, final List list, final boolean bool) {
 		if(stack.hasTagCompound()){

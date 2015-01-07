@@ -13,7 +13,7 @@ public class MessageHandlerUpdatePrayers implements IMessageHandler<MessageUpdat
 	@Override
 	public IMessage onMessage(final MessageUpdatePrayers message, final MessageContext ctx) {
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) this.mc.thePlayer.getExtendedProperties("prayer");
-		prop.setActivePrayers(message.getPrayers());
+		prop.loadNBTData(message.getProp());
 		return null;
 	}
 

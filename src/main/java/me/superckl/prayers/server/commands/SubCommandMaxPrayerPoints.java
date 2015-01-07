@@ -14,7 +14,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 public class SubCommandMaxPrayerPoints implements ISubCommand{
 
 	@Getter
-	private final List<String> aliases = Arrays.asList("maxprayerpoints", "maxpoints", "maxps");
+	private final List<String> aliases = Arrays.asList("maxprayerpoints", "maxpoints", "maxps", "maxp", "mp");
 
 	@Override
 	public String getName() {

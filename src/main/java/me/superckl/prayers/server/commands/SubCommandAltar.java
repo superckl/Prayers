@@ -5,15 +5,13 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
-import me.superckl.prayers.common.entity.tile.TileEntityBasicAltar;
-import me.superckl.prayers.common.prayer.IPrayerAltar;
+import me.superckl.prayers.common.prayer.Altar;
+import me.superckl.prayers.common.prayer.AltarRegistry;
 import me.superckl.prayers.common.utility.ChatHelper;
-import me.superckl.prayers.common.utility.PSReflectionHelper;
 import me.superckl.prayers.common.utility.PlayerHelper;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
@@ -24,7 +22,7 @@ import net.minecraftforge.common.DimensionManager;
 public class SubCommandAltar implements ISubCommand{
 
 	@Getter
-	private final List<String> aliases = Arrays.asList("altar", "alt");
+	private final List<String> aliases = Arrays.asList("altar", "alt", "a");
 
 	@Override
 	public String getName() {
@@ -63,14 +61,13 @@ public class SubCommandAltar implements ISubCommand{
 				sender.sendTranlsatedError("msg.noaltarinrange.text");
 				return;
 			}
-			final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, player.worldObj, pos.blockX, pos.blockY, pos.blockZ);
+			final Altar altar = AltarRegistry.findAltarAt(player.worldObj, pos.blockX, pos.blockY, pos.blockZ);
 			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
 			}
 			altar.setActivated(activate);
-			if(altar instanceof TileEntityBasicAltar)
-				PlayerHelper.sendTileUpdateDim((TileEntity) altar);
+			PlayerHelper.sendTileUpdateDim(altar.getHolder());
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 4){
 			if((sender instanceof EntityPlayer) == false){
@@ -93,14 +90,13 @@ public class SubCommandAltar implements ISubCommand{
 			final int y = Integer.parseInt(args[2]);
 			final int z = Integer.parseInt(args[3]);
 
-			final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, ((EntityPlayer)sender).worldObj, x, y, z);
+			final Altar altar = AltarRegistry.findAltarAt(((EntityPlayer) sender).worldObj, x, y, z);
 			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
 			}
 			altar.setActivated(activate);
-			if(altar instanceof TileEntityBasicAltar)
-				PlayerHelper.sendTileUpdateDim((TileEntity) altar);
+			PlayerHelper.sendTileUpdateDim(altar.getHolder());
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 5){
 			if(!args[1].matches("^(\\+|-)?\\d+$")){
@@ -129,14 +125,13 @@ public class SubCommandAltar implements ISubCommand{
 			final int y = Integer.parseInt(args[2]);
 			final int z = Integer.parseInt(args[3]);
 
-			final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
+			final Altar altar = AltarRegistry.findAltarAt(world, x, y, z);
 			if(altar == null){
 				sender.sendTranlsatedError("msg.notaltar.text");
 				return;
 			}
 			altar.setActivated(activate);
-			if(altar instanceof TileEntityBasicAltar)
-				PlayerHelper.sendTileUpdateDim((TileEntity) altar);
+			PlayerHelper.sendTileUpdateDim(altar.getHolder());
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else
 			sender.sendTranlsatedError("msg.noargs.text");

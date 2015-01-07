@@ -14,7 +14,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 public class SubCommandPrayerPoints implements ISubCommand{
 
 	@Getter
-	private final List<String> aliases = Arrays.asList("prayerpoints", "points", "prayerpoint");
+	private final List<String> aliases = Arrays.asList("prayerpoints", "points", "prayerpoint", "ps", "p");
 
 	@Override
 	public void processCommand(final ICommandSender sender, final String[] args) {

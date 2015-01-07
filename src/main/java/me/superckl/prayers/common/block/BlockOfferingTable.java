@@ -1,46 +1,87 @@
 package me.superckl.prayers.common.block;
 
-import java.util.Random;
-
-import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayers.common.entity.tile.TileEntityBasicAltar;
-import me.superckl.prayers.common.prayer.IPrayerAltar;
-import me.superckl.prayers.common.reference.ModData;
+import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
+import me.superckl.prayers.common.prayer.Altar;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.reference.ModTabs;
-import me.superckl.prayers.common.utility.PSReflectionHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider{
+public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvider{
 
-	public BlockBasicAltar() {
+	public BlockOfferingTable() {
 		super(Material.rock);
-		this.setBlockName("basicaltar").setStepSound(Block.soundTypeStone).setCreativeTab(ModTabs.TAB_PRAYER_BLOCKS);
+		this.setBlockName("offeringtable").setStepSound(Block.soundTypeStone).setCreativeTab(ModTabs.TAB_PRAYER_BLOCKS);
 		this.setHarvestLevel("pickaxe", 1, 0);
 	}
 
 	@Override
+	public TileEntity createNewTileEntity(final World world, final int meta) {
+		return new TileEntityOfferingTable();
+	}
+
+	@Override
+	public boolean onBlockActivated(final World world, final int x, final int y, final int z, final EntityPlayer player, final int meta, final float p_149727_7_, final float p_149727_8_, final float p_149727_9_)
+	{
+		final TileEntity te = world.getTileEntity(x, y, z);
+		if((te == null) || ((te instanceof TileEntityOfferingTable) == false))
+			return false;
+		final TileEntityOfferingTable table = (TileEntityOfferingTable) te;
+		if((player.getHeldItem() != null) && (player.getHeldItem().getItem() == ModItems.bottle) && FluidContainerRegistry.containsFluid(player.getHeldItem(), new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4))
+				&& (table.getCurrentItem() != null) && (table.getCurrentItem().getItem() == ModItems.basicBone) && (table.getCurrentItem().getItemDamage() == 3)){
+			if(table.getCurrentItem().hasTagCompound() && table.getCurrentItem().getTagCompound().getBoolean("soaked"))
+				return false;
+			NBTTagCompound comp;
+			if(table.getCurrentItem().hasTagCompound())
+				comp = table.getCurrentItem().getTagCompound();
+			else{
+				comp = new NBTTagCompound();
+				table.getCurrentItem().setTagCompound(comp);
+			}
+			comp.setBoolean("soaked", true);
+		}else if(table.getCurrentItem() != null){
+			player.inventory.addItemStackToInventory(table.getCurrentItem());
+			table.setCurrentItem(null, player);
+		}else if((player.getHeldItem() == null) && (table.getAltar() != null) && table.getAltar().isActivated()){
+			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
+			final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
+			float toRecharge = table.getAltar().onRechargePlayer(diff, player, false);
+			if((diff <= 0) || (toRecharge <= 0))
+				return false;
+			toRecharge = table.getAltar().onRechargePlayer(diff, player, true);
+			prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
+			return true;
+		}else if((player.getHeldItem() == null) && (table.getAltar() == null)){
+			final Altar altar = new Altar(table);
+			altar.determineBlocks(world);
+		}else if(player.getHeldItem() != null){
+			final ItemStack clone = player.getHeldItem().copy();
+			clone.stackSize = 1;
+			table.setCurrentItem(clone, player);
+			if(!player.capabilities.isCreativeMode && (player.getHeldItem() != null))
+				player.getHeldItem().stackSize--;
+		}
+
+		return true;
+	}
+
+	/*@Override
 	public boolean onBlockActivated(final World world, final int x, final int y, final int z, final EntityPlayer player, final int p_149727_6_, final float p_149727_7_, final float p_149727_8_, final float p_149727_9_)
 	{
-		final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
-		if((altar == null) || player.isSneaking())
+		final TileEntity ent = world.getTileEntity(x, y, z);
+		if((ent == null) || ((ent instanceof TileEntityAltar) == false) || player.isSneaking())
 			return false;
-		final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;
+		final TileEntityAltar te = (TileEntityAltar) ent;
 		if((player.getHeldItem() != null) && (player.getHeldItem().getItem() == ModItems.bottle) && FluidContainerRegistry.containsFluid(player.getHeldItem(), new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4))
 				&& (te.getCurrentItem() != null) && (te.getCurrentItem().getItem() == ModItems.basicBone) && (te.getCurrentItem().getItemDamage() == 3)){
 			if(te.getCurrentItem().hasTagCompound() && te.getCurrentItem().getTagCompound().getBoolean("soaked"))
@@ -56,53 +97,50 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 		}else if(te.getCurrentItem() != null){
 			player.inventory.addItemStackToInventory(te.getCurrentItem());
 			te.setCurrentItem(null, player);
-		}else if((player.getHeldItem() == null) && altar.isActivated()){
+		}else if((player.getHeldItem() == null) && te.isActivated()){
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 			final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
-			float toRecharge = altar.onRechargePlayer(diff, player, false);
+			float toRecharge = te.onRechargePlayer(diff, player, false);
 			if((diff <= 0) || (toRecharge <= 0))
 				return false;
-			toRecharge = altar.onRechargePlayer(diff, player, true);
+			toRecharge = te.onRechargePlayer(diff, player, true);
 			prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
 			return true;
-		}else if(te.isItemValid(player.getHeldItem())){
-
-			final ItemStack clone = player.getHeldItem() == null ? null:player.getHeldItem().copy();
-			if(clone != null)
-				clone.stackSize = 1;
+		}else if(player.getHeldItem() != null){
+			final ItemStack clone = player.getHeldItem().copy();
+			clone.stackSize = 1;
 			te.setCurrentItem(clone, player);
 			if(!player.capabilities.isCreativeMode && (player.getHeldItem() != null))
 				player.getHeldItem().stackSize--;
-
 		}
 		return true;
 	}
 
 	@Override
 	public void onBlockClicked(final World world, final int x, final int y, final int z, final EntityPlayer player) {
-		final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
-		if((altar == null) || !player.isSneaking())
+		final TileEntity ent = world.getTileEntity(x, y, z);
+		if((ent == null) || ((ent instanceof TileEntityAltar) == false) || !player.isSneaking())
 			return;
-		if(altar.getMaxPrayerPoints() <= altar.getPrayerPoints())
+		final TileEntityAltar te = (TileEntityAltar) ent;
+		if(te.getMaxPrayerPoints() <= te.getPrayerPoints())
 			return;
-		float diff = Math.min(100F, altar.getMaxPrayerPoints()-altar.getPrayerPoints());
+		float diff = Math.min(100F, te.getMaxPrayerPoints()-te.getPrayerPoints());
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 		if(prop.getPrayerPoints() <= 0)
 			return;
 		if(prop.getPrayerPoints() < diff)
 			diff = prop.getPrayerPoints();
-		altar.setPrayerPoints(altar.getPrayerPoints()+diff);
+		te.setPrayerPoints(te.getPrayerPoints()+diff);
 		prop.setPrayerPoints(prop.getPrayerPoints()-diff);
-
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
-		final IPrayerAltar altar = PSReflectionHelper.findAt(IPrayerAltar.class, world, x, y, z);
-		if((altar == null) || ((altar instanceof TileEntityBasicAltar) == false))
+		final TileEntity ent = world.getTileEntity(x, y, z);
+		if((ent == null) || ((ent instanceof TileEntityAltar) == false))
 			return;
-		final TileEntityBasicAltar te = (TileEntityBasicAltar) altar;
+		final TileEntityAltar te = (TileEntityAltar) ent;
 		if(te.isBlessingWater())
 			Prayers.getProxy().renderEffect("waterBless", world, x ,y ,z, rand);
 		if(te.isInRitual() && (te.getCurrentItem() == null)){
@@ -158,7 +196,7 @@ public class BlockBasicAltar extends BlockPrayers implements ITileEntityProvider
 
 	@Override
 	public TileEntity createNewTileEntity(final World world, final int meta) {
-		return new TileEntityBasicAltar(false);
-	}
+		return new TileEntityAltar(false);
+	}*/
 
 }

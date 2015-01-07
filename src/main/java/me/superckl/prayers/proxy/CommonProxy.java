@@ -1,7 +1,10 @@
 package me.superckl.prayers.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.common.entity.tile.TileEntityBasicAltar;
+import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.gui.GuiHandler;
 import me.superckl.prayers.common.handler.BucketEventHandler;
 import me.superckl.prayers.common.handler.EntityEventHandler;
@@ -30,6 +33,8 @@ import cpw.mods.fml.relauncher.Side;
 
 public abstract class CommonProxy implements IProxy{
 
+	private static final Map<String, NBTTagCompound> extendedEntityData = new HashMap<String, NBTTagCompound>();
+
 	@Override
 	public void registerHandlers() {
 		FMLCommonHandler.instance().bus().register(Prayers.getInstance().getConfig());
@@ -47,7 +52,7 @@ public abstract class CommonProxy implements IProxy{
 
 	@Override
 	public void registerEntities() {
-		GameRegistry.registerTileEntity(TileEntityBasicAltar.class, "tileEntityBasicAltar");
+		GameRegistry.registerTileEntity(TileEntityOfferingTable.class, "tileEntityOfferingTable");
 	}
 
 	@Override
@@ -60,6 +65,14 @@ public abstract class CommonProxy implements IProxy{
 		comp.setBoolean("soaked", true);
 		soakedBones.setTagCompound(comp);
 		GameRegistry.addShapelessRecipe(soakedBones, new ItemStack(ModItems.basicBone, 1, 3), filledBottle);
+	}
+
+	public static void storeEntityData(final String name, final NBTTagCompound compound){
+		CommonProxy.extendedEntityData.put(name, compound);
+	}
+
+	public static NBTTagCompound getEntityData(final String name){
+		return CommonProxy.extendedEntityData.remove(name);
 	}
 
 }

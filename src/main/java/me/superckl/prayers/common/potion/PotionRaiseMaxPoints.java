@@ -5,11 +5,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 
-public class PotionPrayerRestoreInstant extends Potion{
+public class PotionRaiseMaxPoints extends Potion{
 
-	public PotionPrayerRestoreInstant(final int id) {
-		super(id, false, 0x6cfef9);
-		this.setPotionName("potion.prayerrestoreinstant.name");
+	public PotionRaiseMaxPoints(final int id) {
+		super(id, false, 0x7f0303);
+		this.setPotionName("potion.maxpointsraise.name");
 	}
 
 	@Override
@@ -18,14 +18,7 @@ public class PotionPrayerRestoreInstant extends Potion{
 			return;
 		final EntityPlayer player = (EntityPlayer) entity;
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
-		final float max = prop.getMaxPrayerPoints();
-		final float points = prop.getPrayerPoints();
-		if(max <= points)
-			return;
-		final float toRestore = 150F*(amplifier+1);
-		if((max - points) <= toRestore)
-			prop.setPrayerPoints(max);
-		prop.setPrayerPoints(points+toRestore);
+		prop.setBaseMaxPrayerPoints(prop.getBaseMaxPrayerPoints()+(10F*(amplifier+1)));
 	}
 
 	@Override

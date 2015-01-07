@@ -21,26 +21,31 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EntityEventHandler {
 
-	@SubscribeEvent
+	@SubscribeEvent()
 	public void onEntityConstruction(final EntityConstructing e){
 		if(e.entity instanceof EntityPlayer)
 			e.entity.registerExtendedProperties("prayer", new PrayerExtendedProperties());
 	}
 
-	@SubscribeEvent
-	public void onEntitySpawn(final EntityJoinWorldEvent e){
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onEntityJoinWorld(final EntityJoinWorldEvent e){
 		if((e.entity instanceof EntityLivingBase) == false)
 			return;
 		PSReflectionHelper.setPrivateFinalValue(EntityLivingBase.class, (EntityLivingBase) e.entity, new PotionEffectHashMap((EntityLivingBase) e.entity, ((EntityLivingBase)e.entity).activePotionsMap), "activePotionsMap", "field_70713_bf");
-		if(!e.world.isRemote && (e.entity instanceof EntityPlayerMP))
-			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(PrayerHelper.getActivePrayers((EntityLivingBase) e.entity)), (EntityPlayerMP) e.entity);
+		if(!e.world.isRemote && (e.entity instanceof EntityPlayerMP)){
+			final NBTTagCompound comp = new NBTTagCompound();
+			((PrayerExtendedProperties)((EntityPlayer)e.entity).getExtendedProperties("prayer")).saveNBTData(comp);
+			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(comp), (EntityPlayerMP) e.entity);
+		}
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent()
 	public void onLivingHurt(final LivingHurtEvent e){
 		if((e.source.getSourceOfDamage() != null)){
 			final EntityLivingBase shooter = PlayerHelper.getShooter(e.source.getSourceOfDamage());
@@ -103,7 +108,7 @@ public class EntityEventHandler {
 	}
 
 	@SubscribeEvent
-	public void onLivingDeath(final LivingDropsEvent e){
+	public void onLivingDrops(final LivingDropsEvent e){
 		if(e.entityLiving.getRNG().nextInt(4) == 0)
 			return;
 		if((e.entityLiving.width*e.entityLiving.height) < 2.0F)
@@ -112,7 +117,7 @@ public class EntityEventHandler {
 			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(50) == 0 ? 2:1)));
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOW)
 	public void onItemPickup(final EntityItemPickupEvent e){
 		if(e.item instanceof EntityCleaningDirtyBone){
 			final EntityCleaningDirtyBone ent = (EntityCleaningDirtyBone) e.item;
@@ -126,25 +131,12 @@ public class EntityEventHandler {
 		}
 	}
 
-	/*@SubscribeEvent
-	public void onPlayerInteract(final PlayerInteractEvent e){
-		if(e.action == Action.RIGHT_CLICK_BLOCK){
-			final IPrayerAltar altar = PrayerHelper.findAltar(e.world, e.x, e.y, e.z);
-			if((altar == null) || !altar.canBlessWater() || !altar.canBlessInstantly() || (e.entityPlayer.getHeldItem() == null) || (e.entityPlayer.getHeldItem().getItem() != Items.potionitem) || (e.entityPlayer.getHeldItem().getItemDamage() != 0) || (e.entityPlayer.getHeldItem().stackSize <= 0))
-				return;
-			final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityPlayer.getExtendedProperties("prayer");
-			if(prop.getPrayerLevel() < 20){
-				if(!e.world.isRemote)
-					ChatHelper.sendFormattedDoubleMessage(e.entityPlayer, "msg.whisper.text", ChatHelper.createTranslatedChatWithStyle("msg.lvltoolow:water.text", new ChatStyle().setItalic(false)), new ChatStyle().setColor(EnumChatFormatting.RED).setItalic(true));
-				return;
-			}
-			final ItemStack filledBottle = new ItemStack(ModItems.bottle);
-			ModItems.bottle.fill(filledBottle, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4), true);
-			if(e.entityPlayer.getHeldItem().stackSize == 1)
-				e.entityPlayer.inventory.setInventorySlotContents(e.entityPlayer.inventory.currentItem, filledBottle);
-			else if(e.entityPlayer.getHeldItem().stackSize > 1)
-				e.entityPlayer.inventory.addItemStackToInventory(filledBottle);
-		}
-	}*/
+	@SubscribeEvent
+	public void onPlayerClone(final PlayerEvent.Clone e){
+		final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.original.getExtendedProperties("prayer");
+		final NBTTagCompound comp = new NBTTagCompound();
+		prop.saveNBTData(comp);
+		e.entityPlayer.getExtendedProperties("prayer").loadNBTData(comp);
+	}
 
 }

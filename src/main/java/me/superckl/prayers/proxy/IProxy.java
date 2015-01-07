@@ -1,6 +1,7 @@
 package me.superckl.prayers.proxy;
 
 
+
 public interface IProxy {
 
 	public void registerHandlers();
