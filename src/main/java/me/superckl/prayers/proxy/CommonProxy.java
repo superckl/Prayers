@@ -1,5 +1,6 @@
 package me.superckl.prayers.proxy;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +10,8 @@ import me.superckl.prayers.common.gui.GuiHandler;
 import me.superckl.prayers.common.handler.BucketEventHandler;
 import me.superckl.prayers.common.handler.EntityEventHandler;
 import me.superckl.prayers.common.handler.PlayerTickHandler;
+import me.superckl.prayers.common.prayer.AltarRegistry;
+import me.superckl.prayers.common.prayer.BasicTableCraftingHandler;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
@@ -65,6 +68,7 @@ public abstract class CommonProxy implements IProxy{
 		comp.setBoolean("soaked", true);
 		soakedBones.setTagCompound(comp);
 		GameRegistry.addShapelessRecipe(soakedBones, new ItemStack(ModItems.basicBone, 1, 3), filledBottle);
+		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(filledBottle, new ItemStack(Items.potionitem, 1, 0), Collections.EMPTY_LIST, 200, 0.5F));
 	}
 
 	public static void storeEntityData(final String name, final NBTTagCompound compound){

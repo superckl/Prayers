@@ -11,6 +11,7 @@ import lombok.Setter;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.NumberHelper;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
@@ -36,7 +37,10 @@ public class Altar{
 	private int ritualTimer = 72000; //3 day-night cycles
 	@Getter
 	@Setter
-	private float prayerPoints = 0F;
+	private float prayerPoints = 500F;
+	@Getter
+	@Setter
+	private float maxPrayerPoints = 500F;
 	@Getter
 	private List<Vec3> blocks;
 	@Getter
@@ -52,6 +56,7 @@ public class Altar{
 
 	public void readFromNBT(final NBTTagCompound comp) {
 		this.activated = comp.getBoolean("altarActivated");
+		this.maxPrayerPoints = comp.getFloat("maxPrayerPoints");
 		this.prayerPoints = comp.getFloat("prayerPoints");
 		this.inRitual = comp.getBoolean("inRitual");
 		this.ritualTimer = comp.getInteger("ritualTimer");
@@ -65,6 +70,7 @@ public class Altar{
 
 	public void writeToNBT(final NBTTagCompound comp) {
 		comp.setBoolean("altarActivated", this.activated);
+		comp.setFloat("maxPrayerPoints", this.maxPrayerPoints);
 		comp.setFloat("prayerPoints", this.prayerPoints);
 		comp.setBoolean("inRitual", this.inRitual);
 		comp.setInteger("ritualTimer", this.ritualTimer);
@@ -78,10 +84,6 @@ public class Altar{
 			}
 			comp.setIntArray("blocks", coords);
 		}
-	}
-
-	public float getMaxPrayerPoints() {
-		return 500F; //TODO calculate
 	}
 
 	private int regenTimer = 200;
@@ -131,7 +133,7 @@ public class Altar{
 			this.activated = true;
 			this.inRitual = false;
 			this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
-			//this.holder.getWorldObj().spawnEntityInWorld(new EntityLightningBolt(this.getWorldObj(), this.xCoord+0.5D, this.yCoord+0.5D, this.zCoord+0.5D));
+			this.holder.getWorldObj().spawnEntityInWorld(new EntityLightningBolt(this.holder.getWorldObj(), this.holder.xCoord+0.5D, this.holder.yCoord+0.5D, this.holder.zCoord+0.5D));
 			//TODO effects...
 			return;
 		}
@@ -153,7 +155,7 @@ public class Altar{
 							}
 						}
 					if(this.random.nextInt(7000) == 0){
-						table.setCurrentItem(null, null);
+						table.setCurrentItem(null);
 						table.getWorldObj().markBlockForUpdate(table.xCoord, table.yCoord, table.zCoord);
 						table.getWorldObj().playSoundEffect(table.xCoord+0.5F, table.yCoord+0.5F, table.zCoord+0.5F, "mob.endermen.portal", 1.0F, 1.0F);
 						for (int l = 0; l < 4; ++l)

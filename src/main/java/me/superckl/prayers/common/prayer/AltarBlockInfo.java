@@ -10,7 +10,7 @@ import me.superckl.prayers.common.utility.CalculationEffectType;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class AltarBlockInfo {
+public class AltarBlockInfo implements Cloneable{
 
 	private boolean affectsRechargeRate;
 	private boolean affectsMaxPoints;
@@ -20,5 +20,10 @@ public class AltarBlockInfo {
 	private float maxPointsModifier;
 
 	public AltarBlockInfo(){};
+
+	@Override
+	protected Object clone(){
+		return new AltarBlockInfo(this.affectsRechargeRate, this.affectsMaxPoints, this.rechargeEffectType, this.maxPointsEffectType, this.rechargeRateModifier, this.maxPointsModifier);
+	}
 
 }

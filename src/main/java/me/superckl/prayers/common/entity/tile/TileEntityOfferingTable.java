@@ -1,12 +1,13 @@
 package me.superckl.prayers.common.entity.tile;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.common.prayer.Altar;
-import me.superckl.prayers.common.reference.ModFluids;
-import net.minecraft.entity.player.EntityPlayer;
+import me.superckl.prayers.common.prayer.AltarRegistry;
+import me.superckl.prayers.common.prayer.OfferingTableCraftingHandler;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,9 +20,9 @@ public class TileEntityOfferingTable extends TileEntity{
 
 	@Getter
 	private ItemStack currentItem;
-	//Not saved to NBT.
+	private final List<ItemStack> tertiaryItems = new ArrayList<ItemStack>();
 	@Getter
-	private WeakReference<EntityPlayer> placingPlayer;
+	private OfferingTableCraftingHandler currentRecipe;
 	private int[] masterLoc;
 	@Setter
 	private Altar altar;
@@ -70,11 +71,30 @@ public class TileEntityOfferingTable extends TileEntity{
 
 	@Override
 	public void updateEntity() {
+		super.updateEntity();
 		if(this.isMaster())
 			this.altar.updateEntity(this.worldObj);
+		this.handleCrafting();
 	}
 
-	private void manageWaterBless(){
+	private void handleCrafting(){
+		if(this.getAltar() == null)
+			return;
+		if(this.currentRecipe != null){
+			if(this.currentRecipe.isComplete(this)){
+				this.tertiaryItems.clear();
+				this.currentItem = this.currentRecipe.getResult().copy();
+				this.currentRecipe = null;
+				//TODO effect
+			}else if(this.currentRecipe.isCrafting(this))
+				this.currentRecipe.handleUpdate(this);
+			else if(this.currentRecipe.areAdditionalRequirementsMet(this))
+				this.currentRecipe.beginCrafting(this);
+		}else if((this.worldObj.getWorldTime() % 60) == 0)
+			this.findRecipe();
+	}
+
+	/*private void manageWaterBless(){
 		Altar altar;
 		if((this.currentItem != null) && (this.currentItem.getItem() == Items.potionitem) && (this.currentItem.getItemDamage() == 0) && ((altar = this.getAltar()) != null) && altar.isActivated()){
 			if(altar.getPrayerPoints() >= 0.5F){
@@ -86,7 +106,7 @@ public class TileEntityOfferingTable extends TileEntity{
 				this.currentItem = ModFluids.filledHolyBottle();
 			}
 		}
-	}
+	}*/
 
 	public boolean isBlessingWater(){
 		return (this.getAltar() != null) && this.getAltar().isActivated() && (this.currentItem != null) && (this.currentItem.getItem() == Items.potionitem) && (this.currentItem.getItemDamage() == 0) && (this.getAltar().getPrayerPoints() >= 0.5F) && (this.waterTimer > 0);
@@ -120,10 +140,48 @@ public class TileEntityOfferingTable extends TileEntity{
 		this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 	}
 
-	public void setCurrentItem(final ItemStack item, final EntityPlayer player){
-		this.currentItem = item;
-		this.placingPlayer = new WeakReference<EntityPlayer>(player);
-		this.waterTimer = 200;
+	public void findRecipe(){
+		if(this.currentItem == null)
+			return;
+		for(final OfferingTableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
+			if(handler.checkCompletion(this.currentItem, this.tertiaryItems)){
+				this.currentRecipe = handler.clone();
+				break;
+			}
+	}
+
+	public void onIngredientsModified(){
+		if((this.currentRecipe != null) && this.currentRecipe.isCrafting(this)){
+			//TODO effect
+		}
+		this.currentRecipe = null;
+	}
+
+	public void setCurrentItem(final ItemStack stack){
+		this.currentItem = stack;
+		this.onIngredientsModified();
+	}
+
+	public void addTertiaryIngredient(final ItemStack stack){
+		if(stack == null)
+			return;
+		this.tertiaryItems.add(stack);
+		this.onIngredientsModified();
+	}
+
+	public ItemStack removeTertiaryIngredient(){
+		if(this.tertiaryItems.isEmpty())
+			return null;
+		final ItemStack stack = this.tertiaryItems.remove(this.tertiaryItems.size()-1);
+		this.onIngredientsModified();
+		return stack;
+	}
+
+	public List<ItemStack> removeAllTertiaryIngredients(){
+		final List<ItemStack> list = new ArrayList<ItemStack>(this.tertiaryItems);
+		this.tertiaryItems.clear();
+		this.onIngredientsModified();
+		return list;
 	}
 
 }

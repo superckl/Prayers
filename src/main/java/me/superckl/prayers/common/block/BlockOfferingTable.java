@@ -1,5 +1,8 @@
 package me.superckl.prayers.common.block;
 
+import java.util.Random;
+
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.prayer.Altar;
@@ -16,6 +19,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvider{
 
@@ -51,7 +56,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 			comp.setBoolean("soaked", true);
 		}else if(table.getCurrentItem() != null){
 			player.inventory.addItemStackToInventory(table.getCurrentItem());
-			table.setCurrentItem(null, player);
+			table.setCurrentItem(null);
 		}else if((player.getHeldItem() == null) && (table.getAltar() != null) && table.getAltar().isActivated()){
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 			final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
@@ -67,12 +72,56 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 		}else if(player.getHeldItem() != null){
 			final ItemStack clone = player.getHeldItem().copy();
 			clone.stackSize = 1;
-			table.setCurrentItem(clone, player);
+			table.setCurrentItem(clone);
 			if(!player.capabilities.isCreativeMode && (player.getHeldItem() != null))
 				player.getHeldItem().stackSize--;
 		}
 
 		return true;
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
+		final TileEntity ent = world.getTileEntity(x, y, z);
+		if((ent == null) || ((ent instanceof TileEntityOfferingTable) == false))
+			return;
+		final TileEntityOfferingTable te = (TileEntityOfferingTable) ent;
+		if(te.getAltar() == null)
+			return;
+		if((te.getCurrentRecipe() != null) && te.getCurrentRecipe().isCrafting(te))
+			Prayers.getProxy().renderEffect("waterBless", world, x ,y ,z, rand);
+		if(te.getAltar().isInRitual() && (te.getCurrentItem() == null)){
+			final double d0 = 0.0625D;
+
+			for (int l = 0; l < 6; ++l)
+			{
+				double d1 = x + rand.nextFloat();
+				double d2 = y + rand.nextFloat();
+				double d3 = z + rand.nextFloat();
+
+				if ((l == 0) && !world.getBlock(x, y + 1, z).isOpaqueCube())
+					d2 = y + 1 + d0;
+
+				if ((l == 1) && !world.getBlock(x, y - 1, z).isOpaqueCube())
+					d2 = (y + 0) - d0;
+
+				if ((l == 2) && !world.getBlock(x, y, z + 1).isOpaqueCube())
+					d3 = z + 1 + d0;
+
+				if ((l == 3) && !world.getBlock(x, y, z - 1).isOpaqueCube())
+					d3 = (z + 0) - d0;
+
+				if ((l == 4) && !world.getBlock(x + 1, y, z).isOpaqueCube())
+					d1 = x + 1 + d0;
+
+				if ((l == 5) && !world.getBlock(x - 1, y, z).isOpaqueCube())
+					d1 = (x + 0) - d0;
+
+				if ((d1 < x) || (d1 > (x + 1)) || (d2 < 0.0D) || (d2 > (y + 1)) || (d3 < z) || (d3 > (z + 1)))
+					world.spawnParticle("reddust", d1, d2, d3, 0.0D, 0.0D, 0.0D);
+			}
+		}
 	}
 
 	/*@Override
@@ -134,47 +183,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 		prop.setPrayerPoints(prop.getPrayerPoints()-diff);
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
-		final TileEntity ent = world.getTileEntity(x, y, z);
-		if((ent == null) || ((ent instanceof TileEntityAltar) == false))
-			return;
-		final TileEntityAltar te = (TileEntityAltar) ent;
-		if(te.isBlessingWater())
-			Prayers.getProxy().renderEffect("waterBless", world, x ,y ,z, rand);
-		if(te.isInRitual() && (te.getCurrentItem() == null)){
-			final double d0 = 0.0625D;
 
-			for (int l = 0; l < 6; ++l)
-			{
-				double d1 = x + rand.nextFloat();
-				double d2 = y + rand.nextFloat();
-				double d3 = z + rand.nextFloat();
-
-				if ((l == 0) && !world.getBlock(x, y + 1, z).isOpaqueCube())
-					d2 = y + 1 + d0;
-
-				if ((l == 1) && !world.getBlock(x, y - 1, z).isOpaqueCube())
-					d2 = (y + 0) - d0;
-
-				if ((l == 2) && !world.getBlock(x, y, z + 1).isOpaqueCube())
-					d3 = z + 1 + d0;
-
-				if ((l == 3) && !world.getBlock(x, y, z - 1).isOpaqueCube())
-					d3 = (z + 0) - d0;
-
-				if ((l == 4) && !world.getBlock(x + 1, y, z).isOpaqueCube())
-					d1 = x + 1 + d0;
-
-				if ((l == 5) && !world.getBlock(x - 1, y, z).isOpaqueCube())
-					d1 = (x + 0) - d0;
-
-				if ((d1 < x) || (d1 > (x + 1)) || (d2 < 0.0D) || (d2 > (y + 1)) || (d3 < z) || (d3 > (z + 1)))
-					world.spawnParticle("reddust", d1, d2, d3, 0.0D, 0.0D, 0.0D);
-			}
-		}
-	}
 
 	private IIcon[][] icons;
 
