@@ -5,11 +5,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 
-public class PotionRaiseMaxPoints extends Potion{
+public class PotionAttunement extends Potion{
 
-	public PotionRaiseMaxPoints(final int id) {
+	public PotionAttunement(final int id) {
 		super(id, false, 0x7f0303);
-		this.setPotionName("potion.maxpointsraise.name");
+		this.setPotionName("potion.attunement.name");
 	}
 
 	@Override

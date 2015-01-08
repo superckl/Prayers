@@ -115,7 +115,7 @@ public class ItemPotionPrayers extends ItemPrayers{
 	public IIcon getIcon(final ItemStack stack, final int pass) {
 		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effect")){
 			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(stack.getTagCompound().getCompoundTag("effect"));
-			final String name = effect.getEffectName().split(".")[1];
+			final String name = effect.getEffectName().split("[.]")[1];
 			if(this.icons.containsKey(name))
 				return this.icons.get(name);
 		}
@@ -150,7 +150,7 @@ public class ItemPotionPrayers extends ItemPrayers{
 		this.icons.put("prayerboost", register.registerIcon(ModData.MOD_ID+":prayerboost"));
 		this.icons.put("prayerrestore", register.registerIcon(ModData.MOD_ID+":prayerestore"));
 		this.icons.put("prayerrestoreinstant", register.registerIcon(ModData.MOD_ID+":prayerestoreinstant"));
-		this.icons.put("maxpointsraise", register.registerIcon(ModData.MOD_ID+":maxpointsraise"));
+		this.icons.put("attunement", register.registerIcon(ModData.MOD_ID+":maxpointsraise"));
 	}
 
 }
