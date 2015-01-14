@@ -1,8 +1,10 @@
 package me.superckl.prayers.common.entity;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import lombok.Getter;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.prayer.IPrayerUser;
 import me.superckl.prayers.common.reference.ModItems;
@@ -30,6 +32,10 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 	private int field_70846_g;
 	public boolean updated;
+	@Getter
+	private static final List[] prayers = new List[] {Arrays.asList(EnumPrayers.PROTECT_MAGIC), Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE),
+		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_3),
+		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_3, EnumPrayers.ENHANCE_MAGIC_4)};
 
 	public EntityUndeadWizardPriest(final World world, final int level) {
 		super(world);
@@ -70,7 +76,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	public void onLivingUpdate() {
 		if((this.worldObj.getWorldTime() % 20) == 0){
 			final boolean flag  = this.getMaxHealth() == this.getHealth();
-			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*10D));
+			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(30D+(this.getLevel()*10D));
 			if(flag)
 				this.setHealth(this.getMaxHealth());
 		}
@@ -97,7 +103,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 				d1 = entity.posZ - this.posZ;
 				d3 = (d0 * d0) + (d1 * d1);
 
-				if (d3 > 9.0D)
+				if (d3 > 12.0D)
 				{
 					d5 = MathHelper.sqrt_double(d3);
 					this.motionX += (((d0 / d5) * 0.5D) - this.motionX) * 0.28000000417232513D;
@@ -135,7 +141,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(40.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.28000000417232513D);
-		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*10D));
+		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(30D+(this.getLevel()*10D));
 	}
 
 	@Override
@@ -218,17 +224,12 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 	@Override
 	public List<EnumPrayers> getActivePrayers() {
-		final List<EnumPrayers> list = new ArrayList<EnumPrayers>();
-		list.add(EnumPrayers.PROTECT_MAGIC);
-		if(this.getLevel() > 1)
-			list.add(EnumPrayers.PROTECT_RANGE);
-		if(this.getLevel() > 2){
-			list.add(EnumPrayers.PROTECT_MELEE);
-			list.add(EnumPrayers.ENCHANCE_DEFENCE_3);
-		}
-		if(this.getLevel() > 3)
-			list.add(EnumPrayers.ENHANCE_MAGIC_4);
-		return list;
+		int index = this.getLevel() - 1;
+		if(index < 0)
+			return Collections.EMPTY_LIST;
+		if(index > (EntityUndeadWizardPriest.prayers.length-1))
+			index = EntityUndeadWizardPriest.prayers.length-1;
+		return EntityUndeadWizardPriest.prayers[index];
 	}
 
 	@Override

@@ -47,6 +47,7 @@ public class Prayers {
 		ModAchievements.init();
 		Prayers.proxy.registerRecipes();
 		Prayers.proxy.registerEntities();
+		Prayers.proxy.registerRenderers();
 		Prayers.proxy.setupGuis();
 		Prayers.proxy.registerBindings();
 	}

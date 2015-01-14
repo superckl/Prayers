@@ -22,7 +22,7 @@ public class EntityRenderHandler {
 				continue;
 			final double dist = e.entity.getDistanceSqToEntity(e.renderer.renderManager.livingPlayer);
 
-			if (dist <= (64D * 64D))
+			if (dist <= (4096D))
 			{
 				final float scale = 0.016666668F * 1.6F;
 				GL11.glPushMatrix();
@@ -59,7 +59,6 @@ public class EntityRenderHandler {
 				GL11.glDisable(GL11.GL_BLEND);
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				GL11.glPopMatrix();
-				break;
 			}
 		}
 	}

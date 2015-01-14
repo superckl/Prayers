@@ -6,7 +6,9 @@ import me.superckl.prayers.client.gui.InventoryTabPrayers;
 import me.superckl.prayers.client.handler.EntityRenderHandler;
 import me.superckl.prayers.client.handler.InputHandler;
 import me.superckl.prayers.client.handler.RenderTickHandler;
+import me.superckl.prayers.client.render.RenderUndeadWizardPriest;
 import me.superckl.prayers.client.render.RenderWizardSpell;
+import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.EntityWizardSpell;
 import me.superckl.prayers.common.reference.KeyBindings;
 import me.superckl.prayers.common.reference.ModData;
@@ -91,7 +93,7 @@ public class ClientProxy extends CommonProxy{
 	@Override
 	public void registerRenderers() {
 		//ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBasicAltar.class, new RenderBasicAltar());
-		//RenderingRegistry.registerEntityRenderingHandler(EntityUndeadWizardPriest.class, new RenderUndeadWizardPriest());
+		RenderingRegistry.registerEntityRenderingHandler(EntityUndeadWizardPriest.class, new RenderUndeadWizardPriest());
 		RenderingRegistry.registerEntityRenderingHandler(EntityWizardSpell.class, new RenderWizardSpell());
 	}
 
