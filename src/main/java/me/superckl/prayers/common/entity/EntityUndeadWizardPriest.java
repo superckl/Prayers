@@ -76,7 +76,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	public void onLivingUpdate() {
 		if((this.worldObj.getWorldTime() % 20) == 0){
 			final boolean flag  = this.getMaxHealth() == this.getHealth();
-			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(30D+(this.getLevel()*10D));
+			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*20D));
 			if(flag)
 				this.setHealth(this.getMaxHealth());
 		}
@@ -141,13 +141,13 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(40.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.28000000417232513D);
-		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(30D+(this.getLevel()*10D));
+		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*20D));
 	}
 
 	@Override
 	public int getTotalArmorValue()
 	{
-		final int i = super.getTotalArmorValue() + (this.getLevel()*7);
+		final int i = super.getTotalArmorValue() + (this.getLevel()*5);
 
 		return i;
 	}

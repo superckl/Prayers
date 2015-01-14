@@ -7,6 +7,7 @@ import java.util.Map;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
+import me.superckl.prayers.common.entity.EntityWizardSpell;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.gui.GuiHandler;
 import me.superckl.prayers.common.handler.BucketEventHandler;
@@ -64,6 +65,9 @@ public abstract class CommonProxy implements IProxy{
 		final int wizardID = EntityRegistry.findGlobalUniqueEntityId();
 		EntityRegistry.registerGlobalEntityID(EntityUndeadWizardPriest.class, "prayersundeadpriest", wizardID, Color.GRAY.getRGB(), Color.BLACK.getRGB());
 		EntityRegistry.registerModEntity(EntityUndeadWizardPriest.class, "prayersundeadpriest", wizardID, Prayers.getInstance(), 80, 3, true);
+		final int spellID = EntityRegistry.findGlobalUniqueEntityId();
+		EntityRegistry.registerGlobalEntityID(EntityWizardSpell.class, "prayerswizardspell", spellID);
+		EntityRegistry.registerModEntity(EntityWizardSpell.class, "prayerswizardspell", spellID, Prayers.getInstance(), 80, 3, true);
 	}
 
 	@Override

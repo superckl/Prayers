@@ -17,6 +17,7 @@ potion.attunement.name=Attunement
 potion.prayerrestore.name=Prayer Restore
 potion.prayerrestoreinstant.name=Instant Prayer Restore
 entity.prayersundeadpriest.name=Undead Wizard Priest
+entity.prayerswizardspell.name=Magic Burst
 key.prayers.openprayers=Open Prayers GUI
 key.categories.prayers=prayers
 achievement.prayerrecharged=Recharged

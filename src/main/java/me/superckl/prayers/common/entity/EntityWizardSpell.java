@@ -37,7 +37,7 @@ public class EntityWizardSpell extends EntityThrowable{
 
 	public EntityWizardSpell(final World world, final EntityLivingBase thrower, double x, double y, double z){
 		super(world, thrower);
-		this.setSize(1.0F, 1.0F);
+		this.setSize(0.5F, 0.5F);
 		this.setLocationAndAngles(thrower.posX, thrower.posY, thrower.posZ, thrower.rotationYaw, thrower.rotationPitch);
 		this.setPosition(this.posX, this.posY, this.posZ);
 		this.yOffset = 0.0F;
@@ -54,6 +54,13 @@ public class EntityWizardSpell extends EntityThrowable{
 	public EntityWizardSpell(final World world, final EntityLivingBase thrower, final double x, final double y, final double z, final float damage){
 		this(world, thrower, x, y ,z);
 		this.baseDamage = damage;
+	}
+
+	public EntityWizardSpell(final World world){
+		super(world);
+		this.setSize(0.5F, 0.5F);
+		this.yOffset = 0.0F;
+		this.motionX = this.motionY = this.motionZ = 0.0D;
 	}
 
 	@Override
