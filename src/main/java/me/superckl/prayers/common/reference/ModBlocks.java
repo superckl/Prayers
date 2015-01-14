@@ -8,15 +8,15 @@ import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
 @ObjectHolder(ModData.MOD_ID)
 public class ModBlocks {
 
-	public static final BlockOfferingTable altarBase = new BlockOfferingTable();
+	public static final BlockOfferingTable offeringTable = new BlockOfferingTable();
 	public static BlockFluidHolyWater holyWater;
 
 	public static void init(){
-		GameRegistry.registerBlock(ModBlocks.altarBase, Names.ALTAR_BASE);
+		GameRegistry.registerBlock(ModBlocks.offeringTable, Names.OFFERING_TABLE);
 	}
 
 	public static final class Names{
-		public static final String ALTAR_BASE = "altarBase";
+		public static final String OFFERING_TABLE = "offeringTable";
 		public static final String HOLY_WATER = "holyWater";
 	}
 }

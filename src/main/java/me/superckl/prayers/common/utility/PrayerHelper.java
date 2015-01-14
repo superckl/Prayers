@@ -5,6 +5,7 @@ import java.util.List;
 
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.EnumPrayers;
+import me.superckl.prayers.common.prayer.IPrayerUser;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,6 +41,8 @@ public class PrayerHelper {
 	public static List<EnumPrayers> getActivePrayers(final EntityLivingBase entity){
 		if(entity instanceof EntityPlayer)
 			return ((PrayerExtendedProperties)((EntityPlayer)entity).getExtendedProperties("prayer")).getActivePrayers();
+		else if(entity instanceof IPrayerUser)
+			return ((IPrayerUser)entity).getActivePrayers();
 		return new ArrayList<EnumPrayers>();
 	}
 

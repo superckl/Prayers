@@ -23,7 +23,7 @@ public class ModTabs {
 
 		@Override
 		public Item getTabIconItem() {
-			return Item.getItemFromBlock(ModBlocks.altarBase);
+			return Item.getItemFromBlock(ModBlocks.offeringTable);
 		}
 
 		@Override

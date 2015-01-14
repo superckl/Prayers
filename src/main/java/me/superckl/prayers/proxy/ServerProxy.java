@@ -11,4 +11,7 @@ public class ServerProxy extends CommonProxy{
 	@Override
 	public void renderEffect(final String name, final Object ... args) {}
 
+	@Override
+	public void registerRenderers() {}
+
 }

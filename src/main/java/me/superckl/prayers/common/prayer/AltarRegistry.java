@@ -27,7 +27,7 @@ public class AltarRegistry {
 	private static final Set<OfferingTableCraftingHandler> registeredRecipes = new HashSet<OfferingTableCraftingHandler>();
 
 	static{
-		AltarRegistry.registeredBlocks.put(ModBlocks.altarBase, new AltarBlockInfo(true, true, CalculationEffectType.FIRST_ADDITION, CalculationEffectType.FIRST_ADDITION, 0F, 0F));
+		AltarRegistry.registeredBlocks.put(ModBlocks.offeringTable, new AltarBlockInfo(true, true, CalculationEffectType.FIRST_ADDITION, CalculationEffectType.FIRST_ADDITION, 0F, 0F));
 	}
 
 	public static boolean isBlockRegistered(final Block block){

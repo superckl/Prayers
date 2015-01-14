@@ -21,7 +21,6 @@ public class PotionEffectHashMap extends HashMap<Integer, PotionEffect>{
 	@Override
 	public PotionEffect put(final Integer key, final PotionEffect value) {
 		if(PrayerHelper.getActivePrayers(this.entity).contains(EnumPrayers.ENHANCE_POTION))
-			//value = new PotionEffect(value);
 			value.duration *= 1.2;
 		return super.put(key, value);
 	}
@@ -30,7 +29,6 @@ public class PotionEffectHashMap extends HashMap<Integer, PotionEffect>{
 	public void putAll(final Map<? extends Integer, ? extends PotionEffect> m) {
 		if(PrayerHelper.getActivePrayers(this.entity).contains(EnumPrayers.ENHANCE_POTION))
 			for(final PotionEffect value:m.values())
-				//value = new PotionEffect(value);
 				value.duration *= 1.2;
 		super.putAll(m);
 	}

@@ -16,6 +16,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
@@ -56,6 +57,12 @@ public class Prayers {
 		ModItems.addChestLoot();
 
 		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaDataProvider.callbackRegister");
+		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaEntityProvider.callbackRegister");
+	}
+
+	@EventHandler
+	public void postInit(final FMLPostInitializationEvent e){
+		Prayers.proxy.registerEntitySpawns();
 	}
 
 	@EventHandler

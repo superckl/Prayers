@@ -1,10 +1,12 @@
 package me.superckl.prayers.proxy;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.gui.GuiHandler;
 import me.superckl.prayers.common.handler.BucketEventHandler;
@@ -23,13 +25,16 @@ import me.superckl.prayers.network.MessageHandlerDisablePrayerServer;
 import me.superckl.prayers.network.MessageHandlerEnablePrayerServer;
 import me.superckl.prayers.network.MessageHandlerOpenPrayerGui;
 import me.superckl.prayers.network.MessageOpenPrayerGui;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -56,6 +61,16 @@ public abstract class CommonProxy implements IProxy{
 	@Override
 	public void registerEntities() {
 		GameRegistry.registerTileEntity(TileEntityOfferingTable.class, "tileEntityOfferingTable");
+		final int wizardID = EntityRegistry.findGlobalUniqueEntityId();
+		EntityRegistry.registerGlobalEntityID(EntityUndeadWizardPriest.class, "prayersundeadpriest", wizardID, Color.GRAY.getRGB(), Color.BLACK.getRGB());
+		EntityRegistry.registerModEntity(EntityUndeadWizardPriest.class, "prayersundeadpriest", wizardID, Prayers.getInstance(), 80, 3, true);
+	}
+
+	@Override
+	public void registerEntitySpawns(){
+		for(final BiomeGenBase gen:BiomeGenBase.getBiomeGenArray())
+			if(gen != null)
+				EntityRegistry.addSpawn(EntityUndeadWizardPriest.class, 2, 1, 1, EnumCreatureType.monster, gen);
 	}
 
 	@Override

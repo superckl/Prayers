@@ -6,6 +6,8 @@ import me.superckl.prayers.client.gui.InventoryTabPrayers;
 import me.superckl.prayers.client.handler.EntityRenderHandler;
 import me.superckl.prayers.client.handler.InputHandler;
 import me.superckl.prayers.client.handler.RenderTickHandler;
+import me.superckl.prayers.client.render.RenderWizardSpell;
+import me.superckl.prayers.common.entity.EntityWizardSpell;
 import me.superckl.prayers.common.reference.KeyBindings;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.network.MessageDisablePrayer;
@@ -26,6 +28,7 @@ import tconstruct.client.tabs.AbstractTab;
 import tconstruct.client.tabs.InventoryTabVanilla;
 import tconstruct.client.tabs.TabRegistry;
 import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
@@ -44,8 +47,6 @@ public class ClientProxy extends CommonProxy{
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerClient.class, MessageEnablePrayer.class, 0, Side.CLIENT);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerDisablePrayerClient.class, MessageDisablePrayer.class, 1, Side.CLIENT);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerUpdatePrayers.class, MessageUpdatePrayers.class, 4, Side.CLIENT);
-
-		//ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBasicAltar.class, new RenderBasicAltar());
 	}
 
 	@Override
@@ -85,6 +86,13 @@ public class ClientProxy extends CommonProxy{
 			ent.noClip = true;
 			this.mc.effectRenderer.addEffect(ent);
 		}
+	}
+
+	@Override
+	public void registerRenderers() {
+		//ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBasicAltar.class, new RenderBasicAltar());
+		//RenderingRegistry.registerEntityRenderingHandler(EntityUndeadWizardPriest.class, new RenderUndeadWizardPriest());
+		RenderingRegistry.registerEntityRenderingHandler(EntityWizardSpell.class, new RenderWizardSpell());
 	}
 
 }

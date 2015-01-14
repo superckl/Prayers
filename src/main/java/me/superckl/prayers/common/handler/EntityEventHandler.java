@@ -1,5 +1,6 @@
 package me.superckl.prayers.common.handler;
 
+import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.Altar;
@@ -49,11 +50,19 @@ public class EntityEventHandler {
 			((PrayerExtendedProperties)((EntityPlayer)e.entity).getExtendedProperties("prayer")).saveNBTData(comp);
 			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(comp), (EntityPlayerMP) e.entity);
 		}
+		if(!e.world.isRemote && (e.entity instanceof EntityUndeadWizardPriest)){
+			final EntityUndeadWizardPriest priest = (EntityUndeadWizardPriest) e.entity;
+			if(priest.getLevel() == 0){
+				final int rand = priest.getRNG().nextInt(1000);
+				priest.setLevel(rand == 0 ? 4: rand < 100 ? 3: rand < 700 ? 2:1);
+			}
+
+		}
 	}
 
 	@SubscribeEvent(receiveCanceled = false)
 	public void onPlayerRightClick(final PlayerInteractEvent e){
-		if((e.action != Action.RIGHT_CLICK_BLOCK) || e.entityPlayer.isSneaking() || (e.entityPlayer.getHeldItem() != null) || (e.world.getBlock(e.x, e.y, e.z) == ModBlocks.altarBase))
+		if((e.action != Action.RIGHT_CLICK_BLOCK) || e.entityPlayer.isSneaking() || (e.entityPlayer.getHeldItem() != null) || (e.world.getBlock(e.x, e.y, e.z) == ModBlocks.offeringTable))
 			return;
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityPlayer.getExtendedProperties("prayer");
 		final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
