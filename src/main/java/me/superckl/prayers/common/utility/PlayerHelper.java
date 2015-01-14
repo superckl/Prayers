@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.WorldServer;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -25,7 +26,10 @@ public class PlayerHelper {
 		return null;
 	}
 
-	public static EntityLivingBase getShooter(final Entity ent){
+	public static EntityLivingBase getShooter(final DamageSource source){
+		if((source.getSourceOfDamage() != null) && (source.getSourceOfDamage() != source.getEntity()) && (source.getSourceOfDamage() instanceof EntityLivingBase))
+			return (EntityLivingBase) source.getSourceOfDamage();
+		final Entity ent = source.getEntity();
 		if(ent instanceof EntityThrowable)
 			return ((EntityThrowable)ent).getThrower();
 		try{

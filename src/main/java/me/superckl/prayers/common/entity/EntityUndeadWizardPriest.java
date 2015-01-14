@@ -5,9 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.Getter;
+import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.prayer.IPrayerUser;
 import me.superckl.prayers.common.reference.ModItems;
+import me.superckl.prayers.common.reference.ModPotions;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -24,7 +26,9 @@ import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
@@ -34,8 +38,8 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	public boolean updated;
 	@Getter
 	private static final List[] prayers = new List[] {Arrays.asList(EnumPrayers.PROTECT_MAGIC), Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE),
-		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_3),
-		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_3, EnumPrayers.ENHANCE_MAGIC_4)};
+		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4),
+		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4, EnumPrayers.ENHANCE_MAGIC_4)};
 
 	public EntityUndeadWizardPriest(final World world, final int level) {
 		super(world);
@@ -147,7 +151,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	@Override
 	public int getTotalArmorValue()
 	{
-		final int i = super.getTotalArmorValue() + (this.getLevel()*5);
+		final int i = super.getTotalArmorValue() + (this.getLevel()*3);
 
 		return i;
 	}
@@ -222,6 +226,8 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.setLevel(comp.getInteger("priestLevel"));
 	}
 
+
+
 	@Override
 	public List<EnumPrayers> getActivePrayers() {
 		int index = this.getLevel() - 1;
@@ -239,12 +245,24 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		final double d2 = target.posZ - this.posZ;
 		final float f1 = MathHelper.sqrt_float(uhh) * 0.5F;
 		//TODO effect
-		final EntityWizardSpell spell = new EntityWizardSpell(this.worldObj, this, d0 + (this.rand.nextGaussian() * f1), d1, d2 + (this.rand.nextGaussian() * f1));
+		final EntityWizardSpell spell = new EntityWizardSpell(this.worldObj, this, d0 + (this.rand.nextGaussian() * f1), d1, d2 + (this.rand.nextGaussian() * f1), 4F + (this.getLevel()*4F));
 		spell.posY = this.posY + (this.height / 2.0F) + 0.5D;
 		this.worldObj.spawnEntityInWorld(spell);
 
 	}
 
+	@Override
+	protected void dropFewItems(final boolean recentHit, final int looting){
+		final ItemStack exquisite = new ItemStack(ModItems.basicBone, looting + 2, 3);
+		this.entityDropItem(exquisite, 0F);
+		if(this.rand.nextInt(5) == 0)
+			this.entityDropItem(ItemPotionPrayers.withEffects(new ItemStack(ModItems.potion),
+					this.rand.nextBoolean() ? new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0, 1):new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0, 2)), 0F);
+	}
 
+	@Override
+	protected int getExperiencePoints(final EntityPlayer p_70693_1_) {
+		return 10+(this.getLevel()*12);
+	}
 
 }

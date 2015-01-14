@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 public class RenderUndeadWizardPriest extends RendererLivingEntity{
 
 	public RenderUndeadWizardPriest() {
-		super(new ModelUndeadWizardPriest(), 1F);
+		super(new ModelUndeadWizardPriest(), .7F);
 
 	}
 

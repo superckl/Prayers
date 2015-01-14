@@ -184,12 +184,9 @@ public class EntityWizardSpell extends EntityThrowable{
 	protected void onImpact(final MovingObjectPosition pos) {
 		if (!this.worldObj.isRemote)
 		{
-			if (pos.entityHit != null){
-				float damage = this.baseDamage;
-				if((this.getThrower() != null) && (this.getThrower() instanceof EntityUndeadWizardPriest))
-					damage += ((EntityUndeadWizardPriest)this.getThrower()).getLevel()*4F;
-				pos.entityHit.attackEntityFrom(new EntityDamageSourceIndirect("wizardspell", this.getThrower(), this).setProjectile().setMagicDamage(), damage);
-			}else
+			if (pos.entityHit != null)
+				pos.entityHit.attackEntityFrom(new EntityDamageSourceIndirect("wizardspell", this.getThrower(), this).setProjectile().setMagicDamage(), this.baseDamage);
+			else
 			{
 				//TODO big poof or something
 			}

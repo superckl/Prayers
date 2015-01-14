@@ -82,8 +82,8 @@ public class EntityEventHandler {
 
 	@SubscribeEvent
 	public void onLivingHurt(final LivingHurtEvent e){
-		if((e.source.getSourceOfDamage() != null)){
-			final EntityLivingBase shooter = PlayerHelper.getShooter(e.source.getSourceOfDamage());
+		if((e.source.getEntity() != null)){
+			final EntityLivingBase shooter = PlayerHelper.getShooter(e.source);
 			if(shooter != null){
 				if(e.source.isMagicDamage()) //Compute it if projectile for now, mod compat later
 					e.ammount = PrayerHelper.handleEnhanceMagic(e.ammount, PrayerHelper.getActivePrayers(shooter));
@@ -94,52 +94,49 @@ public class EntityEventHandler {
 		}
 		if(e.source.isUnblockable())
 			return;
-		if(e.entityLiving instanceof EntityPlayer){
-			final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityLiving.getExtendedProperties("prayer");
-			for(final EnumPrayers prayer:prop.getActivePrayers())
-				switch(prayer){
-				case PROTECT_MAGIC:
-				{
-					if(e.source.isMagicDamage())
-						e.ammount /= 2F;
-					break;
-				}
-				case PROTECT_RANGE:
-				{
-					if(e.source.isProjectile() && !e.source.isMagicDamage())
-						e.ammount /= 2F;
-					break;
-				}
-				case PROTECT_MELEE:
-				{
-					if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityLivingBase))
-						e.ammount /= 2F;
-					break;
-				}
-				case ENCHANCE_DEFENCE_1:
-				{
-					e.ammount*=.95;
-					break;
-				}
-				case ENCHANCE_DEFENCE_2:
-				{
-					e.ammount*=.9;
-					break;
-				}
-				case ENCHANCE_DEFENCE_3:
-				{
-					e.ammount*=.85;
-					break;
-				}
-				case ENCHANCE_DEFENCE_4:
-				{
-					e.ammount*=.75;
-					break;
-				}
-				default:
-					break;
-				}
-		}
+		for(final EnumPrayers prayer:PrayerHelper.getActivePrayers(e.entityLiving))
+			switch(prayer){
+			case PROTECT_MAGIC:
+			{
+				if(e.source.isMagicDamage())
+					e.ammount /= 2F;
+				break;
+			}
+			case PROTECT_RANGE:
+			{
+				if(e.source.isProjectile() && !e.source.isMagicDamage())
+					e.ammount /= 2F;
+				break;
+			}
+			case PROTECT_MELEE:
+			{
+				if((e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityLivingBase))
+					e.ammount /= 2F;
+				break;
+			}
+			case ENCHANCE_DEFENCE_1:
+			{
+				e.ammount*=.95;
+				break;
+			}
+			case ENCHANCE_DEFENCE_2:
+			{
+				e.ammount*=.9;
+				break;
+			}
+			case ENCHANCE_DEFENCE_3:
+			{
+				e.ammount*=.85;
+				break;
+			}
+			case ENCHANCE_DEFENCE_4:
+			{
+				e.ammount*=.75;
+				break;
+			}
+			default:
+				break;
+			}
 	}
 
 	@SubscribeEvent

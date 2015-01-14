@@ -15,12 +15,14 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -37,26 +39,34 @@ public class ItemPotionPrayers extends ItemPrayers{
 
 	@Override
 	public void addInformation(final ItemStack stack, final EntityPlayer player, final List list, final boolean bool) {
-		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effect")){
+		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effects")){
 			//emulate vanilla potion tooltips... sort of
-			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(stack.getTagCompound().getCompoundTag("effect"));
-			String s1 = StatCollector.translateToLocal(effect.getEffectName()).trim();
-			final Potion potion = Potion.potionTypes[effect.getPotionID()];
-			if (effect.getAmplifier() > 0)
-				s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + effect.getAmplifier()).trim();
-			if (effect.getDuration() > 20)
-				s1 = s1 + " (" + Potion.getDurationString(effect) + ")";
-			if (potion.isBadEffect())
-				list.add(EnumChatFormatting.RED + s1);
-			else
-				list.add(EnumChatFormatting.GRAY + s1);
+			final NBTTagList nbtList = stack.getTagCompound().getTagList("effects", NBT.TAG_COMPOUND);
+			if(nbtList.tagCount() <= 0)
+				return;
+			for(int i = 0; i < nbtList.tagCount(); i++){
+				final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(nbtList.getCompoundTagAt(i));
+				String s1 = StatCollector.translateToLocal(effect.getEffectName()).trim();
+				final Potion potion = Potion.potionTypes[effect.getPotionID()];
+				if (effect.getAmplifier() > 0)
+					s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + effect.getAmplifier()).trim();
+				if (effect.getDuration() > 20)
+					s1 = s1 + " (" + Potion.getDurationString(effect) + ")";
+				if (potion.isBadEffect())
+					list.add(EnumChatFormatting.RED + s1);
+				else
+					list.add(EnumChatFormatting.GRAY + s1);
+			}
 		}
 	}
 
 	@Override
 	public String getItemStackDisplayName(final ItemStack stack) {
-		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effect")){
-			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(stack.getTagCompound().getCompoundTag("effect"));
+		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effects")){
+			final NBTTagList list = stack.getTagCompound().getTagList("effects", NBT.TAG_COMPOUND);
+			if(list.tagCount() <= 0)
+				return super.getItemStackDisplayName(stack);
+			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(list.getCompoundTagAt(0));
 			final String name = StatCollector.translateToLocal(effect.getEffectName()).trim()+" "+super.getItemStackDisplayName(stack).trim();
 			return name;
 		}else
@@ -110,11 +120,16 @@ public class ItemPotionPrayers extends ItemPrayers{
 
 	@Override
 	public IIcon getIcon(final ItemStack stack, final int pass) {
-		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effect")){
-			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(stack.getTagCompound().getCompoundTag("effect"));
+		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effects")){
+			final NBTTagList list = stack.getTagCompound().getTagList("effects", NBT.TAG_COMPOUND);
+			if(list.tagCount() <= 0)
+				Items.potionitem.getIcon(stack, pass);
+			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(list.getCompoundTagAt(0));
 			final String name = effect.getEffectName().split("[.]")[1];
 			if(this.icons.containsKey(name))
 				return this.icons.get(name);
+			else
+				return Items.potionitem.getIcon(stack, pass);
 		}
 		return Items.potionitem.getIcon(stack, pass);
 	}
@@ -125,11 +140,7 @@ public class ItemPotionPrayers extends ItemPrayers{
 		ItemStack temp;
 		for(final PotionEffect effect:this.effects){
 			temp = base.copy();
-			final NBTTagCompound comp = new NBTTagCompound();
-			final NBTTagCompound sub = new NBTTagCompound();
-			effect.writeCustomPotionEffectToNBT(sub);
-			comp.setTag("effect", sub);
-			temp.setTagCompound(comp);
+			ItemPotionPrayers.withEffects(temp, effect);
 			list.add(temp);
 		}
 	}
@@ -143,6 +154,20 @@ public class ItemPotionPrayers extends ItemPrayers{
 		this.icons.put("prayerrestore", register.registerIcon(ModData.MOD_ID+":prayerestore"));
 		this.icons.put("prayerrestoreinstant", register.registerIcon(ModData.MOD_ID+":prayerestoreinstant"));
 		this.icons.put("attunement", register.registerIcon(ModData.MOD_ID+":maxpointsraise"));
+	}
+
+	public static ItemStack withEffects(final ItemStack stack, final PotionEffect ... effects){
+		if(!stack.hasTagCompound())
+			stack.setTagCompound(new NBTTagCompound());
+		if(!stack.getTagCompound().hasKey("effects"))
+			stack.getTagCompound().setTag("effects", new NBTTagList());
+		final NBTTagList list = stack.getTagCompound().getTagList("effects", NBT.TAG_COMPOUND);
+		for(final PotionEffect effect:effects){
+			final NBTTagCompound sub = new NBTTagCompound();
+			effect.writeCustomPotionEffectToNBT(sub);
+			list.appendTag(sub);
+		}
+		return stack;
 	}
 
 }
