@@ -6,6 +6,7 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.prayer.Altar;
+import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.reference.ModTabs;
@@ -56,6 +57,8 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 			comp.setBoolean("soaked", true);
 		}else if(table.getCurrentItem() != null){
 			player.inventory.addItemStackToInventory(table.getCurrentItem());
+			if(ItemStack.areItemStacksEqual(table.getCurrentItem(), ModFluids.filledHolyBottle()))
+				player.addStat(ModAchievements.FIRST_STEPS, 1);
 			table.setCurrentItem(null);
 		}else if((player.getHeldItem() == null) && (table.getAltar() != null) && table.getAltar().isActivated()){
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
@@ -65,6 +68,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 				return false;
 			toRecharge = table.getAltar().onRechargePlayer(diff, player, true);
 			prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
+			player.addStat(ModAchievements.RECHARGED, 1);
 			return true;
 		}else if((player.getHeldItem() == null) && (table.getAltar() == null)){
 			final Altar altar = new Altar(table);

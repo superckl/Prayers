@@ -2,7 +2,11 @@ package me.superckl.prayers.common.handler;
 
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
+import me.superckl.prayers.common.prayer.Altar;
+import me.superckl.prayers.common.prayer.AltarRegistry;
 import me.superckl.prayers.common.prayer.EnumPrayers;
+import me.superckl.prayers.common.reference.ModAchievements;
+import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.PSReflectionHelper;
@@ -22,12 +26,14 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EntityEventHandler {
 
-	@SubscribeEvent()
+	@SubscribeEvent
 	public void onEntityConstruction(final EntityConstructing e){
 		if(e.entity instanceof EntityPlayer)
 			e.entity.registerExtendedProperties("prayer", new PrayerExtendedProperties());
@@ -45,7 +51,27 @@ public class EntityEventHandler {
 		}
 	}
 
-	@SubscribeEvent()
+	@SubscribeEvent(receiveCanceled = false)
+	public void onPlayerRightClick(final PlayerInteractEvent e){
+		if((e.action != Action.RIGHT_CLICK_BLOCK) || e.entityPlayer.isSneaking() || (e.entityPlayer.getHeldItem() != null) || (e.world.getBlock(e.x, e.y, e.z) == ModBlocks.altarBase))
+			return;
+		final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityPlayer.getExtendedProperties("prayer");
+		final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
+		if(diff <= 0)
+			return;
+		final Altar altar = AltarRegistry.findAltarAt(e.world, e.x, e.y, e.z);
+		if(altar == null)
+			return;
+		float toRecharge = altar.onRechargePlayer(diff, e.entityPlayer, false);
+		if(toRecharge <= 0)
+			return;
+		toRecharge = altar.onRechargePlayer(diff, e.entityPlayer, true);
+		prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
+		e.entityPlayer.addStat(ModAchievements.RECHARGED, 1);
+		e.setCanceled(true);
+	}
+
+	@SubscribeEvent
 	public void onLivingHurt(final LivingHurtEvent e){
 		if((e.source.getSourceOfDamage() != null)){
 			final EntityLivingBase shooter = PlayerHelper.getShooter(e.source.getSourceOfDamage());

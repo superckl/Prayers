@@ -1,6 +1,7 @@
 package me.superckl.prayers;
 
 import lombok.Getter;
+import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModFluids;
@@ -42,6 +43,7 @@ public class Prayers {
 		ModItems.init();
 		ModFluids.init();
 		ModBlocks.init();
+		ModAchievements.init();
 		Prayers.proxy.registerRecipes();
 		Prayers.proxy.registerEntities();
 		Prayers.proxy.setupGuis();

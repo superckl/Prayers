@@ -42,13 +42,10 @@ public class ItemPotionPrayers extends ItemPrayers{
 			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(stack.getTagCompound().getCompoundTag("effect"));
 			String s1 = StatCollector.translateToLocal(effect.getEffectName()).trim();
 			final Potion potion = Potion.potionTypes[effect.getPotionID()];
-
 			if (effect.getAmplifier() > 0)
 				s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + effect.getAmplifier()).trim();
-
 			if (effect.getDuration() > 20)
 				s1 = s1 + " (" + Potion.getDurationString(effect) + ")";
-
 			if (potion.isBadEffect())
 				list.add(EnumChatFormatting.RED + s1);
 			else
@@ -120,11 +117,6 @@ public class ItemPotionPrayers extends ItemPrayers{
 				return this.icons.get(name);
 		}
 		return Items.potionitem.getIcon(stack, pass);
-	}
-
-	@Override
-	public int getMetadata(final int meta) {
-		return meta;
 	}
 
 	@Override

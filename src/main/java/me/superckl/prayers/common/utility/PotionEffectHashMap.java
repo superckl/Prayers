@@ -35,6 +35,4 @@ public class PotionEffectHashMap extends HashMap<Integer, PotionEffect>{
 		super.putAll(m);
 	}
 
-
-
 }
