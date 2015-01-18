@@ -60,7 +60,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 			final ItemStack filledBottle = ModFluids.filledHolyBottle();
 			if(!player.worldObj.isRemote && table.getCurrentItem().isItemEqual(filledBottle) && ItemStack.areItemStackTagsEqual(table.getCurrentItem(), filledBottle))
 				player.addStat(ModAchievements.FIRST_STEPS, 1);
-			table.setCurrentItem(null);
+			table.setCurrentItem(null, player);
 		}else if((player.getHeldItem() == null) && (table.getAltar() != null) && table.getAltar().isActivated()){
 			final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 			final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
@@ -72,11 +72,12 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 			return true;
 		}else if((player.getHeldItem() == null) && (table.getAltar() == null)){
 			final Altar altar = new Altar(table);
-			altar.determineBlocks(world);
+			if(altar.determineBlocks(world))
+				altar.getContributors().put(player.getGameProfile().getId(), false);
 		}else if(player.getHeldItem() != null){
 			final ItemStack clone = player.getHeldItem().copy();
 			clone.stackSize = 1;
-			table.setCurrentItem(clone);
+			table.setCurrentItem(clone, player);
 			if(!player.capabilities.isCreativeMode && (player.getHeldItem() != null))
 				player.getHeldItem().stackSize--;
 		}
@@ -126,25 +127,6 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 					world.spawnParticle("reddust", d1, d2, d3, 0.0D, 0.0D, 0.0D);
 			}
 		}
-	}
-
-	@Override
-	public void onBlockClicked(final World world, final int x, final int y, final int z, final EntityPlayer player) {
-		if(!player.isSneaking() || player.worldObj.isRemote)
-			return;
-		final TileEntity ent = world.getTileEntity(x, y, z);
-		if((ent == null) || ((ent instanceof TileEntityOfferingTable) == false))
-			return;
-		final TileEntityOfferingTable te = (TileEntityOfferingTable) ent;
-		if((te.getAltar() == null) || !te.getAltar().isInRitual())
-			return;
-		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
-		if(prop.getPrayerPoints() < 10F)
-			return;
-		prop.setPrayerPoints(prop.getPrayerPoints()-10F);
-		te.getAltar().setRitualTimer(te.getAltar().getRitualTimer()-20);
-		player.addStat(ModAchievements.SELF_SACRIFICE, 1);
-		//TODO effect
 	}
 
 	/*@Override

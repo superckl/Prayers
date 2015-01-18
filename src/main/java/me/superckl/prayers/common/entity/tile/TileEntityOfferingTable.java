@@ -8,6 +8,8 @@ import lombok.Setter;
 import me.superckl.prayers.common.prayer.Altar;
 import me.superckl.prayers.common.prayer.AltarRegistry;
 import me.superckl.prayers.common.prayer.OfferingTableCraftingHandler;
+import me.superckl.prayers.common.reference.ModItems;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -157,9 +159,12 @@ public class TileEntityOfferingTable extends TileEntity{
 		this.currentRecipe = null;
 	}
 
-	public void setCurrentItem(final ItemStack stack){
+	public void setCurrentItem(final ItemStack stack, final EntityPlayer player){
 		this.currentItem = stack;
 		this.onIngredientsModified();
+		final Altar altar = this.getAltar();
+		if((player != null) && !this.worldObj.isRemote && (altar != null) && altar.isInRitual() && (stack != null) && (stack.getItem() == ModItems.basicBone) && (stack.getItemDamage() == 3))
+			altar.getContributors().put(player.getGameProfile().getId(), false);
 	}
 
 	public void addTertiaryIngredient(final ItemStack stack){

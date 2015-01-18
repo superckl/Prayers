@@ -171,7 +171,7 @@ public class Altar{
 		this.ritualTimer--;
 		if(this.tables != null){
 			final int tempTimer = this.ritualTimer;
-			boolean allSastisfied = true;
+			boolean allSatisfied = true;
 			for(final TileEntityOfferingTable table:this.tables)
 				if((table.getCurrentItem() != null) && (table.getCurrentItem().getItem() == ModItems.basicBone) && (table.getCurrentItem().getItemDamage() == 3)){
 					if(table.getCurrentItem().hasTagCompound())
@@ -186,7 +186,7 @@ public class Altar{
 							}
 						}
 					if(this.random.nextInt(7000) == 0){
-						table.setCurrentItem(null);
+						table.setCurrentItem(null, null);
 						table.getWorldObj().markBlockForUpdate(table.xCoord, table.yCoord, table.zCoord);
 						table.getWorldObj().playSoundEffect(table.xCoord+0.5F, table.yCoord+0.5F, table.zCoord+0.5F, "mob.endermen.portal", 1.0F, 1.0F);
 						for (int l = 0; l < 4; ++l)
@@ -206,8 +206,8 @@ public class Altar{
 						}
 					}
 				}else
-					allSastisfied = false;
-			if(!allSastisfied)
+					allSatisfied = false;
+			if(!allSatisfied)
 				this.ritualTimer = tempTimer+1+(this.random.nextInt(9)/8);
 		}
 		if(this.ritualTimer >= 100000){
