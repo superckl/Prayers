@@ -21,24 +21,24 @@ import net.minecraft.world.World;
 
 public class AltarRegistry {
 
-	private static final Map<Block, AltarBlockInfo> registeredBlocks = new HashMap<Block, AltarBlockInfo>();
+	private static final Map<Block, IAltarBlockInfoProvider> registeredBlocks = new HashMap<Block, IAltarBlockInfoProvider>();
 	@Getter
 	private static final Set<WeakReference<Altar>> loadedAltars = new HashSet<WeakReference<Altar>>();
 	private static final Set<OfferingTableCraftingHandler> registeredRecipes = new HashSet<OfferingTableCraftingHandler>();
 
 	static{
-		AltarRegistry.registeredBlocks.put(ModBlocks.offeringTable, new AltarBlockInfo(true, true, CalculationEffectType.FIRST_ADDITION, CalculationEffectType.FIRST_ADDITION, 0F, 0F));
+		AltarRegistry.registeredBlocks.put(ModBlocks.offeringTable, new SimpleAltarBlockInfoProvider(false, false, CalculationEffectType.NONE, CalculationEffectType.NONE, 0F, 0F));
 	}
 
 	public static boolean isBlockRegistered(final Block block){
 		return AltarRegistry.registeredBlocks.containsKey(block);
 	}
 
-	public static AltarBlockInfo getBlockInfo(final Block block){
+	public static IAltarBlockInfoProvider getBlockInfo(final Block block){
 		return AltarRegistry.registeredBlocks.get(block);
 	}
 
-	public static void registerBlock(final Block block, final AltarBlockInfo info){
+	public static void registerBlock(final Block block, final IAltarBlockInfoProvider info){
 		if(AltarRegistry.registeredBlocks.containsKey(block))
 			LogHelper.warn(StringHelper.build("Class "+PSReflectionHelper.retrieveCallingStackTraceElement().getClassName(), " has re-registered an already registered altar block: ", block.getClass().getCanonicalName(), ". If this is not an intentional override, there are mod conflictions!"));
 		AltarRegistry.registeredBlocks.put(block, info);
@@ -48,7 +48,7 @@ public class AltarRegistry {
 		return AltarRegistry.registeredBlocks.keySet();
 	}
 
-	public static Map<Block, AltarBlockInfo> getAllEntries(){
+	public static Map<Block, IAltarBlockInfoProvider> getAllEntries(){
 		return AltarRegistry.registeredBlocks;
 	}
 

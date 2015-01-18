@@ -49,6 +49,9 @@ public class Altar{
 	private float prayerPoints = 500F;
 	@Getter
 	@Setter
+	private int baseRechargeDelay = 200;
+	@Getter
+	@Setter
 	private float maxPrayerPoints = 500F;
 	@Getter
 	private List<Vec3> blocks;
@@ -117,13 +120,13 @@ public class Altar{
 		if(this.activated && (this.getPrayerPoints() < this.getMaxPrayerPoints())){
 			this.regenTimer--;
 			if(this.regenTimer <= 0){
-				this.regenTimer = 200;
+				this.regenTimer = this.baseRechargeDelay;
 				this.prayerPoints += 1F;
 				if(this.prayerPoints > this.getMaxPrayerPoints())
 					this.prayerPoints = this.getMaxPrayerPoints();
 			}
 		}else
-			this.regenTimer = 200;
+			this.regenTimer = this.baseRechargeDelay;
 		if(!world.isRemote)
 			if(this.inRitual)
 				this.manageRitual(world);
