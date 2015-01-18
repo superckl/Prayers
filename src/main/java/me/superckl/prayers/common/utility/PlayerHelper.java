@@ -1,6 +1,7 @@
 package me.superckl.prayers.common.utility;
 
 import java.lang.reflect.Field;
+import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,6 +22,17 @@ public class PlayerHelper {
 				if((player instanceof EntityPlayerMP) == false)
 					continue;
 				if(((EntityPlayerMP)player).getGameProfile().getName().equalsIgnoreCase(username))
+					return (EntityPlayerMP) player;
+			}
+		return null;
+	}
+
+	public static EntityPlayerMP getPlayer(final UUID uuid){
+		for(final WorldServer wServer:MinecraftServer.getServer().worldServers)
+			for(final Object player:wServer.playerEntities){
+				if((player instanceof EntityPlayerMP) == false)
+					continue;
+				if(((EntityPlayerMP)player).getGameProfile().getId().equals(uuid))
 					return (EntityPlayerMP) player;
 			}
 		return null;

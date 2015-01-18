@@ -2,21 +2,30 @@ package me.superckl.prayers.common.prayer;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
+import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.NumberHelper;
+import me.superckl.prayers.common.utility.PlayerHelper;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -48,6 +57,8 @@ public class Altar{
 	private boolean isRegistered;
 	@Getter
 	private final TileEntityOfferingTable holder;
+	@Getter
+	private final Map<UUID, Boolean> contributors = new HashMap<UUID, Boolean>();
 
 	public Altar(@NonNull final TileEntityOfferingTable holder) {
 		this.holder = holder;
@@ -65,6 +76,11 @@ public class Altar{
 			this.blocks = new ArrayList<Vec3>();
 			for(int i = 0; i < coords.length;)
 				this.blocks.add(Vec3.createVectorHelper(coords[i++], coords[i++], coords[i++]));
+		}
+		final NBTTagList list = comp.getTagList("contributors", NBT.TAG_COMPOUND);
+		for(int i = 0; i < list.tagCount(); i++){
+			final NBTTagCompound entry = list.getCompoundTagAt(i);
+			this.contributors.put(UUID.fromString(entry.getString("name")), entry.getBoolean("rewarded"));
 		}
 	}
 
@@ -84,6 +100,13 @@ public class Altar{
 			}
 			comp.setIntArray("blocks", coords);
 		}
+		final NBTTagList list = new NBTTagList();
+		for(final Entry<UUID, Boolean> entry:this.contributors.entrySet()){
+			final NBTTagCompound nbtEntry = new NBTTagCompound();
+			nbtEntry.setString("name", entry.getKey().toString());
+			nbtEntry.setBoolean("rewarded", entry.getValue());
+		}
+		comp.setTag("contributors", list);
 	}
 
 	private int regenTimer = 200;
@@ -135,6 +158,14 @@ public class Altar{
 			this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
 			this.holder.getWorldObj().spawnEntityInWorld(new EntityLightningBolt(this.holder.getWorldObj(), this.holder.xCoord+0.5D, this.holder.yCoord+0.5D, this.holder.zCoord+0.5D));
 			//TODO effects...
+			for(final Entry<UUID, Boolean> entry:this.contributors.entrySet())
+				if(!entry.getValue()){
+					final EntityPlayerMP player = PlayerHelper.getPlayer(entry.getKey());
+					if(player != null){
+						player.addStat(ModAchievements.SUCCESS, 1);
+						entry.setValue(true);
+					}
+				}
 			return;
 		}
 		this.ritualTimer--;
@@ -209,6 +240,7 @@ public class Altar{
 		this.tables.add(this.holder);
 		this.blocks = new ArrayList<Vec3>();
 		this.blocks.add(Vec3.createVectorHelper(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord));
+		MinecraftForge.EVENT_BUS.register(this);
 		return true;
 	}
 
@@ -217,8 +249,22 @@ public class Altar{
 			return 0F;
 		if(points > this.prayerPoints)
 			points = this.prayerPoints;
-		if(shouldSubtract)
+		if(shouldSubtract){
 			this.prayerPoints -= points;
+			if(!player.worldObj.isRemote){
+				player.addStat(ModAchievements.RECHARGED, 1);
+				if((points >= this.maxPrayerPoints) && (this.prayerPoints <= 0))
+					player.addStat(ModAchievements.TOO_OP, 1);
+				final UUID uuid = player.getGameProfile().getId();
+				if(this.contributors.containsKey(uuid)){
+					player.addStat(ModAchievements.CONVENIENCE, 1);
+					if(!this.contributors.get(uuid)){
+						player.addStat(ModAchievements.SUCCESS, 1);
+						this.contributors.put(uuid, true);
+					}
+				}
+			}
+		}
 		return points;
 	}
 
@@ -228,6 +274,7 @@ public class Altar{
 		this.inRitual = false;
 		this.prayerPoints = 0F;
 		this.holder.onStructureInvalidated();
+		MinecraftForge.EVENT_BUS.unregister(this);
 	}
 
 	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOWEST)

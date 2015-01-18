@@ -6,7 +6,6 @@ import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.Altar;
 import me.superckl.prayers.common.prayer.AltarRegistry;
 import me.superckl.prayers.common.prayer.EnumPrayers;
-import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
@@ -76,7 +75,6 @@ public class EntityEventHandler {
 			return;
 		toRecharge = altar.onRechargePlayer(diff, e.entityPlayer, true);
 		prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
-		e.entityPlayer.addStat(ModAchievements.RECHARGED, 1);
 		e.setCanceled(true);
 	}
 

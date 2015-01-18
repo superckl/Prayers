@@ -35,10 +35,7 @@ public class ItemBottlePrayers extends ItemFluidContainerPrayers{
 	@Override
 	public void getSubItems(final Item item, final CreativeTabs creativeTabs, final List list)
 	{
-		final ItemStack fluid = new ItemStack(item);
-
-		this.fill(fluid, new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4), true);
-		list.add(fluid);
+		list.add(ModFluids.filledHolyBottle());
 	}
 
 	@Override
