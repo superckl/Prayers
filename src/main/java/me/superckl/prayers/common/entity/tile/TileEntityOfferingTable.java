@@ -13,10 +13,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class TileEntityOfferingTable extends TileEntity{
 
@@ -38,6 +40,10 @@ public class TileEntityOfferingTable extends TileEntity{
 			this.currentItem = ItemStack.loadItemStackFromNBT(comp.getCompoundTag("currentItem"));
 		else
 			this.currentItem = null;
+		final NBTTagList list = new NBTTagList();
+		for(final ItemStack stack:this.tertiaryItems)
+			list.appendTag(stack.writeToNBT(new NBTTagCompound()));
+		comp.setTag("tertiaryItems", list);
 		if(comp.hasKey("altar")){
 			this.altar = new Altar(this);
 			this.altar.readFromNBT(comp.getCompoundTag("altar"));
@@ -51,6 +57,9 @@ public class TileEntityOfferingTable extends TileEntity{
 		super.writeToNBT(comp);
 		if(this.currentItem != null)
 			comp.setTag("currentItem", this.currentItem.writeToNBT(new NBTTagCompound()));
+		final NBTTagList list = comp.getTagList("tertiaryItems", NBT.TAG_COMPOUND);
+		for(int i = 0; i < list.tagCount(); i++)
+			this.tertiaryItems.add(ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(i)));
 		if(this.altar != null){
 			final NBTTagCompound tag = new NBTTagCompound();
 			this.altar.writeToNBT(tag);
@@ -187,6 +196,14 @@ public class TileEntityOfferingTable extends TileEntity{
 		this.tertiaryItems.clear();
 		this.onIngredientsModified();
 		return list;
+	}
+
+	public boolean hasTertiaryIngredients(){
+		return !this.tertiaryItems.isEmpty();
+	}
+
+	public List<ItemStack> getTertiaryIngredients(){
+		return new ArrayList<ItemStack>(this.tertiaryItems);
 	}
 
 }

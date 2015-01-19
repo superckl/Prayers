@@ -58,8 +58,18 @@ public class PrayersWailaDataProvider implements IWailaDataProvider{
 					currenttip.add(StringHelper.build(EnumChatFormatting.RESET, "Time Left: ", (te != null) && (te.getCurrentItem() == null) ? EnumChatFormatting.OBFUSCATED:"", DateHelper.toDateString(accessor.getNBTData().getInteger("ritualTimer"))));
 			}else
 				currenttip.add("Inactive");
-		if((te != null) && (te.getCurrentItem() != null))
-			currenttip.add("Current Item: "+te.getCurrentItem().getDisplayName());
+		if((te != null)){
+			if(te.getCurrentItem() != null)
+				currenttip.add("Current Item: "+te.getCurrentItem().getDisplayName());
+			final List<ItemStack> items = te.getTertiaryIngredients();
+			if(!items.isEmpty())
+				if(accessor.getPlayer().isSneaking()){
+					currenttip.add("Tertiary Items:");
+					for(final ItemStack stack:items)
+						currenttip.add(StringHelper.build("- ", stack.getDisplayName()));
+				}else
+					currenttip.add(StringHelper.build("Hold ", EnumChatFormatting.YELLOW, EnumChatFormatting.ITALIC, "Shift ",EnumChatFormatting.RESET, EnumChatFormatting.GRAY, "for more"));
+		}
 		return currenttip;
 	}
 
