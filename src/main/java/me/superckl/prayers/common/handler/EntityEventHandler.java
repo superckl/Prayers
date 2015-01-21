@@ -22,10 +22,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -161,12 +161,11 @@ public class EntityEventHandler {
 		}
 	}
 
-	@SubscribeEvent
-	public void onPlayerClone(final PlayerEvent.Clone e){
-		final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.original.getExtendedProperties("prayer");
-		final NBTTagCompound comp = new NBTTagCompound();
-		prop.saveNBTData(comp);
-		e.entityPlayer.getExtendedProperties("prayer").loadNBTData(comp);
+	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOWEST)
+	public void onPlayerDeath(final LivingDeathEvent e){
+		if((e.entityLiving instanceof EntityPlayer) == false)
+			return;
+		((PrayerExtendedProperties)((EntityPlayer)e.entityLiving).getExtendedProperties("prayer")).disableAllPrayers(false);
 	}
 
 }
