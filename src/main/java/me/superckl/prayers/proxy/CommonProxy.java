@@ -2,8 +2,6 @@ package me.superckl.prayers.proxy;
 
 import java.awt.Color;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
@@ -41,8 +39,6 @@ import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.relauncher.Side;
 
 public abstract class CommonProxy implements IProxy{
-
-	private static final Map<String, NBTTagCompound> extendedEntityData = new HashMap<String, NBTTagCompound>();
 
 	@Override
 	public void registerHandlers() {
@@ -88,14 +84,6 @@ public abstract class CommonProxy implements IProxy{
 		soakedBones.setTagCompound(comp);
 		GameRegistry.addShapelessRecipe(soakedBones, new ItemStack(ModItems.basicBone, 1, 3), filledBottle);
 		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(filledBottle, new ItemStack(Items.potionitem, 1, 0), Collections.EMPTY_LIST, 200, 0.5F));
-	}
-
-	public static void storeEntityData(final String name, final NBTTagCompound compound){
-		CommonProxy.extendedEntityData.put(name, compound);
-	}
-
-	public static NBTTagCompound getEntityData(final String name){
-		return CommonProxy.extendedEntityData.remove(name);
 	}
 
 }
