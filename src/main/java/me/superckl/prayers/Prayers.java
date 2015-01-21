@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import lombok.Getter;
-import me.superckl.prayers.common.prayer.AltarRegistry;
 import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
@@ -69,7 +68,6 @@ public class Prayers {
 		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaDataProvider.callbackRegister");
 		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaEntityProvider.callbackRegister");
 
-		FMLInterModComms.sendMessage("Prayers", "register", AltarRegistry.class.getCanonicalName()+".register");
 	}
 
 	@EventHandler
@@ -84,6 +82,8 @@ public class Prayers {
 
 	@EventHandler
 	public void processIMCs(final IMCEvent e){
+		if(e.getMessages().isEmpty())
+			LogHelper.info("No intermod communications found.");
 		for(final IMCMessage message:e.getMessages()){
 			if(!message.isStringMessage()){
 				LogHelper.error(StringHelper.build("Received invalid message from mod ", message.getSender(), " with key ", message.key, " containing ", message.isItemStackMessage() ? message.getItemStackValue().toString():message.getNBTValue().toString()));

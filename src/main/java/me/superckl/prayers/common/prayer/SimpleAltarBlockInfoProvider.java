@@ -54,4 +54,9 @@ public class SimpleAltarBlockInfoProvider implements IAltarBlockInfoProvider{
 		return new SimpleAltarBlockInfoProvider(this.affectsRechargeRate, this.affectsMaxPoints, this.rechargeRateEffectType, this.maxPointsEffectType, this.rechargeRateModifier, this.maxPointsModifier);
 	}
 
+	@Override
+	public boolean isBlockValid(final World world, final int x, final int y, final int z, final int meta, final Altar altar) {
+		return true;
+	}
+
 }

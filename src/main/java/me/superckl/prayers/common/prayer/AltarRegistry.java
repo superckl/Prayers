@@ -15,6 +15,7 @@ import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PSReflectionHelper;
 import me.superckl.prayers.common.utility.StringHelper;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -30,6 +31,7 @@ public final class AltarRegistry {
 
 	static{
 		AltarRegistry.registeredBlocks.put(ModBlocks.offeringTable, new SimpleAltarBlockInfoProvider(false, false, CalculationEffectType.NONE, CalculationEffectType.NONE, 0F, 0F));
+		AltarRegistry.registeredBlocks.put(Blocks.diamond_block, new SimpleAltarBlockInfoProvider(false, true, CalculationEffectType.NONE, CalculationEffectType.FIRST_ADDITION, 0F, 150F));
 	}
 
 	public static boolean isBlockRegistered(final Block block){

@@ -17,6 +17,8 @@ public interface IAltarBlockInfoProvider extends Cloneable{
 
 	public float getMaxPointsModifier(final World world, final int x, final int y, final int z, final int meta, final Altar altar);
 
+	public boolean isBlockValid(final World world, final int x, final int y, final int z, final int meta, final Altar altar);
+
 	public IAltarBlockInfoProvider clone();
 
 }
