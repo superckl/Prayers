@@ -19,12 +19,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-public class AltarRegistry {
+public final class AltarRegistry {
 
 	private static final Map<Block, IAltarBlockInfoProvider> registeredBlocks = new HashMap<Block, IAltarBlockInfoProvider>();
 	@Getter
 	private static final Set<WeakReference<Altar>> loadedAltars = new HashSet<WeakReference<Altar>>();
 	private static final Set<OfferingTableCraftingHandler> registeredRecipes = new HashSet<OfferingTableCraftingHandler>();
+
+	private AltarRegistry(){};
 
 	static{
 		AltarRegistry.registeredBlocks.put(ModBlocks.offeringTable, new SimpleAltarBlockInfoProvider(false, false, CalculationEffectType.NONE, CalculationEffectType.NONE, 0F, 0F));
