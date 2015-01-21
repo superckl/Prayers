@@ -110,7 +110,7 @@ public class Prayers {
 					method.invoke(null);
 				}else if(method.isAnnotationPresent(InstanceField.class)){
 					final InstanceField iField = method.getAnnotation(InstanceField.class);
-					LogHelper.info("Found InstanceField annotation on method. Attempting too retrieve instance...");
+					LogHelper.info("Found InstanceField annotation on method. Attempting to retrieve instance...");
 					Field field;
 					if(iField.value().contains(".")){
 						index = iField.value().lastIndexOf(".");
