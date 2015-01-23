@@ -65,7 +65,7 @@ public enum EnumPrayers {
 	private static final Class<?>[] types = (Class<?>[]) Arrays.asList(String.class, String.class, List.class, Float.TYPE, Boolean.TYPE, Boolean.TYPE, ResourceLocation.class).toArray();
 
 	/**
-	 * Helper method to allow other mods to easily add prayers. This should be done in preInit.
+	 * Helper method to allow other mods to easily add prayers. This should be done in your register method.
 	 * @return The new prayer.
 	 */
 	public static EnumPrayers addPrayer(final String enumName, final String id, final String displayName, final List<String> description, final float drain, final boolean overhead, final boolean requiresTome, final ResourceLocation texture){

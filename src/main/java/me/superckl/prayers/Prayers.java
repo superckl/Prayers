@@ -63,7 +63,6 @@ public class Prayers {
 	@EventHandler
 	public void init(final FMLInitializationEvent e){
 		Prayers.proxy.registerHandlers();
-		ModItems.addChestLoot();
 
 		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaDataProvider.callbackRegister");
 		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaEntityProvider.callbackRegister");
@@ -73,6 +72,7 @@ public class Prayers {
 	@EventHandler
 	public void postInit(final FMLPostInitializationEvent e){
 		Prayers.proxy.registerEntitySpawns();
+		ModItems.addChestLoot();
 	}
 
 	@EventHandler
