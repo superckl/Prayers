@@ -48,7 +48,7 @@ public class GuiContainerPrayers extends GuiContainer{
 		TabRegistry.addTabsToList(this.buttonList);
 
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) this.mc.thePlayer.getExtendedProperties("prayer");
-		final EnumPrayers[] prayers = EnumPrayers.values();
+		final EnumPrayers[] prayers = PrayerHelper.getAllPrayersDrainSorted();
 		final int width = 5;
 		final int excess = 94-(16*width)-(2*(width-1));
 		final int startX = 79+(excess/2);

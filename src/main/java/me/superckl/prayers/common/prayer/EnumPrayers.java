@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.EnumHelper;
 
 @RequiredArgsConstructor
 public enum EnumPrayers {
@@ -59,6 +60,20 @@ public enum EnumPrayers {
 			if(prayer.id.equals(id))
 				return prayer;
 		return null;
+	}
+
+	private static final Class<?>[] types = (Class<?>[]) Arrays.asList(String.class, String.class, List.class, Float.TYPE, Boolean.TYPE, Boolean.TYPE, ResourceLocation.class).toArray();
+
+	/**
+	 * Helper method to allow other mods to easily add prayers. This should be done in preInit.
+	 * @return The new prayer.
+	 */
+	public static EnumPrayers addPrayer(final String enumName, final String id, final String displayName, final List<String> description, final float drain, final boolean overhead, final boolean requiresTome, final ResourceLocation texture){
+		return EnumPrayers.addPrayersVar(enumName, id, displayName, description, drain, overhead, requiresTome, texture);
+	}
+
+	private static EnumPrayers addPrayersVar(final String enumName, final Object ... objects){
+		return EnumHelper.addEnum(EnumPrayers.class, enumName, EnumPrayers.types, objects);
 	}
 
 }

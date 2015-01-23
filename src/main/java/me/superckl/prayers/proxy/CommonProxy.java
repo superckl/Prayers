@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.Collections;
 
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.common.altar.crafting.BasicTableCraftingHandler;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.EntityWizardSpell;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
@@ -11,8 +13,6 @@ import me.superckl.prayers.common.gui.GuiHandler;
 import me.superckl.prayers.common.handler.BucketEventHandler;
 import me.superckl.prayers.common.handler.EntityEventHandler;
 import me.superckl.prayers.common.handler.PlayerTickHandler;
-import me.superckl.prayers.common.prayer.AltarRegistry;
-import me.superckl.prayers.common.prayer.BasicTableCraftingHandler;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Random;
 
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
-import me.superckl.prayers.common.prayer.Altar;
 import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;

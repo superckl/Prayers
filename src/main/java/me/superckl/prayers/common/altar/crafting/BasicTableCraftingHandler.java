@@ -1,4 +1,4 @@
-package me.superckl.prayers.common.prayer;
+package me.superckl.prayers.common.altar.crafting;
 
 import java.util.List;
 

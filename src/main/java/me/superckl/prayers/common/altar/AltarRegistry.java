@@ -1,4 +1,4 @@
-package me.superckl.prayers.common.prayer;
+package me.superckl.prayers.common.altar;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Getter;
+import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.utility.CalculationEffectType;
 import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PSReflectionHelper;
 import me.superckl.prayers.common.utility.StringHelper;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -31,7 +31,31 @@ public final class AltarRegistry {
 
 	static{
 		AltarRegistry.registeredBlocks.put(ModBlocks.offeringTable, new SimpleAltarBlockInfoProvider(false, false, CalculationEffectType.NONE, CalculationEffectType.NONE, 0F, 0F));
-		AltarRegistry.registeredBlocks.put(Blocks.diamond_block, new SimpleAltarBlockInfoProvider(false, true, CalculationEffectType.NONE, CalculationEffectType.FIRST_ADDITION, 0F, 150F));
+		AltarRegistry.registeredBlocks.put(ModBlocks.altarComponent, new SimpleAltarBlockInfoProvider(true, true, CalculationEffectType.MULTIPLICATION, CalculationEffectType.FIRST_ADDITION, 0F, 0F){
+
+			@Override
+			public boolean affectsRechargeRate(final World world, final int x, final int y, final int z, final int meta, final Altar altar) {
+				return meta > 0;
+			}
+
+			@Override
+			public boolean affectsMaxPoints(final World world, final int x, final int y, final int z, final int meta, final Altar altar) {
+				return meta == 0;
+			}
+
+			@Override
+			public float getMaxPointsModifier(final World world, final int x, final int y, final int z, final int meta, final Altar altar) {
+				if(meta == 0)
+					return 50F;
+				return 0F;
+			}
+
+			@Override
+			public float getRechargeRateModifier(final World world, final int x, final int y, final int z, final int meta, final Altar altar) {
+				return meta == 1 ? .9993F:meta == 2? .9999F:0F;
+			}
+
+		});
 	}
 
 	public static boolean isBlockRegistered(final Block block){

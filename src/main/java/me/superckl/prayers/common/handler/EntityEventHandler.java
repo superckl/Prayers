@@ -1,10 +1,10 @@
 package me.superckl.prayers.common.handler;
 
+import me.superckl.prayers.common.altar.Altar;
+import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
-import me.superckl.prayers.common.prayer.Altar;
-import me.superckl.prayers.common.prayer.AltarRegistry;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;

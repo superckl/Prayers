@@ -1,6 +1,7 @@
 package me.superckl.prayers.common.utility;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
@@ -9,6 +10,7 @@ import me.superckl.prayers.common.prayer.IPrayerUser;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import scala.actors.threadpool.Arrays;
 
 public class PrayerHelper {
 
@@ -36,6 +38,16 @@ public class PrayerHelper {
 				hasOverhead = true;
 			}
 		return false;
+	}
+
+	public static EnumPrayers[] getAllPrayersDrainSorted(){
+		return PrayerHelper.getAllPrayersSorted(new PrayerDrainComparator());
+	}
+
+	public static EnumPrayers[] getAllPrayersSorted(final Comparator<EnumPrayers> compare){
+		final EnumPrayers[] prayers = EnumPrayers.values();
+		Arrays.sort(prayers, compare);
+		return prayers;
 	}
 
 	public static List<EnumPrayers> getActivePrayers(final EntityLivingBase entity){
