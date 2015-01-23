@@ -9,7 +9,7 @@ public class PrayerDrainComparator implements Comparator<EnumPrayers>{
 	@Override
 	public int compare(final EnumPrayers o1, final EnumPrayers o2) {
 		final float d1 = o1.getDrain(), d2 = o2.getDrain();
-		return d1 > d1 ? 1:d1 < d2 ? -1:0;
+		return d1 > d2 ? 1:d1 < d2 ? -1:0;
 	}
 
 }
