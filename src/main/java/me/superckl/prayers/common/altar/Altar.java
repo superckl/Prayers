@@ -12,20 +12,30 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
+import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModAchievements;
+import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModItems;
-import me.superckl.prayers.common.utility.NumberHelper;
+import me.superckl.prayers.common.utility.BlockLocation;
+import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PlayerHelper;
+import me.superckl.prayers.common.utility.PrayerHelper;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockWall;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.Vec3;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -54,12 +64,12 @@ public class Altar{
 	@Setter
 	private float maxPrayerPoints = 500F;
 	@Getter
-	private List<Vec3> blocks;
+	private List<BlockLocation> blocks;
 	@Getter
 	private List<TileEntityOfferingTable> tables;
 	private boolean isRegistered;
 	@Getter
-	private final TileEntityOfferingTable holder;
+	private TileEntityOfferingTable holder;
 	@Getter
 	private final Map<UUID, Boolean> contributors = new HashMap<UUID, Boolean>();
 
@@ -76,9 +86,9 @@ public class Altar{
 		this.ritualTimer = comp.getInteger("ritualTimer");
 		if(comp.hasKey("blocks")){
 			final int[] coords = comp.getIntArray("blocks");
-			this.blocks = new ArrayList<Vec3>();
+			this.blocks = new ArrayList<BlockLocation>();
 			for(int i = 0; i < coords.length;)
-				this.blocks.add(Vec3.createVectorHelper(coords[i++], coords[i++], coords[i++]));
+				this.blocks.add(new BlockLocation(coords[i++], coords[i++], coords[i++]));
 		}
 		final NBTTagList list = comp.getTagList("contributors", NBT.TAG_COMPOUND);
 		for(int i = 0; i < list.tagCount(); i++){
@@ -96,10 +106,10 @@ public class Altar{
 		if(this.blocks != null){
 			final int[] coords = new int[this.blocks.size()*3];
 			int i = 0;
-			for(final Vec3 vec:this.blocks){
-				coords[i++] = (int) vec.xCoord;
-				coords[i++] = (int) vec.yCoord;
-				coords[i++] = (int) vec.zCoord;
+			for(final BlockLocation vec:this.blocks){
+				coords[i++] = vec.getX();
+				coords[i++] = vec.getY();
+				coords[i++] = vec.getZ();
 			}
 			comp.setIntArray("blocks", coords);
 		}
@@ -131,13 +141,13 @@ public class Altar{
 			if(this.inRitual)
 				this.manageRitual(world);
 			else if((this.tables != null) && !this.activated){
-				boolean allSastisfied = true;
+				boolean allSatisfied = true;
 				for(final TileEntityOfferingTable table:this.tables)
 					if(!((table.getCurrentItem() != null) && (table.getCurrentItem().getItem() == ModItems.basicBone) && (table.getCurrentItem().getItemDamage() == 3))){
-						allSastisfied = false;
+						allSatisfied = false;
 						break;
 					}
-				if(allSastisfied)
+				if(allSatisfied)
 					this.startRitual(world);
 			}
 	}
@@ -238,13 +248,15 @@ public class Altar{
 	 * @return If the structure was determined succesfully.
 	 */
 	public boolean determineBlocks(final World world){
-		this.holder.setAltar(this);
 		this.tables = new ArrayList<TileEntityOfferingTable>();
-		this.tables.add(this.holder);
-		this.blocks = new ArrayList<Vec3>();
-		this.blocks.add(Vec3.createVectorHelper(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord));
-		MinecraftForge.EVENT_BUS.register(this);
-		return true;
+		this.blocks = new ArrayList<BlockLocation>();
+		final Map<BlockLocation, BlockRequirement> multi = this.tryFindTier1(world);
+		if((multi != null) && this.establishStructure(multi)){
+			this.holder.setAltar(this);
+			MinecraftForge.EVENT_BUS.register(this);
+			return true;
+		}
+		return false;
 	}
 
 	public float onRechargePlayer(float points, final EntityPlayer player, final boolean shouldSubtract) {
@@ -284,13 +296,76 @@ public class Altar{
 	public void onBlockBreak(final BlockEvent.BreakEvent e){
 		if(this.blocks == null)
 			return;
-		final Vec3 vec = Vec3.createVectorHelper(e.x, e.y, e.z);
-		for(final Vec3 coord:this.blocks)
-			if(NumberHelper.equals(vec, coord)){
-				this.invalidateStructure();
-				break;
+		final BlockLocation loc = new BlockLocation(e.x, e.y, e.z);
+		if(this.blocks.contains(loc)){
+			if(e.getPlayer() != null){
+				final List<EnumPrayers> prayers = PrayerHelper.getActivePrayers(e.getPlayer());
+				if(prayers.contains(EnumPrayers.DESTRUCTIVISM)){
+					this.invalidateStructure();
+					return;
+				}
 			}
+			e.setCanceled(true);
+		}
 
+	}
+
+	private boolean establishStructure(final Map<BlockLocation, BlockRequirement> multi){
+		final World world = this.holder.getWorldObj();
+		final BlockLocation orig = new BlockLocation(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
+		for(final Entry<BlockLocation, BlockRequirement> entry:multi.entrySet()){
+			final BlockLocation loc = entry.getKey().add(orig);
+			final Block block = loc.getBlock(world);
+			if(!entry.getValue().isSatisfied(block)){
+				this.blocks = null;
+				this.tables = null;
+				LogHelper.info(loc);
+				return false;
+			}
+			this.blocks.add(loc);
+			if(block == ModBlocks.offeringTable){
+				final TileEntity te = loc.getTileEntity(world);
+				if(te instanceof TileEntityOfferingTable){
+					this.tables.add((TileEntityOfferingTable) te);
+					if(te != this.holder)
+						((TileEntityOfferingTable)te).setMasterLoc(orig);
+				}
+			}
+		}
+		return true;
+	}
+
+	private Map<BlockLocation, BlockRequirement> tryFindTier1(final World world){
+		final ForgeDirection secondDir;
+		BlockLocation loc = new BlockLocation(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
+		final BlockLocation origLoc = loc;
+		if((loc = origLoc.shift(ForgeDirection.NORTH)).getBlock(world) == ModBlocks.offeringTable)
+			secondDir = ForgeDirection.NORTH;
+		else if((loc = origLoc.shift(ForgeDirection.EAST)).getBlock(world) == ModBlocks.offeringTable)
+			secondDir = ForgeDirection.EAST;
+		else if((loc = origLoc.shift(ForgeDirection.SOUTH)).getBlock(world) == ModBlocks.offeringTable)
+			secondDir = ForgeDirection.SOUTH;
+		else if((loc = origLoc.shift(ForgeDirection.WEST)).getBlock(world) == ModBlocks.offeringTable)
+			secondDir = ForgeDirection.WEST;
+		else
+			return null;
+		final TileEntity te = loc.getTileEntity(world);
+		if((te instanceof TileEntityOfferingTable) == false)
+			return null;
+		final BlockLocation teLoc = loc;
+		ForgeDirection mainDir = secondDir.getRotation(ForgeDirection.DOWN);
+		Block block = (loc = loc.shift(mainDir.getOpposite())).getBlock(world);
+		if(block == Blocks.air){
+			this.holder = (TileEntityOfferingTable) origLoc.shift(secondDir).getTileEntity(world);
+			block = (loc = loc.shift(mainDir).shift(mainDir)).getBlock(world);
+			mainDir = mainDir.getOpposite();
+		}
+		if((block instanceof BlockWall) && (block.getMaterial() == Material.rock)){
+			this.maxPrayerPoints = 500F;
+			this.baseRechargeDelay = 200;
+			return AltarRegistry.getMultiBlock(1, mainDir);
+		}
+		return null;
 	}
 
 }

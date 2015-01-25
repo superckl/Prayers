@@ -6,12 +6,15 @@ import me.superckl.prayers.client.gui.InventoryTabPrayers;
 import me.superckl.prayers.client.handler.EntityRenderHandler;
 import me.superckl.prayers.client.handler.InputHandler;
 import me.superckl.prayers.client.handler.RenderTickHandler;
+import me.superckl.prayers.client.render.RenderOfferingTable;
 import me.superckl.prayers.client.render.RenderUndeadWizardPriest;
 import me.superckl.prayers.client.render.RenderWizardSpell;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.EntityWizardSpell;
+import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.reference.KeyBindings;
 import me.superckl.prayers.common.reference.ModData;
+import me.superckl.prayers.common.reference.RenderData;
 import me.superckl.prayers.network.MessageDisablePrayer;
 import me.superckl.prayers.network.MessageEnablePrayer;
 import me.superckl.prayers.network.MessageHandlerDisablePrayerClient;
@@ -92,7 +95,9 @@ public class ClientProxy extends CommonProxy{
 
 	@Override
 	public void registerRenderers() {
-		//ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBasicAltar.class, new RenderBasicAltar());
+		RenderData.OFFERING_TABLE_ID = RenderingRegistry.getNextAvailableRenderId();
+
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityOfferingTable.class, new RenderOfferingTable());
 		RenderingRegistry.registerEntityRenderingHandler(EntityUndeadWizardPriest.class, new RenderUndeadWizardPriest());
 		RenderingRegistry.registerEntityRenderingHandler(EntityWizardSpell.class, new RenderWizardSpell());
 	}

@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.EnumHelper;
 @RequiredArgsConstructor
 public enum EnumPrayers {
 
+	DESTRUCTIVISM("destructivism", EnumChatFormatting.RED+"Destructivism", Arrays.asList("Allows you to break altars."), 0.1F, true, false, new ResourceLocation("textures/items/fire.png")),
 	ENCHANCE_DEFENCE_1("eDefence1", EnumChatFormatting.YELLOW+"Tough", Arrays.asList("Increases defence by 5%"), 0.1F, false, false, new ResourceLocation("textures/items/fire.png")),
 	ENHANCE_MELEE_1("eMelee1", EnumChatFormatting.YELLOW+"Might", Arrays.asList("Increases melee strength by 5%"), 0.15F, false, false, new ResourceLocation("textures/items/fire.png")),
 	ENHANCE_RANGE_1("eRange1", EnumChatFormatting.YELLOW+"Watchful", Arrays.asList("Increases ranged strength by 5%"), 0.15F, false, false, new ResourceLocation("textures/items/fire.png")),

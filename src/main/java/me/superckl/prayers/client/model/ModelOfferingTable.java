@@ -1,12 +1,16 @@
 package me.superckl.prayers.client.model;
 
 
-public class ModelBasicAltar{
+public class ModelOfferingTable{
 
 	//private final IModelCustom model;
 
-	public ModelBasicAltar() {
+	public ModelOfferingTable() {
 		//this.model = AdvancedModelLoader.loadModel(resource)
+	}
+
+	public void render(){
+
 	}
 
 }

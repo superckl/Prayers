@@ -1,7 +1,6 @@
 package me.superckl.prayers.integration.waila;
 
 import java.util.List;
-import java.util.Set;
 
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -9,10 +8,10 @@ import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.common.block.BlockOfferingTable;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.utility.DateHelper;
 import me.superckl.prayers.common.utility.StringHelper;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -95,11 +94,8 @@ public class PrayersWailaDataProvider implements IWailaDataProvider{
 
 	public static void callbackRegister(final IWailaRegistrar registrar){
 		registrar.addConfig("Prayers", "showaltarinfo", "Show Altar Info", true);
-		final Set<Block> blocks = AltarRegistry.getRegisteredBlocks();
-		for(final Block block:blocks){
-			registrar.registerBodyProvider(PrayersWailaDataProvider.INSTANCE, block.getClass());
-			registrar.registerNBTProvider(PrayersWailaDataProvider.INSTANCE, block.getClass());
-		}
+		registrar.registerBodyProvider(PrayersWailaDataProvider.INSTANCE, BlockOfferingTable.class);
+		registrar.registerNBTProvider(PrayersWailaDataProvider.INSTANCE, BlockOfferingTable.class);
 	}
 
 }

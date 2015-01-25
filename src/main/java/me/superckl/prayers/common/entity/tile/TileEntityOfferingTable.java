@@ -9,8 +9,8 @@ import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
 import me.superckl.prayers.common.reference.ModItems;
+import me.superckl.prayers.common.utility.BlockLocation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -27,11 +27,10 @@ public class TileEntityOfferingTable extends TileEntity{
 	private final List<ItemStack> tertiaryItems = new ArrayList<ItemStack>();
 	@Getter
 	private OfferingTableCraftingHandler currentRecipe;
-	private int[] masterLoc;
+	@Setter
+	private BlockLocation masterLoc;
 	@Setter
 	private Altar altar;
-	@Getter
-	private int waterTimer = 200;
 
 	@Override
 	public void readFromNBT(final NBTTagCompound comp) {
@@ -40,16 +39,19 @@ public class TileEntityOfferingTable extends TileEntity{
 			this.currentItem = ItemStack.loadItemStackFromNBT(comp.getCompoundTag("currentItem"));
 		else
 			this.currentItem = null;
-		final NBTTagList list = new NBTTagList();
-		for(final ItemStack stack:this.tertiaryItems)
-			list.appendTag(stack.writeToNBT(new NBTTagCompound()));
-		comp.setTag("tertiaryItems", list);
+		if(comp.hasKey("masterLoc")){
+			final int[] array = comp.getIntArray("masterLoc");
+			this.masterLoc = new BlockLocation(array[0], array[1], array[2]);
+		}else
+			this.masterLoc = null;
+		final NBTTagList list = comp.getTagList("tertiaryItems", NBT.TAG_COMPOUND);
+		for(int i = 0; i < list.tagCount(); i++)
+			this.tertiaryItems.add(ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(i)));
 		if(comp.hasKey("altar")){
 			this.altar = new Altar(this);
 			this.altar.readFromNBT(comp.getCompoundTag("altar"));
 		}else
 			this.altar = null;
-		this.waterTimer = comp.getInteger("waterTimer");
 	}
 
 	@Override
@@ -57,15 +59,17 @@ public class TileEntityOfferingTable extends TileEntity{
 		super.writeToNBT(comp);
 		if(this.currentItem != null)
 			comp.setTag("currentItem", this.currentItem.writeToNBT(new NBTTagCompound()));
-		final NBTTagList list = comp.getTagList("tertiaryItems", NBT.TAG_COMPOUND);
-		for(int i = 0; i < list.tagCount(); i++)
-			this.tertiaryItems.add(ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(i)));
+		if(this.masterLoc != null)
+			comp.setIntArray("masterLoc", new int[] {this.masterLoc.getX(), this.masterLoc.getY(), this.masterLoc.getZ()});
+		final NBTTagList list = new NBTTagList();
+		for(final ItemStack stack:this.tertiaryItems)
+			list.appendTag(stack.writeToNBT(new NBTTagCompound()));
+		comp.setTag("tertiaryItems", list);
 		if(this.altar != null){
 			final NBTTagCompound tag = new NBTTagCompound();
 			this.altar.writeToNBT(tag);
 			comp.setTag("altar", tag);
 		}
-		comp.setInteger("waterTimer", this.waterTimer);
 	}
 
 	@Override
@@ -119,8 +123,8 @@ public class TileEntityOfferingTable extends TileEntity{
 		}
 	}*/
 
-	public boolean isBlessingWater(){
-		return (this.getAltar() != null) && this.getAltar().isActivated() && (this.currentItem != null) && (this.currentItem.getItem() == Items.potionitem) && (this.currentItem.getItemDamage() == 0) && (this.getAltar().getPrayerPoints() >= 0.5F) && (this.waterTimer > 0);
+	public boolean isCrafting(){
+		return (this.getAltar() != null) && this.getAltar().isActivated() && this.getCurrentRecipe().isCrafting(this);
 	}
 
 	public Altar getAltar(){
@@ -138,7 +142,7 @@ public class TileEntityOfferingTable extends TileEntity{
 
 	public TileEntityOfferingTable getMaster(){
 		if(this.masterLoc != null){
-			final TileEntity te = this.worldObj.getTileEntity(this.masterLoc[0], this.masterLoc[1], this.masterLoc[2]);
+			final TileEntity te = this.masterLoc.getTileEntity(this.worldObj);
 			if((te != null) && (te instanceof TileEntityOfferingTable))
 				return (TileEntityOfferingTable) te;
 		}
@@ -146,7 +150,6 @@ public class TileEntityOfferingTable extends TileEntity{
 	}
 
 	public void onStructureInvalidated(){
-		this.waterTimer = 200;
 		this.altar = null;
 		this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 	}

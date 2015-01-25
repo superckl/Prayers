@@ -11,6 +11,7 @@ import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.reference.ModTabs;
+import me.superckl.prayers.common.reference.RenderData;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -36,6 +37,24 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 	@Override
 	public TileEntity createNewTileEntity(final World world, final int meta) {
 		return new TileEntityOfferingTable();
+	}
+
+	@Override
+	public boolean renderAsNormalBlock()
+	{
+		return false;
+	}
+
+	@Override
+	public int getRenderType()
+	{
+		return RenderData.OFFERING_TABLE_ID;
+	}
+
+	@Override
+	public boolean isOpaqueCube()
+	{
+		return false;
 	}
 
 	@Override
