@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.prayer.EnumPrayers;
@@ -59,10 +60,13 @@ public class Altar{
 	private float prayerPoints = 500F;
 	@Getter
 	@Setter
-	private int baseRechargeDelay = 200;
+	private int baseRechargeDelay = Prayers.getInstance().getConfig().getTier1RechargeDelay();
 	@Getter
 	@Setter
-	private float maxPrayerPoints = 500F;
+	private float baseRechargeRate = Prayers.getInstance().getConfig().getTier1RechargeRate();
+	@Getter
+	@Setter
+	private float maxPrayerPoints = Prayers.getInstance().getConfig().getTier1Max();
 	@Getter
 	private List<BlockLocation> blocks;
 	@Getter
@@ -81,6 +85,8 @@ public class Altar{
 	public void readFromNBT(final NBTTagCompound comp) {
 		this.activated = comp.getBoolean("altarActivated");
 		this.maxPrayerPoints = comp.getFloat("maxPrayerPoints");
+		this.baseRechargeRate = comp.getFloat("baseRechargeRate");
+		this.baseRechargeDelay = comp.getInteger("baseRechargeDelay");
 		this.prayerPoints = comp.getFloat("prayerPoints");
 		this.inRitual = comp.getBoolean("inRitual");
 		this.ritualTimer = comp.getInteger("ritualTimer");
@@ -100,6 +106,8 @@ public class Altar{
 	public void writeToNBT(final NBTTagCompound comp) {
 		comp.setBoolean("altarActivated", this.activated);
 		comp.setFloat("maxPrayerPoints", this.maxPrayerPoints);
+		comp.setFloat("baseRechargeRate", this.baseRechargeRate);
+		comp.setInteger("baseRechargeDelay", this.baseRechargeDelay);
 		comp.setFloat("prayerPoints", this.prayerPoints);
 		comp.setBoolean("inRitual", this.inRitual);
 		comp.setInteger("ritualTimer", this.ritualTimer);
@@ -131,7 +139,7 @@ public class Altar{
 			this.regenTimer--;
 			if(this.regenTimer <= 0){
 				this.regenTimer = this.baseRechargeDelay;
-				this.prayerPoints += 1F;
+				this.prayerPoints += this.baseRechargeRate;
 				if(this.prayerPoints > this.getMaxPrayerPoints())
 					this.prayerPoints = this.getMaxPrayerPoints();
 			}

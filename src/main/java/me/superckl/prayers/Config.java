@@ -11,14 +11,21 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class Config {
 
-	@Getter
-	private final Configuration configFile;
-
 	public static final class Category{
 
 		public static String GENERAL = "general";
+		public static String ALTAR = "altar";
 
 	}
+
+	@Getter
+	private final Configuration configFile;
+	@Getter
+	private float tier1Max;
+	@Getter
+	private int tier1RechargeDelay;
+	@Getter
+	private float tier1RechargeRate;
 
 	public Config(final File config){
 		this.configFile = new Configuration(config);
@@ -35,6 +42,9 @@ public class Config {
 
 	public void loadValues(){
 		try{
+			this.tier1Max = this.configFile.getFloat("Tier 1 Max Points", Category.ALTAR, 500F, 0F, Float.MAX_VALUE, "Determines how many prayer points a tier 1 altar will have.");
+			this.tier1RechargeDelay = this.configFile.getInt("Tier 1 Recharge Delay", Category.ALTAR, 200, 0, Integer.MAX_VALUE, "Determines how long a tier 1 altar will wate before applying the recharge rate. Measured in ticks.");
+			this.tier1RechargeRate = this.configFile.getFloat("Tier 1 Recharge Rate", Category.ALTAR, 1F, 0F, Float.MAX_VALUE, "Determines how much a tier 1 altar will recharge.");
 			this.configFile.save();
 		}catch(final Exception e){
 			e.printStackTrace();

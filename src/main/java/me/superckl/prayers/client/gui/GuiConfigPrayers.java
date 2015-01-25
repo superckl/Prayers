@@ -26,6 +26,7 @@ public class GuiConfigPrayers extends GuiConfig{
 	private static List<IConfigElement> getConfigElements(){
 		final List<IConfigElement> list = new ArrayList<IConfigElement>();
 		list.add(new DummyConfigElement.DummyCategoryElement("General", "prayers.configgui.ctgy.general", GeneralCategory.class));
+		list.add(new DummyConfigElement.DummyCategoryElement("Altar", "prayers.configgui.ctgy.altar", AltarCategory.class));
 		return list;
 	}
 
@@ -40,6 +41,21 @@ public class GuiConfigPrayers extends GuiConfig{
 		protected GuiScreen buildChildScreen(){
 			return new GuiConfig(this.owningScreen, new ConfigElement(Prayers.getInstance().getConfig().getConfigFile().getCategory(Category.GENERAL)).getChildElements()
 					, ModData.MOD_ID, false, false, LanguageRegistry.instance().getStringLocalization(StringHelper.formatGUIUnlocalizedName("config_general")));
+		}
+
+	}
+
+	public static class AltarCategory extends CategoryEntry{
+
+		public AltarCategory(final GuiConfig owningScreen,
+				final GuiConfigEntries owningEntryList, final IConfigElement configElement) {
+			super(owningScreen, owningEntryList, configElement);
+		}
+
+		@Override
+		protected GuiScreen buildChildScreen(){
+			return new GuiConfig(this.owningScreen, new ConfigElement(Prayers.getInstance().getConfig().getConfigFile().getCategory(Category.ALTAR)).getChildElements()
+					, ModData.MOD_ID, false, false, LanguageRegistry.instance().getStringLocalization(StringHelper.formatGUIUnlocalizedName("config_altar")));
 		}
 
 	}
