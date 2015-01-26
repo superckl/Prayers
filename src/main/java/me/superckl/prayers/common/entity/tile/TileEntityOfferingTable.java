@@ -10,7 +10,9 @@ import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.BlockLocation;
+import me.superckl.prayers.common.utility.NumberHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -18,9 +20,10 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class TileEntityOfferingTable extends TileEntity{
+public class TileEntityOfferingTable extends TileEntity implements ISidedInventory{
 
 	@Getter
 	private ItemStack currentItem;
@@ -44,6 +47,7 @@ public class TileEntityOfferingTable extends TileEntity{
 			this.masterLoc = new BlockLocation(array[0], array[1], array[2]);
 		}else
 			this.masterLoc = null;
+		this.tertiaryItems.clear();
 		final NBTTagList list = comp.getTagList("tertiaryItems", NBT.TAG_COMPOUND);
 		for(int i = 0; i < list.tagCount(); i++)
 			this.tertiaryItems.add(ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(i)));
@@ -207,6 +211,104 @@ public class TileEntityOfferingTable extends TileEntity{
 
 	public List<ItemStack> getTertiaryIngredients(){
 		return new ArrayList<ItemStack>(this.tertiaryItems);
+	}
+
+	@Override
+	public int getSizeInventory() {
+		return Integer.MAX_VALUE;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(final int slot) {
+		if(slot <= 0)
+			return this.currentItem;
+		if(!this.hasTertiaryIngredients() || (slot > this.tertiaryItems.size()))
+			return null;
+		return this.tertiaryItems.get(slot-1);
+	}
+
+	@Override
+	public ItemStack decrStackSize(final int slot, final int amount) {
+		if(slot <= 0){
+			final ItemStack stack = this.currentItem;
+			this.setCurrentItem(null, null);
+			return stack;
+		}
+		if(!this.hasTertiaryIngredients())
+			return null;
+		if((slot-1) < this.tertiaryItems.size()){
+			this.onIngredientsModified();
+			return this.tertiaryItems.remove(slot-1);
+		}
+		return this.removeTertiaryIngredient();
+	}
+
+	@Override
+	public ItemStack getStackInSlotOnClosing(final int slot) {
+		return this.getStackInSlot(slot);
+	}
+
+	@Override
+	public void setInventorySlotContents(final int slot, final ItemStack stack) {
+		if(slot <= 0){
+			this.setCurrentItem(stack, null);
+			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+			return;
+		}
+		if(!this.hasTertiaryIngredients() || (slot > this.tertiaryItems.size())){
+			this.addTertiaryIngredient(stack);
+			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+			return;
+		}
+		this.tertiaryItems.set(slot-1, stack);
+		this.onIngredientsModified();
+		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+	}
+
+	@Override
+	public String getInventoryName() {
+		return StatCollector.translateToLocal("tile.prayers:offeringtable.name");
+	}
+
+	@Override
+	public boolean hasCustomInventoryName() {
+		return true;
+	}
+
+	@Override
+	public int getInventoryStackLimit() {
+		return 1;
+	}
+
+	@Override
+	public boolean isUseableByPlayer(final EntityPlayer p_70300_1_) {
+		return true;
+	}
+
+	@Override
+	public void openInventory() {}
+
+	@Override
+	public void closeInventory() {}
+
+	@Override
+	public boolean isItemValidForSlot(final int p_94041_1_, final ItemStack p_94041_2_) {
+		return true;
+	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(final int side) {
+		return NumberHelper.fillIncreasing(this.tertiaryItems.size()+1);
+	}
+
+	@Override
+	public boolean canInsertItem(final int slot, final ItemStack stack, final int side) {
+		return true;
+	}
+
+	@Override
+	public boolean canExtractItem(final int slot, final ItemStack p_102008_2_, final int side) {
+		return true;
 	}
 
 }

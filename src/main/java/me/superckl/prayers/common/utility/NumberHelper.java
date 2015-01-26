@@ -22,4 +22,18 @@ public class NumberHelper {
 		return loc.add(dir.offsetX, dir.offsetY, dir.offsetZ);
 	}
 
+	public static int[] fillIncreasing(final int max){
+		final int[] array = new int[max+1];
+		for(int i = 0; i <= max; i++)
+			array[i] = i;
+		return array;
+	}
+
+	public static int[] fillDecreasing(final int max){
+		final int[] array = new int[max+1];
+		for(int i = max; i >= 0; i--)
+			array[max-i] = i;
+		return array;
+	}
+
 }
