@@ -1,5 +1,6 @@
 package me.superckl.prayers.common.handler;
 
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
@@ -61,7 +62,7 @@ public class EntityEventHandler {
 
 	@SubscribeEvent(receiveCanceled = false)
 	public void onPlayerRightClick(final PlayerInteractEvent e){
-		if((e.action != Action.RIGHT_CLICK_BLOCK) || e.entityPlayer.isSneaking() || (e.entityPlayer.getHeldItem() != null) || (e.world.getBlock(e.x, e.y, e.z) == ModBlocks.offeringTable))
+		if((e.action != Action.RIGHT_CLICK_BLOCK) || e.entityPlayer.isSneaking() || (e.entityPlayer.getHeldItem() != null) || (!Prayers.getInstance().getConfig().isRechargeEverywhere()) ||(e.world.getBlock(e.x, e.y, e.z) == ModBlocks.offeringTable))
 			return;
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityPlayer.getExtendedProperties("prayer");
 		final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
