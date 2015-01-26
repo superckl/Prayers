@@ -1,7 +1,6 @@
 package me.superckl.prayers.common.utility;
 
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class NumberHelper {
 
@@ -18,21 +17,10 @@ public class NumberHelper {
 		return (vec0.xCoord == vec1.xCoord) && (vec0.yCoord == vec1.yCoord) && (vec0.zCoord == vec1.zCoord);
 	}
 
-	public static BlockLocation move(final BlockLocation loc, final ForgeDirection dir){
-		return loc.add(dir.offsetX, dir.offsetY, dir.offsetZ);
-	}
-
 	public static int[] fillIncreasing(final int max){
 		final int[] array = new int[max+1];
 		for(int i = 0; i <= max; i++)
 			array[i] = i;
-		return array;
-	}
-
-	public static int[] fillDecreasing(final int max){
-		final int[] array = new int[max+1];
-		for(int i = max; i >= 0; i--)
-			array[max-i] = i;
 		return array;
 	}
 

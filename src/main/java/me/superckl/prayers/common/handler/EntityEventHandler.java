@@ -56,7 +56,6 @@ public class EntityEventHandler {
 				final int rand = priest.getRNG().nextInt(1000);
 				priest.setLevel(rand == 0 ? 4: rand < 100 ? 3: rand < 700 ? 2:1);
 			}
-
 		}
 	}
 

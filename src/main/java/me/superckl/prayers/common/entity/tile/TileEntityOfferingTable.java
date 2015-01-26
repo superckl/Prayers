@@ -113,20 +113,6 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 			this.findRecipe();
 	}
 
-	/*private void manageWaterBless(){
-		Altar altar;
-		if((this.currentItem != null) && (this.currentItem.getItem() == Items.potionitem) && (this.currentItem.getItemDamage() == 0) && ((altar = this.getAltar()) != null) && altar.isActivated()){
-			if(altar.getPrayerPoints() >= 0.5F){
-				this.waterTimer--;
-				altar.setPrayerPoints(altar.getPrayerPoints()-0.5F);
-			}
-			if(this.waterTimer <= 0){
-				this.waterTimer = 200;
-				this.currentItem = ModFluids.filledHolyBottle();
-			}
-		}
-	}*/
-
 	public boolean isCrafting(){
 		return (this.getAltar() != null) && this.getAltar().isActivated() && this.getCurrentRecipe().isCrafting(this);
 	}
