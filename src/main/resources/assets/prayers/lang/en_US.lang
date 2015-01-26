@@ -1,5 +1,6 @@
 gui.prayers:config.name=Prayers Configuration
 gui.prayers:config_general.name=Prayers General Configuration
+gui.prayers:config_altar.name=Prayers Altar Configuration
 prayers.configgui.ctgy.general.tooltip=Configure general elements of Prayers
 item.prayers:basicbone:0.name=Small Bones
 item.prayers:basicbone:1.name=Large Bones
