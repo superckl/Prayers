@@ -79,9 +79,9 @@ public class ClientProxy extends CommonProxy{
 	@Override
 	public void renderEffect(final String name, final Object ... args) {
 		if(name.equalsIgnoreCase("waterBless")){
-			final int x = ((Integer)args[1]).intValue();
-			final int y = ((Integer)args[2]).intValue();
-			final int z = ((Integer)args[3]).intValue();
+			final float x = ((Float)args[1]).floatValue();
+			final float y = ((Float)args[2]).floatValue();
+			final float z = ((Float)args[3]).floatValue();
 			final Random rand = (Random) args[4];
 			final float startX = (x+(rand.nextFloat()*3))-1;
 			final float startY = y+(rand.nextFloat()*.5F)+1;//TODO actual height

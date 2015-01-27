@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 @Getter
 @RequiredArgsConstructor
@@ -59,6 +60,23 @@ public class BasicTableCraftingHandler extends OfferingTableCraftingHandler{
 		final BasicTableCraftingHandler handler = new BasicTableCraftingHandler(this.result, this.baseIngredient, this.tertiaryIngredients, this.length, this.pointDrain);
 		handler.crafting = this.crafting;
 		handler.timer = this.timer;
+		handler.recipeID = this.recipeID;
+		return handler;
+	}
+
+	@Override
+	public NBTTagCompound toNBT(NBTTagCompound comp) {
+		comp = super.toNBT(comp);
+		comp.setInteger("timer", this.timer);
+		comp.setBoolean("crafting", this.crafting);
+		return comp;
+	}
+
+	@Override
+	public BasicTableCraftingHandler cloneWithNBT(final NBTTagCompound comp) {
+		final BasicTableCraftingHandler handler = this.clone();
+		handler.timer = comp.getInteger("timer");
+		handler.crafting = comp.getBoolean("crafting");
 		return handler;
 	}
 

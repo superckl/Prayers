@@ -4,10 +4,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 public abstract class OfferingTableCraftingHandler implements Cloneable{
+
+	@Getter
+	@Setter
+	protected int recipeID;
 
 	public abstract ItemStack getResult();
 	public abstract ItemStack getBaseIngredient();
@@ -19,6 +27,7 @@ public abstract class OfferingTableCraftingHandler implements Cloneable{
 	public abstract boolean isComplete(final TileEntityOfferingTable te);
 	@Override
 	public abstract OfferingTableCraftingHandler clone();
+	public abstract OfferingTableCraftingHandler cloneWithNBT(final NBTTagCompound comp);
 
 	public boolean checkCompletion(final ItemStack base, final List<ItemStack> tertiary){
 		if(!base.isItemEqual(this.getBaseIngredient()))
@@ -36,6 +45,17 @@ public abstract class OfferingTableCraftingHandler implements Cloneable{
 				}
 		}
 		return list.isEmpty();
+	}
+
+	public NBTTagCompound toNBT(final NBTTagCompound compound){
+		compound.setInteger("recipeID", this.recipeID);
+		return compound;
+	}
+
+	public static OfferingTableCraftingHandler fromNBT(final NBTTagCompound compound){
+		OfferingTableCraftingHandler handler = AltarRegistry.getRecipeById(compound.getInteger("recipeID"));
+		handler = handler.cloneWithNBT(compound);
+		return handler;
 	}
 
 }

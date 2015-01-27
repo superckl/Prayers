@@ -1,5 +1,6 @@
 package me.superckl.prayers.integration.waila;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 import mcp.mobius.waila.api.IWailaConfigHandler;
@@ -24,6 +25,13 @@ public class PrayersWailaDataProvider implements IWailaDataProvider{
 
 	public static final PrayersWailaDataProvider INSTANCE = new PrayersWailaDataProvider();
 
+	private final NumberFormat format = NumberFormat.getNumberInstance();
+
+	public PrayersWailaDataProvider() {
+		this.format.setMinimumFractionDigits(0);
+		this.format.setMaximumFractionDigits(0);
+	}
+
 	@Override
 	public ItemStack getWailaStack(final IWailaDataAccessor accessor, final IWailaConfigHandler config) {
 		return null;
@@ -47,16 +55,19 @@ public class PrayersWailaDataProvider implements IWailaDataProvider{
 			final MovingObjectPosition pos = accessor.getPosition();
 			altar = AltarRegistry.findAltarAt(accessor.getWorld(), pos.blockX, pos.blockY, pos.blockZ);
 		}
-		if(altar != null)
+		if(altar != null){
+			final NBTTagCompound comp = accessor.getNBTData();
 			if(altar.isActivated()){
 				currenttip.add("Active");
-				currenttip.add(StringHelper.build("Points: ", altar.getPrayerPoints(), "/", altar.getMaxPrayerPoints()));
+				currenttip.add(StringHelper.build("Points: ", this.format.format(comp.hasKey("points") ? comp.getFloat("points"):altar.getPrayerPoints()), "/",
+						this.format.format(comp.hasKey("maxPoints") ? comp.getFloat("maxPoints"):altar.getMaxPrayerPoints())));
 			}else if(altar.isInRitual()){
 				currenttip.add("Activating");
-				if((accessor.getNBTData() != null) && accessor.getNBTData().hasKey("ritualTimer"))
+				if((accessor.getNBTData() != null) && comp.hasKey("ritualTimer"))
 					currenttip.add(StringHelper.build(EnumChatFormatting.RESET, "Time Left: ", (te != null) && (te.getCurrentItem() == null) ? EnumChatFormatting.OBFUSCATED:"", DateHelper.toDateString(accessor.getNBTData().getInteger("ritualTimer"))));
 			}else
 				currenttip.add("Inactive");
+		}
 		if((te != null)){
 			if(te.getCurrentItem() != null)
 				currenttip.add("Current Item: "+te.getCurrentItem().getDisplayName());
@@ -89,6 +100,10 @@ public class PrayersWailaDataProvider implements IWailaDataProvider{
 		if(altar != null)
 			if(altar.isInRitual() && !altar.isActivated())
 				tag.setInteger("ritualTimer", altar.getRitualTimer());
+			else if(altar.isActivated()){
+				tag.setFloat("points", altar.getPrayerPoints());
+				tag.setFloat("maxPoints", altar.getMaxPrayerPoints());
+			}
 		return tag;
 	}
 

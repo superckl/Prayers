@@ -1,6 +1,7 @@
 package me.superckl.prayers.proxy;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.Collections;
 
 import me.superckl.prayers.Prayers;
@@ -84,6 +85,8 @@ public abstract class CommonProxy implements IProxy{
 		soakedBones.setTagCompound(comp);
 		GameRegistry.addShapelessRecipe(soakedBones, new ItemStack(ModItems.basicBone, 1, 3), filledBottle);
 		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(filledBottle, new ItemStack(Items.potionitem, 1, 0), Collections.EMPTY_LIST, 200, 0.5F));
+		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(new ItemStack(Items.golden_apple, 1, 1), new ItemStack(Items.golden_apple),
+				Arrays.asList(filledBottle, filledBottle, filledBottle, filledBottle, filledBottle), 6000, .083F));
 	}
 
 }

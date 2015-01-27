@@ -262,6 +262,7 @@ public class Altar{
 		if((multi != null) && this.establishStructure(multi)){
 			this.holder.setAltar(this);
 			MinecraftForge.EVENT_BUS.register(this);
+			this.isRegistered = true;
 			return true;
 		}
 		return false;

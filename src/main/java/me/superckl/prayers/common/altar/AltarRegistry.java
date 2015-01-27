@@ -1,6 +1,7 @@
 package me.superckl.prayers.common.altar;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,7 +30,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public final class AltarRegistry {
 	@Getter
 	private static final Set<WeakReference<Altar>> loadedAltars = new HashSet<WeakReference<Altar>>();
-	private static final Set<OfferingTableCraftingHandler> registeredRecipes = new HashSet<OfferingTableCraftingHandler>();
+	private static final List<OfferingTableCraftingHandler> registeredRecipes = new ArrayList<OfferingTableCraftingHandler>();
 	@Getter
 	private static final Map<Integer, Map<ForgeDirection, Map<BlockLocation, BlockRequirement>>> multiblocks = new HashMap<Integer, Map<ForgeDirection, Map<BlockLocation,BlockRequirement>>>();
 
@@ -65,12 +66,18 @@ public final class AltarRegistry {
 		return null;
 	}
 
-	public static Set<OfferingTableCraftingHandler> getRegisteredRecipes(){
-		return new HashSet<OfferingTableCraftingHandler>(AltarRegistry.registeredRecipes);
+	public static List<OfferingTableCraftingHandler> getRegisteredRecipes(){
+		return new ArrayList<OfferingTableCraftingHandler>(AltarRegistry.registeredRecipes);
 	}
 
 	public static void registerOfferingTableRecipe(final OfferingTableCraftingHandler recipe){
 		AltarRegistry.registerOfferingTableRecipe(recipe, false);
+	}
+
+	public static OfferingTableCraftingHandler getRecipeById(final int id){
+		if(id >= AltarRegistry.registeredRecipes.size())
+			return null;
+		return AltarRegistry.registeredRecipes.get(id);
 	}
 
 	public static void registerOfferingTableRecipe(final OfferingTableCraftingHandler recipe, final boolean override){
@@ -102,6 +109,7 @@ public final class AltarRegistry {
 			}
 		}
 		AltarRegistry.registeredRecipes.add(recipe);
+		recipe.setRecipeID(AltarRegistry.registeredRecipes.size()-1);
 	}
 
 	public static void registerMultiBlocks(){

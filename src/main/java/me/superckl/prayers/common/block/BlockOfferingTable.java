@@ -121,7 +121,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 		if(te.getAltar() == null)
 			return;
 		if((te.getCurrentRecipe() != null) && te.getCurrentRecipe().isCrafting(te))
-			Prayers.getProxy().renderEffect("waterBless", world, x ,y ,z, rand);
+			Prayers.getProxy().renderEffect("waterBless", world, (float) x ,y+1.1F , (float) z, rand);
 		if(te.getAltar().isInRitual() && (te.getCurrentItem() == null)){
 			final double d0 = 0.0625D;
 

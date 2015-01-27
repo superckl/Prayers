@@ -42,6 +42,10 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 			this.currentItem = ItemStack.loadItemStackFromNBT(comp.getCompoundTag("currentItem"));
 		else
 			this.currentItem = null;
+		if(comp.hasKey("currentRecipe"))
+			this.currentRecipe = OfferingTableCraftingHandler.fromNBT(comp.getCompoundTag("currentRecipe"));
+		else
+			this.currentRecipe = null;
 		if(comp.hasKey("masterLoc")){
 			final int[] array = comp.getIntArray("masterLoc");
 			this.masterLoc = new BlockLocation(array[0], array[1], array[2]);
@@ -63,6 +67,8 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 		super.writeToNBT(comp);
 		if(this.currentItem != null)
 			comp.setTag("currentItem", this.currentItem.writeToNBT(new NBTTagCompound()));
+		if(this.currentRecipe != null)
+			comp.setTag("currentRecipe", this.currentRecipe.toNBT(new NBTTagCompound()));
 		if(this.masterLoc != null)
 			comp.setIntArray("masterLoc", new int[] {this.masterLoc.getX(), this.masterLoc.getY(), this.masterLoc.getZ()});
 		final NBTTagList list = new NBTTagList();
