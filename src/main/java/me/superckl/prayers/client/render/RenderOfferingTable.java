@@ -37,13 +37,10 @@ public class RenderOfferingTable extends TileEntitySpecialRenderer{
 
 		GL11.glPushMatrix();
 
-		// Scale, Translate, Rotate
 		GL11.glTranslated(x, y, z);
 
-		// Bind texture
 		//this.bindTexture(Textures.Model.ALUDEL);
 
-		// Render
 		this.model.render();
 
 		GL11.glPopMatrix();
@@ -73,21 +70,20 @@ public class RenderOfferingTable extends TileEntitySpecialRenderer{
 
 			final float scaleFactor = .35F;
 			final float rotationAngle = (float) ((720.0 * (System.currentTimeMillis() & 0x3FFFL)) / 0x3FFFL)*.5F;
-			final float circleOffset = (float) ((720.0 * (System.currentTimeMillis() & 0x3FFFL)) / 0x3FFFL)*.0000000001F;
 
 			GL11.glTranslatef((float) x + 0.5F, (float) y + 1.15F, (float) z + 0.5F);
 			GL11.glScalef(scaleFactor, scaleFactor, scaleFactor);
-			GL11.glRotatef(rotationAngle, 0.0F, 1.0F, 0.0F);
 
 			final float increment = (float) ((2D*Math.PI)/offer.getTertiaryIngredients().size());
-			float current = circleOffset;
+			float current = (float) Math.toRadians(rotationAngle);
 
 			for(final ItemStack stack:offer.getTertiaryIngredients()){
 				final EntityItem entity = new EntityItem(offer.getWorldObj());
 				entity.hoverStart = 0F;
 				entity.setEntityItemStack(stack);
 
-				this.customRenderItem.doRender(entity, Math.cos(current), 0, -Math.sin(current), 0, 0);
+				final double cos = Math.cos(current), sin = Math.sin(current);
+				this.customRenderItem.doRender(entity, cos, 0, -sin, 0, (float) (current+Math.PI)*20F);
 				current += increment;
 			}
 
