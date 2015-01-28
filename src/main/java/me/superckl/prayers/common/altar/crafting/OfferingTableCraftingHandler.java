@@ -25,6 +25,8 @@ public abstract class OfferingTableCraftingHandler implements Cloneable{
 	public abstract void handleUpdate(final TileEntityOfferingTable te);
 	public abstract boolean isCrafting(final TileEntityOfferingTable te);
 	public abstract boolean isComplete(final TileEntityOfferingTable te);
+	public abstract float getOverallDrain();
+	public abstract int getOverallTime();
 	@Override
 	public abstract OfferingTableCraftingHandler clone();
 	public abstract OfferingTableCraftingHandler cloneWithNBT(final NBTTagCompound comp);

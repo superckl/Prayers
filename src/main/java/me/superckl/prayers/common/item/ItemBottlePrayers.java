@@ -52,6 +52,11 @@ public class ItemBottlePrayers extends ItemFluidContainerPrayers{
 	}
 
 	@Override
+	public boolean hasEffect(final ItemStack i){
+		return true;
+	}
+
+	@Override
 	public IIcon getIcon(final ItemStack itemStack, final int renderPass)
 	{
 		final FluidStack fluid = this.getFluid(itemStack);

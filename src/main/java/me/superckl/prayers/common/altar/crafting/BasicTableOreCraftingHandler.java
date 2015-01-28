@@ -176,4 +176,14 @@ public class BasicTableOreCraftingHandler extends OfferingTableCraftingHandler{
 		return handler;
 	}
 
+	@Override
+	public float getOverallDrain() {
+		return this.pointDrain*this.length;
+	}
+
+	@Override
+	public int getOverallTime() {
+		return this.length;
+	}
+
 }

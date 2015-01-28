@@ -48,8 +48,6 @@ public class ItemBasicBone extends ItemPrayers{
 		return this.icons[meta+1];
 	}
 
-
-
 	@Override
 	public IIcon getIcon(final ItemStack stack, final int pass) {
 		if(stack.hasTagCompound() && stack.getTagCompound().getBoolean("soaked"))

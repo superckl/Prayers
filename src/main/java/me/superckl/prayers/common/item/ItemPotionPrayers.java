@@ -151,9 +151,21 @@ public class ItemPotionPrayers extends ItemPrayers{
 	@Override
 	public void registerIcons(final IIconRegister register) {
 		this.icons.put("prayerboost", register.registerIcon(ModData.MOD_ID+":prayerboost"));
-		this.icons.put("prayerrestore", register.registerIcon(ModData.MOD_ID+":prayerestore"));
-		this.icons.put("prayerrestoreinstant", register.registerIcon(ModData.MOD_ID+":prayerestoreinstant"));
-		this.icons.put("attunement", register.registerIcon(ModData.MOD_ID+":maxpointsraise"));
+		this.icons.put("prayerrestore", register.registerIcon(ModData.MOD_ID+":prayerrestore"));
+		this.icons.put("prayerrestoreinstant", register.registerIcon(ModData.MOD_ID+":prayerrestoreinstant"));
+		this.icons.put("attunement", register.registerIcon(ModData.MOD_ID+":attunement"));
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean requiresMultipleRenderPasses()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean hasEffect(final ItemStack i){
+		return true;
 	}
 
 	public static ItemStack withEffects(final ItemStack stack, final PotionEffect ... effects){
