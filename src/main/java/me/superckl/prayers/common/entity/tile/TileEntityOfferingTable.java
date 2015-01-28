@@ -108,7 +108,9 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 		if(this.currentRecipe != null){
 			if(this.currentRecipe.isComplete(this)){
 				this.tertiaryItems.clear();
-				this.currentItem = this.currentRecipe.getResult().copy();
+				final ItemStack result = this.currentRecipe.getResult();
+				this.currentItem = result == null ? null:result.copy();
+				this.currentRecipe.onPostComplete(this);
 				this.currentRecipe = null;
 				//TODO effect
 			}else if(this.currentRecipe.isCrafting(this))
