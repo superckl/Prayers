@@ -8,6 +8,8 @@ import lombok.Setter;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
+import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Post;
+import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Pre;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.BlockLocation;
 import me.superckl.prayers.common.utility.NumberHelper;
@@ -21,6 +23,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class TileEntityOfferingTable extends TileEntity implements ISidedInventory{
@@ -30,6 +33,7 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 	private final List<ItemStack> tertiaryItems = new ArrayList<ItemStack>();
 	@Getter
 	private OfferingTableCraftingHandler currentRecipe;
+	private boolean craftingLock;
 	@Setter
 	private BlockLocation masterLoc;
 	@Setter
@@ -105,18 +109,31 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 	private void handleCrafting(){
 		if(this.getAltar() == null)
 			return;
-		if(this.currentRecipe != null){
+		if((this.currentRecipe != null) && !this.craftingLock){
 			if(this.currentRecipe.isComplete(this)){
+				final Post post = new Post(this, this.currentRecipe);
+				if(MinecraftForge.EVENT_BUS.post(post)){
+					this.currentRecipe = null;
+					this.craftingLock = true;
+					return;
+					//TODO effect
+				}
 				this.tertiaryItems.clear();
-				final ItemStack result = this.currentRecipe.getResult();
+				final ItemStack result = post.getCraftingResult().copy();
 				this.currentItem = result == null ? null:result.copy();
 				this.currentRecipe.onPostComplete(this);
 				this.currentRecipe = null;
 				//TODO effect
 			}else if(this.currentRecipe.isCrafting(this))
 				this.currentRecipe.handleUpdate(this);
-			else if(this.currentRecipe.areAdditionalRequirementsMet(this))
+			else if(this.currentRecipe.areAdditionalRequirementsMet(this)){
+				final Pre pre = new Pre(this, this.currentRecipe);
+				if(MinecraftForge.EVENT_BUS.post(pre)){
+					this.craftingLock = true;
+					return;
+				}
 				this.currentRecipe.beginCrafting(this);
+			}
 		}else if((this.worldObj.getWorldTime() % 60) == 0)
 			this.findRecipe();
 	}
@@ -158,6 +175,7 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 		for(final OfferingTableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
 			if(handler.checkCompletion(this.currentItem, this.tertiaryItems)){
 				this.currentRecipe = handler.clone();
+				this.craftingLock = false;
 				break;
 			}
 	}
