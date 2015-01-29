@@ -68,7 +68,7 @@ public class RenderOfferingTable extends TileEntitySpecialRenderer{
 
 			GL11.glPushMatrix();
 
-			final float scaleFactor = .35F;
+			final float scaleFactor = .37F;
 			final float rotationAngle = (float) ((720.0 * (System.currentTimeMillis() & 0x3FFFL)) / 0x3FFFL)*.5F;
 
 			GL11.glTranslatef((float) x + 0.5F, (float) y + 1.15F, (float) z + 0.5F);
