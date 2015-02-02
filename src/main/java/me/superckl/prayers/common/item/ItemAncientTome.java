@@ -23,7 +23,7 @@ public class ItemAncientTome extends ItemPrayers{
 	@Override
 	public ItemStack onItemRightClick(final ItemStack stack, final World world, final EntityPlayer player) {
 		if(!world.isRemote)
-			player.openGui(Prayers.getInstance(), GUIIDs.PRAYERS, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+			player.openGui(Prayers.getInstance(), GUIIDs.ANCIENT_TOME, world, (int) player.posX, (int) player.posY, (int) player.posZ);
 		return stack;
 	}
 
