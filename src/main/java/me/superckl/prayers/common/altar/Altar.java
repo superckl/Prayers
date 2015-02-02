@@ -67,8 +67,6 @@ public class Altar{
 	@Setter
 	private float maxPrayerPoints;
 	@Getter
-	private String customId;
-	@Getter
 	private int tier;
 	@Getter
 	private List<BlockLocation> blocks;
@@ -91,10 +89,6 @@ public class Altar{
 		this.baseRechargeRate = comp.getFloat("baseRechargeRate");
 		this.baseRechargeDelay = comp.getInteger("baseRechargeDelay");
 		this.tier = comp.getInteger("tier");
-		if(comp.hasKey("customId"))
-			this.customId = comp.getString("customId");
-		else
-			this.customId = null;
 		this.prayerPoints = comp.getFloat("prayerPoints");
 		this.inRitual = comp.getBoolean("inRitual");
 		this.ritualTimer = comp.getInteger("ritualTimer");
@@ -117,8 +111,6 @@ public class Altar{
 		comp.setFloat("baseRechargeRate", this.baseRechargeRate);
 		comp.setInteger("baseRechargeDelay", this.baseRechargeDelay);
 		comp.setInteger("tier", this.tier);
-		if(this.customId != null)
-			comp.setString("customId", this.customId);
 		comp.setFloat("prayerPoints", this.prayerPoints);
 		comp.setBoolean("inRitual", this.inRitual);
 		comp.setInteger("ritualTimer", this.ritualTimer);
@@ -257,10 +249,6 @@ public class Altar{
 		this.ritualTimer = 72000;
 		this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
 		//TODO
-	}
-
-	public boolean isCustom(){
-		return this.customId != null;
 	}
 
 	/**

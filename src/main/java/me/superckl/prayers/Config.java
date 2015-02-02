@@ -59,9 +59,6 @@ public class Config {
 	}
 
 	public void setStats(final Altar altar){
-		if(altar.isCustom())
-			//TODO
-			return;
 		switch(altar.getTier()){
 		case 1:
 		{

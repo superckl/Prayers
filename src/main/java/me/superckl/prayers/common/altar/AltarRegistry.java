@@ -82,7 +82,7 @@ public final class AltarRegistry {
 
 	public static void registerOfferingTableRecipe(final OfferingTableCraftingHandler recipe, final boolean override){
 		if(AltarRegistry.registeredRecipes.contains(recipe)){
-			LogHelper.warn(StringHelper.build("Class "+PSReflectionHelper.retrieveCallingStackTraceElement().getClassName(), " has re-registered an already registered recipe: ", recipe.getClass().getCanonicalName(), ". There are mod conflictions!"));
+			LogHelper.warn(StringHelper.build("Class ", PSReflectionHelper.retrieveCallingStackTraceElement().getClassName(), " has re-registered an already registered recipe: ", recipe.getClass().getCanonicalName(), ". There are mod conflictions!"));
 			return;
 		}
 		final ItemStack base = recipe.getBaseIngredient();
