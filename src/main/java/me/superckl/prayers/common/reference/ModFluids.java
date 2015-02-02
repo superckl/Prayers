@@ -9,7 +9,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-public class ModFluids {
+public final class ModFluids {
 
 	public static final FluidHolyWater holyWater = new FluidHolyWater("holyWater");
 

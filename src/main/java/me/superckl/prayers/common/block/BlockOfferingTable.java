@@ -48,7 +48,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 	@Override
 	public int getRenderType()
 	{
-		return RenderData.OFFERING_TABLE_ID;
+		return RenderData.BlockIDs.OFFERING_TABLE;
 	}
 
 	@Override

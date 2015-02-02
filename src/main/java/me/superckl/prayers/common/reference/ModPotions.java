@@ -9,7 +9,7 @@ import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PSReflectionHelper;
 import net.minecraft.potion.Potion;
 
-public class ModPotions {
+public final class ModPotions {
 
 	public static PotionPrayerBoost prayerBoost;
 	public static PotionPrayerRestore prayerRestore;

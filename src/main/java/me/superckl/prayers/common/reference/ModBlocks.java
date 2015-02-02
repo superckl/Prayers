@@ -7,7 +7,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
 
 @ObjectHolder(ModData.MOD_ID)
-public class ModBlocks {
+public final class ModBlocks {
 
 	public static final BlockOfferingTable offeringTable = new BlockOfferingTable();
 	public static final BlockAltarComponent altarComponent = new BlockAltarComponent();

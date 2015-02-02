@@ -11,12 +11,12 @@ import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
 
-public class RenderOfferingTable extends TileEntitySpecialRenderer{
+public class RenderTileOfferingTable extends TileEntitySpecialRenderer{
 
 	private final ModelOfferingTable model = new ModelOfferingTable();
 	private final RenderItem customRenderItem;
 
-	public RenderOfferingTable() {
+	public RenderTileOfferingTable() {
 		this.customRenderItem = new RenderItem()
 		{
 			@Override

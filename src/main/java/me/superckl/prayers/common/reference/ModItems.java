@@ -21,7 +21,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
 
 @ObjectHolder(ModData.MOD_ID)
-public class ModItems {
+public final class ModItems {
 
 	public static final ItemBasicBone basicBone = new ItemBasicBone();
 	public static final ItemBucketPrayers bucket = new ItemBucketPrayers();

@@ -3,7 +3,7 @@ package me.superckl.prayers.common.reference;
 import net.minecraft.stats.Achievement;
 import net.minecraftforge.common.AchievementPage;
 
-public class ModAchievements {
+public final class ModAchievements {
 
 	public static final Achievement RECHARGED = new Achievement("prayerachrecharge", "prayerrecharged", 0, 0, ModBlocks.offeringTable, null).registerStat();
 	public static final Achievement TOO_OP = new Achievement("prayersachtooop", "prayerstooop", 0, -2, ModBlocks.offeringTable, ModAchievements.RECHARGED).setSpecial().registerStat();
