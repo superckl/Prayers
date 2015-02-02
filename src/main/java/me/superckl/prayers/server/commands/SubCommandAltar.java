@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.utility.ChatHelper;
@@ -67,6 +68,8 @@ public class SubCommandAltar implements ISubCommand{
 				return;
 			}
 			altar.setActivated(activate);
+			if(activate)
+				Prayers.getInstance().getConfig().setStats(altar);
 			PlayerHelper.sendTileUpdateDim(altar.getHolder());
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 4){
@@ -96,6 +99,8 @@ public class SubCommandAltar implements ISubCommand{
 				return;
 			}
 			altar.setActivated(activate);
+			if(activate)
+				Prayers.getInstance().getConfig().setStats(altar);
 			PlayerHelper.sendTileUpdateDim(altar.getHolder());
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else if(args.length == 5){
@@ -131,6 +136,8 @@ public class SubCommandAltar implements ISubCommand{
 				return;
 			}
 			altar.setActivated(activate);
+			if(activate)
+				Prayers.getInstance().getConfig().setStats(altar);
 			PlayerHelper.sendTileUpdateDim(altar.getHolder());
 			sender.sendTranlsatedConfirmation(String.format("msg.altar%s.text", activate ? "activate":"deactivate"));
 		}else

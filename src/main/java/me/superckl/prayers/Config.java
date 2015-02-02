@@ -3,6 +3,7 @@ package me.superckl.prayers;
 import java.io.File;
 
 import lombok.Getter;
+import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.utility.LogHelper;
 import net.minecraftforge.common.config.Configuration;
@@ -54,6 +55,21 @@ public class Config {
 		}finally{
 			if(this.configFile.hasChanged())
 				this.configFile.save();
+		}
+	}
+
+	public void setStats(final Altar altar){
+		if(altar.isCustom())
+			//TODO
+			return;
+		switch(altar.getTier()){
+		case 1:
+		{
+			altar.setBaseRechargeDelay(this.tier1RechargeDelay);
+			altar.setBaseRechargeRate(this.tier1RechargeRate);
+			altar.setMaxPrayerPoints(this.tier1Max);
+			altar.setPrayerPoints(this.tier1Max);
+		}
 		}
 	}
 

@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
@@ -57,16 +56,20 @@ public class Altar{
 	private int ritualTimer = 72000; //3 day-night cycles
 	@Getter
 	@Setter
-	private float prayerPoints = 500F;
+	private float prayerPoints;
 	@Getter
 	@Setter
-	private int baseRechargeDelay = Prayers.getInstance().getConfig().getTier1RechargeDelay();
+	private int baseRechargeDelay;
 	@Getter
 	@Setter
-	private float baseRechargeRate = Prayers.getInstance().getConfig().getTier1RechargeRate();
+	private float baseRechargeRate;
 	@Getter
 	@Setter
-	private float maxPrayerPoints = Prayers.getInstance().getConfig().getTier1Max();
+	private float maxPrayerPoints;
+	@Getter
+	private String customId;
+	@Getter
+	private int tier;
 	@Getter
 	private List<BlockLocation> blocks;
 	@Getter
@@ -77,7 +80,7 @@ public class Altar{
 	@Getter
 	private final Map<UUID, Boolean> contributors = new HashMap<UUID, Boolean>();
 
-	public Altar(@NonNull final TileEntityOfferingTable holder) {
+	public Altar(final TileEntityOfferingTable holder) {
 		this.holder = holder;
 		AltarRegistry.getLoadedAltars().add(new WeakReference<Altar>(this));
 	}
@@ -87,6 +90,11 @@ public class Altar{
 		this.maxPrayerPoints = comp.getFloat("maxPrayerPoints");
 		this.baseRechargeRate = comp.getFloat("baseRechargeRate");
 		this.baseRechargeDelay = comp.getInteger("baseRechargeDelay");
+		this.tier = comp.getInteger("tier");
+		if(comp.hasKey("customId"))
+			this.customId = comp.getString("customId");
+		else
+			this.customId = null;
 		this.prayerPoints = comp.getFloat("prayerPoints");
 		this.inRitual = comp.getBoolean("inRitual");
 		this.ritualTimer = comp.getInteger("ritualTimer");
@@ -108,6 +116,9 @@ public class Altar{
 		comp.setFloat("maxPrayerPoints", this.maxPrayerPoints);
 		comp.setFloat("baseRechargeRate", this.baseRechargeRate);
 		comp.setInteger("baseRechargeDelay", this.baseRechargeDelay);
+		comp.setInteger("tier", this.tier);
+		if(this.customId != null)
+			comp.setString("customId", this.customId);
 		comp.setFloat("prayerPoints", this.prayerPoints);
 		comp.setBoolean("inRitual", this.inRitual);
 		comp.setInteger("ritualTimer", this.ritualTimer);
@@ -237,9 +248,6 @@ public class Altar{
 			this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
 			//TODO effect
 		}
-		//if((this.ritualTimer % 40) == 0)
-		//	this.getWorldObj().markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord); //TODO Meh... It only happens during the ritual I guess...
-		//Fixed by WAILA getNBTTag method
 	}
 
 	public void startRitual(final World world){
@@ -251,6 +259,10 @@ public class Altar{
 		//TODO
 	}
 
+	public boolean isCustom(){
+		return this.customId != null;
+	}
+
 	/**
 	 * Tries to determine the multiblock altar
 	 * @return If the structure was determined succesfully.
@@ -258,8 +270,11 @@ public class Altar{
 	public boolean determineBlocks(final World world){
 		this.tables = new ArrayList<TileEntityOfferingTable>();
 		this.blocks = new ArrayList<BlockLocation>();
+		final int tier = 1;
 		final Map<BlockLocation, BlockRequirement> multi = this.tryFindTier1(world);
 		if((multi != null) && this.establishStructure(multi)){
+			this.tier = tier;
+			Prayers.getInstance().getConfig().setStats(this);
 			this.holder.setAltar(this);
 			MinecraftForge.EVENT_BUS.register(this);
 			this.isRegistered = true;
@@ -369,11 +384,8 @@ public class Altar{
 			block = (loc = loc.shift(mainDir).shift(mainDir)).getBlock(world);
 			mainDir = mainDir.getOpposite();
 		}
-		if((block instanceof BlockWall) && (block.getMaterial() == Material.rock)){
-			this.maxPrayerPoints = 500F;
-			this.baseRechargeDelay = 200;
+		if((block instanceof BlockWall) && (block.getMaterial() == Material.rock))
 			return AltarRegistry.getMultiBlock(1, mainDir);
-		}
 		return null;
 	}
 
