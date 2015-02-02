@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import me.superckl.prayers.common.item.ItemAncientTome;
 import me.superckl.prayers.common.item.ItemBasicBone;
 import me.superckl.prayers.common.item.ItemBottlePrayers;
 import me.superckl.prayers.common.item.ItemBucketPrayers;
@@ -27,6 +28,7 @@ public final class ModItems {
 	public static final ItemBucketPrayers bucket = new ItemBucketPrayers();
 	public static final ItemBottlePrayers bottle = new ItemBottlePrayers();
 	public static final ItemPrayerTome tome = new ItemPrayerTome();
+	public static final ItemAncientTome aTome = new ItemAncientTome();
 	public static ItemPotionPrayers potion;
 
 	public static void init(){
@@ -35,6 +37,7 @@ public final class ModItems {
 		GameRegistry.registerItem(ModItems.bottle, Names.BOTTLE);
 		GameRegistry.registerItem(ModItems.potion, Names.POTION);
 		GameRegistry.registerItem(ModItems.tome, Names.TOME);
+		GameRegistry.registerItem(ModItems.aTome, Names.ANCIENT_TOME);
 	}
 
 	public static void addChestLoot(){
@@ -109,6 +112,7 @@ public final class ModItems {
 		public static final String BOTTLE = "bottle";
 		public static final String POTION = "potion";
 		public static final String TOME = "tome";
+		public static final String ANCIENT_TOME = "aTome";
 	}
 
 }

@@ -1,6 +1,7 @@
 package me.superckl.prayers.proxy;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -87,6 +88,7 @@ public abstract class CommonProxy implements IProxy{
 		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(filledBottle, new ItemStack(Items.potionitem, 1, 0), Collections.EMPTY_LIST, 200, 0.5F));
 		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(new ItemStack(Items.golden_apple, 1, 1), new ItemStack(Items.golden_apple),
 				Arrays.asList(filledBottle, filledBottle, filledBottle, filledBottle, filledBottle), 6000, .083F));
+		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(new ItemStack(ModItems.aTome), new ItemStack(Items.book), new ArrayList<ItemStack>(), 100, 0.5F));
 	}
 
 }
