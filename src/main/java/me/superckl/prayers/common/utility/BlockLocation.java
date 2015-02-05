@@ -71,4 +71,8 @@ public class BlockLocation {
 		return hash;
 	}
 
+	public static BlockLocation fromTileEntity(final TileEntity te){
+		return new BlockLocation(te.xCoord, te.yCoord, te.zCoord);
+	}
+
 }

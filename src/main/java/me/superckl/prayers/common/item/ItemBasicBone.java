@@ -31,7 +31,7 @@ public class ItemBasicBone extends ItemPrayers{
 	public void addInformation(final ItemStack stack, final EntityPlayer player, final List list, final boolean bool) {
 		if(stack.hasTagCompound()){
 			final NBTTagCompound comp = stack.getTagCompound();
-			if(comp.hasKey("progress"))
+			if(comp.hasKey("progress") && (comp.getInteger("progress") != 0))
 				list.add("Cleaning progress: "+(int)(((comp.getInteger("progress"))/1200F)*100F)+"%");
 			if(comp.getBoolean("soaked"))
 				list.add("Soaked");

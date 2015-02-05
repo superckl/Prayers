@@ -13,18 +13,21 @@ import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
+import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.BlockLocation;
+import me.superckl.prayers.common.utility.EntityHelper;
 import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PlayerHelper;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -53,7 +56,7 @@ public class Altar{
 	private boolean inRitual;
 	@Getter
 	@Setter
-	private int ritualTimer = 72000; //3 day-night cycles
+	private int ritualTimer; //3 day-night cycles
 	@Getter
 	@Setter
 	private float prayerPoints;
@@ -138,6 +141,13 @@ public class Altar{
 	public void updateEntity(final World world) {
 		if(!this.isRegistered && !world.isRemote)
 			MinecraftForge.EVENT_BUS.register(this);
+		if((this.blocks != null) && (this.tables == null)){
+			this.tables = new ArrayList<TileEntityOfferingTable>();
+			TileEntity te;
+			for(final BlockLocation loc:this.blocks)
+				if((loc.getBlock(world) == ModBlocks.offeringTable) && ((te = loc.getTileEntity(world)) != null) && (te instanceof TileEntityOfferingTable))
+					this.tables.add((TileEntityOfferingTable) te);
+		}
 		if(this.activated && (this.getPrayerPoints() < this.getMaxPrayerPoints())){
 			this.regenTimer--;
 			if(this.regenTimer <= 0){
@@ -193,6 +203,7 @@ public class Altar{
 			return;
 		}
 		this.ritualTimer--;
+		int maxChance = 30000;
 		if(this.tables != null){
 			final int tempTimer = this.ritualTimer;
 			boolean allSatisfied = true;
@@ -231,14 +242,40 @@ public class Altar{
 					}
 				}else
 					allSatisfied = false;
-			if(!allSatisfied)
+			if(!allSatisfied){
 				this.ritualTimer = tempTimer+1+(this.random.nextInt(9)/8);
+				maxChance -= 15000;
+			}
 		}
-		if(this.ritualTimer >= 100000){
+		if(this.ritualTimer >= 80000){
 			this.inRitual = false;
-			this.ritualTimer = 72000;
+			this.ritualTimer = 0;
 			this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
+			for(final TileEntityOfferingTable te:this.tables){
+				final BlockLocation loc = BlockLocation.fromTileEntity(te).add(0, 1, 0);
+				final EntityLightningBolt lightning = new EntityLightningBolt(this.holder.getWorldObj(), loc.getX(), loc.getY(), loc.getZ());
+				world.spawnEntityInWorld(lightning);
+			}
+			final BlockLocation loc = EntityHelper.tryFindSpawnLoc(EnumCreatureType.creature, this.holder.getWorldObj(), BlockLocation.fromTileEntity(this.holder), this.random);
+			if(loc != null){
+				final EntityUndeadWizardPriest priest = new EntityUndeadWizardPriest(this.holder.getWorldObj(), this.tier+Math.round(this.random.nextInt(3)*this.random.nextFloat()));
+				priest.forceSpawn = true;
+				priest.setLocationAndAngles(loc.getX(), loc.getY(), loc.getZ(), 0F, 0F);
+				this.holder.getWorldObj().spawnEntityInWorld(priest);
+			}
+			return;
 			//TODO effect
+		}
+
+		if(this.random.nextInt(maxChance) == 0){
+			final BlockLocation loc = EntityHelper.tryFindSpawnLoc(EnumCreatureType.creature, this.holder.getWorldObj(), BlockLocation.fromTileEntity(this.holder), this.random);
+			if(loc != null){
+				final EntityLightningBolt lightning = new EntityLightningBolt(this.holder.getWorldObj(), loc.getX(), loc.getY(), loc.getZ());
+				world.spawnEntityInWorld(lightning);
+				final EntityUndeadWizardPriest priest = new EntityUndeadWizardPriest(this.holder.getWorldObj(), this.tier+Math.round(this.random.nextInt(3)*this.random.nextFloat()));
+				priest.setLocationAndAngles(loc.getX(), loc.getY(), loc.getZ(), 0F, 0F);
+				this.holder.getWorldObj().spawnEntityInWorld(priest);
+			}
 		}
 	}
 
