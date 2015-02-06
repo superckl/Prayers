@@ -84,3 +84,10 @@ processResources
         exclude 'mcmod.info'
     }
 }
+
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'me.superckl.prayers.core.PrayersCore'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
+    }
+}
