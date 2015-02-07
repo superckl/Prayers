@@ -9,7 +9,6 @@ import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
-import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.reference.ModPotions;
 import me.superckl.prayers.common.utility.InstanceField;
@@ -52,7 +51,6 @@ public class Prayers {
 		//The order of init calls is important. Don't randomly change it.
 		ModPotions.init();
 		ModItems.init();
-		ModFluids.init();
 		ModBlocks.init();
 		ModAchievements.init();
 		AltarRegistry.registerMultiBlocks();

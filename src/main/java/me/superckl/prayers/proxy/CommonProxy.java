@@ -12,11 +12,9 @@ import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.EntityWizardSpell;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.gui.GuiHandler;
-import me.superckl.prayers.common.handler.BucketEventHandler;
 import me.superckl.prayers.common.handler.EntityEventHandler;
 import me.superckl.prayers.common.handler.PlayerTickHandler;
 import me.superckl.prayers.common.reference.ModData;
-import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.worldgen.ComponentAltarRoom;
 import me.superckl.prayers.common.worldgen.PrayersVillageCreationHandler;
@@ -47,7 +45,6 @@ public abstract class CommonProxy implements IProxy{
 		FMLCommonHandler.instance().bus().register(Prayers.getInstance().getConfig());
 		FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
 		MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
-		MinecraftForge.EVENT_BUS.register(new BucketEventHandler());
 		NetworkRegistry.INSTANCE.registerGuiHandler(Prayers.getInstance(), new GuiHandler());
 		ModData.PRAYER_UPDATE_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel("prayerUpdate");
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerServer.class, MessageEnablePrayer.class, 0, Side.SERVER);
@@ -77,9 +74,10 @@ public abstract class CommonProxy implements IProxy{
 
 	@Override
 	public void registerRecipes(){
-		final ItemStack filledBucket = ModFluids.filledHolyBucket();
-		final ItemStack filledBottle = ModFluids.filledHolyBottle();
-		GameRegistry.addShapelessRecipe(filledBucket, Items.bucket, filledBottle, filledBottle, filledBottle, filledBottle);
+		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 3, 15), new ItemStack(ModItems.basicBone));
+		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 3, 15), new ItemStack(ModItems.basicBone, 1, 1));
+		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 3, 15), new ItemStack(ModItems.basicBone, 1, 2));
+		final ItemStack filledBottle = new ItemStack(ModItems.bottle);
 		final ItemStack soakedBones = new ItemStack(ModItems.basicBone, 1, 3);
 		final NBTTagCompound comp = new NBTTagCompound();
 		comp.setBoolean("soaked", true);

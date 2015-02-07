@@ -8,7 +8,6 @@ import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.reference.ModAchievements;
-import me.superckl.prayers.common.reference.ModFluids;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.reference.ModTabs;
 import me.superckl.prayers.common.reference.RenderData;
@@ -21,8 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidContainerRegistry;
-import net.minecraftforge.fluids.FluidStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -32,6 +29,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 		super(Material.rock);
 		this.setBlockName("offeringtable").setStepSound(Block.soundTypeStone).setCreativeTab(ModTabs.TAB_PRAYER_BLOCKS);
 		this.setHarvestLevel("pickaxe", 1, 0);
+		this.setBlockBounds(0.0625F/2F, 0, 0.0625F/2F, 1-0.0625F, 1-(2.5F*0.0625F), 1-0.0625F);
 	}
 
 	@Override
@@ -64,8 +62,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 		if((te == null) || ((te instanceof TileEntityOfferingTable) == false))
 			return false;
 		final TileEntityOfferingTable table = (TileEntityOfferingTable) te;
-		if((player.getHeldItem() != null) && (player.getHeldItem().getItem() == ModItems.bottle) && FluidContainerRegistry.containsFluid(player.getHeldItem(), new FluidStack(ModFluids.holyWater, FluidContainerRegistry.BUCKET_VOLUME/4))
-				&& (table.getCurrentItem() != null) && (table.getCurrentItem().getItem() == ModItems.basicBone) && (table.getCurrentItem().getItemDamage() == 3)){
+		if((player.getHeldItem() != null) && (player.getHeldItem().getItem() == ModItems.bottle) && (table.getCurrentItem() != null) && (table.getCurrentItem().getItem() == ModItems.basicBone) && (table.getCurrentItem().getItemDamage() == 3)){
 			if(table.getCurrentItem().hasTagCompound() && table.getCurrentItem().getTagCompound().getBoolean("soaked"))
 				return false;
 			NBTTagCompound comp;
@@ -89,8 +86,8 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 			player.inventory.addItemStackToInventory(table.removeTertiaryIngredient());
 		else if(table.getCurrentItem() != null){
 			player.inventory.addItemStackToInventory(table.getCurrentItem());
-			final ItemStack filledBottle = ModFluids.filledHolyBottle();
-			if(!player.worldObj.isRemote && table.getCurrentItem().isItemEqual(filledBottle) && ItemStack.areItemStackTagsEqual(table.getCurrentItem(), filledBottle))
+			final ItemStack filledBottle = new ItemStack(ModItems.bottle);
+			if(!player.worldObj.isRemote && table.getCurrentItem().isItemEqual(filledBottle))
 				player.addStat(ModAchievements.FIRST_STEPS, 1);
 			table.setCurrentItem(null, player);
 		}else if((player.getHeldItem() == null) && (table.getAltar() != null) && table.getAltar().isActivated()){

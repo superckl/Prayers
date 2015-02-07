@@ -9,7 +9,6 @@ import java.util.Random;
 import me.superckl.prayers.common.item.ItemAncientTome;
 import me.superckl.prayers.common.item.ItemBasicBone;
 import me.superckl.prayers.common.item.ItemBottlePrayers;
-import me.superckl.prayers.common.item.ItemBucketPrayers;
 import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.item.ItemPrayerTome;
 import me.superckl.prayers.common.prayer.EnumPrayers;
@@ -25,7 +24,6 @@ import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
 public final class ModItems {
 
 	public static final ItemBasicBone basicBone = new ItemBasicBone();
-	public static final ItemBucketPrayers bucket = new ItemBucketPrayers();
 	public static final ItemBottlePrayers bottle = new ItemBottlePrayers();
 	public static final ItemPrayerTome tome = new ItemPrayerTome();
 	public static final ItemAncientTome aTome = new ItemAncientTome();
@@ -33,7 +31,6 @@ public final class ModItems {
 
 	public static void init(){
 		GameRegistry.registerItem(ModItems.basicBone, Names.BASIC_BONE);
-		GameRegistry.registerItem(ModItems.bucket, Names.BUCKET);
 		GameRegistry.registerItem(ModItems.bottle, Names.BOTTLE);
 		GameRegistry.registerItem(ModItems.potion, Names.POTION);
 		GameRegistry.registerItem(ModItems.tome, Names.TOME);
@@ -108,7 +105,6 @@ public final class ModItems {
 
 	public static final class Names{
 		public static final String BASIC_BONE = "basicBone";
-		public static final String BUCKET = "bucket";
 		public static final String BOTTLE = "bottle";
 		public static final String POTION = "potion";
 		public static final String TOME = "tome";
