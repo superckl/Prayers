@@ -13,13 +13,15 @@ import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class RenderBlockOfferingTable implements ISimpleBlockRenderingHandler{
 
+	private final TileEntityOfferingTable dummy = new TileEntityOfferingTable();
+
 	@Override
 	public void renderInventoryBlock(final Block block, final int metadata, final int modelId,
 			final RenderBlocks renderer) {
 		GL11.glPushMatrix();
-		GL11.glTranslatef(-0.5F, -0.6F, -0.5F);
+		GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
 		GL11.glScalef(0.9F, 0.9F, 0.9F);
-		TileEntityRendererDispatcher.instance.renderTileEntityAt(new TileEntityOfferingTable(), 0.0D, 0.0D, 0.0D, 0.0F);
+		TileEntityRendererDispatcher.instance.renderTileEntityAt(this.dummy, 0.0D, 0.0D, 0.0D, 0.0F);
 		GL11.glPopMatrix();
 
 	}

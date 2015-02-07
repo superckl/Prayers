@@ -1,7 +1,6 @@
 package me.superckl.prayers.common.item;
 
 import java.util.List;
-import java.util.Random;
 
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.reference.ModData;
@@ -20,8 +19,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemBasicBone extends ItemPrayers{
-
-	private final Random random = new Random();
 
 	public ItemBasicBone() {
 		this.setMaxStackSize(16).setUnlocalizedName("basicbone").setCreativeTab(ModTabs.TAB_PRAYER_ITEMS).setHasSubtypes(true);
@@ -45,15 +42,7 @@ public class ItemBasicBone extends ItemPrayers{
 
 	@Override
 	public IIcon getIconFromDamage(final int meta) {
-		return this.icons[meta+1];
-	}
-
-	@Override
-	public IIcon getIcon(final ItemStack stack, final int pass) {
-		if(stack.hasTagCompound() && stack.getTagCompound().getBoolean("soaked"))
-			return this.icons[0];
-		else
-			return super.getIcon(stack, pass);
+		return this.icons[meta];
 	}
 
 	@Override
@@ -63,10 +52,10 @@ public class ItemBasicBone extends ItemPrayers{
 
 	@Override
 	public void getSubItems(final Item item, final CreativeTabs tab, final List list) {
+		super.getSubItems(item, tab, list);
 		list.add(new ItemStack(item, 1, 1));
 		list.add(new ItemStack(item, 1, 2));
 		list.add(new ItemStack(item, 1, 3));
-		super.getSubItems(item, tab, list);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -74,9 +63,13 @@ public class ItemBasicBone extends ItemPrayers{
 
 	@Override
 	public void registerIcons(final IIconRegister register) {
-		this.icons = new IIcon[] {register.registerIcon(ModData.MOD_ID+":wetbones"), register.registerIcon(ModData.MOD_ID+":smallbones"),
-				register.registerIcon(ModData.MOD_ID+":largebones"), register.registerIcon(ModData.MOD_ID+":dirtybones"),
+		this.icons = new IIcon[] {register.registerIcon(ModData.MOD_ID+":smallbones"), register.registerIcon(ModData.MOD_ID+":largebones"), register.registerIcon(ModData.MOD_ID+":ancientbones"),
 				register.registerIcon(ModData.MOD_ID+":exquisitebones")};
+	}
+
+	@Override
+	public boolean hasEffect(final ItemStack i){
+		return  i.getItemDamage() == 3;
 	}
 
 	@Override
