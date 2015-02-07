@@ -142,9 +142,9 @@ public class EntityEventHandler {
 		if(e.entityLiving.getRNG().nextInt(4) == 0)
 			return;
 		if((e.entityLiving.width*e.entityLiving.height) < 2.0F)
-			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(50) == 0 ? 2:0)));
+			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(100) == 0 ? 2:0)));
 		else
-			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(50) == 0 ? 2:1)));
+			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(100) == 0 ? 2:1)));
 	}
 
 	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOW)

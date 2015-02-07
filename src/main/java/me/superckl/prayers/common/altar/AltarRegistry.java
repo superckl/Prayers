@@ -37,7 +37,7 @@ public final class AltarRegistry {
 	private AltarRegistry(){};
 
 	public static boolean hasMultiBlocksOfTier(final int tier){
-		return AltarRegistry.multiblocks.containsKey(tier);
+		return AltarRegistry.multiblocks.containsKey(tier) && !AltarRegistry.multiblocks.get(tier).isEmpty();
 	}
 
 	public static boolean hasMultiBlock(final int tier, final ForgeDirection direction){

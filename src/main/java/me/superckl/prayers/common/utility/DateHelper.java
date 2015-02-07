@@ -3,6 +3,9 @@ package me.superckl.prayers.common.utility;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+/**
+ *From the plugin Essentials. Modified to fit the needs of this mod.
+ */
 public class DateHelper {
 
 	public static String toDateString(final int ticks){

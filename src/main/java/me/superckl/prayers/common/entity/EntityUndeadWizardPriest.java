@@ -35,7 +35,6 @@ import net.minecraft.world.World;
 public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, IRangedAttackMob{
 
 	private int field_70846_g;
-	public boolean updated;
 	@Getter
 	private static final List[] prayers = new List[] {Arrays.asList(EnumPrayers.PROTECT_MAGIC), Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE),
 		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4),
@@ -52,7 +51,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.tasks.addTask(6, new EntityAILookIdle(this));
 		this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));
-		this.setSize(0.6F, 1.8F);
+		this.setSize(1F, 3F);
 	}
 
 	public EntityUndeadWizardPriest(final World world) {
