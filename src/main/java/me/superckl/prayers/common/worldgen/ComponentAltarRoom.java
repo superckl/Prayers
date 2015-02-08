@@ -24,7 +24,7 @@ import net.minecraft.world.gen.structure.StructureVillagePieces.Start;
 import net.minecraft.world.gen.structure.StructureVillagePieces.Village;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class ComponentAltarRoom extends StructureVillagePieces.Village{
+public class ComponentAltarRoom extends StructureVillagePieces.House1{
 
 	private int averageGroundLevel = -1;
 
@@ -37,7 +37,7 @@ public class ComponentAltarRoom extends StructureVillagePieces.Village{
 	}
 
 	public static ComponentAltarRoom buildComponent(final Start villagePiece, final List pieces, final Random random, final int x, final int y, final int z, final int coordBaseMode, final int p5) {
-		final StructureBoundingBox box = StructureBoundingBox.getComponentToAddBoundingBox(x, y, z, 0, 0, 0, 11, 6, 11, coordBaseMode);//TODO actual dimensions
+		final StructureBoundingBox box = StructureBoundingBox.getComponentToAddBoundingBox(x, y, z, 0, 0, 0, 5, 5, 5, coordBaseMode);//TODO actual dimensions
 		return Village.canVillageGoDeeper(box) && (StructureComponent.findIntersecting(pieces, box) == null) ? new ComponentAltarRoom(villagePiece, p5, random, box, coordBaseMode) : null;
 	}
 
@@ -49,10 +49,10 @@ public class ComponentAltarRoom extends StructureVillagePieces.Village{
 			if (this.averageGroundLevel < 0)
 				return true;
 
-			this.boundingBox.offset(0, (this.averageGroundLevel - this.boundingBox.maxY) + 6, 0);
+			this.boundingBox.offset(0, (this.averageGroundLevel - this.boundingBox.maxY) + 5, 0);
 		}
 
-		LogHelper.info("Genning at"+box.toString());
+		LogHelper.info("Genning at "+box.toString());
 		ForgeDirection dir;
 		switch(this.coordBaseMode){
 		case 0:
