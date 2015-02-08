@@ -31,7 +31,6 @@ public final class AltarRegistry {
 	@Getter
 	private static final Set<WeakReference<Altar>> loadedAltars = new HashSet<WeakReference<Altar>>();
 	private static final List<OfferingTableCraftingHandler> registeredRecipes = new ArrayList<OfferingTableCraftingHandler>();
-	@Getter
 	private static final Map<Integer, Map<ForgeDirection, Map<BlockLocation, BlockRequirement>>> multiblocks = new HashMap<Integer, Map<ForgeDirection, Map<BlockLocation,BlockRequirement>>>();
 
 	private AltarRegistry(){};
@@ -44,8 +43,12 @@ public final class AltarRegistry {
 		return AltarRegistry.hasMultiBlocksOfTier(tier) ? AltarRegistry.multiblocks.get(tier).containsKey(direction):false;
 	}
 
+	/**
+	 * This method should always be used when retrieving multiblocks. It performs a deep copy of the original to ensure altar properties don't bleed over to each other.
+	 * @return The data structure representing the multiblock
+	 */
 	public static Map<BlockLocation, BlockRequirement> getMultiBlock(final int tier, final ForgeDirection direction){
-		return AltarRegistry.hasMultiBlocksOfTier(tier) ? AltarRegistry.multiblocks.get(tier).get(direction):null;
+		return AltarRegistry.hasMultiBlocksOfTier(tier) ? AltarRegistry.deepCopy(AltarRegistry.multiblocks.get(tier).get(direction)):null;
 	}
 
 	public static Altar findAltarAt(final World world, final int x, final int y, final int z){
@@ -175,9 +178,16 @@ public final class AltarRegistry {
 		west.put(new BlockLocation(1, 0, 0), wall);
 		west.put(new BlockLocation(1, 0, -1), wall);
 		west.put(new BlockLocation(1, 0, -2), wall);
-		west.put(new BlockLocation(0, -1, 1), stone);
-		west.put(new BlockLocation(0, -1, -2), stone);
+		west.put(new BlockLocation(0, -1, 1), wall);
+		west.put(new BlockLocation(0, -1, -2), wall);
 		return west;
+	}
+
+	public static Map<BlockLocation, BlockRequirement> deepCopy(final Map<BlockLocation, BlockRequirement> map){
+		final Map<BlockLocation, BlockRequirement> copy = new HashMap<BlockLocation, BlockRequirement>();
+		for(final Entry<BlockLocation, BlockRequirement> entry:map.entrySet())
+			copy.put(entry.getKey().clone(), entry.getValue().clone());
+		return copy;
 	}
 
 }

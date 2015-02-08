@@ -9,12 +9,14 @@ import net.minecraft.block.material.Material;
 @Getter
 @Setter
 @ToString
-public class BlockRequirement{
+public class BlockRequirement implements Cloneable{
 
 	private Material material;
 	private Block block;
 	private Class<? extends Block> clazz;
 	private boolean assignBlock;
+
+	private BlockRequirement(){}
 
 	public BlockRequirement(final Material material){
 		this.material = material;
@@ -51,6 +53,16 @@ public class BlockRequirement{
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public BlockRequirement clone(){
+		final BlockRequirement req = new BlockRequirement();
+		req.assignBlock = this.assignBlock;
+		req.block = this.block;
+		req.clazz = this.clazz;
+		req.material = this.material;
+		return req;
 	}
 
 }

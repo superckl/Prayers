@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 @Setter
 @RequiredArgsConstructor
 @ToString
-public class BlockLocation {
+public class BlockLocation implements Cloneable{
 
 	private final int x, y, z;
 
@@ -45,6 +45,16 @@ public class BlockLocation {
 		return world.getTileEntity(this.x, this.y, this.z);
 	}
 
+	public BlockLocation setBlock(final World world, final Block block){
+		world.setBlock(this.x, this.y, this.z, block);
+		return this;
+	}
+
+	public BlockLocation setMeta(final World world, final int meta){
+		world.setBlockMetadataWithNotify(this.x, this.y, this.z, meta, 3);
+		return this;
+	}
+
 	public BlockLocation shift(final ForgeDirection dir){
 		return this.add(dir.offsetX, dir.offsetY, dir.offsetZ);
 	}
@@ -69,6 +79,11 @@ public class BlockLocation {
 		hash = ((hash*31)+octal.hashCode())^(octal.hashCode() >>> 32);
 		hash = (hash*59) + this.z;
 		return hash;
+	}
+
+	@Override
+	public BlockLocation clone(){
+		return new BlockLocation(this.x, this.y, this.z);
 	}
 
 	public static BlockLocation fromTileEntity(final TileEntity te){

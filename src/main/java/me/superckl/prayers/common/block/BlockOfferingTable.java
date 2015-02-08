@@ -14,8 +14,10 @@ import me.superckl.prayers.common.reference.RenderData;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -188,6 +190,12 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 				world.spawnEntityInWorld(entityItem);
 				item.stackSize = 0;
 			}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void registerBlockIcons(final IIconRegister register){
+		this.blockIcon = Blocks.stone.getIcon(0, 0);
 	}
 
 }
