@@ -16,7 +16,6 @@ import me.superckl.prayers.common.handler.EntityEventHandler;
 import me.superckl.prayers.common.handler.PlayerTickHandler;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
-import me.superckl.prayers.common.reference.RenderData;
 import me.superckl.prayers.common.worldgen.ComponentAltarRoom;
 import me.superckl.prayers.common.worldgen.PrayersVillageCreationHandler;
 import me.superckl.prayers.network.MessageDisablePrayer;

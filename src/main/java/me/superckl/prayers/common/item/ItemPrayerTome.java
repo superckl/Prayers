@@ -32,8 +32,21 @@ public class ItemPrayerTome extends ItemPrayers{
 	public void addInformation(final ItemStack stack, final EntityPlayer player, final List list, final boolean bool) {
 		if(stack.hasTagCompound()){
 			final NBTTagCompound comp = stack.getTagCompound();
-			if(comp.hasKey("prayer"))
-				list.add(EnumPrayers.getById(comp.getString("prayer")).getDisplayName());
+			if(comp.hasKey("prayer")){
+				final EnumPrayers prayer = EnumPrayers.getById(comp.getString("prayer"));
+				final List<String> unlocked = ((PrayerExtendedProperties)player.getExtendedProperties("prayer")).getUnlockedPrayers();
+				String name = prayer.getDisplayName();
+				for(final EnumPrayers require:prayer.getRequiredAfter())
+					if(!unlocked.contains(require.getId())){
+						name = EnumChatFormatting.OBFUSCATED+EnumChatFormatting.getTextWithoutFormattingCodes(name);
+						break;
+					}
+				list.add(name);
+				if(unlocked.contains(prayer.getId())){
+					list.add("Unlocked");
+					return;
+				}
+			}
 		}
 	}
 
@@ -44,10 +57,17 @@ public class ItemPrayerTome extends ItemPrayers{
 			return itemStack;
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) player.getExtendedProperties("prayer");
 		final String id = itemStack.getTagCompound().getString("prayer");
-		if(prop.getUnlockedPrayers().contains(id))
+		final EnumPrayers prayer = EnumPrayers.getById(id);
+		final List<String> unlocked = prop.getUnlockedPrayers();
+		if(unlocked.contains(id))
 			return itemStack;
-		prop.getUnlockedPrayers().add(id);
-		ChatHelper.sendFormattedDoubleMessage(player, "msg.whisper.text", ChatHelper.createTranslatedChatWithStyle("msg.newprayer.text", new ChatStyle().setItalic(false), EnumChatFormatting.getTextWithoutFormattingCodes(EnumPrayers.getById(id).getDisplayName())),
+		for(final EnumPrayers require:prayer.getRequiredAfter())
+			if(!unlocked.contains(require.getId())){
+				player.addChatMessage(ChatHelper.createTranslatedChatWithStyle("msg.failread.text", new ChatStyle().setColor(EnumChatFormatting.RED).setItalic(true)));
+				return itemStack;
+			}
+		unlocked.add(id);
+		ChatHelper.sendFormattedDoubleMessage(player, "msg.whisper.text", ChatHelper.createTranslatedChatWithStyle("msg.newprayer.text", new ChatStyle().setItalic(false), EnumChatFormatting.getTextWithoutFormattingCodes(prayer.getDisplayName())),
 				new ChatStyle().setColor(EnumChatFormatting.RED).setItalic(true));
 		if (!player.capabilities.isCreativeMode)
 			--itemStack.stackSize;

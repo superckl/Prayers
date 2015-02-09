@@ -47,3 +47,4 @@ msg.nodim.text=Dimension %d not found.
 msg.lvltoolow:water.text=You lack the required level to make Holy Water.
 msg.whisper.text=The Gods whisper to you: 
 msg.newprayer.text=You may now use the prayer %s.
+msg.failread.text=You fail to read the strange text.

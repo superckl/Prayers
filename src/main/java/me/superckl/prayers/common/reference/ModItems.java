@@ -1,9 +1,7 @@
 package me.superckl.prayers.common.reference;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import me.superckl.prayers.common.item.ItemAncientTome;
@@ -48,7 +46,7 @@ public final class ModItems {
 
 		//Prayer tomes
 		final Random random = new Random();
-		final List<EnumPrayers> prayers = new ArrayList<EnumPrayers>(Arrays.asList(EnumPrayers.values()));
+		final EnumSet<EnumPrayers> prayers = EnumSet.allOf(EnumPrayers.class);
 		final Iterator<EnumPrayers> it = prayers.iterator();
 		while(it.hasNext())
 			if(!it.next().isRequiresTome())
