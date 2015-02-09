@@ -18,7 +18,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 public class ModContainerPrayersCore extends DummyModContainer{
 
-	public static final Logger logger = LogManager.getLogger("BetterOceansCore");
+	public static final Logger logger = LogManager.getLogger("PrayersCore");
 
 	public ModContainerPrayersCore() {
 
@@ -28,7 +28,7 @@ public class ModContainerPrayersCore extends DummyModContainer{
 		meta.name = "Prayers Core";
 		meta.parent = "Prayers";
 		meta.version = "1.0";
-		meta.authorList = Arrays.asList("superckl");
+		meta.authorList = Arrays.asList("superckl, WillThGreat");
 		meta.description = "";
 		meta.url = "hhttps://github.com/superckl/Prayers";
 		meta.updateUrl = "";

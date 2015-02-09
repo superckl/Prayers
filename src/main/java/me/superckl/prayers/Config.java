@@ -22,6 +22,8 @@ public class Config {
 	@Getter
 	private final Configuration configFile;
 	@Getter
+	private int villagerID;
+	@Getter
 	private boolean rechargeEverywhere;
 	@Getter
 	private float tier1Max;
@@ -45,6 +47,7 @@ public class Config {
 
 	public void loadValues(){
 		try{
+			this.villagerID = this.configFile.getInt("Villager ID", Category.GENERAL, 757767, 0, Integer.MAX_VALUE, "The ID with which to register the priest villager.");
 			this.rechargeEverywhere = this.configFile.getBoolean("Recharge Everywhere", Category.ALTAR, true, "If false, a player will only be able to recharge their prayer points by right clicking an offering table, instead of any block in the altar. If true, this can get quite CPU intensive if there are many large altars loaded.");
 			this.tier1Max = this.configFile.getFloat("Tier 1 Max Points", Category.ALTAR, 500F, 0F, Float.MAX_VALUE, "Determines how many prayer points a tier 1 altar will have.");
 			this.tier1RechargeDelay = this.configFile.getInt("Tier 1 Recharge Delay", Category.ALTAR, 200, 0, Integer.MAX_VALUE, "Determines how long a tier 1 altar will wate before applying the recharge rate. Measured in ticks.");

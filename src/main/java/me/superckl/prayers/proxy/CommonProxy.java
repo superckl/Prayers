@@ -16,6 +16,7 @@ import me.superckl.prayers.common.handler.EntityEventHandler;
 import me.superckl.prayers.common.handler.PlayerTickHandler;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
+import me.superckl.prayers.common.reference.RenderData;
 import me.superckl.prayers.common.worldgen.ComponentAltarRoom;
 import me.superckl.prayers.common.worldgen.PrayersVillageCreationHandler;
 import me.superckl.prayers.network.MessageDisablePrayer;
@@ -63,6 +64,9 @@ public abstract class CommonProxy implements IProxy{
 		final int spellID = EntityRegistry.findGlobalUniqueEntityId();
 		EntityRegistry.registerGlobalEntityID(EntityWizardSpell.class, "prayerswizardspell", spellID);
 		EntityRegistry.registerModEntity(EntityWizardSpell.class, "prayerswizardspell", spellID, Prayers.getInstance(), 80, 3, true);
+		final int id = Prayers.getInstance().getConfig().getVillagerID();
+		//VillagerRegistry.instance().registerVillagerId(id);
+		//VillagerRegistry.instance().registerVillagerSkin(id, RenderData.PRIEST_VILLAGER_MODEL);
 	}
 
 	@Override
