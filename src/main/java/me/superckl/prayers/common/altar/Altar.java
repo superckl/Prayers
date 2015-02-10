@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.Prayers;
@@ -43,42 +44,32 @@ import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
+@Getter
 public class Altar{
 
 	/**
 	 * Only to be used on the server side.
 	 */
+	@Getter(AccessLevel.NONE)
 	private final Random random = new Random();
-	@Getter
 	@Setter
 	private boolean activated;
-	@Getter
 	private boolean inRitual;
-	@Getter
 	@Setter
 	private int ritualTimer; //3 day-night cycles
-	@Getter
 	@Setter
 	private float prayerPoints;
-	@Getter
 	@Setter
 	private int baseRechargeDelay;
-	@Getter
 	@Setter
 	private float baseRechargeRate;
-	@Getter
 	@Setter
 	private float maxPrayerPoints;
-	@Getter
 	private int tier;
-	@Getter
 	private List<BlockLocation> blocks;
-	@Getter
 	private List<TileEntityOfferingTable> tables;
 	private boolean isRegistered;
-	@Getter
 	private TileEntityOfferingTable holder;
-	@Getter
 	private final Map<UUID, Boolean> contributors = new HashMap<UUID, Boolean>();
 
 	public Altar(final TileEntityOfferingTable holder) {

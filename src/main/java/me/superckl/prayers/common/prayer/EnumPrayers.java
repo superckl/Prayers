@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.EnumHelper;
 
 import com.google.common.collect.ImmutableList;
 
+@Getter
 @RequiredArgsConstructor
 public enum EnumPrayers {
 
@@ -42,24 +43,16 @@ public enum EnumPrayers {
 
 	public static final float MAX_DRAIN = 7F;
 
-	@Getter
 	private final String id;
-	@Getter
 	private final String displayName;
-	@Getter
 	private final List<String> description;
 	/**
 	 * Calculated every second (20 ticks)
 	 */
-	@Getter
 	private final float drain;
-	@Getter
 	private final boolean overhead;
-	@Getter
 	private final boolean requiresTome;
-	@Getter
 	private final List<EnumPrayers> requiredAfter;
-	@Getter
 	private final ResourceLocation texture;
 
 	public static EnumPrayers getById(final String id){
