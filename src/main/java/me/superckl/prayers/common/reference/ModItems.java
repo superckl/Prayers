@@ -6,7 +6,7 @@ import java.util.Random;
 
 import me.superckl.prayers.common.item.ItemAncientTome;
 import me.superckl.prayers.common.item.ItemBasicBone;
-import me.superckl.prayers.common.item.ItemBottlePrayers;
+import me.superckl.prayers.common.item.ItemHolyWaterBottle;
 import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.item.ItemPrayerTome;
 import me.superckl.prayers.common.prayer.EnumPrayers;
@@ -22,7 +22,7 @@ import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
 public final class ModItems {
 
 	public static final ItemBasicBone basicBone = new ItemBasicBone();
-	public static final ItemBottlePrayers bottle = new ItemBottlePrayers();
+	public static final ItemHolyWaterBottle bottle = new ItemHolyWaterBottle();
 	public static final ItemPrayerTome tome = new ItemPrayerTome();
 	public static final ItemAncientTome aTome = new ItemAncientTome();
 	public static ItemPotionPrayers potion;

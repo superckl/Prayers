@@ -9,9 +9,9 @@ import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemBottlePrayers extends ItemPrayers{
+public class ItemHolyWaterBottle extends ItemPrayers{
 
-	public ItemBottlePrayers() {
+	public ItemHolyWaterBottle() {
 		this.setMaxStackSize(1).setUnlocalizedName("bottleprayers").setCreativeTab(ModTabs.TAB_PRAYER_ITEMS);
 	}
 

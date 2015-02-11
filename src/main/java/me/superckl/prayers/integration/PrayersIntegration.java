@@ -1,7 +1,6 @@
 package me.superckl.prayers.integration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,9 @@ import lombok.Getter;
 import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PSReflectionHelper;
 import me.superckl.prayers.common.utility.StringHelper;
+
+import com.google.common.collect.Lists;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
 
@@ -20,7 +22,8 @@ public class PrayersIntegration implements IIntegrationModule{
 	private static final Map<List<String>, String> modules = new HashMap<List<String>, String>();
 
 	static{
-		PrayersIntegration.modules.put(Arrays.asList(new String[] {"NotEnoughItems"}), "me.superckl.prayers.integration.nei.NEIIntegration");
+		PrayersIntegration.modules.put(Lists.newArrayList("NotEnoughItems"), "me.superckl.prayers.integration.nei.NEIIntegration");
+		PrayersIntegration.modules.put(Lists.newArrayList("Thaumcraft"), "me.superckl.prayers.integration.thaumcraft.ThaumcraftIntegration");
 	}
 
 	@Getter
@@ -30,6 +33,8 @@ public class PrayersIntegration implements IIntegrationModule{
 
 	@Override
 	public void preInit(){
+		if(!Loader.instance().isInState(LoaderState.PREINITIALIZATION))
+			LogHelper.error("Class "+PSReflectionHelper.retrieveCallingStackTraceElement().getClassName()+" attempted to preinitialize integration, but FML is not in that state!");
 		boolean noGo = false;
 		for(final Entry<List<String>, String> entry:PrayersIntegration.modules.entrySet()){
 			for(final String mod:entry.getKey())
@@ -47,8 +52,6 @@ public class PrayersIntegration implements IIntegrationModule{
 					e.printStackTrace();
 				}
 		}
-		if(!Loader.instance().isInState(LoaderState.PREINITIALIZATION))
-			LogHelper.error("Class "+PSReflectionHelper.retrieveCallingStackTraceElement().getClassName()+" attempted to preinitialize integration, but FML is not in that state!");
 		for(final IIntegrationModule module:this.activeModules)
 			module.preInit();
 	}
