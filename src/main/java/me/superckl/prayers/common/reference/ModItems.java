@@ -6,6 +6,7 @@ import java.util.Random;
 
 import me.superckl.prayers.common.item.ItemAncientTome;
 import me.superckl.prayers.common.item.ItemBasicBone;
+import me.superckl.prayers.common.item.ItemExquisiteBoneMeal;
 import me.superckl.prayers.common.item.ItemHolyWaterBottle;
 import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.item.ItemPrayerTome;
@@ -25,6 +26,7 @@ public final class ModItems {
 	public static final ItemHolyWaterBottle bottle = new ItemHolyWaterBottle();
 	public static final ItemPrayerTome tome = new ItemPrayerTome();
 	public static final ItemAncientTome aTome = new ItemAncientTome();
+	public static final ItemExquisiteBoneMeal eBoneMeal = new ItemExquisiteBoneMeal();
 	public static ItemPotionPrayers potion;
 
 	public static void init(){
@@ -33,6 +35,7 @@ public final class ModItems {
 		GameRegistry.registerItem(ModItems.potion, Names.POTION);
 		GameRegistry.registerItem(ModItems.tome, Names.TOME);
 		GameRegistry.registerItem(ModItems.aTome, Names.ANCIENT_TOME);
+		GameRegistry.registerItem(ModItems.eBoneMeal, Names.E_BONE_MEAL);
 	}
 
 	public static void addChestLoot(){
@@ -107,6 +110,7 @@ public final class ModItems {
 		public static final String POTION = "potion";
 		public static final String TOME = "tome";
 		public static final String ANCIENT_TOME = "aTome";
+		public static final String E_BONE_MEAL = "eBoneMeal";
 	}
 
 }

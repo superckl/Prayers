@@ -78,8 +78,9 @@ public abstract class CommonProxy implements IProxy{
 	@Override
 	public void registerRecipes(){
 		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 3, 15), new ItemStack(ModItems.basicBone));
-		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 3, 15), new ItemStack(ModItems.basicBone, 1, 1));
-		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 3, 15), new ItemStack(ModItems.basicBone, 1, 2));
+		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 4, 15), new ItemStack(ModItems.basicBone, 1, 1));
+		GameRegistry.addShapelessRecipe(new ItemStack(Items.dye, 4, 15), new ItemStack(ModItems.basicBone, 1, 2));
+		GameRegistry.addShapelessRecipe(new ItemStack(ModItems.eBoneMeal), new ItemStack(ModItems.basicBone, 1, 3));
 		final ItemStack filledBottle = new ItemStack(ModItems.bottle);
 		final ItemStack soakedBones = new ItemStack(ModItems.basicBone, 1, 3);
 		final NBTTagCompound comp = new NBTTagCompound();
