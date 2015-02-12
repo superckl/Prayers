@@ -40,9 +40,14 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4),
 		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4, EnumPrayers.ENHANCE_MAGIC_4)};
 
-	public EntityUndeadWizardPriest(final World world, final int level) {
+	public EntityUndeadWizardPriest(final World world, int level) {
 		super(world);
-		this.setLevel(level);
+		if(level <= 0){
+			final int rand = this.getRNG().nextInt(1000);
+			level = rand == 0 ? 4: rand < 100 ? 3: rand < 700 ? 2:1;
+		}
+		this.setLevel(level, true);
+		this.setHealth(this.getMaxHealth());
 		this.getNavigator().setCanSwim(true);
 		this.tasks.addTask(1, new EntityAISwimming(this));
 		this.tasks.addTask(4, new EntityAIArrowAttack(this, 1.0D, 20, 60, 15.0F));
@@ -77,13 +82,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 	@Override
 	public void onLivingUpdate() {
-		if((this.worldObj.getWorldTime() % 20) == 0){
-			final boolean flag  = this.getMaxHealth() == this.getHealth();
-			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*20D));
-			if(flag)
-				this.setHealth(this.getMaxHealth());
-		}
-		this.motionY *= 0.28000000417232513D;
+		this.motionY *= 0.6000000238418579D;
 		double d1;
 		double d3;
 		double d5;
@@ -134,8 +133,10 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		return this.getDataWatcher().getWatchableObjectInt(12);
 	}
 
-	public void setLevel(final int level){
+	public void setLevel(final int level, final boolean updateMaxHealth){
 		this.getDataWatcher().updateObject(12, new Integer(level));
+		if(updateMaxHealth)
+			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*20D));
 	}
 
 	@Override
@@ -154,6 +155,9 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 		return i;
 	}
+
+	@Override
+	public void setInWeb() {}
 
 	@Override
 	protected boolean isAIEnabled()
@@ -208,7 +212,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	{
 		super.addRandomArmor();
 
-		//TODO tools
+		//TODO
 	}
 
 	@Override
@@ -222,10 +226,8 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	public void readEntityFromNBT(final NBTTagCompound comp)
 	{
 		super.readEntityFromNBT(comp);
-		this.setLevel(comp.getInteger("priestLevel"));
+		this.setLevel(comp.getInteger("priestLevel"), true);
 	}
-
-
 
 	@Override
 	public List<EnumPrayers> getActivePrayers() {
@@ -263,5 +265,13 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	protected int getExperiencePoints(final EntityPlayer p_70693_1_) {
 		return 10+(this.getLevel()*12);
 	}
+
+	@Override
+	public void mountEntity(final Entity p_70078_1_)
+	{
+		this.ridingEntity = null;
+	}
+
+
 
 }

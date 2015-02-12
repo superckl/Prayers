@@ -3,7 +3,6 @@ package me.superckl.prayers.common.handler;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
-import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.EnumPrayers;
@@ -49,13 +48,6 @@ public class EntityEventHandler {
 			final NBTTagCompound comp = new NBTTagCompound();
 			((PrayerExtendedProperties)((EntityPlayer)e.entity).getExtendedProperties("prayer")).saveNBTData(comp);
 			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(comp), (EntityPlayerMP) e.entity);
-		}
-		if(!e.world.isRemote && (e.entity instanceof EntityUndeadWizardPriest)){
-			final EntityUndeadWizardPriest priest = (EntityUndeadWizardPriest) e.entity;
-			if(priest.getLevel() == 0){
-				final int rand = priest.getRNG().nextInt(1000);
-				priest.setLevel(rand == 0 ? 4: rand < 100 ? 3: rand < 700 ? 2:1);
-			}
 		}
 	}
 

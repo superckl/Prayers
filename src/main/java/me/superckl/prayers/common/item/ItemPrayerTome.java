@@ -1,8 +1,6 @@
 package me.superckl.prayers.common.item;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.EnumSet;
 import java.util.List;
 
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
@@ -88,14 +86,12 @@ public class ItemPrayerTome extends ItemPrayers{
 	@Override
 	public void getSubItems(final Item item, final CreativeTabs creativeTabs, final List list)
 	{
-		final List<EnumPrayers> prayers = new ArrayList<EnumPrayers>(Arrays.asList(EnumPrayers.values()));
-		final Iterator<EnumPrayers> it = prayers.iterator();
-		while(it.hasNext())
-			if(!it.next().isRequiresTome())
-				it.remove();
+		final EnumSet<EnumPrayers> prayers = EnumSet.allOf(EnumPrayers.class);
 		final ItemStack stack = new ItemStack(item);
 		ItemStack temp;
 		for(final EnumPrayers prayer:prayers){
+			if(!prayer.isRequiresTome())
+				continue;
 			temp = stack.copy();
 			final NBTTagCompound comp = new NBTTagCompound();
 			comp.setString("prayer", prayer.getId());
@@ -103,7 +99,5 @@ public class ItemPrayerTome extends ItemPrayers{
 			list.add(temp);
 		}
 	}
-
-
 
 }
