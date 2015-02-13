@@ -14,8 +14,10 @@ import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.gui.GuiHandler;
 import me.superckl.prayers.common.handler.EntityEventHandler;
 import me.superckl.prayers.common.handler.PlayerTickHandler;
+import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
+import me.superckl.prayers.common.reference.ModPotions;
 import me.superckl.prayers.common.worldgen.ComponentAltarRoom;
 import me.superckl.prayers.common.worldgen.PrayersVillageCreationHandler;
 import me.superckl.prayers.network.MessageDisablePrayer;
@@ -28,9 +30,13 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
+
+import com.google.common.collect.Lists;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
@@ -91,6 +97,17 @@ public abstract class CommonProxy implements IProxy{
 		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(new ItemStack(Items.golden_apple, 1, 1), new ItemStack(Items.golden_apple),
 				Arrays.asList(filledBottle, filledBottle, filledBottle, filledBottle, filledBottle), 6000, .083F));
 		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(new ItemStack(ModItems.aTome), new ItemStack(Items.book), new ArrayList<ItemStack>(), 100, 0.5F));
+		AltarRegistry.registerOfferingTableRecipe(new BasicTableCraftingHandler(ItemPotionPrayers.withEffects(new ItemStack(ModItems.potion), new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0)),
+				new ItemStack(Items.potionitem, 1, 16), Lists.newArrayList(new ItemStack(ModItems.eBoneMeal), new ItemStack(ModItems.eBoneMeal), new ItemStack(ModItems.eBoneMeal), new ItemStack(ModItems.eBoneMeal), new ItemStack(ModItems.eBoneMeal))
+				, 6000, 1F/6F){
+
+			@Override
+			public boolean areAdditionalRequirementsMet(final TileEntityOfferingTable te) {
+				final long time = te.getWorldObj().getWorldTime() % 24000;
+				return super.areAdditionalRequirementsMet(te) && (te.getAltar().getTier() >= 3) && (time >= 14000) && (time <= 16000);
+			}
+
+		});
 	}
 
 }
