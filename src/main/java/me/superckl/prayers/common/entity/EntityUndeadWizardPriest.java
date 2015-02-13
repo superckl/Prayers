@@ -1,8 +1,6 @@
 package me.superckl.prayers.common.entity;
 
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 
 import lombok.Getter;
 import me.superckl.prayers.common.item.ItemPotionPrayers;
@@ -38,9 +36,9 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 	private int field_70846_g;
 	@Getter
-	private static final List[] prayers = new List[] {Arrays.asList(EnumPrayers.PROTECT_MAGIC), Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE),
-		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4),
-		Arrays.asList(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4, EnumPrayers.ENHANCE_MAGIC_4)};
+	private static final EnumSet[] prayers = new EnumSet[] {EnumSet.of(EnumPrayers.PROTECT_MAGIC), EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE),
+		EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4),
+		EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4, EnumPrayers.ENHANCE_MAGIC_4)};
 
 	public EntityUndeadWizardPriest(final World world, int level) {
 		super(world);
