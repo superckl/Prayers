@@ -7,9 +7,11 @@ import java.util.List;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.EnumPrayers;
+import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
@@ -160,10 +162,13 @@ public class EntityEventHandler {
 	}
 
 	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOWEST)
-	public void onPlayerDeath(final LivingDeathEvent e){
-		if((e.entityLiving instanceof EntityPlayer) == false)
-			return;
-		((PrayerExtendedProperties)((EntityPlayer)e.entityLiving).getExtendedProperties("prayer")).disableAllPrayers(false);
+	public void onLivingDeath(final LivingDeathEvent e){
+		if((e.entityLiving instanceof EntityPlayer))
+			((PrayerExtendedProperties)((EntityPlayer)e.entityLiving).getExtendedProperties("prayer")).disableAllPrayers(false);
+		else if(!e.entity.worldObj.isRemote && (e.entityLiving instanceof EntityUndeadWizardPriest) && e.entityLiving.getEntityData().getBoolean("ritualSpawn") && (e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityPlayer)){
+			final EntityPlayer player = (EntityPlayer) e.source.getSourceOfDamage();
+			player.addStat(ModAchievements.ANCIENTS_WRATH, 1);
+		}
 	}
 
 	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOWEST)

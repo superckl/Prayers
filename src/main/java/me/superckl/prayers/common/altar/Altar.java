@@ -216,6 +216,7 @@ public class Altar{
 				final EntityUndeadWizardPriest priest = new EntityUndeadWizardPriest(this.holder.getWorldObj(), this.tier+Math.round(this.random.nextInt(3)*this.random.nextFloat()));
 				priest.forceSpawn = true;
 				priest.setLocationAndAngles(loc.getX(), loc.getY(), loc.getZ(), 0F, 0F);
+				priest.getEntityData().setBoolean("ritualSpawn", true);
 				this.holder.getWorldObj().spawnEntityInWorld(priest);
 			}
 			return;
@@ -229,6 +230,7 @@ public class Altar{
 				world.spawnEntityInWorld(lightning);
 				final EntityUndeadWizardPriest priest = new EntityUndeadWizardPriest(this.holder.getWorldObj(), this.tier+Math.round(this.random.nextInt(3)*this.random.nextFloat()));
 				priest.setLocationAndAngles(loc.getX(), loc.getY(), loc.getZ(), 0F, 0F);
+				priest.getEntityData().setBoolean("ritualSpawn", true);
 				this.holder.getWorldObj().spawnEntityInWorld(priest);
 			}
 		}
