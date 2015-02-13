@@ -4,7 +4,6 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
@@ -22,10 +21,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class EntityWizardSpell extends EntityThrowable{
 
-	private int field_145795_e = -1;
-	private int field_145793_f = -1;
-	private int field_145794_g = -1;
-	private Block field_145796_h;
 	private int ticksAlive;
 	private int ticksInAir;
 	public double accelerationX;
@@ -78,16 +73,6 @@ public class EntityWizardSpell extends EntityThrowable{
 
 			if (this.inGround)
 			{
-				if (this.worldObj.getBlock(this.field_145795_e, this.field_145793_f, this.field_145794_g) == this.field_145796_h)
-				{
-					++this.ticksAlive;
-
-					if (this.ticksAlive == 600)
-						this.setDead();
-
-					return;
-				}
-
 				this.inGround = false;
 				this.motionX *= this.rand.nextFloat() * 0.2F;
 				this.motionY *= this.rand.nextFloat() * 0.2F;
@@ -206,13 +191,17 @@ public class EntityWizardSpell extends EntityThrowable{
 	}
 
 	@Override
+	public void writeEntityToNBT(final NBTTagCompound p_70014_1_)
+	{
+		super.writeEntityToNBT(p_70014_1_);
+		p_70014_1_.setTag("direction", this.newDoubleNBTList(new double[] {this.motionX, this.motionY, this.motionZ}));
+
+	}
+
+	@Override
 	public void readEntityFromNBT(final NBTTagCompound p_70037_1_)
 	{
-		this.field_145795_e = p_70037_1_.getShort("xTile");
-		this.field_145793_f = p_70037_1_.getShort("yTile");
-		this.field_145794_g = p_70037_1_.getShort("zTile");
-		this.field_145796_h = Block.getBlockById(p_70037_1_.getByte("inTile") & 255);
-		this.inGround = p_70037_1_.getByte("inGround") == 1;
+		super.readEntityFromNBT(p_70037_1_);
 
 		if (p_70037_1_.hasKey("direction", 9))
 		{
