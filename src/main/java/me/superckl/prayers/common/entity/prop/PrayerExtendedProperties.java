@@ -67,17 +67,9 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	public void init(final Entity entity, final World world) {
 		if(!(entity instanceof EntityPlayer))
 			return;
-		if(this.player == null){
 			this.player = (EntityPlayer) entity;
 			this.player.getDataWatcher().addObject(27, new Float(10F));
 			this.player.getDataWatcher().addObject(28, new Float(this.getMaxPrayerPoints()));
-		}else{
-			//We have to do this funky thing to handle Player cloning on dimension switches
-			final EntityPlayer player = (EntityPlayer) entity;
-			player.getDataWatcher().addObject(27, new Float(this.getPrayerPoints()));
-			player.getDataWatcher().addObject(28, new Float(this.getMaxPrayerPoints()));
-			this.player = player;
-		}
 	}
 
 	public void playerTick(){
