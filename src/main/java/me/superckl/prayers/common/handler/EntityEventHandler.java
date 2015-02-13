@@ -21,6 +21,7 @@ import me.superckl.prayers.common.utility.PSReflectionHelper;
 import me.superckl.prayers.common.utility.PlayerHelper;
 import me.superckl.prayers.common.utility.PotionEffectHashMap;
 import me.superckl.prayers.common.utility.PrayerHelper;
+import me.superckl.prayers.common.utility.PrayersWorldSaveData;
 import me.superckl.prayers.network.MessageUpdatePrayers;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -28,6 +29,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -57,6 +59,10 @@ public class EntityEventHandler {
 			final NBTTagCompound comp = new NBTTagCompound();
 			((PrayerExtendedProperties)((EntityPlayer)e.entity).getExtendedProperties("prayer")).saveNBTData(comp);
 			ModData.PRAYER_UPDATE_CHANNEL.sendTo(new MessageUpdatePrayers(comp), (EntityPlayerMP) e.entity);
+		}
+		if(!e.world.isRemote && (e.entity instanceof EntityPlayer) && this.hasDataForPlayer((EntityPlayer) e.entity)){
+			final PrayerExtendedProperties prop = ((PrayerExtendedProperties)((EntityPlayer)e.entity).getExtendedProperties("prayer"));
+			prop.readFromNBT(this.getPlayerData((EntityPlayer) e.entity, ((EntityPlayer)e.entity).getHealth() > 0));
 		}
 	}
 
@@ -164,8 +170,11 @@ public class EntityEventHandler {
 
 	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOWEST)
 	public void onLivingDeath(final LivingDeathEvent e){
-		if((e.entityLiving instanceof EntityPlayer))
-			((PrayerExtendedProperties)((EntityPlayer)e.entityLiving).getExtendedProperties("prayer")).disableAllPrayers(false);
+		if((e.entityLiving instanceof EntityPlayer)){
+			final PrayerExtendedProperties prop = ((PrayerExtendedProperties)((EntityPlayer)e.entityLiving).getExtendedProperties("prayer"));
+			prop.disableAllPrayers(false);
+			this.storePlayerData((EntityPlayer) e.entityLiving, prop.writeToNBT());
+		}
 		else if(!e.entity.worldObj.isRemote && (e.entityLiving instanceof EntityUndeadWizardPriest) && e.entityLiving.getEntityData().getBoolean("ritualSpawn") && (e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityPlayer)){
 			final EntityPlayer player = (EntityPlayer) e.source.getSourceOfDamage();
 			player.addStat(ModAchievements.ANCIENTS_WRATH, 1);
@@ -196,6 +205,37 @@ public class EntityEventHandler {
 				e.setCanceled(true);
 			}
 		}
+	}
+
+	//Wrapper methods for map save
+
+	public void storePlayerData(final EntityPlayer player, final NBTTagCompound compound){
+		if(player.worldObj.isRemote)
+			return;
+		this.ensureMapStorage(player.worldObj);
+		final PrayersWorldSaveData data = ((PrayersWorldSaveData)player.worldObj.mapStorage.loadData(PrayersWorldSaveData.class, "prayersextendedsave"));
+		data.storePlayerData(player, compound);
+	}
+
+	public NBTTagCompound getPlayerData(final EntityPlayer player, final boolean remove){
+		if(player.worldObj.isRemote)
+			return null;
+		this.ensureMapStorage(player.worldObj);
+		final PrayersWorldSaveData data = (PrayersWorldSaveData) player.worldObj.mapStorage.loadData(PrayersWorldSaveData.class, "prayersextendedsave");
+		return data.getPlayerData(player, remove);
+	}
+
+	public boolean hasDataForPlayer(final EntityPlayer player){
+		if(player.worldObj.isRemote)
+			return false;
+		this.ensureMapStorage(player.worldObj);
+		final PrayersWorldSaveData data = (PrayersWorldSaveData) player.worldObj.mapStorage.loadData(PrayersWorldSaveData.class, "prayersextendedsave");
+		return data.hasDataForPlayer(player);
+	}
+
+	private void ensureMapStorage(final World world){
+		if(world.mapStorage.loadData(PrayersWorldSaveData.class, "prayersextendedsave") == null)
+			world.mapStorage.setData("prayersextendedsave", new PrayersWorldSaveData("prayersextendedsave"));
 	}
 
 }
