@@ -34,6 +34,9 @@ public class EntityWizardSpell extends EntityThrowable{
 	@Setter
 	@Getter
 	private float baseDamage = 6F;
+	@Getter
+	@Setter
+	private Entity target;
 
 	public EntityWizardSpell(final World world, final EntityLivingBase thrower, double x, double y, double z){
 		super(world, thrower);
@@ -91,7 +94,7 @@ public class EntityWizardSpell extends EntityThrowable{
 				this.motionZ *= this.rand.nextFloat() * 0.2F;
 				this.ticksAlive = 0;
 				this.ticksInAir = 0;
-			} else
+			}else
 				++this.ticksInAir;
 
 			Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
@@ -168,10 +171,17 @@ public class EntityWizardSpell extends EntityThrowable{
 
 				f2 = 0.8F;
 			}
-
-			this.motionX += this.accelerationX;
-			this.motionY += this.accelerationY;
-			this.motionZ += this.accelerationZ;
+			if(this.target != null){
+				final Vec3 thisPos = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
+				final Vec3 motionVec = thisPos.subtract(Vec3.createVectorHelper(this.target.posX, this.target.posY, this.target.posZ)).normalize();
+				this.motionX = motionVec.xCoord;
+				this.motionY = motionVec.yCoord;
+				this.motionZ = motionVec.zCoord;
+			}else{
+				this.motionX += this.accelerationX;
+				this.motionY += this.accelerationY;
+				this.motionZ += this.accelerationZ;
+			}
 			this.motionX *= f2;
 			this.motionY *= f2;
 			this.motionZ *= f2;

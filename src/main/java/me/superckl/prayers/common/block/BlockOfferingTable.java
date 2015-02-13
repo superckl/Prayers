@@ -31,7 +31,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 		super(Material.rock);
 		this.setBlockName("offeringtable").setStepSound(Block.soundTypeStone).setCreativeTab(ModTabs.TAB_PRAYER_BLOCKS);
 		this.setHarvestLevel("pickaxe", 1, 0);
-		this.setBlockBounds(0.0625F/2F, 0, 0.0625F/2F, 1-0.0625F, 1-(2.5F*0.0625F), 1-0.0625F);
+		this.setBlockBounds(0, 0, 0, 1, 0.9375F, 1);
 	}
 
 	@Override

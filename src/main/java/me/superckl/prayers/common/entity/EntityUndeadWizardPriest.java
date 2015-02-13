@@ -48,6 +48,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 			final int rand = this.getRNG().nextInt(1000);
 			level = rand == 0 ? 4: rand < 100 ? 3: rand < 700 ? 2:1;
 		}
+		level = 3;
 		this.setLevel(level, true);
 		this.setHealth(this.getMaxHealth());
 		this.getNavigator().setCanSwim(true);
@@ -250,6 +251,8 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		//TODO effect
 		final EntityWizardSpell spell = new EntityWizardSpell(this.worldObj, this, d0 + (this.rand.nextGaussian() * f1), d1, d2 + (this.rand.nextGaussian() * f1), 4F + (this.getLevel()*4F));
 		spell.posY = this.posY + (this.height / 2.0F) + 0.5D;
+		if(this.getLevel() >= 3)
+			spell.setTarget(target);
 		this.worldObj.spawnEntityInWorld(spell);
 
 	}
