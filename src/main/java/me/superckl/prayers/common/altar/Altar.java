@@ -14,6 +14,9 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
+import me.superckl.prayers.common.event.AltarEvent;
+import me.superckl.prayers.common.event.AltarEvent.EstablishBlocks;
+import me.superckl.prayers.common.event.AltarEvent.SearchForMultiblock.Post;
 import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModItems;
@@ -30,6 +33,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Getter
@@ -154,6 +158,7 @@ public class Altar{
 			this.inRitual = false;
 			this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
 			this.holder.getWorldObj().spawnEntityInWorld(new EntityLightningBolt(this.holder.getWorldObj(), this.holder.xCoord+0.5D, this.holder.yCoord+0.5D, this.holder.zCoord+0.5D));
+			MinecraftForge.EVENT_BUS.post(new AltarEvent.ActivationRitualEvent.Post(this));
 			//TODO effects...
 			return;
 		}
@@ -203,6 +208,8 @@ public class Altar{
 			}
 		}
 		if(this.ritualTimer >= 80000){
+			if(MinecraftForge.EVENT_BUS.post(new AltarEvent.ActivationRitualEvent.Fail(this)))
+				return;
 			this.inRitual = false;
 			this.ritualTimer = 0;
 			this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
@@ -239,6 +246,7 @@ public class Altar{
 	public void startRitual(final World world){
 		if(this.inRitual)
 			return;
+		MinecraftForge.EVENT_BUS.post(new AltarEvent.ActivationRitualEvent.Pre(this));
 		this.inRitual = true;
 		this.ritualTimer = 72000;
 		this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
@@ -250,11 +258,19 @@ public class Altar{
 	 * @return If the structure was determined succesfully.
 	 */
 	public boolean determineBlocks(final World world){
+		if(MinecraftForge.EVENT_BUS.post(new AltarEvent.SearchForMultiblock.Pre(this)))
+			return false;
 		this.tables = new ArrayList<TileEntityOfferingTable>();
 		this.blocks = new ArrayList<BlockLocation>();
 		final int tier = 1;
-		final Map<BlockLocation, BlockRequirement> multi = this.tryFindTier1(world);
-		if((multi != null) && this.establishStructure(multi)){
+		Map<BlockLocation, BlockRequirement> multi = this.tryFindTier1(world);
+		if((multi != null)){
+			final AltarEvent.SearchForMultiblock.Post event = new Post(this, tier, multi);
+			if(MinecraftForge.EVENT_BUS.post(event))
+				return false;
+			multi = event.getMultiblock();
+			if(!this.establishStructure(multi))
+				return false;
 			this.tier = tier;
 			Prayers.getInstance().getConfig().setStats(this);
 			this.holder.setAltar(this);
@@ -309,6 +325,14 @@ public class Altar{
 				}
 			}
 		}
+		final EstablishBlocks event = new EstablishBlocks(this, this.blocks, this.tables, multi);
+		if(MinecraftForge.EVENT_BUS.post(event)){
+			this.blocks = null;
+			this.tables = null;
+			return false;
+		}
+		this.blocks = event.getBlocks();
+		this.tables = event.getTables();
 		return true;
 	}
 
