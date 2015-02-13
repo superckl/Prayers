@@ -2,12 +2,10 @@ package me.superckl.prayers.common.altar;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.UUID;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,7 +21,6 @@ import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.BlockLocation;
 import me.superckl.prayers.common.utility.EntityHelper;
 import me.superckl.prayers.common.utility.LogHelper;
-import me.superckl.prayers.common.utility.PlayerHelper;
 import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWall;
@@ -31,14 +28,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -70,7 +64,6 @@ public class Altar{
 	private List<TileEntityOfferingTable> tables;
 	private boolean isRegistered;
 	private TileEntityOfferingTable holder;
-	private final Map<UUID, Boolean> contributors = new HashMap<UUID, Boolean>();
 
 	public Altar(final TileEntityOfferingTable holder) {
 		this.holder = holder;
@@ -91,11 +84,6 @@ public class Altar{
 			this.blocks = new ArrayList<BlockLocation>();
 			for(int i = 0; i < coords.length;)
 				this.blocks.add(new BlockLocation(coords[i++], coords[i++], coords[i++]));
-		}
-		final NBTTagList list = comp.getTagList("contributors", NBT.TAG_COMPOUND);
-		for(int i = 0; i < list.tagCount(); i++){
-			final NBTTagCompound entry = list.getCompoundTagAt(i);
-			this.contributors.put(UUID.fromString(entry.getString("name")), entry.getBoolean("rewarded"));
 		}
 	}
 
@@ -118,13 +106,6 @@ public class Altar{
 			}
 			comp.setIntArray("blocks", coords);
 		}
-		final NBTTagList list = new NBTTagList();
-		for(final Entry<UUID, Boolean> entry:this.contributors.entrySet()){
-			final NBTTagCompound nbtEntry = new NBTTagCompound();
-			nbtEntry.setString("name", entry.getKey().toString());
-			nbtEntry.setBoolean("rewarded", entry.getValue());
-		}
-		comp.setTag("contributors", list);
 	}
 
 	private int regenTimer = 200;
@@ -183,14 +164,6 @@ public class Altar{
 			this.holder.getWorldObj().markBlockForUpdate(this.holder.xCoord, this.holder.yCoord, this.holder.zCoord);
 			this.holder.getWorldObj().spawnEntityInWorld(new EntityLightningBolt(this.holder.getWorldObj(), this.holder.xCoord+0.5D, this.holder.yCoord+0.5D, this.holder.zCoord+0.5D));
 			//TODO effects...
-			for(final Entry<UUID, Boolean> entry:this.contributors.entrySet())
-				if(!entry.getValue()){
-					final EntityPlayerMP player = PlayerHelper.getPlayer(entry.getKey());
-					if(player != null){
-						player.addStat(ModAchievements.SUCCESS, 1);
-						entry.setValue(true);
-					}
-				}
 			return;
 		}
 		this.ritualTimer--;
@@ -310,14 +283,6 @@ public class Altar{
 				player.addStat(ModAchievements.RECHARGED, 1);
 				if((points >= this.maxPrayerPoints) && (this.prayerPoints <= 0))
 					player.addStat(ModAchievements.TOO_OP, 1);
-				final UUID uuid = player.getGameProfile().getId();
-				if(this.contributors.containsKey(uuid)){
-					player.addStat(ModAchievements.CONVENIENCE, 1);
-					if(!this.contributors.get(uuid)){
-						player.addStat(ModAchievements.SUCCESS, 1);
-						this.contributors.put(uuid, true);
-					}
-				}
 			}
 		}
 		return points;

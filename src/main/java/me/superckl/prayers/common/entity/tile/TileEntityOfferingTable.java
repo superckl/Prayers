@@ -10,7 +10,6 @@ import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
 import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Post;
 import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Pre;
-import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.BlockLocation;
 import me.superckl.prayers.common.utility.NumberHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -190,9 +189,6 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 	public void setCurrentItem(final ItemStack stack, final EntityPlayer player){
 		this.currentItem = stack;
 		this.onIngredientsModified();
-		final Altar altar = this.getAltar();
-		if((player != null) && !this.worldObj.isRemote && (altar != null) && altar.isInRitual() && (stack != null) && (stack.getItem() == ModItems.basicBone) && (stack.getItemDamage() == 3))
-			altar.getContributors().put(player.getGameProfile().getId(), false);
 	}
 
 	public void addTertiaryIngredient(final ItemStack stack){

@@ -103,8 +103,7 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 			return true;
 		}else if((player.getHeldItem() == null) && (table.getAltar() == null)){
 			final Altar altar = new Altar(table);
-			if(altar.determineBlocks(world))
-				altar.getContributors().put(player.getGameProfile().getId(), false);
+			altar.determineBlocks(world);
 		}
 
 		return true;
