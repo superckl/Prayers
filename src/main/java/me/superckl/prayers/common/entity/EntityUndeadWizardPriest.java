@@ -276,7 +276,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 	@Override
 	public void onDeath(final DamageSource source) {
-		if((this.getLevel() >= 4) && source.damageType.equals("holywater") && (source.getSourceOfDamage() != null) && (source.getSourceOfDamage() instanceof EntityPlayer)){
+		if(!this.worldObj.isRemote && (this.getLevel() >= 4) && source.damageType.equals("holywater") && (source.getSourceOfDamage() != null) && (source.getSourceOfDamage() instanceof EntityPlayer)){
 			final EntityPlayer player = (EntityPlayer) source.getSourceOfDamage();
 			player.addStat(ModAchievements.GODS_WRATH, 1);
 		}else
