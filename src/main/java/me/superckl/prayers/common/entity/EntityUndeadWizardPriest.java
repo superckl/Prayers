@@ -8,6 +8,7 @@ import lombok.Getter;
 import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.prayer.IPrayerUser;
+import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.reference.ModPotions;
 import net.minecraft.block.Block;
@@ -29,6 +30,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
@@ -270,6 +272,15 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	public void mountEntity(final Entity p_70078_1_)
 	{
 		this.ridingEntity = null;
+	}
+
+	@Override
+	public void onDeath(final DamageSource source) {
+		if((this.getLevel() >= 4) && source.damageType.equals("holywater") && (source.getSourceOfDamage() != null) && (source.getSourceOfDamage() instanceof EntityPlayer)){
+			final EntityPlayer player = (EntityPlayer) source.getSourceOfDamage();
+			player.addStat(ModAchievements.GODS_WRATH, 1);
+		}else
+			super.onDeath(source);
 	}
 
 
