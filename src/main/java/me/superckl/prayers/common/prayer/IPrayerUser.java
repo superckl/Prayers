@@ -1,9 +1,9 @@
 package me.superckl.prayers.common.prayer;
 
-import java.util.List;
+import java.util.EnumSet;
 
 public interface IPrayerUser {
 
-	public List<EnumPrayers> getActivePrayers();
+	public EnumSet<EnumPrayers> getActivePrayers();
 
 }

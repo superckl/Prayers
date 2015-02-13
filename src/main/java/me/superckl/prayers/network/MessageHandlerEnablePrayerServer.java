@@ -1,7 +1,6 @@
 package me.superckl.prayers.network;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumSet;
 
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.EnumPrayers;
@@ -14,8 +13,8 @@ public class MessageHandlerEnablePrayerServer implements IMessageHandler<Message
 	@Override
 	public MessageDisablePrayer onMessage(final MessageEnablePrayer message, final MessageContext ctx) {
 		final PrayerExtendedProperties prop = ((PrayerExtendedProperties)ctx.getServerHandler().playerEntity.getExtendedProperties("prayer"));
-		final List<EnumPrayers> list = prop.getActivePrayers();
-		final List<EnumPrayers> temp = new ArrayList<EnumPrayers>(list);
+		final EnumSet<EnumPrayers> list = prop.getActivePrayers();
+		final EnumSet<EnumPrayers> temp = EnumSet.copyOf(list);
 		temp.add(message.getPrayer());
 		if(list.contains(message.getPrayer()) || PrayerHelper.hasConflictions(temp)){
 			final MessageDisablePrayer disable = new MessageDisablePrayer();

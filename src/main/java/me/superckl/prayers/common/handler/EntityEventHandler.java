@@ -1,6 +1,7 @@
 package me.superckl.prayers.common.handler;
 
 import java.lang.ref.WeakReference;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -186,7 +187,7 @@ public class EntityEventHandler {
 			final BlockLocation loc = new BlockLocation(e.x, e.y, e.z);
 			if(blocks.contains(loc)){
 				if(e.getPlayer() != null){
-					final List<EnumPrayers> prayers = PrayerHelper.getActivePrayers(e.getPlayer());
+					final EnumSet<EnumPrayers> prayers = PrayerHelper.getActivePrayers(e.getPlayer());
 					if(prayers.contains(EnumPrayers.DESTRUCTIVISM)){
 						wr.get().invalidateStructure();
 						return;

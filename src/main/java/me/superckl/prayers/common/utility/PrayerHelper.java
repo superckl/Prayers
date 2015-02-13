@@ -2,6 +2,7 @@ package me.superckl.prayers.common.utility;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
@@ -14,22 +15,23 @@ import scala.actors.threadpool.Arrays;
 
 public class PrayerHelper {
 
-	public static List<EnumPrayers> fromNBT(final NBTTagCompound comp){
-		final List<EnumPrayers> list = new ArrayList<EnumPrayers>();
+	public static EnumSet<EnumPrayers> fromNBT(final NBTTagCompound comp){
+		final EnumSet<EnumPrayers> list = EnumSet.noneOf(EnumPrayers.class);
 		int i = 0;
 		while(comp.hasKey(Integer.toString(i)))
 			list.add(EnumPrayers.getById(comp.getString(Integer.toString(i++))));
 		return list;
 	}
 
-	public static NBTTagCompound toNBT(final List<EnumPrayers> list){
+	public static NBTTagCompound toNBT(final EnumSet<EnumPrayers> enumSet){
+		final List<EnumPrayers> activePrayers = new ArrayList<EnumPrayers>(enumSet);
 		final NBTTagCompound comp = new NBTTagCompound();
-		for(int i = 0; i < list.size(); i++)
-			comp.setString(Integer.toString(i), list.get(i).getId());
+		for(int i = 0; i < activePrayers.size(); i++)
+			comp.setString(Integer.toString(i), activePrayers.get(i).getId());
 		return comp;
 	}
 
-	public static boolean hasConflictions(final List<EnumPrayers> list){
+	public static boolean hasConflictions(final EnumSet<EnumPrayers> list){
 		boolean hasOverhead = false;
 		for(final EnumPrayers prayer:list)
 			if(prayer.isOverhead()){
@@ -50,16 +52,16 @@ public class PrayerHelper {
 		return prayers;
 	}
 
-	public static List<EnumPrayers> getActivePrayers(final EntityLivingBase entity){
+	public static EnumSet<EnumPrayers> getActivePrayers(final EntityLivingBase entity){
 		if(entity instanceof EntityPlayer)
 			return ((PrayerExtendedProperties)((EntityPlayer)entity).getExtendedProperties("prayer")).getActivePrayers();
 		else if(entity instanceof IPrayerUser)
 			return ((IPrayerUser)entity).getActivePrayers();
-		return new ArrayList<EnumPrayers>();
+		return EnumSet.noneOf(EnumPrayers.class);
 	}
 
-	public static float handlePotency(float amount, final List<EnumPrayers> prayers){
-		for(final EnumPrayers prayer:prayers)
+	public static float handlePotency(float amount, final EnumSet<EnumPrayers> enumSet){
+		for(final EnumPrayers prayer:enumSet)
 			switch(prayer){
 			case POTENCY_1:
 			{
@@ -77,7 +79,7 @@ public class PrayerHelper {
 		return amount;
 	}
 
-	public static float handleEnhanceMelee(float amount, final List<EnumPrayers> prayers){
+	public static float handleEnhanceMelee(float amount, final EnumSet<EnumPrayers> prayers){
 		amount = PrayerHelper.handlePotency(amount, prayers);
 		for(final EnumPrayers prayer:prayers)
 			switch(prayer){
@@ -107,7 +109,7 @@ public class PrayerHelper {
 		return amount;
 	}
 
-	public static float handleEnhanceRange(float amount, final List<EnumPrayers> prayers){
+	public static float handleEnhanceRange(float amount, final EnumSet<EnumPrayers> prayers){
 		amount = PrayerHelper.handlePotency(amount, prayers);
 		for(final EnumPrayers prayer:prayers)
 			switch(prayer){
@@ -137,9 +139,9 @@ public class PrayerHelper {
 		return amount;
 	}
 
-	public static float handleEnhanceMagic(float amount, final List<EnumPrayers> prayers){
-		amount = PrayerHelper.handlePotency(amount, prayers);
-		for(final EnumPrayers prayer:prayers)
+	public static float handleEnhanceMagic(float amount, final EnumSet<EnumPrayers> enumSet){
+		amount = PrayerHelper.handlePotency(amount, enumSet);
+		for(final EnumPrayers prayer:enumSet)
 			switch(prayer){
 			case ENHANCE_MAGIC_1:
 			{

@@ -1,6 +1,7 @@
 package me.superckl.prayers.client.gui;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import me.superckl.prayers.client.gui.button.ButtonPrayer;
@@ -85,7 +86,7 @@ public class GuiContainerPrayers extends GuiContainer{
 			final ButtonPrayer pButton = (ButtonPrayer) button;
 			final EnumPrayers prayer = pButton.getPrayer();
 			final EntityPlayer player = ((ContainerPrayers)this.inventorySlots).getInvPlayer().player;
-			final List<EnumPrayers> list = PrayerHelper.getActivePrayers(player);
+			final EnumSet<EnumPrayers> list = PrayerHelper.getActivePrayers(player);
 			if(list.contains(prayer)){
 				list.remove(prayer);
 				final MessageDisablePrayer message = new MessageDisablePrayer();

@@ -1,7 +1,7 @@
 package me.superckl.prayers.common.entity;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import lombok.Getter;
@@ -232,13 +232,13 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	}
 
 	@Override
-	public List<EnumPrayers> getActivePrayers() {
+	public EnumSet<EnumPrayers> getActivePrayers() {
 		int index = this.getLevel() - 1;
 		if(index < 0)
-			return Collections.EMPTY_LIST;
+			return EnumSet.noneOf(EnumPrayers.class);
 		if(index > (EntityUndeadWizardPriest.prayers.length-1))
 			index = EntityUndeadWizardPriest.prayers.length-1;
-		return EntityUndeadWizardPriest.prayers[index];
+		return EnumSet.copyOf(EntityUndeadWizardPriest.prayers[index]);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package me.superckl.prayers.common.entity.prop;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class PrayerExtendedProperties implements IExtendedEntityProperties{
 	private EntityPlayer player;
 	@Getter
 	@Setter
-	private List<EnumPrayers> activePrayers = new ArrayList<EnumPrayers>();
+	private EnumSet<EnumPrayers> activePrayers = EnumSet.noneOf(EnumPrayers.class);
 	@Getter
 	private final List<String> unlockedPrayers = new ArrayList<String>();
 	private int tickDelay = 20;
