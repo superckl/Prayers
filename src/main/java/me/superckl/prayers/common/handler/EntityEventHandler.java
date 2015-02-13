@@ -1,5 +1,9 @@
 package me.superckl.prayers.common.handler;
 
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.List;
+
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
@@ -9,6 +13,7 @@ import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
+import me.superckl.prayers.common.utility.BlockLocation;
 import me.superckl.prayers.common.utility.PSReflectionHelper;
 import me.superckl.prayers.common.utility.PlayerHelper;
 import me.superckl.prayers.common.utility.PotionEffectHashMap;
@@ -28,6 +33,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
+import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -158,6 +164,32 @@ public class EntityEventHandler {
 		if((e.entityLiving instanceof EntityPlayer) == false)
 			return;
 		((PrayerExtendedProperties)((EntityPlayer)e.entityLiving).getExtendedProperties("prayer")).disableAllPrayers(false);
+	}
+
+	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOWEST)
+	public void onBlockBreak(final BlockEvent.BreakEvent e){
+		final Iterator<WeakReference<Altar>> it = AltarRegistry.getLoadedAltars().iterator();
+		while(it.hasNext()){
+			final WeakReference<Altar> wr = it.next();
+			if(wr.get() == null){
+				it.remove();
+				continue;
+			}
+			final List<BlockLocation> blocks = wr.get().getBlocks();
+			if(blocks == null)
+				continue;
+			final BlockLocation loc = new BlockLocation(e.x, e.y, e.z);
+			if(blocks.contains(loc)){
+				if(e.getPlayer() != null){
+					final List<EnumPrayers> prayers = PrayerHelper.getActivePrayers(e.getPlayer());
+					if(prayers.contains(EnumPrayers.DESTRUCTIVISM)){
+						wr.get().invalidateStructure();
+						return;
+					}
+				}
+				e.setCanceled(true);
+			}
+		}
 	}
 
 }

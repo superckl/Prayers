@@ -14,14 +14,12 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
-import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.BlockLocation;
 import me.superckl.prayers.common.utility.EntityHelper;
 import me.superckl.prayers.common.utility.LogHelper;
-import me.superckl.prayers.common.utility.PrayerHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
@@ -32,11 +30,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.world.BlockEvent;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @Getter
 public class Altar{
@@ -62,7 +56,6 @@ public class Altar{
 	private int tier;
 	private List<BlockLocation> blocks;
 	private List<TileEntityOfferingTable> tables;
-	private boolean isRegistered;
 	private TileEntityOfferingTable holder;
 
 	public Altar(final TileEntityOfferingTable holder) {
@@ -111,8 +104,6 @@ public class Altar{
 	private int regenTimer = 200;
 
 	public void updateEntity(final World world) {
-		if(!this.isRegistered && !world.isRemote)
-			MinecraftForge.EVENT_BUS.register(this);
 		if((this.blocks != null) && (this.tables == null)){
 			this.tables = new ArrayList<TileEntityOfferingTable>();
 			TileEntity te;
@@ -265,8 +256,6 @@ public class Altar{
 			this.tier = tier;
 			Prayers.getInstance().getConfig().setStats(this);
 			this.holder.setAltar(this);
-			MinecraftForge.EVENT_BUS.register(this);
-			this.isRegistered = true;
 			return true;
 		}
 		return false;
@@ -294,25 +283,6 @@ public class Altar{
 		this.inRitual = false;
 		this.prayerPoints = 0F;
 		this.holder.onStructureInvalidated();
-		MinecraftForge.EVENT_BUS.unregister(this);
-	}
-
-	@SubscribeEvent(receiveCanceled = false, priority = EventPriority.LOWEST)
-	public void onBlockBreak(final BlockEvent.BreakEvent e){
-		if(this.blocks == null)
-			return;
-		final BlockLocation loc = new BlockLocation(e.x, e.y, e.z);
-		if(this.blocks.contains(loc)){
-			if(e.getPlayer() != null){
-				final List<EnumPrayers> prayers = PrayerHelper.getActivePrayers(e.getPlayer());
-				if(prayers.contains(EnumPrayers.DESTRUCTIVISM)){
-					this.invalidateStructure();
-					return;
-				}
-			}
-			e.setCanceled(true);
-		}
-
 	}
 
 	private boolean establishStructure(final Map<BlockLocation, BlockRequirement> multi){
