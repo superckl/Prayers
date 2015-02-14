@@ -1,5 +1,6 @@
 package me.superckl.prayers.common.entity.ai;
 
+import me.superckl.prayers.common.utility.LogHelper;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.RandomPositionGenerator;
@@ -15,8 +16,6 @@ public class EntityAIKeepDistance extends EntityAIBase{
 	private int delayCounter;
 
 	private Vec3 target;
-
-	private boolean reached;
 
 	public EntityAIKeepDistance(final EntityCreature creature, final int distanceToRun, final double distanceToKeep, final double speed, final int delay) {
 		this.entity = creature;
@@ -42,7 +41,6 @@ public class EntityAIKeepDistance extends EntityAIBase{
 		else
 		{
 			this.target = vec3;
-			this.reached = false;
 			return true;
 		}
 	}
@@ -50,22 +48,12 @@ public class EntityAIKeepDistance extends EntityAIBase{
 	@Override
 	public boolean continueExecuting()
 	{
-		return !this.reached && !this.entity.isCollidedHorizontally;
+		return !this.entity.getNavigator().noPath();
 	}
 
 	@Override
-	public void updateTask() {
-		if(this.delayCounter++ < this.delay)
-			return;
-		final Vec3 thisPos = Vec3.createVectorHelper(this.entity.posX, this.entity.posY, this.entity.posZ);
-		final Vec3 diff = thisPos.subtract(Vec3.createVectorHelper(this.target.xCoord, this.target.yCoord, this.target.zCoord));
-		final Vec3 motionVec = diff.normalize();
-		this.entity.motionX = motionVec.xCoord*this.speed;
-		this.entity.motionY = motionVec.yCoord*this.speed;
-		this.entity.motionZ = motionVec.zCoord*this.speed;
-		this.reached = diff.lengthVector() < 1D;
-		if(this.reached)
-			this.delayCounter = 0;
+	public void startExecuting(){
+		LogHelper.info(this.entity.getNavigator().tryMoveToXYZ(this.target.xCoord, this.target.yCoord, this.target.zCoord, this.speed));
 	}
 
 }

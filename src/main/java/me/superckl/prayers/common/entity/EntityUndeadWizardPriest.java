@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Getter;
 import me.superckl.prayers.common.entity.ai.EntityAIBurstShot;
 import me.superckl.prayers.common.entity.ai.EntityAIKeepDistance;
+import me.superckl.prayers.common.entity.ai.PathNavigateFlying;
 import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.prayer.IPrayerUser;
@@ -45,6 +46,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 	public EntityUndeadWizardPriest(final World world, int level) {
 		super(world);
+		this.navigator = new PathNavigateFlying(this, world);
 		if(level <= 0){
 			final int rand = this.getRNG().nextInt(1000);
 			level = rand == 0 ? 4: rand < 100 ? 3: rand < 700 ? 2:1;
@@ -52,15 +54,17 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.setLevel(level, true);
 		this.setHealth(this.getMaxHealth());
 		this.getNavigator().setCanSwim(true);
-		this.tasks.addTask(1, new EntityAIKeepDistance(this, 10, 3, 0.4D, 15));// 3
+		this.tasks.addTask(1, new EntityAIKeepDistance(this, 10, 3, 10D, 15));// 3
+		//this.tasks.addTask(4, new EntityAIMoveTowardTargetBounded(this, 15D, 0.4D)); // 1
 		this.tasks.addTask(5, new EntityAISwimming(this));//4
-		this.tasks.addTask(4, new EntityAIBurstShot(this, 1.0D, 100, 60, 20.0F, 5));// 3
-		this.tasks.addTask(5, new EntityAIWander(this, 1.0D));// 1
-		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
-		this.tasks.addTask(6, new EntityAILookIdle(this));// 3
+		this.tasks.addTask(5, new EntityAIBurstShot(this, 1.0D, 100, 60, 20.0F, 5));// 3
+		this.tasks.addTask(6, new EntityAIWander(this, 0.5D));// 1
+		this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
+		this.tasks.addTask(7, new EntityAILookIdle(this));// 3
 		this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false));// 1
 		this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));// 1
 		this.setSize(1F, 3F);
+
 	}
 
 	public EntityUndeadWizardPriest(final World world) {
@@ -94,9 +98,8 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		if (!this.worldObj.isRemote && (this.getAttackTarget() != null))
 		{
 			final Entity entity = this.getAttackTarget();
-
 			if (entity != null)
-				if (this.posY < (entity.posY + 2D))
+				if (this.posY < (Math.max(entity.posY, this.worldObj.getTopSolidOrLiquidBlock((int) this.posX, (int) this.posZ)) + 2D))
 				{
 					if (this.motionY < 0.0D)
 						this.motionY = 0.0D;
@@ -110,6 +113,10 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 				continue;
 			final EntityLivingBase base = (EntityLivingBase) entity;
 			base.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 60));
+			if(this.getLevel() == 3)
+				base.addPotionEffect(new PotionEffect(Potion.poison.id, 60));
+			else if(this.getLevel() >= 4)
+				base.addPotionEffect(new PotionEffect(Potion.wither.id, 60, 1));
 		}
 		super.onLivingUpdate();
 	}
