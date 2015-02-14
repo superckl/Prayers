@@ -29,6 +29,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
@@ -53,7 +54,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.getNavigator().setCanSwim(true);
 		this.tasks.addTask(1, new EntityAIKeepDistance(this, 10, 3, 0.4D, 15));// 3
 		this.tasks.addTask(5, new EntityAISwimming(this));//4
-		this.tasks.addTask(4, new EntityAIBurstShot(this, 1.0D, 100, 60, 15.0F, 5));// 3
+		this.tasks.addTask(4, new EntityAIBurstShot(this, 1.0D, 100, 60, 20.0F, 5));// 3
 		this.tasks.addTask(5, new EntityAIWander(this, 1.0D));// 1
 		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
 		this.tasks.addTask(6, new EntityAILookIdle(this));// 3
@@ -105,7 +106,10 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		}
 		final List<Entity> entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(2.5D, 3D, 2.5D));
 		for(final Entity entity:entities){
-
+			if((entity instanceof EntityLivingBase) == false)
+				continue;
+			final EntityLivingBase base = (EntityLivingBase) entity;
+			base.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 60));
 		}
 		super.onLivingUpdate();
 	}
@@ -240,7 +244,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		final double d2 = target.posZ - this.posZ;
 		final float f1 = MathHelper.sqrt_float(uhh) * 0.5F;
 		//TODO effect
-		final EntityWizardSpell spell = new EntityWizardSpell(this.worldObj, this, d0 + (this.rand.nextGaussian() * f1), d1, d2 + (this.rand.nextGaussian() * f1), 4F + (this.getLevel()*4F));
+		final EntityWizardSpell spell = new EntityWizardSpell(this.worldObj, this, d0 + (this.rand.nextGaussian() * f1), d1, d2 + (this.rand.nextGaussian() * f1), (this.getLevel()*3F));
 		spell.posY = this.posY + (this.height / 2.0F) + 0.5D;
 		if(this.getLevel() >= 3)
 			spell.setTarget(target);

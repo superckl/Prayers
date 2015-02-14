@@ -6,6 +6,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.common.reference.ModData;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.EnumHelper;
@@ -19,10 +20,10 @@ public enum EnumPrayers {
 	//I would be using EnumSets for the requiredAfter, but it causes an initialization exception
 	DESTRUCTIVISM("destructivism", EnumChatFormatting.RED+"Destructivism", Arrays.asList("Allows you to break altars."), 0.1F, true, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
 	ENCHANCE_DEFENCE_1("eDefence1", EnumChatFormatting.YELLOW+"Tough", Arrays.asList("Increases defence by 5%"), 0.1F, false, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
-	ENHANCE_MELEE_1("eMelee1", EnumChatFormatting.YELLOW+"Might", Arrays.asList("Increases melee strength by 5%"), 0.15F, false, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
-	ENHANCE_RANGE_1("eRange1", EnumChatFormatting.YELLOW+"Watchful", Arrays.asList("Increases ranged strength by 5%"), 0.15F, false, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
+	ENHANCE_MELEE_1("eMelee1", EnumChatFormatting.YELLOW+"Might", Arrays.asList("Increases melee strength by 5%"), 0.15F, false, false, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemelee1.png")),
+	ENHANCE_RANGE_1("eRange1", EnumChatFormatting.YELLOW+"Watchful", Arrays.asList("Increases ranged strength by 5%"), 0.15F, false, false, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancerange1.png")),
 	ENHANCE_POTION("ePotion", EnumChatFormatting.YELLOW+"Enhance Potions", Arrays.asList("Boosts potion duration by 20%"), 1F, false, true, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
-	ENHANCE_MAGIC_1("eMagic1", EnumChatFormatting.YELLOW+"Mystic Charge", Arrays.asList("Increases magic strength by 5%"), 0.15F, false, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
+	ENHANCE_MAGIC_1("eMagic1", EnumChatFormatting.YELLOW+"Mystic Charge", Arrays.asList("Increases magic strength by 5%"), 0.15F, false, false, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemagic1.png")),
 	ENCHANCE_DEFENCE_2("eDefence2", EnumChatFormatting.YELLOW+"Durable", Arrays.asList("Increases defence by 10%"), 0.2F, false, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
 	ENHANCE_MELEE_2("eMelee2", EnumChatFormatting.YELLOW+"Strength", Arrays.asList("Increases melee strength by 10%"), 0.25F, false, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
 	ENHANCE_RANGE_2("eRange2", EnumChatFormatting.YELLOW+"Sharp Eye", Arrays.asList("Increases ranged strength by 10%"), 0.25F, false, false, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
