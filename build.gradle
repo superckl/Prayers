@@ -32,7 +32,7 @@ repositories {
 
 sourceSets.main{
     java{
-        srcDirs = ['src/main/java', 'dependencies/main/java']
+        srcDirs = ['src/main/java', 'dependencies/main/java', 'dependencies/thaumcraft-api']
     }
     resources{
         srcDirs = ['src/main/resources']
@@ -90,4 +90,6 @@ jar {
         attributes 'FMLCorePlugin': 'me.superckl.prayers.core.PrayersCore'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
+	exclude '**/thaumcraft/**'
+    exclude 'nei_at.cfg'
 }
