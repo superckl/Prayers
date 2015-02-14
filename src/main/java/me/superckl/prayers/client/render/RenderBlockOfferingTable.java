@@ -23,7 +23,6 @@ public class RenderBlockOfferingTable implements ISimpleBlockRenderingHandler{
 		GL11.glScalef(0.9F, 0.9F, 0.9F);
 		TileEntityRendererDispatcher.instance.renderTileEntityAt(this.dummy, 0.0D, 0.0D, 0.0D, 0.0F);
 		GL11.glPopMatrix();
-
 	}
 
 	@Override

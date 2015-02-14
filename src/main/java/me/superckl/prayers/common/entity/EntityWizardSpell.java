@@ -69,7 +69,6 @@ public class EntityWizardSpell extends EntityThrowable{
 		else
 		{
 			this.onEntityUpdate();
-			this.setFire(1);
 
 			if (this.inGround)
 			{

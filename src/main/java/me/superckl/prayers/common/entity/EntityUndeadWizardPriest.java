@@ -1,8 +1,11 @@
 package me.superckl.prayers.common.entity;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import lombok.Getter;
+import me.superckl.prayers.common.entity.ai.EntityAIBurstShot;
+import me.superckl.prayers.common.entity.ai.EntityAIKeepDistance;
 import me.superckl.prayers.common.item.ItemPotionPrayers;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.prayer.IPrayerUser;
@@ -15,7 +18,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIArrowAttack;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -49,13 +51,14 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.setLevel(level, true);
 		this.setHealth(this.getMaxHealth());
 		this.getNavigator().setCanSwim(true);
-		this.tasks.addTask(1, new EntityAISwimming(this));
-		this.tasks.addTask(4, new EntityAIArrowAttack(this, 1.0D, 20, 60, 15.0F));
-		this.tasks.addTask(5, new EntityAIWander(this, 1.0D));
-		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-		this.tasks.addTask(6, new EntityAILookIdle(this));
-		this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
-		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));
+		this.tasks.addTask(1, new EntityAIKeepDistance(this, 10, 3, 0.4D, 15));// 3
+		this.tasks.addTask(5, new EntityAISwimming(this));//4
+		this.tasks.addTask(4, new EntityAIBurstShot(this, 1.0D, 100, 60, 15.0F, 5));// 3
+		this.tasks.addTask(5, new EntityAIWander(this, 1.0D));// 1
+		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
+		this.tasks.addTask(6, new EntityAILookIdle(this));// 3
+		this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false));// 1
+		this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));// 1
 		this.setSize(1F, 3F);
 	}
 
@@ -83,35 +86,26 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	@Override
 	public void onLivingUpdate() {
 		this.motionY *= 0.6000000238418579D;
-		double d1;
-		double d3;
-		double d5;
+		final double d1;
+		final double d3;
+		final double d5;
 
 		if (!this.worldObj.isRemote && (this.getAttackTarget() != null))
 		{
 			final Entity entity = this.getAttackTarget();
 
 			if (entity != null)
-			{
-				if (this.posY < (entity.posY + 4.5D))
+				if (this.posY < (entity.posY + 2D))
 				{
 					if (this.motionY < 0.0D)
 						this.motionY = 0.0D;
 
 					this.motionY += (0.5D - this.motionY) * 0.28000000417232513D;
 				}
+		}
+		final List<Entity> entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(2.5D, 3D, 2.5D));
+		for(final Entity entity:entities){
 
-				final double d0 = entity.posX - this.posX;
-				d1 = entity.posZ - this.posZ;
-				d3 = (d0 * d0) + (d1 * d1);
-
-				if (d3 > 12.0D)
-				{
-					d5 = MathHelper.sqrt_double(d3);
-					this.motionX += (((d0 / d5) * 0.5D) - this.motionX) * 0.28000000417232513D;
-					this.motionZ += (((d1 / d5) * 0.5D) - this.motionZ) * 0.28000000417232513D;
-				}
-			}
 		}
 		super.onLivingUpdate();
 	}

@@ -6,6 +6,7 @@ import me.superckl.prayers.client.gui.InventoryTabPrayers;
 import me.superckl.prayers.client.handler.EntityRenderHandler;
 import me.superckl.prayers.client.handler.InputHandler;
 import me.superckl.prayers.client.handler.RenderTickHandler;
+import me.superckl.prayers.client.handler.TextureStitchHandler;
 import me.superckl.prayers.client.render.RenderBlockOfferingTable;
 import me.superckl.prayers.client.render.RenderTileOfferingTable;
 import me.superckl.prayers.client.render.RenderUndeadWizardPriest;
@@ -49,6 +50,7 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new EntityRenderHandler());
 		MinecraftForge.EVENT_BUS.register(new RenderTickHandler());
 		MinecraftForge.EVENT_BUS.register(new TabRegistry());
+		MinecraftForge.EVENT_BUS.register(new TextureStitchHandler());
 		FMLCommonHandler.instance().bus().register(new InputHandler());
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerClient.class, MessageEnablePrayer.class, 0, Side.CLIENT);
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerDisablePrayerClient.class, MessageDisablePrayer.class, 1, Side.CLIENT);

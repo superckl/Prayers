@@ -10,6 +10,7 @@ item.prayers:potion.name=Potion
 item.prayers:bottleprayers.name=Holy Water Bottle
 item.prayers:prayertome.name=Prayer Tome
 item.prayers:ancienttome.name=Ancient Tome
+item.prayers:exquisitebonemeal.name=Exquisite Bone Meal
 tile.prayers:offeringtable.name=Offering Table
 tile.prayers:holywater.name=Holy Water
 fluid.prayers:holywater.name=Holy Water
