@@ -48,7 +48,10 @@ public class EntityAIKeepDistance extends EntityAIBase{
 	@Override
 	public boolean continueExecuting()
 	{
-		return !this.entity.getNavigator().noPath();
+		/*final double distX = this.target.xCoord - this.entity.getAttackTarget().posX;
+		final double distZ = this.target.zCoord - this.entity.getAttackTarget().posZ;
+		final double dist = (distX*distX)+(distZ*distZ);*/
+		return !this.entity.getNavigator().noPath()/* && dist > this.distanceToKeep*.8D*/;
 	}
 
 	@Override

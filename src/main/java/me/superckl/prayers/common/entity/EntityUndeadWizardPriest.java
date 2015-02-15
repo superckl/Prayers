@@ -22,7 +22,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityMob;
@@ -54,14 +53,13 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.setLevel(level, true);
 		this.setHealth(this.getMaxHealth());
 		this.getNavigator().setCanSwim(true);
-		this.tasks.addTask(1, new EntityAIKeepDistance(this, 10, 3, 10D, 15));// 3
+		this.tasks.addTask(2, new EntityAIKeepDistance(this, 12, 5, 20D, 15));// 3
 		//this.tasks.addTask(4, new EntityAIMoveTowardTargetBounded(this, 15D, 0.4D)); // 1
-		this.tasks.addTask(5, new EntityAISwimming(this));//4
-		this.tasks.addTask(5, new EntityAIBurstShot(this, 1.0D, 100, 60, 20.0F, 5));// 3
-		this.tasks.addTask(6, new EntityAIWander(this, 0.5D));// 1
-		this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
-		this.tasks.addTask(7, new EntityAILookIdle(this));// 3
-		this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false));// 1
+		this.tasks.addTask(4, new EntityAIBurstShot(this, 1.0D, 100, 60, 40.0F, 5));// 3
+		this.tasks.addTask(5, new EntityAIWander(this, 1D));// 1
+		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
+		this.tasks.addTask(6, new EntityAILookIdle(this));// 3
+		this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));// 1
 		this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));// 1
 		this.setSize(1F, 3F);
 
@@ -149,7 +147,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	{
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(40.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.28000000417232513D);
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.5D);
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*20D));
 	}
 

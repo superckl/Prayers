@@ -121,7 +121,7 @@ public class EntityAIBurstShot extends EntityAIBase{
 		this.entity.getLookHelper().setLookPositionWithEntity(this.attackTarget, 30.0F, 30.0F);
 		float f;
 
-		if (((this.entity.worldObj.getWorldTime() % 10) == 0) && (this.shotCounter < this.shots))
+		if (((this.entity.worldObj.getWorldTime() % 5) == 0) && (this.shotCounter < this.shots))
 		{
 			if ((d0 > this.field_82642_h) || !flag)
 				return;

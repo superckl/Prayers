@@ -1,5 +1,6 @@
 package me.superckl.prayers.common.entity.ai;
 
+import me.superckl.prayers.common.utility.LogHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.pathfinding.PathEntity;
@@ -26,32 +27,32 @@ public class PathNavigateFlying extends PathNavigate{
 		final int k1 = p_75483_1_ - (p_75483_4_ / 2);
 		final int l1 = p_75483_3_ - (p_75483_6_ / 2);
 
-		if (!this.isPositionClear(k1, p_75483_2_, l1, p_75483_4_, p_75483_5_, p_75483_6_, p_75483_7_, p_75483_8_, p_75483_10_))
-			return false;
-		else
-			return true;
+		return !this.isPositionClear(k1, p_75483_2_, l1, p_75483_4_, p_75483_5_, p_75483_6_, p_75483_7_, p_75483_8_, p_75483_10_);
 	}
 
 	@Override
 	public void pathFollow()
 	{
 		final Vec3 vec3 = this.getEntityPosition();
-		int i = this.currentPath.getCurrentPathLength();
+		final int i = this.currentPath.getCurrentPathLength();
 
-		for (int j = this.currentPath.getCurrentPathIndex(); j < this.currentPath.getCurrentPathLength(); ++j)
+		/*for (int j = this.currentPath.getCurrentPathIndex(); j < this.currentPath.getCurrentPathLength(); ++j)
 			if (this.currentPath.getPathPointFromIndex(j).yCoord != (int)vec3.yCoord)
 			{
 				i = j;
 				break;
-			}
+			}*/
 
 		final float f = this.theEntity.width * this.theEntity.width;
 		int k;
 
-		for (k = this.currentPath.getCurrentPathIndex(); k < i; ++k)
-			if (vec3.squareDistanceTo(this.currentPath.getVectorFromIndex(this.theEntity, k)) < f)
+		for (k = this.currentPath.getCurrentPathIndex(); k < i; ++k){
+			final Vec3 vec4 = this.currentPath.getVectorFromIndex(this.theEntity, k);
+			final double d0 = vec4.xCoord - vec3.xCoord;
+			final double d2 = vec4.zCoord - vec3.zCoord;
+			if (((d0*d0)+(d2*d2)) < f)
 				this.currentPath.setCurrentPathIndex(k + 1);
-
+		}
 		k = MathHelper.ceiling_float_int(this.theEntity.width);
 		final int l = (int)this.theEntity.height + 1;
 		final int i1 = k;
@@ -67,6 +68,7 @@ public class PathNavigateFlying extends PathNavigate{
 		{
 			final double d0 = this.lastPosCheck.xCoord - vec3.xCoord;
 			final double d2 = this.lastPosCheck.zCoord - vec3.zCoord;
+			LogHelper.info(vec3+":"+":"+this.lastPosCheck+":"+(d0*d0)+(d2*d2));
 			if (((d0*d0)+(d2*d2)) < 2.25D)
 				this.clearPathEntity();
 
