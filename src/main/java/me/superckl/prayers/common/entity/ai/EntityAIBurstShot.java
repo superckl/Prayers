@@ -150,7 +150,7 @@ public class EntityAIBurstShot extends EntityAIBase{
 
 			if(this.entity instanceof EntityCreature){
 
-				final Vec3 vec3 = RandomPositionGenerator.findRandomTargetBlockTowards((EntityCreature) this.entity, 4, 1, Vec3.createVectorHelper(this.entity.getAttackTarget().posX, this.entity.getAttackTarget().posY, this.entity.getAttackTarget().posZ));
+				final Vec3 vec3 = RandomPositionGenerator.findRandomTargetBlockTowards((EntityCreature) this.entity, 3, 1, Vec3.createVectorHelper(this.entity.getAttackTarget().posX, this.entity.getAttackTarget().posY, this.entity.getAttackTarget().posZ));
 				if(vec3 != null)
 					LogHelper.info(this.entity.getNavigator().tryMoveToXYZ(vec3.xCoord, vec3.yCoord, vec3.zCoord, this.speed));
 			}

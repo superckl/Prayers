@@ -53,16 +53,16 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.setLevel(level, true);
 		this.setHealth(this.getMaxHealth());
 		this.getNavigator().setCanSwim(true);
-		this.tasks.addTask(2, new EntityAIKeepDistance(this, 12, 5, 40D, 15));// 3
+		this.tasks.addTask(2, new EntityAIKeepDistance(this, 12, 5, 1D, 15));// 3
 		//this.tasks.addTask(4, new EntityAIMoveTowardTargetBounded(this, 15D, 0.4D)); // 1
-		this.tasks.addTask(4, new EntityAIBurstShot(this, 40.0D, 100, 60, 40.0F, 5));// 3
+		this.tasks.addTask(4, new EntityAIBurstShot(this, 1D, 100, 60, 40.0F, 5));// 3
 		this.tasks.addTask(5, new EntityAIWander(this, 1D));// 1
 		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
 		this.tasks.addTask(6, new EntityAILookIdle(this));// 3
 		this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));// 1
 		this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));// 1
 		this.setSize(1F, 3F);
-
+		this.jumpMovementFactor = 0.15F;
 	}
 
 	public EntityUndeadWizardPriest(final World world) {
@@ -154,7 +154,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	{
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(40.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(2D);
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.3D);
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*20D));
 	}
 
