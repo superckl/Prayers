@@ -1,10 +1,14 @@
 package me.superckl.prayers.common.entity.ai;
 
+import me.superckl.prayers.common.utility.LogHelper;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.RandomPositionGenerator;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 
 public class EntityAIBurstShot extends EntityAIBase{
 
@@ -143,6 +147,14 @@ public class EntityAIBurstShot extends EntityAIBase{
 			f = MathHelper.sqrt_double(d0) / this.field_96562_i;
 			this.rangedAttackTime = MathHelper.floor_float((f * (this.maxRangedAttackTime - this.field_96561_g)) + this.field_96561_g);
 			this.shotCounter = 0;
+
+			if(this.entity instanceof EntityCreature){
+
+				final Vec3 vec3 = RandomPositionGenerator.findRandomTargetBlockTowards((EntityCreature) this.entity, 4, 1, Vec3.createVectorHelper(this.entity.getAttackTarget().posX, this.entity.getAttackTarget().posY, this.entity.getAttackTarget().posZ));
+				if(vec3 != null)
+					LogHelper.info(this.entity.getNavigator().tryMoveToXYZ(vec3.xCoord, vec3.yCoord, vec3.zCoord, this.speed));
+			}
+
 		}
 	}
 

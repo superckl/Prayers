@@ -53,9 +53,9 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 		this.setLevel(level, true);
 		this.setHealth(this.getMaxHealth());
 		this.getNavigator().setCanSwim(true);
-		this.tasks.addTask(2, new EntityAIKeepDistance(this, 12, 5, 20D, 15));// 3
+		this.tasks.addTask(2, new EntityAIKeepDistance(this, 12, 5, 40D, 15));// 3
 		//this.tasks.addTask(4, new EntityAIMoveTowardTargetBounded(this, 15D, 0.4D)); // 1
-		this.tasks.addTask(4, new EntityAIBurstShot(this, 1.0D, 100, 60, 40.0F, 5));// 3
+		this.tasks.addTask(4, new EntityAIBurstShot(this, 40.0D, 100, 60, 40.0F, 5));// 3
 		this.tasks.addTask(5, new EntityAIWander(this, 1D));// 1
 		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F)); // 2
 		this.tasks.addTask(6, new EntityAILookIdle(this));// 3
@@ -79,6 +79,13 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 
 	@Override
 	protected void updateFallState(final double p_70064_1_, final boolean p_70064_3_) {}
+
+	@Override
+	public void setAttackTarget(final EntityLivingBase target)
+	{
+		super.setAttackTarget(target);
+		this.getNavigator().clearPathEntity();
+	}
 
 	@Override
 	public boolean doesEntityNotTriggerPressurePlate()
@@ -105,7 +112,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 					this.motionY += (0.5D - this.motionY) * 0.28000000417232513D;
 				}
 		}
-		final List<Entity> entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(2.5D, 3D, 2.5D));
+		final List<Entity> entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(3D, 3D, 3D));
 		for(final Entity entity:entities){
 			if((entity instanceof EntityLivingBase) == false)
 				continue;
@@ -147,7 +154,7 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	{
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(40.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.5D);
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(2D);
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20D+(this.getLevel()*20D));
 	}
 
@@ -283,6 +290,12 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 			player.addStat(ModAchievements.GODS_WRATH, 1);
 		}else
 			super.onDeath(source);
+	}
+
+	@Override
+	protected void damageEntity(final DamageSource source, final float damage) {
+		super.damageEntity(source, damage);
+		this.getNavigator().clearPathEntity();
 	}
 
 
