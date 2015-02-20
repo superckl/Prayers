@@ -104,7 +104,7 @@ public abstract class CommonProxy implements IProxy{
 			@Override
 			public boolean areAdditionalRequirementsMet(final TileEntityOfferingTable te) {
 				final long time = te.getWorldObj().getWorldTime() % 24000;
-				return super.areAdditionalRequirementsMet(te) && (te.getAltar().getTier() >= 3) && (time >= 14000) && (time <= 16000);
+				return super.areAdditionalRequirementsMet(te) && (te.getAltar().getTier() >= 3) && (time >= 14000) && (time <= 16000) && te.getWorldObj().canBlockSeeTheSky(te.xCoord, te.yCoord, te.zCoord);
 			}
 
 		});
