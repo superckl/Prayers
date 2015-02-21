@@ -3,9 +3,8 @@ package me.superckl.prayers.common.event;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
+import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
-import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
 
@@ -14,12 +13,12 @@ import cpw.mods.fml.common.eventhandler.Event;
 public abstract class OfferingTableCraftingEvent extends Event{
 
 	private final TileEntityOfferingTable offeringTable;
-	private final OfferingTableCraftingHandler handler;
+	private final TableCraftingHandler handler;
 
 	@Cancelable
 	public static class Pre extends OfferingTableCraftingEvent{
 
-		public Pre(final TileEntityOfferingTable offeringTable, final OfferingTableCraftingHandler handler) {
+		public Pre(final TileEntityOfferingTable offeringTable, final TableCraftingHandler handler) {
 			super(offeringTable, handler);
 			// TODO Auto-generated constructor stub
 		}
@@ -31,11 +30,11 @@ public abstract class OfferingTableCraftingEvent extends Event{
 	@Setter
 	public static class Post extends OfferingTableCraftingEvent{
 
-		private ItemStack craftingResult;
+		//private ItemStack craftingResult; TODO
 
-		public Post(final TileEntityOfferingTable offeringTable, final OfferingTableCraftingHandler handler) {
+		public Post(final TileEntityOfferingTable offeringTable, final TableCraftingHandler handler) {
 			super(offeringTable, handler);
-			this.craftingResult = handler.getResult().copy();
+			//this.craftingResult = handler.getResult().copy();
 		}
 
 	}

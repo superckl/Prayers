@@ -5,7 +5,8 @@ import java.util.List;
 
 import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.BasicTableOreCraftingHandler;
-import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
+import me.superckl.prayers.common.altar.crafting.RecipeTableCraftingHandler;
+import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;
 import me.superckl.prayers.common.reference.RenderData;
 import me.superckl.prayers.integration.IIntegrationModule;
 import net.minecraft.client.Minecraft;
@@ -49,39 +50,39 @@ public class NEIIntegration implements IIntegrationModule{
 
 		@Override
 		public void loadCraftingRecipes(final ItemStack result) {
-			for(final OfferingTableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
-				if(handler.getResult().isItemEqual(result))
-					this.arecipes.add(new OfferingTableCachedRecipe(handler));
+			for(final TableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
+				if((handler instanceof RecipeTableCraftingHandler) && ((RecipeTableCraftingHandler) handler).getResult().isItemEqual(result))
+					this.arecipes.add(new OfferingTableCachedRecipe((RecipeTableCraftingHandler) handler));
 		}
 
 		@Override
 		public void loadUsageRecipes(final ItemStack ingredient) {
-			for(final OfferingTableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
+			for(final TableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
 				if(handler instanceof BasicTableOreCraftingHandler){
 					final List<Object> objs = ((BasicTableOreCraftingHandler)handler).getInput();
 					for(final Object obj:objs)
 						if((obj instanceof ItemStack) && ((ItemStack)obj).isItemEqual(ingredient)){
-							this.arecipes.add(new OfferingTableCachedRecipe(handler));
+							this.arecipes.add(new OfferingTableCachedRecipe((BasicTableOreCraftingHandler) handler));
 							break;
 						}else if(obj instanceof List){
 							boolean shouldBreak = false;
 							for(final Object obj2:((List)obj))
 								if((obj2 instanceof ItemStack) && ((ItemStack)obj2).isItemEqual(ingredient)){
-									this.arecipes.add(new OfferingTableCachedRecipe(handler));
+									this.arecipes.add(new OfferingTableCachedRecipe((BasicTableOreCraftingHandler) handler));
 									shouldBreak = true;
 									break;
 								}
 							if(shouldBreak)
 								break;
 						}
-				}else{
-					if(handler.getBaseIngredient().isItemEqual(ingredient)){
-						this.arecipes.add(new OfferingTableCachedRecipe(handler));
+				}else if(handler instanceof RecipeTableCraftingHandler){
+					if(((RecipeTableCraftingHandler) handler).getBaseIngredient().isItemEqual(ingredient)){
+						this.arecipes.add(new OfferingTableCachedRecipe((RecipeTableCraftingHandler) handler));
 						continue;
 					}
-					for(final ItemStack stack:handler.getTertiaryIngredients())
+					for(final ItemStack stack:((RecipeTableCraftingHandler) handler).getTertiaryIngredients())
 						if(stack.isItemEqual(ingredient)){
-							this.arecipes.add(new OfferingTableCachedRecipe(handler));
+							this.arecipes.add(new OfferingTableCachedRecipe((RecipeTableCraftingHandler) handler));
 							break;
 						}
 				}
@@ -108,7 +109,7 @@ public class NEIIntegration implements IIntegrationModule{
 			private final int time;
 			private final boolean isOre;
 
-			public OfferingTableCachedRecipe(final OfferingTableCraftingHandler handler){
+			public OfferingTableCachedRecipe(final RecipeTableCraftingHandler handler){
 				this.isOre = handler instanceof BasicTableOreCraftingHandler;
 				this.result = new PositionedStack(handler.getResult(), 122, 26, this.isOre);
 				this.points = (int) handler.getOverallDrain();

@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import lombok.Getter;
-import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
+import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.utility.BlockLocation;
@@ -23,14 +23,13 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public final class AltarRegistry {
 	@Getter
 	private static final Set<WeakReference<Altar>> loadedAltars = new HashSet<WeakReference<Altar>>();
-	private static final List<OfferingTableCraftingHandler> registeredRecipes = new ArrayList<OfferingTableCraftingHandler>();
+	private static final List<TableCraftingHandler> registeredRecipes = new ArrayList<TableCraftingHandler>();
 	private static final Map<Integer, Map<ForgeDirection, Map<BlockLocation, BlockRequirement>>> multiblocks = new HashMap<Integer, Map<ForgeDirection, Map<BlockLocation,BlockRequirement>>>();
 
 	private AltarRegistry(){};
@@ -69,26 +68,26 @@ public final class AltarRegistry {
 		return null;
 	}
 
-	public static List<OfferingTableCraftingHandler> getRegisteredRecipes(){
-		return new ArrayList<OfferingTableCraftingHandler>(AltarRegistry.registeredRecipes);
+	public static List<TableCraftingHandler> getRegisteredRecipes(){
+		return new ArrayList<TableCraftingHandler>(AltarRegistry.registeredRecipes);
 	}
 
-	public static void registerOfferingTableRecipe(final OfferingTableCraftingHandler recipe){
+	public static void registerOfferingTableRecipe(final TableCraftingHandler recipe){
 		AltarRegistry.registerOfferingTableRecipe(recipe, false);
 	}
 
-	public static OfferingTableCraftingHandler getRecipeById(final int id){
+	public static TableCraftingHandler getRecipeById(final int id){
 		if(id >= AltarRegistry.registeredRecipes.size())
 			return null;
 		return AltarRegistry.registeredRecipes.get(id);
 	}
 
-	public static void registerOfferingTableRecipe(final OfferingTableCraftingHandler recipe, final boolean override){
+	public static void registerOfferingTableRecipe(final TableCraftingHandler recipe, final boolean override){
 		if(AltarRegistry.registeredRecipes.contains(recipe)){
 			LogHelper.warn(StringHelper.build("Class ", PSReflectionHelper.retrieveCallingStackTraceElement().getClassName(), " has re-registered an already registered recipe: ", recipe.getClass().getCanonicalName(), ". There are mod conflictions!"));
 			return;
 		}
-		final ItemStack base = recipe.getBaseIngredient();
+		/*		final ItemStack base = recipe.getBaseIngredient();
 		final List<ItemStack> tertiary = recipe.getTertiaryIngredients();
 		if((base == null) || (tertiary == null)){
 			LogHelper.warn(StringHelper.build("Recipe ", recipe.getClass().getCanonicalName(), " is invalid! It contains one or more null ingredients! It will not be registered."));
@@ -99,9 +98,9 @@ public final class AltarRegistry {
 				LogHelper.warn(StringHelper.build("Recipe ", recipe.getClass().getCanonicalName(), " is invalid! It contains one or more null tertiary ingredients! It will not be registered."));
 				return;
 			}
-		final Iterator<OfferingTableCraftingHandler> it = AltarRegistry.registeredRecipes.iterator();
+		final Iterator<ITableCraftingHandler> it = AltarRegistry.registeredRecipes.iterator();
 		while(it.hasNext()){
-			final OfferingTableCraftingHandler handler = it.next();
+			final ITableCraftingHandler handler = it.next();
 			if(handler.checkCompletion(base, tertiary)){
 				LogHelper.warn(StringHelper.build("Recipe ", recipe.getClass().getCanonicalName(), " requires ingredients that conflict with an already registered recipe. ", override ? "The registered recipe will be overriden.": "It will not be registered."));
 				if(override){
@@ -110,7 +109,7 @@ public final class AltarRegistry {
 				}
 				return;
 			}
-		}
+		}*/
 		AltarRegistry.registeredRecipes.add(recipe);
 		recipe.setRecipeID(AltarRegistry.registeredRecipes.size()-1);
 	}

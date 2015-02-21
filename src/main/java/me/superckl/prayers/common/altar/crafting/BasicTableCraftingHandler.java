@@ -10,7 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 @Getter
 @RequiredArgsConstructor
-public class BasicTableCraftingHandler extends OfferingTableCraftingHandler{
+public class BasicTableCraftingHandler extends RecipeTableCraftingHandler{
 
 	protected final ItemStack result;
 	protected final ItemStack baseIngredient;
@@ -56,7 +56,7 @@ public class BasicTableCraftingHandler extends OfferingTableCraftingHandler{
 	}
 
 	@Override
-	public BasicTableCraftingHandler clone() {
+	public BasicTableCraftingHandler copy() {
 		final BasicTableCraftingHandler handler = new BasicTableCraftingHandler(this.result, this.baseIngredient, this.tertiaryIngredients, this.length, this.pointDrain);
 		handler.crafting = this.crafting;
 		handler.timer = this.timer;
@@ -73,8 +73,8 @@ public class BasicTableCraftingHandler extends OfferingTableCraftingHandler{
 	}
 
 	@Override
-	public BasicTableCraftingHandler cloneWithNBT(final NBTTagCompound comp) {
-		final BasicTableCraftingHandler handler = this.clone();
+	public BasicTableCraftingHandler copyWithNBT(final NBTTagCompound comp) {
+		final BasicTableCraftingHandler handler = this.copy();
 		handler.timer = comp.getInteger("timer");
 		handler.crafting = comp.getBoolean("crafting");
 		return handler;

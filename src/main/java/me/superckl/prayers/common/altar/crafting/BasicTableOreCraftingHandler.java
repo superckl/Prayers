@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class BasicTableOreCraftingHandler extends OfferingTableCraftingHandler{
+public class BasicTableOreCraftingHandler extends RecipeTableCraftingHandler{
 
 	private final ItemStack output;
 	@Getter
@@ -97,7 +97,7 @@ public class BasicTableOreCraftingHandler extends OfferingTableCraftingHandler{
 	}
 
 	@Override
-	public BasicTableOreCraftingHandler clone() {
+	public BasicTableOreCraftingHandler copy() {
 		final BasicTableOreCraftingHandler ore = new BasicTableOreCraftingHandler(this.output, this.length, this.pointDrain);
 		ore.crafting = this.crafting;
 		ore.timer = this.timer;
@@ -169,8 +169,8 @@ public class BasicTableOreCraftingHandler extends OfferingTableCraftingHandler{
 	}
 
 	@Override
-	public BasicTableOreCraftingHandler cloneWithNBT(final NBTTagCompound comp) {
-		final BasicTableOreCraftingHandler handler = this.clone();
+	public BasicTableOreCraftingHandler copyWithNBT(final NBTTagCompound comp) {
+		final BasicTableOreCraftingHandler handler = this.copy();
 		handler.timer = comp.getInteger("timer");
 		handler.crafting = comp.getBoolean("crafting");
 		return handler;

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
-import me.superckl.prayers.common.altar.crafting.OfferingTableCraftingHandler;
+import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;
 import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Post;
 import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Pre;
 import me.superckl.prayers.common.utility.BlockLocation;
@@ -31,7 +31,7 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 	private ItemStack currentItem;
 	private final List<ItemStack> tertiaryItems = new ArrayList<ItemStack>();
 	@Getter
-	private OfferingTableCraftingHandler currentRecipe;
+	private TableCraftingHandler currentRecipe;
 	private boolean craftingLock;
 	@Setter
 	private BlockLocation masterLoc;
@@ -45,8 +45,9 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 			this.currentItem = ItemStack.loadItemStackFromNBT(comp.getCompoundTag("currentItem"));
 		else
 			this.currentItem = null;
+		//TODO may be broken now
 		if(comp.hasKey("currentRecipe"))
-			this.currentRecipe = OfferingTableCraftingHandler.fromNBT(comp.getCompoundTag("currentRecipe"));
+			this.currentRecipe = TableCraftingHandler.fromNBT(comp.getCompoundTag("currentRecipe"));
 		else
 			this.currentRecipe = null;
 		if(comp.hasKey("masterLoc")){
@@ -117,9 +118,9 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 					return;
 					//TODO effect
 				}
-				this.tertiaryItems.clear();
-				final ItemStack result = post.getCraftingResult().copy();
-				this.currentItem = result == null ? null:result.copy();
+				//this.tertiaryItems.clear();
+				//final ItemStack result = post.getCraftingResult().copy();
+				//this.currentItem = result == null ? null:result.copy();
 				this.currentRecipe.onPostComplete(this);
 				this.currentRecipe = null;
 				//TODO effect
@@ -171,9 +172,9 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 	public void findRecipe(){
 		if(this.currentItem == null)
 			return;
-		for(final OfferingTableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
-			if(handler.checkCompletion(this.currentItem, this.tertiaryItems)){
-				this.currentRecipe = handler.clone();
+		for(final TableCraftingHandler handler:AltarRegistry.getRegisteredRecipes())
+			if(handler.areBaseRequirementsMet(this)){
+				this.currentRecipe = handler.copy();
 				this.craftingLock = false;
 				break;
 			}
