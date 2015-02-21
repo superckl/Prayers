@@ -90,6 +90,7 @@ jar {
         attributes 'FMLCorePlugin': 'me.superckl.prayers.core.PrayersCore'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
-	exclude '**/thaumcraft/**'
+	exclude '**/thaumcraft-api/**'
+	exclude '**/bloodmagic/**'
     exclude 'nei_at.cfg'
 }
