@@ -27,6 +27,8 @@ public class GuiConfigPrayers extends GuiConfig{
 		final List<IConfigElement> list = new ArrayList<IConfigElement>();
 		list.add(new DummyConfigElement.DummyCategoryElement("General", "prayers.configgui.ctgy.general", GeneralCategory.class));
 		list.add(new DummyConfigElement.DummyCategoryElement("Altar", "prayers.configgui.ctgy.altar", AltarCategory.class));
+		list.add(new DummyConfigElement.DummyCategoryElement("Blood Magic", "prayers.configgui.ctgy.bloodmagic", BloodMagicCategory.class));
+		list.add(new DummyConfigElement.DummyCategoryElement("Potions", "prayers.configgui.ctgy.potions", PotionsCategory.class));
 		return list;
 	}
 
@@ -55,7 +57,37 @@ public class GuiConfigPrayers extends GuiConfig{
 		@Override
 		protected GuiScreen buildChildScreen(){
 			return new GuiConfig(this.owningScreen, new ConfigElement(Prayers.getInstance().getConfig().getConfigFile().getCategory(Category.ALTAR)).getChildElements()
-					, ModData.MOD_ID, false, false, LanguageRegistry.instance().getStringLocalization(StringHelper.formatGUIUnlocalizedName("config_altar")));
+					, ModData.MOD_ID, false, true, LanguageRegistry.instance().getStringLocalization(StringHelper.formatGUIUnlocalizedName("config_altar")));
+		}
+
+	}
+
+	public static class BloodMagicCategory extends CategoryEntry{
+
+		public BloodMagicCategory(final GuiConfig owningScreen,
+				final GuiConfigEntries owningEntryList, final IConfigElement configElement) {
+			super(owningScreen, owningEntryList, configElement);
+		}
+
+		@Override
+		protected GuiScreen buildChildScreen(){
+			return new GuiConfig(this.owningScreen, new ConfigElement(Prayers.getInstance().getConfig().getConfigFile().getCategory(Category.ALTAR)).getChildElements()
+					, ModData.MOD_ID, false, true, LanguageRegistry.instance().getStringLocalization(StringHelper.formatGUIUnlocalizedName("config_bloodmagic")));
+		}
+
+	}
+
+	public static class PotionsCategory extends CategoryEntry{
+
+		public PotionsCategory(final GuiConfig owningScreen,
+				final GuiConfigEntries owningEntryList, final IConfigElement configElement) {
+			super(owningScreen, owningEntryList, configElement);
+		}
+
+		@Override
+		protected GuiScreen buildChildScreen(){
+			return new GuiConfig(this.owningScreen, new ConfigElement(Prayers.getInstance().getConfig().getConfigFile().getCategory(Category.ALTAR)).getChildElements()
+					, ModData.MOD_ID, false, true, LanguageRegistry.instance().getStringLocalization(StringHelper.formatGUIUnlocalizedName("config_potions")));
 		}
 
 	}

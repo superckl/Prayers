@@ -16,6 +16,8 @@ public class Config {
 
 		public static String GENERAL = "general";
 		public static String ALTAR = "altar";
+		public static String BLOOD_MAGIC = "bloodmagic";
+		public static String POTIONS = "potions";
 
 	}
 
@@ -31,6 +33,20 @@ public class Config {
 	private int tier1RechargeDelay;
 	@Getter
 	private float tier1RechargeRate;
+	@Getter
+	private boolean orbRecipe;
+	@Getter
+	private int orbExchangeRate;
+	@Getter
+	private boolean dynamicPotionIDs;
+	@Getter
+	private int prayerBoostID;
+	@Getter
+	private int prayerRestoreID;
+	@Getter
+	private int prayerRestoreInstantID;
+	@Getter
+	private int prayerMaxPointsRaiseID;
 
 	public Config(final File config){
 		this.configFile = new Configuration(config);
@@ -52,6 +68,13 @@ public class Config {
 			this.tier1Max = this.configFile.getFloat("Tier 1 Max Points", Category.ALTAR, 500F, 0F, Float.MAX_VALUE, "Determines how many prayer points a tier 1 altar will have.");
 			this.tier1RechargeDelay = this.configFile.getInt("Tier 1 Recharge Delay", Category.ALTAR, 200, 0, Integer.MAX_VALUE, "Determines how long a tier 1 altar will wate before applying the recharge rate. Measured in ticks.");
 			this.tier1RechargeRate = this.configFile.getFloat("Tier 1 Recharge Rate", Category.ALTAR, 1F, 0F, Float.MAX_VALUE, "Determines how much a tier 1 altar will recharge.");
+			this.orbRecipe = this.configFile.getBoolean("Blood Orb Charge Recipe", Category.BLOOD_MAGIC, true, "Enables a player to place blood orbs on an altar to exchange prayer points from that altar for points in their soul network.");
+			this.orbExchangeRate = this.configFile.getInt("Point Exchange Rate", Category.BLOOD_MAGIC, 5, 0, Integer.MAX_VALUE, "Determines how many blood points one prayer point gets converted to.");
+			this.dynamicPotionIDs = this.configFile.getBoolean("Dynamic Potion IDs", Category.POTIONS, true, "If true, Prayers will attempt to insert potions at the end of the array. If this fails, Prayers will resort to the static IDs specified.");
+			this.prayerBoostID = this.configFile.getInt("Prayer Boost ID", Category.POTIONS, 77, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerRestoreID = this.configFile.getInt("Prayer Restore ID", Category.POTIONS, 78, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerRestoreInstantID = this.configFile.getInt("Prayer Restore Instant ID", Category.POTIONS, 79, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerMaxPointsRaiseID = this.configFile.getInt("Prayer Max Points Raise ID", Category.POTIONS, 10, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
 			this.configFile.save();
 		}catch(final Exception e){
 			e.printStackTrace();

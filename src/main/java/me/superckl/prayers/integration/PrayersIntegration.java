@@ -24,6 +24,7 @@ public class PrayersIntegration implements IIntegrationModule{
 	static{
 		PrayersIntegration.modules.put(Lists.newArrayList("NotEnoughItems"), "me.superckl.prayers.integration.nei.NEIIntegration");
 		PrayersIntegration.modules.put(Lists.newArrayList("Thaumcraft"), "me.superckl.prayers.integration.thaumcraft.ThaumcraftIntegration");
+		PrayersIntegration.modules.put(Lists.newArrayList("AWWayofTime"), "me.superckl.prayers.integration.bloodmagic.BloodMagicIntegration");
 	}
 
 	@Getter

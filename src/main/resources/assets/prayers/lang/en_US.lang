@@ -1,7 +1,10 @@
 gui.prayers:config.name=Prayers Configuration
 gui.prayers:config_general.name=Prayers General Configuration
 gui.prayers:config_altar.name=Prayers Altar Configuration
+gui.prayers:config_bloodmagic.name=Prayers Blood Magic Configuration
 prayers.configgui.ctgy.general.tooltip=Configure general elements of Prayers
+prayers.configgui.ctgy.altar.tooltip=Configure elements of Prayers relating to altars
+prayers.configgui.ctgy.bloodmagic.tooltip=Configure elements of Prayers relating to Blood Magic
 item.prayers:basicbone:0.name=Bones
 item.prayers:basicbone:1.name=Large Bones
 item.prayers:basicbone:2.name=Ancient Bones

@@ -32,6 +32,8 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 	private final List<ItemStack> tertiaryItems = new ArrayList<ItemStack>();
 	@Getter
 	private TableCraftingHandler currentRecipe;
+	@Getter
+	@Setter
 	private boolean craftingLock;
 	@Setter
 	private BlockLocation masterLoc;

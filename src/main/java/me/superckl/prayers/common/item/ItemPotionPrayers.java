@@ -7,6 +7,7 @@ import java.util.Map;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModPotions;
 import me.superckl.prayers.common.reference.ModTabs;
+import me.superckl.prayers.common.utility.LogHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -46,6 +47,10 @@ public class ItemPotionPrayers extends ItemPrayers{
 				return;
 			for(int i = 0; i < nbtList.tagCount(); i++){
 				final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(nbtList.getCompoundTagAt(i));
+				if(effect == null){
+					LogHelper.error("Something went wrong when parsing a potion effect!");
+					continue;
+				}
 				String s1 = StatCollector.translateToLocal(effect.getEffectName()).trim();
 				final Potion potion = Potion.potionTypes[effect.getPotionID()];
 				if (effect.getAmplifier() > 0)
@@ -67,6 +72,10 @@ public class ItemPotionPrayers extends ItemPrayers{
 			if(list.tagCount() <= 0)
 				return super.getItemStackDisplayName(stack);
 			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(list.getCompoundTagAt(0));
+			if(effect == null){
+				LogHelper.error("Something went wrong when parsing a potion effect!");
+				return "Potion";
+			}
 			final String name = StatCollector.translateToLocal(effect.getEffectName()).trim()+" "+super.getItemStackDisplayName(stack).trim();
 			return name;
 		}else
