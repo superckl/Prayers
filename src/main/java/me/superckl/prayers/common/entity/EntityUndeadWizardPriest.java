@@ -40,8 +40,8 @@ public class EntityUndeadWizardPriest extends EntityMob implements IPrayerUser, 
 	private int field_70846_g;
 	@Getter
 	private static final EnumSet[] prayers = new EnumSet[] {EnumSet.of(EnumPrayers.PROTECT_MAGIC), EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE),
-		EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4),
-		EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_4, EnumPrayers.ENHANCE_MAGIC_4)};
+		EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_3),
+		EnumSet.of(EnumPrayers.PROTECT_MAGIC, EnumPrayers.PROTECT_RANGE, EnumPrayers.PROTECT_MELEE, EnumPrayers.ENCHANCE_DEFENCE_3, EnumPrayers.ENHANCE_MAGIC_3)};
 
 	public EntityUndeadWizardPriest(final World world, int level) {
 		super(world);

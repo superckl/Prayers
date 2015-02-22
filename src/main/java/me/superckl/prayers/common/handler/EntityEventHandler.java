@@ -126,15 +126,10 @@ public class EntityEventHandler {
 			}
 			case ENCHANCE_DEFENCE_2:
 			{
-				e.ammount*=.9;
-				break;
-			}
-			case ENCHANCE_DEFENCE_3:
-			{
 				e.ammount*=.85;
 				break;
 			}
-			case ENCHANCE_DEFENCE_4:
+			case ENCHANCE_DEFENCE_3:
 			{
 				e.ammount*=.75;
 				break;

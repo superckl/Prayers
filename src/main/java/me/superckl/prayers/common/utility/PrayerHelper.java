@@ -90,15 +90,10 @@ public class PrayerHelper {
 			}
 			case ENHANCE_MELEE_2:
 			{
-				amount *= 1.1;
-				break;
-			}
-			case ENHANCE_MELEE_3:
-			{
 				amount *= 1.15;
 				break;
 			}
-			case ENHANCE_MELEE_4:
+			case ENHANCE_MELEE_3:
 			{
 				amount *= 1.25;
 				break;
@@ -120,15 +115,10 @@ public class PrayerHelper {
 			}
 			case ENHANCE_RANGE_2:
 			{
-				amount *= 1.1;
-				break;
-			}
-			case ENHANCE_RANGE_3:
-			{
 				amount *= 1.15;
 				break;
 			}
-			case ENHANCE_RANGE_4:
+			case ENHANCE_RANGE_3:
 			{
 				amount *= 1.25;
 				break;
@@ -150,15 +140,10 @@ public class PrayerHelper {
 			}
 			case ENHANCE_MAGIC_2:
 			{
-				amount *= 1.1;
-				break;
-			}
-			case ENHANCE_MAGIC_3:
-			{
 				amount *= 1.15;
 				break;
 			}
-			case ENHANCE_MAGIC_4:
+			case ENHANCE_MAGIC_3:
 			{
 				amount *= 1.25;
 				break;
