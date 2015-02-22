@@ -32,7 +32,7 @@ repositories {
 
 sourceSets.main{
     java{
-        srcDirs = ['src/main/java', 'dependencies/main/java', 'dependencies/thaumcraft-api']
+        srcDirs = ['src/main/java', 'dependencies/tconstruct-tabs', 'dependencies/thaumcraft-api']
     }
     resources{
         srcDirs = ['src/main/resources']
@@ -64,6 +64,7 @@ version = "${config.minecraft_version}-${config.mod_version}.${System.getenv("BU
 dependencies {
     compile "org.projectlombok:lombok:1.16.0"
     compile "mcp.mobius.waila:Waila:1.5.8a_1.7.10"
+    compile fileTree(dir: 'dependencies/bloodmagic', include: '*.jar')
 }
 
 processResources
