@@ -28,15 +28,15 @@ public enum EnumPrayers {
 	ENHANCE_MELEE_2("eMelee2", EnumChatFormatting.YELLOW+"Strength", Arrays.asList("Increases melee strength by 15%"), 0.25F, false, false, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemelee2.png")),
 	ENHANCE_RANGE_2("eRange2", EnumChatFormatting.YELLOW+"Sharp Eye", Arrays.asList("Increases ranged strength by 15%"), 0.25F, false, false, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancerange2.png")),
 	ENHANCE_MAGIC_2("eMagic2", EnumChatFormatting.YELLOW+"Mystic Will", Arrays.asList("Increases magic strength by 15%"), 0.25F, false, false, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemagic2.png")),
-	ENCHANCE_DEFENCE_3("eDefence3", EnumChatFormatting.YELLOW+"Robust", Arrays.asList("Increases defence by 25%"), 0.5F, false, true, ImmutableList.of(ENCHANCE_DEFENCE_2), new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancedefence3.png")),
-	ENHANCE_MELEE_3("eMelee3", EnumChatFormatting.YELLOW+"Vigor", Arrays.asList("Increases melee strength by 25%"), 0.6F, false, true, ImmutableList.of(ENHANCE_MELEE_2), new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemelee3.png")),
-	ENHANCE_RANGE_3("eRange3", EnumChatFormatting.YELLOW+"Hawk Eye", Arrays.asList("Increases ranged strength by 25%"), 0.6F, false, true, ImmutableList.of(ENHANCE_RANGE_2), new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancerange3.png")),
-	ENHANCE_MAGIC_3("eMagic3", EnumChatFormatting.YELLOW+"Mystic Attunement", Arrays.asList("Increases magic strength by 25%"), 0.6F, true, true, ImmutableList.of(ENHANCE_MAGIC_2), new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemagic3.png")),
+	ENCHANCE_DEFENCE_3("eDefence3", EnumChatFormatting.YELLOW+"Robust", Arrays.asList("Increases defence by 25%"), 0.5F, false, true, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancedefence3.png")),
+	ENHANCE_MELEE_3("eMelee3", EnumChatFormatting.YELLOW+"Vigor", Arrays.asList("Increases melee strength by 25%"), 0.6F, false, true, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemelee3.png")),
+	ENHANCE_RANGE_3("eRange3", EnumChatFormatting.YELLOW+"Hawk Eye", Arrays.asList("Increases ranged strength by 25%"), 0.6F, false, true, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancerange3.png")),
+	ENHANCE_MAGIC_3("eMagic3", EnumChatFormatting.YELLOW+"Mystic Might", Arrays.asList("Increases magic strength by 25%"), 0.6F, true, true, Collections.EMPTY_LIST, new ResourceLocation(ModData.MOD_ID+":textures/prayer/enhancemagic3.png")),
 	PROTECT_MELEE("pMelee", EnumChatFormatting.AQUA+"Protect from Melee", Arrays.asList("Reduces melee damage by 50%"), 2.5F, true, true, Collections.EMPTY_LIST, new ResourceLocation("textures/items/diamond_sword.png")),
 	PROTECT_RANGE("pRange", EnumChatFormatting.AQUA+"Protect from Range", Arrays.asList("Reduces ranged damage by 50%"), 2.5F, true, true, Collections.EMPTY_LIST, new ResourceLocation("textures/items/arrow.png")),
 	PROTECT_MAGIC("pMagic", EnumChatFormatting.AQUA+"Protect from Magic", Arrays.asList("Reduces magic damage by 50%"), 2.5F, true, true, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
 	POTENCY_1("eAll1", EnumChatFormatting.AQUA+"Effective", Arrays.asList("Increases damage output by 30%"), 5F, false, true, ImmutableList.of(ENHANCE_MAGIC_3, ENHANCE_RANGE_3, ENHANCE_MELEE_3), new ResourceLocation("textures/items/fire.png")),
-	POTENCY_2("eAll2", EnumChatFormatting.AQUA+"Potent", Arrays.asList("Increases damage output by 50%"), 7F, false, true, ImmutableList.of(POTENCY_1), new ResourceLocation("textures/items/fire.png"));//TODO
+	POTENCY_2("eAll2", EnumChatFormatting.AQUA+"Potent", Arrays.asList("Increases damage output by 50%"), 7F, false, true, ImmutableList.of(POTENCY_1), new ResourceLocation(ModData.MOD_ID+":textures/prayer/potency.png"));//TODO
 
 	public static final float MAX_DRAIN = 7F;
 
