@@ -35,7 +35,7 @@ public enum EnumPrayers {
 	PROTECT_MELEE("pMelee", EnumChatFormatting.AQUA+"Protect from Melee", Arrays.asList("Reduces melee damage by 50%"), 2.5F, true, true, Collections.EMPTY_LIST, new ResourceLocation("textures/items/diamond_sword.png")),
 	PROTECT_RANGE("pRange", EnumChatFormatting.AQUA+"Protect from Range", Arrays.asList("Reduces ranged damage by 50%"), 2.5F, true, true, Collections.EMPTY_LIST, new ResourceLocation("textures/items/arrow.png")),
 	PROTECT_MAGIC("pMagic", EnumChatFormatting.AQUA+"Protect from Magic", Arrays.asList("Reduces magic damage by 50%"), 2.5F, true, true, Collections.EMPTY_LIST, new ResourceLocation("textures/items/fire.png")),
-	POTENCY_1("eAll1", EnumChatFormatting.AQUA+"Effective", Arrays.asList("Increases damage output by 30%"), 5F, false, true, ImmutableList.of(ENHANCE_MAGIC_3, ENHANCE_RANGE_3, ENHANCE_MELEE_3), new ResourceLocation("textures/items/fire.png")),
+	POTENCY_1("eAll1", EnumChatFormatting.AQUA+"Effective", Arrays.asList("Increases damage output by 30%"), 5F, false, true, ImmutableList.of(ENHANCE_MAGIC_3, ENHANCE_RANGE_3, ENHANCE_MELEE_3), new ResourceLocation(ModData.MOD_ID+":textures/prayer/effective.png")),
 	POTENCY_2("eAll2", EnumChatFormatting.AQUA+"Potent", Arrays.asList("Increases damage output by 50%"), 7F, false, true, ImmutableList.of(POTENCY_1), new ResourceLocation(ModData.MOD_ID+":textures/prayer/potency.png"));//TODO
 
 	public static final float MAX_DRAIN = 7F;
