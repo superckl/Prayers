@@ -15,6 +15,7 @@ import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.utility.BlockLocation;
+import me.superckl.prayers.common.utility.CollectionHelper;
 import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.NumberHelper;
 import me.superckl.prayers.common.utility.PSReflectionHelper;
@@ -44,10 +45,12 @@ public final class AltarRegistry {
 
 	/**
 	 * This method should always be used when retrieving multiblocks. It performs a deep copy of the original to ensure altar properties don't bleed over to each other.
+	 * @param tier The desired tier of altar.
+	 * @param direction The desired direction the altar should be facing.
 	 * @return The data structure representing the multiblock
 	 */
 	public static Map<BlockLocation, BlockRequirement> getMultiBlock(final int tier, final ForgeDirection direction){
-		return AltarRegistry.hasMultiBlocksOfTier(tier) ? AltarRegistry.deepCopy(AltarRegistry.multiblocks.get(tier).get(direction)):null;
+		return AltarRegistry.hasMultiBlocksOfTier(tier) ? CollectionHelper.deepCopyWithIdentityCheck(AltarRegistry.multiblocks.get(tier).get(direction)):null;
 	}
 
 	public static Altar findAltarAt(final World world, final int x, final int y, final int z){
@@ -72,6 +75,10 @@ public final class AltarRegistry {
 		return new ArrayList<TableCraftingHandler>(AltarRegistry.registeredRecipes);
 	}
 
+	/**
+	 * Registers a new Offering Table recipe.
+	 * @param recipe The recipe to register.
+	 */
 	public static void registerOfferingTableRecipe(final TableCraftingHandler recipe){
 		AltarRegistry.registerOfferingTableRecipe(recipe, false);
 	}
@@ -82,6 +89,11 @@ public final class AltarRegistry {
 		return AltarRegistry.registeredRecipes.get(id);
 	}
 
+	/**
+	 * Registers a new Offering Table recipe.
+	 * @param recipe The recipe to register.
+	 * @param override If the registration should override any conflicting recipes.
+	 */
 	public static void registerOfferingTableRecipe(final TableCraftingHandler recipe, final boolean override){
 		if(AltarRegistry.registeredRecipes.contains(recipe)){
 			LogHelper.warn(StringHelper.build("Class ", PSReflectionHelper.retrieveCallingStackTraceElement().getClassName(), " has re-registered an already registered recipe: ", recipe.getClass().getCanonicalName(), ". There are mod conflictions!"));
@@ -180,13 +192,6 @@ public final class AltarRegistry {
 		west.put(new BlockLocation(0, -1, 1), wall);
 		west.put(new BlockLocation(0, -1, -2), wall);
 		return west;
-	}
-
-	public static Map<BlockLocation, BlockRequirement> deepCopy(final Map<BlockLocation, BlockRequirement> map){
-		final Map<BlockLocation, BlockRequirement> copy = new HashMap<BlockLocation, BlockRequirement>();
-		for(final Entry<BlockLocation, BlockRequirement> entry:map.entrySet())
-			copy.put(entry.getKey().clone(), entry.getValue().clone());
-		return copy;
 	}
 
 }

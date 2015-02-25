@@ -4,7 +4,6 @@ import me.superckl.prayers.client.model.ModelOfferingTable;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.reference.RenderData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.EntityBreakingFX;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -95,8 +94,6 @@ public class RenderTileOfferingTable extends TileEntitySpecialRenderer{
 
 				final double cos = Math.cos(current), sin = Math.sin(current);
 				this.customRenderItem.doRender(entity, cos, 0, -sin, 0, (float) (current+Math.PI)*20F);
-				final EntityBreakingFX fx = new EntityBreakingFX(offer.getWorldObj(), cos + x + 0.5F, y + 1.05F, (z + 0.5F)-sin, -cos*5F, 0, sin*5F, stack.getItem(), 0);
-				this.mc.effectRenderer.addEffect(fx);
 				current += increment;
 			}
 
