@@ -4,12 +4,14 @@ import me.superckl.prayers.client.model.ModelOfferingTable;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.reference.RenderData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EntityBreakingFX;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
 
 import org.lwjgl.opengl.GL11;
 
@@ -57,15 +59,16 @@ public class RenderTileOfferingTable extends TileEntitySpecialRenderer{
 			GL11.glPushMatrix();
 
 			final float scaleFactor = .85F;
-			final float rotationAngle = (float) ((720.0 * (System.currentTimeMillis() & 0x3FFFL)) / 0x3FFFL)*.5F;
+			final float ticks = Minecraft.getMinecraft().renderViewEntity.ticksExisted + pticks;
+			final float bob = MathHelper.sin((ticks % 32767.0F) / 16.0F) * 0.05F;
 
 			final EntityItem entity = new EntityItem(offer.getWorldObj());
-			entity.hoverStart = 0F;
+			entity.hoverStart = 0;
 			entity.setEntityItemStack(offer.getCurrentItem());
 
-			GL11.glTranslatef((float) x + 0.5F, (float) y + 1.15F, (float) z + 0.5F);
+			GL11.glTranslatef((float) x + 0.5F, (float) y + 1.15F+bob, (float) z + 0.5F);
 			GL11.glScalef(scaleFactor, scaleFactor, scaleFactor);
-			GL11.glRotatef(rotationAngle, 0.0F, 1.0F, 0.0F);
+			GL11.glRotatef(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
 
 			this.customRenderItem.doRender(entity, 0, 0, 0, 0, 0);
 
@@ -77,13 +80,13 @@ public class RenderTileOfferingTable extends TileEntitySpecialRenderer{
 			GL11.glPushMatrix();
 
 			final float scaleFactor = .37F;
-			final float rotationAngle = (float) ((720.0 * (System.currentTimeMillis() & 0x3FFFL)) / 0x3FFFL)*.5F;
+			final float ticks = Minecraft.getMinecraft().renderViewEntity.ticksExisted + pticks;
 
 			GL11.glTranslatef((float) x + 0.5F, (float) y + 1.05F, (float) z + 0.5F);
 			GL11.glScalef(scaleFactor, scaleFactor, scaleFactor);
 
 			final float increment = (float) ((2D*Math.PI)/offer.getTertiaryIngredients().size());
-			float current = (float) Math.toRadians(rotationAngle);
+			float current = (float) Math.toRadians(ticks % 360.0F);
 
 			for(final ItemStack stack:offer.getTertiaryIngredients()){
 				final EntityItem entity = new EntityItem(offer.getWorldObj());
@@ -92,6 +95,8 @@ public class RenderTileOfferingTable extends TileEntitySpecialRenderer{
 
 				final double cos = Math.cos(current), sin = Math.sin(current);
 				this.customRenderItem.doRender(entity, cos, 0, -sin, 0, (float) (current+Math.PI)*20F);
+				final EntityBreakingFX fx = new EntityBreakingFX(offer.getWorldObj(), cos + x + 0.5F, y + 1.05F, (z + 0.5F)-sin, -cos*5F, 0, sin*5F, stack.getItem(), 0);
+				this.mc.effectRenderer.addEffect(fx);
 				current += increment;
 			}
 
