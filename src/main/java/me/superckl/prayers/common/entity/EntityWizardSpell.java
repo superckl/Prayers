@@ -28,7 +28,7 @@ public class EntityWizardSpell extends EntityThrowable{
 	public double accelerationZ;
 	@Setter
 	@Getter
-	private float baseDamage = 6F;
+	private float baseDamage = 3F;
 	@Getter
 	@Setter
 	private Entity target;
@@ -179,7 +179,7 @@ public class EntityWizardSpell extends EntityThrowable{
 		if (!this.worldObj.isRemote)
 		{
 			if (pos.entityHit != null)
-				pos.entityHit.attackEntityFrom(new EntityDamageSourceIndirect("wizardspell", this.getThrower(), this).setProjectile().setMagicDamage(), this.baseDamage);
+				pos.entityHit.attackEntityFrom(new EntityDamageSourceIndirect("wizardspell", this.getThrower(), this).setProjectile().setMagicDamage().setDifficultyScaled(), this.baseDamage);
 			else
 			{
 				//TODO big poof or something
