@@ -2,6 +2,7 @@ package me.superckl.prayers.common.altar;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -301,6 +302,18 @@ public class Altar{
 		this.inRitual = false;
 		this.prayerPoints = 0F;
 		this.holder.onStructureInvalidated();
+		final Iterator<WeakReference<Altar>> it = AltarRegistry.getLoadedAltars().iterator();
+		while(it.hasNext()){
+			final WeakReference<Altar> weakR = it.next();
+			if(weakR.get() == null){
+				it.remove();
+				continue;
+			}
+			if(weakR.get() == this){
+				it.remove();
+				break;
+			}
+		}
 	}
 
 	private boolean establishStructure(final Map<BlockLocation, BlockRequirement> multi){

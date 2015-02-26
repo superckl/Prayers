@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
-import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
@@ -13,7 +12,6 @@ import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModAchievements;
-import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModItems;
 import me.superckl.prayers.common.utility.BlockLocation;
@@ -36,8 +34,6 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -66,10 +62,13 @@ public class EntityEventHandler {
 		}
 	}
 
-	@SubscribeEvent(receiveCanceled = false)
+	//This only only called on the client when we want it... We're going to have to send a packet to implement this
+	/*@SubscribeEvent(receiveCanceled = false)
 	public void onPlayerRightClick(final PlayerInteractEvent e){
+		LogHelper.info("Called");
 		if((e.action != Action.RIGHT_CLICK_BLOCK) || e.entityPlayer.isSneaking() || (e.entityPlayer.getHeldItem() != null) || (!Prayers.getInstance().getConfig().isRechargeEverywhere()) ||(e.world.getBlock(e.x, e.y, e.z) == ModBlocks.offeringTable))
 			return;
+		LogHelper.info("Trying to find altar...");
 		final PrayerExtendedProperties prop = (PrayerExtendedProperties) e.entityPlayer.getExtendedProperties("prayer");
 		final float diff = prop.getMaxPrayerPoints()-prop.getPrayerPoints();
 		if(diff <= 0)
@@ -77,13 +76,14 @@ public class EntityEventHandler {
 		final Altar altar = AltarRegistry.findAltarAt(e.world, e.x, e.y, e.z);
 		if(altar == null)
 			return;
+		LogHelper.info("found altar");
 		float toRecharge = altar.onRechargePlayer(diff, e.entityPlayer, false);
 		if(toRecharge <= 0)
 			return;
 		toRecharge = altar.onRechargePlayer(diff, e.entityPlayer, true);
 		prop.setPrayerPoints(prop.getPrayerPoints()+toRecharge);
 		e.setCanceled(true);
-	}
+	}*/
 
 	@SubscribeEvent
 	public void onLivingHurt(final LivingHurtEvent e){
