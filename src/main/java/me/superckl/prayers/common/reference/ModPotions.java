@@ -18,32 +18,35 @@ public final class ModPotions {
 	public static PotionPrayerRestoreInstant prayerRestoreInstant;
 	public static PotionAttunement prayerMaxPointsRaise;
 
-	private static int offset;
-
 	public static void init(){
 		LogHelper.info("Extending Potions array...");
 		final Config c = Prayers.getInstance().getConfig();
-		ModPotions.offset = Potion.potionTypes.length;
-		if((ModPotions.offset >= 256) || !c.isDynamicPotionIDs()){
+		if((Potion.potionTypes.length >= 256) || !c.isDynamicPotionIDs()){
 			if(c.isDynamicPotionIDs()){
 				LogHelper.warn("A mod decided to yolo it and set the potion array to length 256! Tsk tsk...");
 				LogHelper.warn("If you're certain that no mod did this, then you have a larger problem occuring. The potion array is full.");
 				LogHelper.warn("Resorting to static potion IDs...");
 			}
+			final Potion[] potionTypes = new Potion[256];
+			System.arraycopy(Potion.potionTypes, 0, potionTypes, 0, Potion.potionTypes.length);
+
+			PSReflectionHelper.setPrivateFinalValue(Potion.class, null, potionTypes, "potionTypes", "field_76425_a");
+
 			ModPotions.prayerBoost = new PotionPrayerBoost(c.getPrayerBoostID());
 			ModPotions.prayerRestore = new PotionPrayerRestore(c.getPrayerRestoreID());
 			ModPotions.prayerRestoreInstant = new PotionPrayerRestoreInstant(c.getPrayerRestoreInstantID());
 			ModPotions.prayerMaxPointsRaise = new PotionAttunement(c.getPrayerMaxPointsRaiseID());
 		}else{
-			final Potion[] potionTypes = new Potion[ModPotions.offset + 4];
-			System.arraycopy(Potion.potionTypes, 0, potionTypes, 0, ModPotions.offset);
+			int offset = Potion.potionTypes.length;
+			final Potion[] potionTypes = new Potion[offset + 4];
+			System.arraycopy(Potion.potionTypes, 0, potionTypes, 0, offset);
 
 			PSReflectionHelper.setPrivateFinalValue(Potion.class, null, potionTypes, "potionTypes", "field_76425_a");
 
-			ModPotions.prayerBoost = new PotionPrayerBoost(ModPotions.offset++);
-			ModPotions.prayerRestore = new PotionPrayerRestore(ModPotions.offset++);
-			ModPotions.prayerRestoreInstant = new PotionPrayerRestoreInstant(ModPotions.offset++);
-			ModPotions.prayerMaxPointsRaise = new PotionAttunement(ModPotions.offset++);
+			ModPotions.prayerBoost = new PotionPrayerBoost(offset++);
+			ModPotions.prayerRestore = new PotionPrayerRestore(offset++);
+			ModPotions.prayerRestoreInstant = new PotionPrayerRestoreInstant(offset++);
+			ModPotions.prayerMaxPointsRaise = new PotionAttunement(offset++);
 		}
 		ModItems.potion = new ItemPotionPrayers();
 	}
