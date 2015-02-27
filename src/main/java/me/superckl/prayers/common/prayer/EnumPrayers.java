@@ -7,6 +7,9 @@ import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.common.reference.ModData;
+import me.superckl.prayers.common.utility.LogHelper;
+import me.superckl.prayers.common.utility.PSReflectionHelper;
+import me.superckl.prayers.common.utility.StringHelper;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.EnumHelper;
@@ -70,7 +73,13 @@ public enum EnumPrayers {
 	}
 
 	private static EnumPrayers addPrayersVar(final String enumName, final Object ... objects){
-		return EnumHelper.addEnum(EnumPrayers.class, enumName, EnumPrayers.types, objects);
+		try {
+			return EnumHelper.addEnum(EnumPrayers.class, enumName, EnumPrayers.types, objects);
+		} catch (final Exception e) {
+			LogHelper.error(StringHelper.build("Failed to register a new Prayer: ", enumName, ". The registration was requested in class: "+PSReflectionHelper.retrieveCallingStackTraceElement().getClassName()));
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }
