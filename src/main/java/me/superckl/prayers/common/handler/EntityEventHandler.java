@@ -58,7 +58,14 @@ public class EntityEventHandler {
 		}
 		if(!e.world.isRemote && (e.entity instanceof EntityPlayer) && this.hasDataForPlayer((EntityPlayer) e.entity)){
 			final PrayerExtendedProperties prop = ((PrayerExtendedProperties)((EntityPlayer)e.entity).getExtendedProperties("prayer"));
-			prop.readFromNBT(this.getPlayerData((EntityPlayer) e.entity, ((EntityPlayer)e.entity).getHealth() > 0));
+			final NBTTagCompound comp = this.getPlayerData((EntityPlayer) e.entity, ((EntityPlayer)e.entity).getHealth() > 0);
+			prop.readFromNBT(comp);
+			if(comp.hasKey("firstItem")){
+				final ItemStack stack = ItemStack.loadItemStackFromNBT(comp.getCompoundTag("firstItem"));
+				if((stack == null) || ((EntityPlayer)e.entity).inventory.hasItemStack(stack))
+					return;
+				((EntityPlayer)e.entity).inventory.addItemStackToInventory(stack);
+			}
 		}
 	}
 
@@ -167,8 +174,13 @@ public class EntityEventHandler {
 	public void onLivingDeath(final LivingDeathEvent e){
 		if((e.entityLiving instanceof EntityPlayer)){
 			final PrayerExtendedProperties prop = ((PrayerExtendedProperties)((EntityPlayer)e.entityLiving).getExtendedProperties("prayer"));
+			final EnumSet prayers = EnumSet.copyOf(prop.getActivePrayers());
 			prop.disableAllPrayers(false);
-			this.storePlayerData((EntityPlayer) e.entityLiving, prop.writeToNBT());
+			final NBTTagCompound compound = prop.writeToNBT();
+			ItemStack stack;
+			if(!e.entityLiving.worldObj.isRemote && !e.entityLiving.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory") && prayers.contains(EnumPrayers.PROTECT_ITEM) && ((stack = e.entityLiving.getHeldItem()) != null))
+				compound.setTag("firstItem", stack.writeToNBT(new NBTTagCompound()));
+			this.storePlayerData((EntityPlayer) e.entityLiving, compound);
 		}
 		else if(!e.entity.worldObj.isRemote && (e.entityLiving instanceof EntityUndeadWizardPriest) && e.entityLiving.getEntityData().getBoolean("ritualSpawn") && (e.source.getSourceOfDamage() != null) && (e.source.getSourceOfDamage() instanceof EntityPlayer)){
 			final EntityPlayer player = (EntityPlayer) e.source.getSourceOfDamage();
