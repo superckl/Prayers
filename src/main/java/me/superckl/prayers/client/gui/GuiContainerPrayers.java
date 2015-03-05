@@ -3,6 +3,8 @@ package me.superckl.prayers.client.gui;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import me.superckl.prayers.client.gui.button.ButtonPrayer;
 import me.superckl.prayers.common.container.ContainerPrayers;
@@ -10,7 +12,9 @@ import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.prayer.EnumPrayers;
 import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.RenderData;
+import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.PrayerHelper;
+import me.superckl.prayers.common.utility.StringHelper;
 import me.superckl.prayers.network.MessageDisablePrayer;
 import me.superckl.prayers.network.MessageEnablePrayer;
 import net.minecraft.client.gui.GuiButton;
@@ -27,6 +31,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import tconstruct.client.tabs.TabRegistry;
+
+import com.google.common.collect.Maps;
 
 public class GuiContainerPrayers extends GuiContainer{
 
@@ -86,6 +92,14 @@ public class GuiContainerPrayers extends GuiContainer{
 			final ButtonPrayer pButton = (ButtonPrayer) button;
 			final EnumPrayers prayer = pButton.getPrayer();
 			final EntityPlayer player = ((ContainerPrayers)this.inventorySlots).getInvPlayer().player;
+			//Call handlers, if any
+			if(GuiContainerPrayers.handlers.containsKey(prayer)){
+				final TreeMap<Integer, PrayerGuiClickHandler> map = GuiContainerPrayers.handlers.get(prayer);
+				for(final PrayerGuiClickHandler handler:map.values())
+					if(handler.onClick(player, prayer, this, pButton))
+						return;
+			}
+			//Activate/deactivate prayer
 			final EnumSet<EnumPrayers> list = PrayerHelper.getActivePrayers(player);
 			if(list.contains(prayer)){
 				list.remove(prayer);
@@ -173,6 +187,28 @@ public class GuiContainerPrayers extends GuiContainer{
 		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
+	}
+
+	private static Map<EnumPrayers, TreeMap<Integer, PrayerGuiClickHandler>> handlers = Maps.newEnumMap(EnumPrayers.class);
+
+	/**
+	 * Registers a ClickHandler.
+	 * @param prayer The prayer to register the handler for.
+	 * @param priority The priority to register the handler with. Higher priorities will be called earlier.
+	 * @param handler The handler to register.
+	 */
+	public static void registerPrayerClickHandler(final EnumPrayers prayer, int priority, final PrayerGuiClickHandler handler){
+		if(!GuiContainerPrayers.handlers.containsKey(prayer)){
+			final TreeMap<Integer, PrayerGuiClickHandler> map = new TreeMap<Integer, PrayerGuiClickHandler>();
+			map.put(priority, handler);
+			GuiContainerPrayers.handlers.put(prayer, map);
+		}else{
+			final Map<Integer, PrayerGuiClickHandler> map = GuiContainerPrayers.handlers.get(prayer);
+			while(map.containsKey(priority))
+				priority--;
+			map.put(priority, handler);
+		}
+		LogHelper.debug(StringHelper.build("Registered a click handler for prayer: ", prayer.toString(), " with priority ", priority,"; ",handler.getClass().getCanonicalName()));
 	}
 
 }
