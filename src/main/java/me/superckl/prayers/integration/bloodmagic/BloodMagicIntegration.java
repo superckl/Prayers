@@ -1,7 +1,7 @@
 package me.superckl.prayers.integration.bloodmagic;
 
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.integration.IIntegrationModule;
 
 public class BloodMagicIntegration implements IIntegrationModule{

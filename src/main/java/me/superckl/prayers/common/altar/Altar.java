@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;

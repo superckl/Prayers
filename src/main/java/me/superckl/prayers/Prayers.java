@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import lombok.Getter;
-import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.common.reference.ModAchievements;
 import me.superckl.prayers.common.reference.ModBlocks;
 import me.superckl.prayers.common.reference.ModData;

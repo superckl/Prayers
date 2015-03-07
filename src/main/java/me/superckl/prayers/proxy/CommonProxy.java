@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.BasicTableCraftingHandler;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.EntityWizardSpell;

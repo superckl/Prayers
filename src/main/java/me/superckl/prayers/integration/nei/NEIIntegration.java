@@ -3,7 +3,7 @@ package me.superckl.prayers.integration.nei;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.BasicTableOreCraftingHandler;
 import me.superckl.prayers.common.altar.crafting.RecipeTableCraftingHandler;
 import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;

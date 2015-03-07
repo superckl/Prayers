@@ -1,4 +1,4 @@
-package me.superckl.prayers.common.altar;
+package me.superckl.prayers.api;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import lombok.Getter;
+import me.superckl.prayers.common.altar.Altar;
 import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;
 import me.superckl.prayers.common.altar.multi.BlockRequirement;
 import me.superckl.prayers.common.reference.ModBlocks;
@@ -126,6 +127,9 @@ public final class AltarRegistry {
 		recipe.setRecipeID(AltarRegistry.registeredRecipes.size()-1);
 	}
 
+	/**
+	 * Registers all built-in altars. You shouldn't need to call this.
+	 */
 	public static void registerMultiBlocks(){
 		AltarRegistry.multiblocks.clear();
 		final Map<ForgeDirection, Map<BlockLocation, BlockRequirement>> tier1 = new HashMap<ForgeDirection, Map<BlockLocation,BlockRequirement>>();

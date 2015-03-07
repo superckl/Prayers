@@ -5,8 +5,9 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
+import me.superckl.prayers.api.AltarRegistry;
+import me.superckl.prayers.api.PrayersAPI;
 import me.superckl.prayers.common.altar.Altar;
-import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.item.EntityCleaningDirtyBone;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
@@ -148,7 +149,7 @@ public class EntityEventHandler {
 
 	@SubscribeEvent
 	public void onLivingDrops(final LivingDropsEvent e){
-		if(e.entityLiving.getRNG().nextInt(4) == 0)
+		if(PrayersAPI.isExcludedFromBoneDrops(e.entityLiving) || (e.entityLiving.getRNG().nextInt(4) == 0))
 			return;
 		if((e.entityLiving.width*e.entityLiving.height) < 2.0F)
 			e.drops.add(new EntityItem(e.entityLiving.worldObj, e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ, new ItemStack(ModItems.basicBone, e.lootingLevel+1, e.entityLiving.getRNG().nextInt(100) == 0 ? 2:0)));

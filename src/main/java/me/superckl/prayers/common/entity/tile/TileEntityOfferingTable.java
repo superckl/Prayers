@@ -5,8 +5,8 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.common.altar.Altar;
-import me.superckl.prayers.common.altar.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.TableCraftingHandler;
 import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Post;
 import me.superckl.prayers.common.event.OfferingTableCraftingEvent.Pre;

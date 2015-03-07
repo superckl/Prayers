@@ -2,7 +2,7 @@ package me.superckl.prayers.common.altar.crafting;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.superckl.prayers.common.altar.AltarRegistry;
+import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.utility.LogHelper;
 import net.minecraft.nbt.NBTTagCompound;
