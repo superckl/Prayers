@@ -16,7 +16,7 @@ public class MessageHandlerEnablePrayerServer implements IMessageHandler<Message
 		final EnumSet<EnumPrayers> list = prop.getActivePrayers();
 		final EnumSet<EnumPrayers> temp = EnumSet.copyOf(list);
 		temp.add(message.getPrayer());
-		if(list.contains(message.getPrayer()) || PrayerHelper.hasConflictions(temp)){
+		if(list.contains(message.getPrayer()) || PrayerHelper.hasConflictions(temp) || (message.getPrayer().isRequiresTome() && !prop.getUnlockedPrayers().contains(message.getPrayer().getId()))){
 			final MessageDisablePrayer disable = new MessageDisablePrayer();
 			disable.setPrayer(message.getPrayer());
 			return disable;
