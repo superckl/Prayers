@@ -8,6 +8,7 @@ import java.util.Collections;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.api.AltarRegistry;
 import me.superckl.prayers.common.altar.crafting.BasicTableCraftingHandler;
+import me.superckl.prayers.common.entity.EntityMonsterPortal;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.EntityWizardSpell;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
@@ -69,6 +70,9 @@ public abstract class CommonProxy implements IProxy{
 		final int spellID = EntityRegistry.findGlobalUniqueEntityId();
 		EntityRegistry.registerGlobalEntityID(EntityWizardSpell.class, "prayerswizardspell", spellID);
 		EntityRegistry.registerModEntity(EntityWizardSpell.class, "prayerswizardspell", spellID, Prayers.getInstance(), 80, 3, true);
+		final int portalID = EntityRegistry.findGlobalUniqueEntityId();
+		EntityRegistry.registerGlobalEntityID(EntityMonsterPortal.class, "prayersmonsterportal", portalID);
+		EntityRegistry.registerModEntity(EntityMonsterPortal.class, "prayersmonsterportal", portalID, Prayers.getInstance(), 80, 3, false);
 		final int id = Prayers.getInstance().getConfig().getVillagerID();
 		//VillagerRegistry.instance().registerVillagerId(id);
 		//VillagerRegistry.instance().registerVillagerSkin(id, RenderData.PRIEST_VILLAGER_MODEL);
