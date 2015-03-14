@@ -25,7 +25,8 @@ public class PotionPrayerRestoreInstant extends Potion{
 		final float toRestore = 150F*(amplifier+1);
 		if((max - points) <= toRestore)
 			prop.setPrayerPoints(max);
-		prop.setPrayerPoints(points+toRestore);
+		else
+			prop.setPrayerPoints(points+toRestore);
 	}
 
 	@Override

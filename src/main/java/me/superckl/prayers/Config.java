@@ -10,6 +10,7 @@ import net.minecraftforge.common.config.Configuration;
 import cpw.mods.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
+@Getter
 public class Config {
 
 	public static final class Category{
@@ -21,32 +22,21 @@ public class Config {
 
 	}
 
-	@Getter
 	private final Configuration configFile;
-	@Getter
 	private int villagerID;
 	//@Getter
 	//private boolean rechargeEverywhere;
-	@Getter
 	private float tier1Max;
-	@Getter
 	private int tier1RechargeDelay;
-	@Getter
 	private float tier1RechargeRate;
-	@Getter
 	private boolean orbRecipe;
-	@Getter
 	private int orbExchangeRate;
-	@Getter
 	private boolean dynamicPotionIDs;
-	@Getter
 	private int prayerBoostID;
-	@Getter
 	private int prayerRestoreID;
-	@Getter
 	private int prayerRestoreInstantID;
-	@Getter
 	private int prayerMaxPointsRaiseID;
+	private int prayerDrainID;
 
 	public Config(final File config){
 		this.configFile = new Configuration(config);
@@ -71,10 +61,11 @@ public class Config {
 			this.orbRecipe = this.configFile.getBoolean("Blood Orb Charge Recipe", Category.BLOOD_MAGIC, true, "Enables a player to place blood orbs on an altar to exchange prayer points from that altar for points in their soul network.");
 			this.orbExchangeRate = this.configFile.getInt("Point Exchange Rate", Category.BLOOD_MAGIC, 5, 0, Integer.MAX_VALUE, "Determines how many blood points one prayer point gets converted to.");
 			this.dynamicPotionIDs = this.configFile.getBoolean("Dynamic Potion IDs", Category.POTIONS, true, "If true, Prayers will attempt to insert potions at the end of the array. If this fails, Prayers will resort to the static IDs specified.");
-			this.prayerBoostID = this.configFile.getInt("Prayer Boost ID", Category.POTIONS, 77, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
-			this.prayerRestoreID = this.configFile.getInt("Prayer Restore ID", Category.POTIONS, 78, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
-			this.prayerRestoreInstantID = this.configFile.getInt("Prayer Restore Instant ID", Category.POTIONS, 79, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
-			this.prayerMaxPointsRaiseID = this.configFile.getInt("Prayer Max Points Raise ID", Category.POTIONS, 10, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerBoostID = this.configFile.getInt("Prayer Boost ID", Category.POTIONS, 75, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerRestoreID = this.configFile.getInt("Prayer Restore ID", Category.POTIONS, 76, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerRestoreInstantID = this.configFile.getInt("Prayer Restore Instant ID", Category.POTIONS, 77, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerMaxPointsRaiseID = this.configFile.getInt("Prayer Max Points Raise ID", Category.POTIONS, 78, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
+			this.prayerDrainID = this.configFile.getInt("Prayer Drain ID", Category.POTIONS, 79, 0, 255, "The static ID to be used if dynamic IDs are disabled or dynamic ID resolution fails.");
 			this.configFile.save();
 		}catch(final Exception e){
 			e.printStackTrace();

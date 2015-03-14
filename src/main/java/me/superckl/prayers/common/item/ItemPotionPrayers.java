@@ -35,7 +35,8 @@ public class ItemPotionPrayers extends ItemPrayers{
 		this.setMaxStackSize(1).setCreativeTab(ModTabs.TAB_PRAYER_ITEMS).setHasSubtypes(true).setUnlocalizedName("potion");
 		this.effects = new PotionEffect[] {new PotionEffect(ModPotions.prayerRestoreInstant.id, 0), new PotionEffect(ModPotions.prayerRestoreInstant.id, 0, 1),
 				new PotionEffect(ModPotions.prayerRestore.id, 6000), new PotionEffect(ModPotions.prayerRestore.id, 12000, 1), new PotionEffect(ModPotions.prayerBoost.id, 2400),
-				new PotionEffect(ModPotions.prayerBoost.id, 6000, 1), new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0), new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0, 1)};
+				new PotionEffect(ModPotions.prayerBoost.id, 6000, 1), new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0), new PotionEffect(ModPotions.prayerMaxPointsRaise.id, 0, 1),
+				new PotionEffect(ModPotions.prayerDrain.id, 6000), new PotionEffect(ModPotions.prayerDrain.id, 12000, 1)};
 	}
 
 	@Override
@@ -107,13 +108,18 @@ public class ItemPotionPrayers extends ItemPrayers{
 		if (!player.capabilities.isCreativeMode)
 			--stack.stackSize;
 
-		if (!world.isRemote && stack.hasTagCompound() && stack.getTagCompound().hasKey("effect"))
+		if (!world.isRemote && stack.hasTagCompound() && stack.getTagCompound().hasKey("effects"))
 		{
-			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(stack.getTagCompound().getCompoundTag("effect"));
-			if(Potion.potionTypes[effect.getPotionID()].isInstant())
-				Potion.potionTypes[effect.getPotionID()].affectEntity(null, player, effect.getAmplifier(), 0);
-			else
-				player.addPotionEffect(new PotionEffect(effect));
+			final NBTTagList list = stack.getTagCompound().getTagList("effects", NBT.TAG_COMPOUND);
+			if(list.tagCount() <= 0)
+				return stack;
+			for(int i = 0; i < list.tagCount(); i++){
+				final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(list.getCompoundTagAt(i));
+				if(Potion.potionTypes[effect.getPotionID()].isInstant())
+					Potion.potionTypes[effect.getPotionID()].affectEntity(null, player, effect.getAmplifier(), 0);
+				else
+					player.addPotionEffect(new PotionEffect(effect));
+			}
 		}
 
 		if (!player.capabilities.isCreativeMode)
