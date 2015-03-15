@@ -194,11 +194,12 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 		this.onIngredientsModified();
 	}
 
-	public void addTertiaryIngredient(final ItemStack stack){
-		if(stack == null)
-			return;
+	public boolean addTertiaryIngredient(final ItemStack stack){
+		if((stack == null) || (this.tertiaryItems.size() >= 10))
+			return false;
 		this.tertiaryItems.add(stack);
 		this.onIngredientsModified();
+		return true;
 	}
 
 	public ItemStack removeTertiaryIngredient(){
@@ -226,7 +227,7 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 
 	@Override
 	public int getSizeInventory() {
-		return Integer.MAX_VALUE;
+		return 11;
 	}
 
 	@Override
@@ -260,12 +261,13 @@ public class TileEntityOfferingTable extends TileEntity implements ISidedInvento
 	}
 
 	@Override
-	public void setInventorySlotContents(final int slot, final ItemStack stack) {
+	public void setInventorySlotContents(int slot, final ItemStack stack) {
 		if(slot <= 0){
 			this.setCurrentItem(stack, null);
 			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 			return;
 		}
+		slot = Math.min(10, slot);
 		if(!this.hasTertiaryIngredients() || (slot > this.tertiaryItems.size())){
 			this.addTertiaryIngredient(stack);
 			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);

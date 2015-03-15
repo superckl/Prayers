@@ -78,11 +78,12 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 		}else if(player.getHeldItem() != null){
 			final ItemStack clone = player.getHeldItem().copy();
 			clone.stackSize = 1;
+			boolean flag = false;
 			if(table.getCurrentItem() == null)
 				table.setCurrentItem(clone, player);
 			else
-				table.addTertiaryIngredient(clone);
-			if(!player.capabilities.isCreativeMode && (player.getHeldItem() != null))
+				flag = table.addTertiaryIngredient(clone);
+			if(flag && !player.capabilities.isCreativeMode && (player.getHeldItem() != null))
 				player.getHeldItem().stackSize--;
 		}else if(table.hasTertiaryIngredients())
 			player.inventory.addItemStackToInventory(table.removeTertiaryIngredient());
