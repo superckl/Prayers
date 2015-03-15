@@ -1,10 +1,8 @@
 package me.superckl.prayers.common.item;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import me.superckl.prayers.common.reference.ModData;
 import me.superckl.prayers.common.reference.ModPotions;
 import me.superckl.prayers.common.reference.ModTabs;
 import me.superckl.prayers.common.utility.LogHelper;
@@ -19,6 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.PotionHelper;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
@@ -134,19 +133,23 @@ public class ItemPotionPrayers extends ItemPrayers{
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
+	public int getColorFromItemStack(final ItemStack stack, final int pass)
+	{
+		if((pass > 0) || !(stack.hasTagCompound() && stack.getTagCompound().hasKey("effects")))
+			return 16777215;
+		final NBTTagList list = stack.getTagCompound().getTagList("effects", NBT.TAG_COMPOUND);
+		if(list.tagCount() <= 0)
+			return 16777215;
+		final List<PotionEffect> effects = new ArrayList<PotionEffect>();
+		for(int i = 0; i < list.tagCount(); i++)
+			effects.add(PotionEffect.readCustomPotionEffectFromNBT(list.getCompoundTagAt(i)));
+		return PotionHelper.calcPotionLiquidColor(effects);
+	}
+
+	@Override
 	public IIcon getIcon(final ItemStack stack, final int pass) {
-		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("effects")){
-			final NBTTagList list = stack.getTagCompound().getTagList("effects", NBT.TAG_COMPOUND);
-			if(list.tagCount() <= 0)
-				Items.potionitem.getIcon(stack, pass);
-			final PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(list.getCompoundTagAt(0));
-			final String name = effect.getEffectName().split("[.]")[1];
-			if(this.icons.containsKey(name))
-				return this.icons.get(name);
-			else
-				return Items.potionitem.getIcon(stack, pass);
-		}
-		return Items.potionitem.getIcon(stack, pass);
+		return pass == 0 ? this.blankPotion:this.emptyBottle;
 	}
 
 	@Override
@@ -160,7 +163,7 @@ public class ItemPotionPrayers extends ItemPrayers{
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	private final Map<String, IIcon> icons = new HashMap<String, IIcon>();
 
 	@Override
@@ -169,6 +172,17 @@ public class ItemPotionPrayers extends ItemPrayers{
 		this.icons.put("prayerrestore", register.registerIcon(ModData.MOD_ID+":prayerrestore"));
 		this.icons.put("prayerrestoreinstant", register.registerIcon(ModData.MOD_ID+":prayerrestoreinstant"));
 		this.icons.put("attunement", register.registerIcon(ModData.MOD_ID+":attunement"));
+	}*/
+
+	private IIcon blankPotion;
+	private IIcon emptyBottle;
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerIcons(final IIconRegister p_94581_1_)
+	{
+		this.emptyBottle = p_94581_1_.registerIcon("potion" + "_" + "bottle_drinkable");
+		this.blankPotion = p_94581_1_.registerIcon("potion" + "_" + "overlay");
 	}
 
 	@Override
