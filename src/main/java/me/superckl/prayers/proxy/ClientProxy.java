@@ -8,9 +8,11 @@ import me.superckl.prayers.client.handler.InputHandler;
 import me.superckl.prayers.client.handler.RenderTickHandler;
 import me.superckl.prayers.client.handler.TextureStitchHandler;
 import me.superckl.prayers.client.render.RenderBlockOfferingTable;
+import me.superckl.prayers.client.render.RenderMonsterPortal;
 import me.superckl.prayers.client.render.RenderTileOfferingTable;
 import me.superckl.prayers.client.render.RenderUndeadWizardPriest;
 import me.superckl.prayers.client.render.RenderWizardSpell;
+import me.superckl.prayers.common.entity.EntityMonsterPortal;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.entity.EntityWizardSpell;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
@@ -103,6 +105,7 @@ public class ClientProxy extends CommonProxy{
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityOfferingTable.class, new RenderTileOfferingTable());
 		RenderingRegistry.registerEntityRenderingHandler(EntityUndeadWizardPriest.class, new RenderUndeadWizardPriest());
 		RenderingRegistry.registerEntityRenderingHandler(EntityWizardSpell.class, new RenderWizardSpell());
+		RenderingRegistry.registerEntityRenderingHandler(EntityMonsterPortal.class, new RenderMonsterPortal());
 	}
 
 }
