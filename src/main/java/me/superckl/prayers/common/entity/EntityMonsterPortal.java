@@ -1,5 +1,6 @@
 package me.superckl.prayers.common.entity;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,20 +8,44 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.superckl.prayers.common.event.PortalSpawnEntityEvent;
+import me.superckl.prayers.common.utility.GenericWeightedItem;
+import me.superckl.prayers.common.utility.LogHelper;
+import me.superckl.prayers.common.utility.NumberHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.WeightedRandom;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Getter
 @Setter
 public class EntityMonsterPortal extends Entity{
 
-	@Getter
-	private static final Map<Integer, List<Class<? extends Entity>>> possibleSpawns = new HashMap<Integer, List<Class<? extends Entity>>>();
+	private static final Map<Integer, List<GenericWeightedItem<Class<? extends Entity>>>> possibleSpawns = new HashMap<Integer, List<GenericWeightedItem<Class<? extends Entity>>>>();
+
+	static{
+		final List<GenericWeightedItem<Class<? extends Entity>>> levelOne = new ArrayList<GenericWeightedItem<Class<? extends Entity>>>();
+		final List<GenericWeightedItem<Class<? extends Entity>>> levelTwo = new ArrayList<GenericWeightedItem<Class<? extends Entity>>>();
+		final List<GenericWeightedItem<Class<? extends Entity>>> levelThree = new ArrayList<GenericWeightedItem<Class<? extends Entity>>>();
+		final List<GenericWeightedItem<Class<? extends Entity>>> levelFour = new ArrayList<GenericWeightedItem<Class<? extends Entity>>>();
+		levelOne.add(new GenericWeightedItem<Class<? extends Entity>>(2, EntityZombie.class));
+		levelOne.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySkeleton.class));
+
+
+		EntityMonsterPortal.possibleSpawns.put(1, levelOne);
+		EntityMonsterPortal.possibleSpawns.put(2, levelTwo);
+		EntityMonsterPortal.possibleSpawns.put(3, levelThree);
+		EntityMonsterPortal.possibleSpawns.put(4, levelFour);
+	}
 
 	public EntityMonsterPortal(final World world) {
 		super(world);
+		this.setSize(1F, 1F);
 	}
 
 	@Override
@@ -78,10 +103,41 @@ public class EntityMonsterPortal extends Entity{
 
 	public static void registerPossibleSpawn(final Class<? extends Entity> clazz, final int weight, final int level){
 		if(!EntityMonsterPortal.possibleSpawns.containsKey(level))
-			EntityMonsterPortal.possibleSpawns.put(level, new ArrayList<Class<? extends Entity>>());
-		final List<Class<? extends Entity>> list = EntityMonsterPortal.possibleSpawns.get(level);
-		for(int i = 0; i < weight; i++)
-			list.add(clazz);
+			EntityMonsterPortal.possibleSpawns.put(level, new ArrayList<GenericWeightedItem<Class<? extends Entity>>>());
+		EntityMonsterPortal.possibleSpawns.get(level).add(new GenericWeightedItem<Class<? extends Entity>>(weight, clazz));
+	}
+
+	@Override
+	public void onUpdate() {
+		super.onUpdate();
+		if(this.worldObj.isRemote)
+			return;
+		final int bound = (5-this.getLevel())*200;
+		if(this.rand.nextInt(bound) == 0)
+			this.trySpawnEntity();
+	}
+
+	public boolean trySpawnEntity(){
+		final Class<? extends Entity> clazz = ((GenericWeightedItem<Class<? extends Entity>>) WeightedRandom.getRandomItem(this.rand, EntityMonsterPortal.possibleSpawns.get(this.getLevel()))).getItem();
+		if(clazz == null)
+			return false;
+		try{
+			final Constructor<? extends Entity> construct = clazz.getConstructor(World.class);
+			Entity entity = construct.newInstance(this.worldObj);
+			final PortalSpawnEntityEvent event = new PortalSpawnEntityEvent(this, entity);
+			if(MinecraftForge.EVENT_BUS.post(event) || (event.getEntityToSpawn() == null))
+				return false;
+			final ForgeDirection dir = this.getDirection();
+			entity = event.getEntityToSpawn();
+			entity.setLocationAndAngles(this.posX+dir.offsetX, this.posY+dir.offsetY, this.posZ+dir.offsetZ, NumberHelper.toYaw(dir), 0);
+			if(entity instanceof EntityLiving)
+				((EntityLiving) entity).onSpawnWithEgg(null);
+			this.worldObj.spawnEntityInWorld(entity);
+		}catch(final Exception e){
+			LogHelper.warn("Failed spawn entity from portal!");
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }

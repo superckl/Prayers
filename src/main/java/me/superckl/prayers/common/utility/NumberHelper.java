@@ -1,6 +1,7 @@
 package me.superckl.prayers.common.utility;
 
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class NumberHelper {
 
@@ -22,6 +23,21 @@ public class NumberHelper {
 		for(int i = 0; i <= max; i++)
 			array[i] = i;
 		return array;
+	}
+
+	public static float toYaw(final ForgeDirection dir){
+		switch(dir){
+		case SOUTH:
+			return 0;
+		case WEST:
+			return 90;
+		case NORTH:
+			return 180;
+		case EAST:
+			return 270;
+		default:
+			return 0;
+		}
 	}
 
 }

@@ -6,6 +6,7 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaEntityAccessor;
 import mcp.mobius.waila.api.IWailaEntityProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
+import me.superckl.prayers.common.entity.EntityMonsterPortal;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
 import me.superckl.prayers.common.utility.StringHelper;
 import net.minecraft.entity.Entity;
@@ -34,8 +35,12 @@ public class PrayersWailaEntityProvider implements IWailaEntityProvider{
 	@Override
 	public List<String> getWailaBody(final Entity entity, final List<String> currenttip,
 			final IWailaEntityAccessor accessor, final IWailaConfigHandler config) {
-		if((entity != null) && (entity instanceof EntityUndeadWizardPriest))
+		if(entity == null)
+			return currenttip;
+		if(entity instanceof EntityUndeadWizardPriest)
 			currenttip.add(StringHelper.build("Level: ", ((EntityUndeadWizardPriest)entity).getLevel()));
+		else if(entity instanceof EntityMonsterPortal)
+			currenttip.add(StringHelper.build("Level: ", ((EntityMonsterPortal)entity).getLevel()));
 		return currenttip;
 	}
 
@@ -55,6 +60,7 @@ public class PrayersWailaEntityProvider implements IWailaEntityProvider{
 
 	public static void callbackRegister(final IWailaRegistrar registrar){
 		registrar.registerBodyProvider(PrayersWailaEntityProvider.INSTANCE, EntityUndeadWizardPriest.class);
+		registrar.registerBodyProvider(PrayersWailaEntityProvider.INSTANCE, EntityMonsterPortal.class);
 	}
 
 }

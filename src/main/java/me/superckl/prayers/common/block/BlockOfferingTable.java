@@ -5,6 +5,7 @@ import java.util.Random;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.common.altar.Altar;
+import me.superckl.prayers.common.entity.EntityMonsterPortal;
 import me.superckl.prayers.common.entity.prop.PrayerExtendedProperties;
 import me.superckl.prayers.common.entity.tile.TileEntityOfferingTable;
 import me.superckl.prayers.common.reference.ModAchievements;
@@ -158,6 +159,9 @@ public class BlockOfferingTable extends BlockPrayers implements ITileEntityProvi
 	public void breakBlock(final World world, final int x, final int y, final int z, final Block p_149749_5_, final int p_149749_6_){
 		this.dropItems(world, x, y, z);
 		super.breakBlock(world, x, y, z, p_149749_5_, p_149749_6_);
+		final EntityMonsterPortal portal = new EntityMonsterPortal(world);
+		portal.setLocationAndAngles(x, y, z, 0, 0);
+		world.spawnEntityInWorld(portal);
 	}
 
 	private void dropItems(final World world, final int x, final int y, final int z){
