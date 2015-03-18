@@ -29,7 +29,7 @@ public class EntityRenderHandler {
 				GL11.glTranslatef((float)e.x + 0.0F, (float)e.y + e.entity.height + 1.5F, (float)e.z);
 				GL11.glNormal3f(0.0F, 1.0F, 0.0F);
 				GL11.glRotatef(-e.renderer.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-				GL11.glRotatef(e.renderer.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+				GL11.glRotatef(e.renderer.renderManager.playerViewX - ((e.renderer.renderManager.options.thirdPersonView == 2 ? e.renderer.renderManager.livingPlayer.rotationPitch:0)*2F), 1.0F, 0.0F, 0.0F);
 				GL11.glScalef(-scale, -scale, scale);
 				GL11.glDisable(GL11.GL_LIGHTING);
 				//GL11.glDepthMask(false);
@@ -38,7 +38,7 @@ public class EntityRenderHandler {
 				OpenGlHelper.glBlendFunc(770, 771, 1, 0);
 				GL11.glColor4f(1F, 1F, 1F, 1F);
 				final Tessellator tessellator = Tessellator.instance;
-				final byte b0 = 10;
+				final byte b0 = 8;
 
 				//GL11.glDisable(GL11.GL_TEXTURE_2D);
 				tessellator.startDrawingQuads();
