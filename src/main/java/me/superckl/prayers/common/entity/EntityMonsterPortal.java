@@ -14,7 +14,9 @@ import me.superckl.prayers.common.utility.LogHelper;
 import me.superckl.prayers.common.utility.NumberHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.WeightedRandom;
@@ -35,6 +37,20 @@ public class EntityMonsterPortal extends Entity{
 		final List<GenericWeightedItem<Class<? extends Entity>>> levelFour = new ArrayList<GenericWeightedItem<Class<? extends Entity>>>();
 		levelOne.add(new GenericWeightedItem<Class<? extends Entity>>(2, EntityZombie.class));
 		levelOne.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySkeleton.class));
+
+		levelTwo.add(new GenericWeightedItem<Class<? extends Entity>>(3, EntityZombie.class));
+		levelTwo.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySkeleton.class));
+		levelTwo.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySpider.class));
+
+		levelThree.add(new GenericWeightedItem<Class<? extends Entity>>(3, EntityZombie.class));
+		levelThree.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySkeleton.class));
+		levelThree.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySpider.class));
+		levelThree.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntityCreeper.class));
+
+		levelFour.add(new GenericWeightedItem<Class<? extends Entity>>(4, EntityZombie.class));
+		levelFour.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySkeleton.class));
+		levelFour.add(new GenericWeightedItem<Class<? extends Entity>>(1, EntitySpider.class));
+		levelFour.add(new GenericWeightedItem<Class<? extends Entity>>(2, EntityCreeper.class));
 
 
 		EntityMonsterPortal.possibleSpawns.put(1, levelOne);
@@ -127,11 +143,15 @@ public class EntityMonsterPortal extends Entity{
 			final PortalSpawnEntityEvent event = new PortalSpawnEntityEvent(this, entity);
 			if(MinecraftForge.EVENT_BUS.post(event) || (event.getEntityToSpawn() == null))
 				return false;
+			if(entity == event.getEntityToSpawn()){
+				if(entity instanceof EntityLiving)
+					((EntityLiving) entity).onSpawnWithEgg(null);
+
+				//TODO Apply random effects
+			}else
+				entity = event.getEntityToSpawn();
 			final ForgeDirection dir = this.getDirection();
-			entity = event.getEntityToSpawn();
 			entity.setLocationAndAngles(this.posX+dir.offsetX, this.posY+dir.offsetY, this.posZ+dir.offsetZ, NumberHelper.toYaw(dir), 0);
-			if(entity instanceof EntityLiving)
-				((EntityLiving) entity).onSpawnWithEgg(null);
 			this.worldObj.spawnEntityInWorld(entity);
 		}catch(final Exception e){
 			LogHelper.warn("Failed spawn entity from portal!");
