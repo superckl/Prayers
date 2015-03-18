@@ -7,6 +7,7 @@ import java.util.Collections;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.api.AltarRegistry;
+import me.superckl.prayers.api.PrayersAPI;
 import me.superckl.prayers.common.altar.crafting.BasicTableCraftingHandler;
 import me.superckl.prayers.common.entity.EntityMonsterPortal;
 import me.superckl.prayers.common.entity.EntityUndeadWizardPriest;
@@ -28,11 +29,16 @@ import me.superckl.prayers.network.MessageHandlerEnablePrayerServer;
 import me.superckl.prayers.network.MessageHandlerOpenPrayerGui;
 import me.superckl.prayers.network.MessageOpenPrayerGui;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.monster.EntityGhast;
+import net.minecraft.entity.monster.EntityMagmaCube;
+import net.minecraft.entity.monster.EntitySlime;
+import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.BiomeGenBase.TempCategory;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -52,6 +58,10 @@ public abstract class CommonProxy implements IProxy{
 		FMLCommonHandler.instance().bus().register(Prayers.getInstance().getConfig());
 		FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
 		MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
+		PrayersAPI.removeFromBoneDrops(EntitySlime.class);
+		PrayersAPI.removeFromBoneDrops(EntityGhast.class);
+		PrayersAPI.removeFromBoneDrops(EntityMagmaCube.class);
+		PrayersAPI.removeFromBoneDrops(EntitySnowman.class);
 		NetworkRegistry.INSTANCE.registerGuiHandler(Prayers.getInstance(), new GuiHandler());
 		ModData.PRAYER_UPDATE_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel("prayerUpdate");
 		ModData.PRAYER_UPDATE_CHANNEL.registerMessage(MessageHandlerEnablePrayerServer.class, MessageEnablePrayer.class, 0, Side.SERVER);
@@ -81,7 +91,7 @@ public abstract class CommonProxy implements IProxy{
 	@Override
 	public void registerEntitySpawns(){
 		for(final BiomeGenBase gen:BiomeGenBase.getBiomeGenArray())
-			if(gen != null)
+			if((gen != null) && (gen.getTempCategory() != TempCategory.OCEAN))
 				EntityRegistry.addSpawn(EntityUndeadWizardPriest.class, 2, 1, 1, EnumCreatureType.monster, gen);
 	}
 
