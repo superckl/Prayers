@@ -55,14 +55,14 @@ minecraft {
     version = config.minecraft_version + "-" + config.forge_version
 
     replaceIn "reference/ModData.java"
-    replace "@VERSION@", "${config.mod_version}.${System.env.BUILD_NUMBER} ?: 0}"
+    replace "@VERSION@", "${config.mod_version}.${System.env.BUILD_NUMBER ?: 0}"
     runDir = "eclipse"
 }
 
 version = "${config.minecraft_version}-${config.mod_version}.${System.getenv("BUILD_NUMBER") ?: 0}"
 
 dependencies {
-    compile "org.projectlombok:lombok:1.16.0"
+    compile "org.projectlombok:lombok:1.16.2"
     compile "mcp.mobius.waila:Waila:1.5.10_1.7.10"
     compile fileTree(dir: 'dependencies/bloodmagic', include: '*.jar')
 }
