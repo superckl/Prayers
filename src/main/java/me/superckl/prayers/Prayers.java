@@ -1,146 +1,163 @@
 package me.superckl.prayers;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import org.apache.logging.log4j.LogManager;
 
-import lombok.Getter;
-import me.superckl.prayers.api.AltarRegistry;
-import me.superckl.prayers.common.reference.ModAchievements;
-import me.superckl.prayers.common.reference.ModBlocks;
-import me.superckl.prayers.common.reference.ModData;
-import me.superckl.prayers.common.reference.ModItems;
-import me.superckl.prayers.common.reference.ModPotions;
-import me.superckl.prayers.common.utility.InstanceField;
-import me.superckl.prayers.common.utility.LogHelper;
-import me.superckl.prayers.common.utility.StringHelper;
-import me.superckl.prayers.integration.PrayersIntegration;
-import me.superckl.prayers.proxy.IProxy;
-import me.superckl.prayers.server.commands.CommandPrayers;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.event.FMLInterModComms.IMCEvent;
-import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-@Mod(modid=ModData.MOD_ID, name=ModData.MOD_NAME, version=ModData.VERSION, guiFactory=ModData.GUI_FACTORY, dependencies = "after:Waila;after:Thaumcraft;after:AWWayofTime")
-public class Prayers {
+import me.superckl.prayers.client.gui.RenderTickHandler;
+import me.superckl.prayers.client.input.KeyBindings;
+import me.superckl.prayers.network.packet.PacketActivatePrayer;
+import me.superckl.prayers.network.packet.PacketDeactivatePrayer;
+import me.superckl.prayers.network.packet.PacketSetPrayerPoints;
+import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
+import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.server.CommandSetPrayerPoints;
+import me.superckl.prayers.user.DefaultPrayerUser;
+import me.superckl.prayers.user.IPrayerUser;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.EntityArgument;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.Capability.IStorage;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 
-	@Instance(ModData.MOD_ID)
-	@Getter
-	private static Prayers instance;
+@Mod(Prayers.MOD_ID)
+public class Prayers
+{
 
-	@SidedProxy(clientSide=ModData.CLIENT_PROXY, serverSide=ModData.SERVER_PROXY)
-	@Getter
-	private static IProxy proxy;
+	public static final String MOD_ID = "prayers";
 
-	@Getter
-	private Config config;
+	@CapabilityInject(IPrayerUser.class)
+	public static Capability<IPrayerUser> PRAYER_USER_CAPABILITY;
 
-	@EventHandler
-	public void preInit(final FMLPreInitializationEvent e){
-		LogHelper.info("Please note, you are running a beta version! Please report any bugs you find.");
-		this.config = new Config(e.getSuggestedConfigurationFile());
-		this.config.loadValues();
-		//The order of init calls is important. Don't randomly change it.
-		ModPotions.init();
-		ModItems.init();
-		ModBlocks.init();
-		ModAchievements.init();
-		AltarRegistry.registerMultiBlocks();
-		Prayers.proxy.registerRecipes();
-		Prayers.proxy.registerEntities();
-		Prayers.proxy.registerRenderers();
-		Prayers.proxy.setupGuis();
-		Prayers.proxy.registerBindings();
-		PrayersIntegration.INSTANCE.preInit();
+	public Prayers() {
+		LogHelper.setLogger(LogManager.getFormatterLogger(Prayers.MOD_ID));
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
+		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Prayer.class, this::registerPrayers);
 	}
 
-	@EventHandler
-	public void init(final FMLInitializationEvent e){
-		Prayers.proxy.registerHandlers();
-
-		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaDataProvider.callbackRegister");
-		FMLInterModComms.sendMessage("Waila", "register", "me.superckl.prayers.integration.waila.PrayersWailaEntityProvider.callbackRegister");
-
-		PrayersIntegration.INSTANCE.init();
+	private void commonSetup(final FMLCommonSetupEvent event){
+		MinecraftForge.EVENT_BUS.register(this);
+		CapabilityManager.INSTANCE.register(IPrayerUser.class, new DefaultPrayerUser.Storage(), DefaultPrayerUser::new);
+		int pIndex = 0;
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketActivatePrayer.class,
+				PacketActivatePrayer::encode, PacketActivatePrayer::decode, PacketActivatePrayer::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivatePrayer.class,
+				PacketDeactivatePrayer::encode, PacketDeactivatePrayer::decode, PacketDeactivatePrayer::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetPrayerPoints.class,
+				PacketSetPrayerPoints::encode, PacketSetPrayerPoints::decode, PacketSetPrayerPoints::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSyncPrayerUser.class,
+				PacketSyncPrayerUser::encode, PacketSyncPrayerUser::decode, PacketSyncPrayerUser::handle);
 	}
 
-	@EventHandler
-	public void postInit(final FMLPostInitializationEvent e){
-		Prayers.proxy.registerEntitySpawns();
-		ModItems.addChestLoot();
-		PrayersIntegration.INSTANCE.postInit();
+	private void clientSetup(final FMLClientSetupEvent event) {
+		MinecraftForge.EVENT_BUS.register(new RenderTickHandler());
+		MinecraftForge.EVENT_BUS.register(KeyBindings.class);
+		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYER_GUI);
 	}
 
-	@EventHandler
-	public void onServerStarting(final FMLServerStartingEvent e){
-		e.registerServerCommand(new CommandPrayers());
+	private void createRegistry(final RegistryEvent.NewRegistry e) {
+		new RegistryBuilder<Prayer>().setName(new ResourceLocation(Prayers.MOD_ID, "prayers")).setType(Prayer.class).create();
 	}
 
-	@EventHandler
-	public void processIMCs(final IMCEvent e){
-		if(e.getMessages().isEmpty())
-			LogHelper.info("No intermod communications found.");
-		for(final IMCMessage message:e.getMessages()){
-			if(!message.isStringMessage()){
-				LogHelper.error(StringHelper.build("Received invalid message from mod ", message.getSender(), " with key ", message.key, " containing ", message.isItemStackMessage() ? message.getItemStackValue().toString():message.getNBTValue().toString()));
-				continue;
-			}
-			if(!message.key.equalsIgnoreCase("register")){
-				LogHelper.error(StringHelper.build("Received invalid message from mod ", message.getSender(), " with key ", message.key, " containing ", message.getStringValue()));
-				continue;
-			}
-			int index = message.getStringValue().lastIndexOf(".");
-			if(index == -1){
-				LogHelper.error(StringHelper.build("Received invalid message from mod ", message.getSender(), " with key ", message.key, " containing ", message.getStringValue()));
-				continue;
-			}
-			LogHelper.info(StringHelper.build("Attempting to process message from mod ", message.getSender(), " with key ", message.key, " containing ", message.getStringValue()));
-			try{
-				final String className = message.getStringValue().substring(0, index);
-				final String methodName = message.getStringValue().substring(index+1, message.getStringValue().length());
-				final Class<?> clazz = Class.forName(className);
-				final Method method = clazz.getDeclaredMethod(methodName);
-				method.setAccessible(true);
-				if((method.getModifiers() & Modifier.STATIC) == Modifier.STATIC){
-					LogHelper.info("Field is static. Attempting to invoke...");
-					method.invoke(null);
-				}else if(method.isAnnotationPresent(InstanceField.class)){
-					final InstanceField iField = method.getAnnotation(InstanceField.class);
-					LogHelper.info("Found InstanceField annotation on method. Attempting to retrieve instance...");
-					Field field;
-					if(iField.value().contains(".")){
-						index = iField.value().lastIndexOf(".");
-						final String className2 = iField.value().substring(0, index);
-						final String fieldName = iField.value().substring(index+1, iField.value().length());
-						final Class<?> clazz2 = Class.forName(className);
-						field = clazz2.getDeclaredField(fieldName);
-					}else
-						field = clazz.getDeclaredField(iField.value());
-					field.setAccessible(true);
-					if((field.getModifiers() & Modifier.STATIC) != Modifier.STATIC)
-						throw new IllegalArgumentException(StringHelper.build("Instance field ", iField.value(), " is not static!"));
-					method.invoke(field.get(null));
-				}else{
-					LogHelper.info("No instances found. Attempting to instantiate class...");
-					final Object obj = clazz.newInstance();
-					method.invoke(obj);
-				}
-				LogHelper.info("Successfully processed message.");
-			}catch(final Exception e1){
-				LogHelper.error(StringHelper.build("Received invalid message from mod ", message.getSender(), " with key ", message.key, " containing ", message.getStringValue()));
-				LogHelper.error("The following error occured while processing the message:");
-				e1.printStackTrace();
-				continue;
-			}
+	private void registerPrayers(final RegistryEvent.Register<Prayer> e) {
+		final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
+		registry.registerAll(Prayer.POTENCY_1, Prayer.POTENCY_2,
+				Prayer.ENHANCE_MELEE_1, Prayer.ENHANCE_MELEE_2, Prayer.ENHANCE_MELEE_3,
+				Prayer.ENHANCE_MAGIC_1, Prayer.ENHANCE_MAGIC_2, Prayer.ENHANCE_MAGIC_3,
+				Prayer.ENHANCE_RANGE_1, Prayer.ENHANCE_RANGE_2, Prayer.ENHANCE_RANGE_3,
+				Prayer.ENHANCE_DEFENCE_1, Prayer.ENHANCE_DEFENCE_2, Prayer.ENHANCE_DEFENCE_3,
+				Prayer.PROTECT_MAGIC, Prayer.PROTECT_MELEE, Prayer.PROTECT_RANGE);
+	}
+
+	@SubscribeEvent
+	public void registerCommands(final RegisterCommandsEvent e) {
+		LiteralArgumentBuilder<CommandSource> root = Commands.literal(Prayers.MOD_ID);
+		final SuggestionProvider<CommandSource> simpleFloatEx = (context, builder) -> builder.suggest(0).suggest(10).buildFuture();
+		final LiteralArgumentBuilder<CommandSource> set = Commands.literal("set").then(Commands.literal("prayer_points")
+				.then(Commands.argument("targets", EntityArgument.entities())
+						.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleFloatEx).executes(CommandSetPrayerPoints::execute))));
+
+		root = root.then(set);
+		e.getDispatcher().register(root);
+	}
+
+	//Attaches the prayer capability to all living entities
+	@SubscribeEvent
+	public void attachUser(final AttachCapabilitiesEvent<Entity> e) {
+		if (e.getObject() instanceof LivingEntity) {
+			final DefaultPrayerUser.Provider provider = new DefaultPrayerUser.Provider();
+			e.addCapability(new ResourceLocation(Prayers.MOD_ID, "prayer_user"), provider);
+			e.addListener(provider::invalidate);
 		}
+	}
+
+	//Sync prayer data when a client logs in
+	@SubscribeEvent
+	public void onPlayerLogin(final PlayerLoggedInEvent e) {
+		if(e.getPlayer() instanceof ServerPlayerEntity) {
+			final IPrayerUser user = e.getPlayer().getCapability(Prayers.PRAYER_USER_CAPABILITY)
+					.orElseThrow(() -> new IllegalStateException(String.format("Player %s has no prayer capability!", e.getPlayer().getDisplayName().toString())));
+			final INBT userNBT = Prayers.PRAYER_USER_CAPABILITY.getStorage().writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null);
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e.getPlayer()),
+					PacketSyncPrayerUser.builder().entityID(e.getPlayer().getEntityId()).userNBT(userNBT).build());
+		}
+	}
+
+	//Clones prayer data when a player dies
+	@SubscribeEvent
+	public void onPlayerClone(final PlayerEvent.Clone e) {
+		e.getOriginal().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> {
+			final IPrayerUser newUser = e.getPlayer().getCapability(Prayers.PRAYER_USER_CAPABILITY)
+					.orElseThrow(() -> new IllegalStateException(String.format("Player entity %s does not have capability data!", e.getPlayer().toString())));
+			final IStorage<IPrayerUser> storage = Prayers.PRAYER_USER_CAPABILITY.getStorage();
+			storage.readNBT(Prayers.PRAYER_USER_CAPABILITY, newUser, null, storage.writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null));
+		});
+	}
+
+	//Updates clients of an entity's prayer data when they begin tracking
+	@SubscribeEvent
+	public void onPlayerTrack(final PlayerEvent.StartTracking e) {
+		if(!(e.getPlayer() instanceof ServerPlayerEntity))
+			return;
+		e.getEntity().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> {
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) e.getPlayer()),
+					PacketSyncPrayerUser.builder().entityID(e.getEntity().getEntityId())
+					.userNBT(Prayers.PRAYER_USER_CAPABILITY.getStorage().writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null)).build());
+		});
+	}
+
+	//Deactivates all prayers when an entity dies
+	@SubscribeEvent
+	public void onDeath(final LivingDeathEvent e) {
+		e.getEntity().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> user.deactivateAllPrayers());
 	}
 
 }

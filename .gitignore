@@ -1,14 +1,27 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
 .classpath
-.gradle/*
 .project
-.settings/*
-eclipse/*
-bin/*
-Techne/*
-Logo/*
-/bin/
-build.bat
-desktop.ini
-eclipse.bat
-setup.bat
-src/main/resources/nei_at.cfg
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+logs
+src/generated
+
+# Files from Forge MDK
+forge*changelog.txt
