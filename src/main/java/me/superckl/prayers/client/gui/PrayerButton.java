@@ -3,7 +3,6 @@ package me.superckl.prayers.client.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import me.superckl.prayers.Prayer;
-import me.superckl.prayers.Prayers;
 import me.superckl.prayers.network.packet.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -14,7 +13,6 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.util.SoundEvents;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class PrayerButton extends ImageButton{
 
@@ -49,9 +47,7 @@ public class PrayerButton extends ImageButton{
 
 	@Override
 	public void onPress() {
-		final LazyOptional<IPrayerUser> opt = this.mc.player.getCapability(Prayers.PRAYER_USER_CAPABILITY);
-		final IPrayerUser user = opt.orElseThrow(() -> new IllegalStateException(String.format("Player %s attempted to activate prayer %s without prayer capabilities!",
-				this.mc.player.getDisplayName().getString(),this.prayer.getRegistryName().toString())));
+		final IPrayerUser user = IPrayerUser.getUser(this.mc.player);
 		if(user.isPrayerActive(this.prayer)) {
 			user.deactivatePrayer(this.prayer);
 			super.playDownSound(this.mc.getSoundHandler());

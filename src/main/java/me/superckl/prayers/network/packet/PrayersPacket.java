@@ -3,9 +3,7 @@ package me.superckl.prayers.network.packet;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.Prayers;
 import me.superckl.prayers.user.IPrayerUser;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -27,12 +25,7 @@ public abstract class PrayersPacket {
 	}
 
 	protected IPrayerUser getUser(final World world) {
-		return this.getUser(world.getEntityByID(this.entityID));
-	}
-
-	protected IPrayerUser getUser(final Entity entity) {
-		return entity.getCapability(Prayers.PRAYER_USER_CAPABILITY)
-				.orElseThrow(() -> new IllegalStateException(String.format("Accepted packet for entity %s with no prayer capability!", entity.toString())));
+		return IPrayerUser.getUser(world.getEntityByID(this.entityID));
 	}
 
 	@SuppressWarnings("unchecked")

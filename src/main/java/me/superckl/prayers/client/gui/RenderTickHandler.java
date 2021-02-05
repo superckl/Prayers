@@ -12,7 +12,6 @@ import net.minecraft.util.text.Color;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class RenderTickHandler {
@@ -26,11 +25,7 @@ public class RenderTickHandler {
 	public void onRenderOverlay(final RenderGameOverlayEvent.Post e) {
 		//Render after all HUD elements have been rendered
 		if (e.getType() != null && e.getType() == ElementType.ALL) {
-			//Make sure the player has prayer points
-			final LazyOptional<IPrayerUser> opt = this.mc.player.getCapability(Prayers.PRAYER_USER_CAPABILITY);
-			if (!opt.isPresent())
-				return;
-			final IPrayerUser user = opt.orElse(null);
+			final IPrayerUser user = IPrayerUser.getUser(this.mc.player);
 
 			final int width = e.getWindow().getScaledWidth();
 			final int height = e.getWindow().getScaledHeight();

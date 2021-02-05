@@ -3,6 +3,8 @@ package me.superckl.prayers.user;
 import java.util.Collection;
 
 import me.superckl.prayers.Prayer;
+import me.superckl.prayers.Prayers;
+import net.minecraft.entity.Entity;
 
 public interface IPrayerUser{
 
@@ -39,6 +41,11 @@ public interface IPrayerUser{
 			this.deactivatePrayer(prayer);
 		else
 			this.activatePrayer(prayer);
+	}
+
+	static IPrayerUser getUser(final Entity entity) {
+		return entity.getCapability(Prayers.PRAYER_USER_CAPABILITY)
+				.orElseThrow(() -> new IllegalStateException(String.format("Received entity %s with no prayer capability!", entity.toString())));
 	}
 
 }

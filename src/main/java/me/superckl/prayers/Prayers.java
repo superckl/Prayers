@@ -38,6 +38,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -136,8 +137,7 @@ public class Prayers
 	@SubscribeEvent
 	public void onPlayerLogin(final PlayerLoggedInEvent e) {
 		if(e.getPlayer() instanceof ServerPlayerEntity) {
-			final IPrayerUser user = e.getPlayer().getCapability(Prayers.PRAYER_USER_CAPABILITY)
-					.orElseThrow(() -> new IllegalStateException(String.format("Player %s has no prayer capability!", e.getPlayer().getDisplayName().toString())));
+			final IPrayerUser user = IPrayerUser.getUser(e.getPlayer());
 			final INBT userNBT = Prayers.PRAYER_USER_CAPABILITY.getStorage().writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null);
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e.getPlayer()),
 					PacketSyncPrayerUser.builder().entityID(e.getPlayer().getEntityId()).userNBT(userNBT).build());
@@ -148,8 +148,7 @@ public class Prayers
 	@SubscribeEvent
 	public void onPlayerClone(final PlayerEvent.Clone e) {
 		e.getOriginal().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> {
-			final IPrayerUser newUser = e.getPlayer().getCapability(Prayers.PRAYER_USER_CAPABILITY)
-					.orElseThrow(() -> new IllegalStateException(String.format("Player entity %s does not have capability data!", e.getPlayer().toString())));
+			final IPrayerUser newUser =  IPrayerUser.getUser(e.getPlayer());
 			final IStorage<IPrayerUser> storage = Prayers.PRAYER_USER_CAPABILITY.getStorage();
 			storage.readNBT(Prayers.PRAYER_USER_CAPABILITY, newUser, null, storage.writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null));
 		});
@@ -170,7 +169,7 @@ public class Prayers
 	//Deactivates all prayers when an entity dies
 	@SubscribeEvent
 	public void onDeath(final LivingDeathEvent e) {
-		e.getEntity().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(IPrayerUser::deactivateAllPrayers);
+		IPrayerUser.getUser(e.getEntity()).deactivateAllPrayers();
 	}
 
 }

@@ -20,7 +20,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 @Getter
@@ -136,8 +135,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	}
 
 	public boolean isActive(final Entity entity) {
-		final LazyOptional<IPrayerUser> opt = entity.getCapability(Prayers.PRAYER_USER_CAPABILITY);
-		return opt.isPresent() && opt.orElse(null).isPrayerActive(this);
+		return IPrayerUser.getUser(entity).isPrayerActive(this);
 	}
 
 	public static List<Prayer> all(){
