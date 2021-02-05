@@ -21,7 +21,7 @@ public class PacketSetPrayerLevel extends PrayersPacket{
 	@Override
 	public void encode(final PacketBuffer buffer) {
 		super.encode(buffer);
-		buffer.writeFloat(this.level);
+		buffer.writeInt(this.level);
 	}
 
 	public static PacketSetPrayerLevel decode(final PacketBuffer buffer) {
@@ -29,7 +29,6 @@ public class PacketSetPrayerLevel extends PrayersPacket{
 	}
 
 	@Override
-	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		super.handle(supplier);
 		final Context context = supplier.get();

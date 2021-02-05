@@ -29,7 +29,6 @@ public class PacketSetPrayerPoints extends PrayersPacket{
 	}
 
 	@Override
-	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		super.handle(supplier);
 		final Context context = supplier.get();
