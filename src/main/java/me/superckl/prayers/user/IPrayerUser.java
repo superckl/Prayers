@@ -1,6 +1,10 @@
 package me.superckl.prayers.user;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
@@ -8,7 +12,13 @@ import net.minecraft.entity.Entity;
 
 public interface IPrayerUser{
 
-	boolean canActivatePrayer(Prayer prayer);
+	public default boolean canActivatePrayer(final Prayer prayer) {
+		if(!prayer.isEnabled() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
+			return false;
+		final Set<String> excludes = Sets.newHashSet();
+		this.getActivePrayers().forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
+		return Collections.disjoint(prayer.getExclusionTypes(), excludes);
+	}
 
 	void activatePrayer(Prayer prayer);
 
@@ -41,6 +51,16 @@ public interface IPrayerUser{
 			this.deactivatePrayer(prayer);
 		else
 			this.activatePrayer(prayer);
+	}
+	
+	default void applyDrain() {
+		float drain = (float) this.getActivePrayers().stream().mapToDouble((prayer) -> prayer.getDrain()).sum();
+		float newPoints = this.getCurrentPrayerPoints()-drain/20F;
+		if (newPoints < 0) {
+			newPoints = 0;
+			this.deactivateAllPrayers();
+		}
+		this.setCurrentPrayerPoints(newPoints);
 	}
 
 	static IPrayerUser getUser(final Entity entity) {

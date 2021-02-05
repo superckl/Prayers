@@ -42,15 +42,6 @@ public class DefaultPrayerUser implements IPrayerUser{
 	}
 
 	@Override
-	public boolean canActivatePrayer(final Prayer prayer) {
-		if(!prayer.isEnabled())
-			return false;
-		final Set<String> excludes = Sets.newHashSet();
-		this.activePrayers.forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
-		return Collections.disjoint(prayer.getExclusionTypes(), excludes);
-	}
-
-	@Override
 	public void activatePrayer(final Prayer prayer) {
 		this.activePrayers.add(prayer);
 	}
@@ -119,7 +110,7 @@ public class DefaultPrayerUser implements IPrayerUser{
 	}
 
 	private float computeMaxPoints() {
-		return this.prayerLevel+this.maxPointsBoost;
+		return 10*this.prayerLevel+this.maxPointsBoost;
 	}
 
 	public static class Provider implements ICapabilitySerializable<INBT>{

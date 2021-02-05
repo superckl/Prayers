@@ -25,81 +25,81 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 @Getter
 public class Prayer extends ForgeRegistryEntry<Prayer>{
 
-	public static final Prayer.PrayerBuilder POTENCY_1 = Prayer.builder().name("Effective")
+	public static final Prayer.PrayerBuilder POTENCY_1 = Prayer.builder().name("Effective").drain(2.5F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/effective.png"))
 			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 0.3F))
 			.exclusionTypes(Lists.newArrayList("enhance_melee", "enhance_range", "enhance_magic"))
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "effective"));
-	public static final Prayer.PrayerBuilder POTENCY_2 = Prayer.builder().name("Potent")
+	public static final Prayer.PrayerBuilder POTENCY_2 = Prayer.builder().name("Potent").drain(5F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/potency.png"))
 			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 0.5F))
 			.exclusionTypes(Lists.newArrayList("enhance_melee", "enhance_range", "enhance_magic"))
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "potent"));
 
-	public static final Prayer.PrayerBuilder PROTECT_MELEE = Prayer.builder().name("Protect Melee")
+	public static final Prayer.PrayerBuilder PROTECT_MELEE = Prayer.builder().name("Protect Melee").drain(2.5F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectmelee.png"))
 			.effect(() -> new DamageEffect(DamageType.MELEE, true, true, -0.5F)).exclusionType("protect")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "protect_melee"));
-	public static final Prayer.PrayerBuilder PROTECT_MAGIC = Prayer.builder().name("Protect Magic")
+	public static final Prayer.PrayerBuilder PROTECT_MAGIC = Prayer.builder().name("Protect Magic").drain(2.5F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectmagic.png"))
 			.effect(() -> new DamageEffect(DamageType.MAGIC, true, true, -0.5F)).exclusionType("protect")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "protect_magic"));
-	public static final Prayer.PrayerBuilder PROTECT_RANGE = Prayer.builder().name("Protect Range")
+	public static final Prayer.PrayerBuilder PROTECT_RANGE = Prayer.builder().name("Protect Range").drain(2.5F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectrange.png"))
 			.effect(() -> new DamageEffect(DamageType.RANGE, true, true, -0.5F)).exclusionType("protect")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "protect_range"));
-	public static final Prayer.PrayerBuilder PROTECT_ITEM = Prayer.builder().name("Protect Item")
+	public static final Prayer.PrayerBuilder PROTECT_ITEM = Prayer.builder().name("Protect Item").drain(0.2F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectitem.png"))
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "protect_item"));
 
-	public static final Prayer.PrayerBuilder ENHANCE_MELEE_1 = Prayer.builder().name("Might")
+	public static final Prayer.PrayerBuilder ENHANCE_MELEE_1 = Prayer.builder().name("Might").drain(0.2F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemelee1.png"))
 			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.05F)).exclusionType("enhance_melee")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_melee_1"));
-	public static final Prayer.PrayerBuilder ENHANCE_MELEE_2 = Prayer.builder().name("Strength")
+	public static final Prayer.PrayerBuilder ENHANCE_MELEE_2 = Prayer.builder().name("Strength").drain(1F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemelee2.png"))
 			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.15F)).exclusionType("enhance_melee")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_melee_2"));
-	public static final Prayer.PrayerBuilder ENHANCE_MELEE_3 = Prayer.builder().name("Vigor")
+	public static final Prayer.PrayerBuilder ENHANCE_MELEE_3 = Prayer.builder().name("Vigor").drain(3F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemelee3.png"))
 			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.25F)).exclusionType("enhance_melee")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_melee_3"));
 
-	public static final Prayer.PrayerBuilder ENHANCE_MAGIC_1 = Prayer.builder().name("Mystic Charge")
+	public static final Prayer.PrayerBuilder ENHANCE_MAGIC_1 = Prayer.builder().name("Mystic Charge").drain(0.2F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemagic1.png"))
 			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.05F)).exclusionType("enhance_magic")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_magic_1"));
-	public static final Prayer.PrayerBuilder ENHANCE_MAGIC_2 = Prayer.builder().name("Mystic Will")
+	public static final Prayer.PrayerBuilder ENHANCE_MAGIC_2 = Prayer.builder().name("Mystic Will").drain(1F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemagic2.png"))
 			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.15F)).exclusionType("enhance_magic")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_magic_2"));
-	public static final Prayer.PrayerBuilder ENHANCE_MAGIC_3 = Prayer.builder().name("Mystic Might")
+	public static final Prayer.PrayerBuilder ENHANCE_MAGIC_3 = Prayer.builder().name("Mystic Might").drain(3F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemagic3.png"))
 			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.25F)).exclusionType("enhance_magic")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_magic_3"));
 
-	public static final Prayer.PrayerBuilder ENHANCE_RANGE_1 = Prayer.builder().name("Watchful")
+	public static final Prayer.PrayerBuilder ENHANCE_RANGE_1 = Prayer.builder().name("Watchful").drain(0.2F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancerange1.png"))
 			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.05F)).exclusionType("enhance_range")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_range_1"));
-	public static final Prayer.PrayerBuilder ENHANCE_RANGE_2 = Prayer.builder().name("Sharp Eye")
+	public static final Prayer.PrayerBuilder ENHANCE_RANGE_2 = Prayer.builder().name("Sharp Eye").drain(1F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancerange2.png"))
 			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.15F)).exclusionType("enhance_range")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_range_2"));
-	public static final Prayer.PrayerBuilder ENHANCE_RANGE_3 = Prayer.builder().name("Hawk Eye")
+	public static final Prayer.PrayerBuilder ENHANCE_RANGE_3 = Prayer.builder().name("Hawk Eye").drain(3F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancerange3.png"))
 			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.25F)).exclusionType("enhance_range")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_range_3"));
 
-	public static final Prayer.PrayerBuilder ENHANCE_DEFENCE_1 = Prayer.builder().name("Tough")
+	public static final Prayer.PrayerBuilder ENHANCE_DEFENCE_1 = Prayer.builder().name("Tough").drain(0.16F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancedefence1.png"))
 			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.05F)).exclusionType("enhance_defence")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_defence_1"));
-	public static final Prayer.PrayerBuilder ENHANCE_DEFENCE_2 = Prayer.builder().name("Durable")
+	public static final Prayer.PrayerBuilder ENHANCE_DEFENCE_2 = Prayer.builder().name("Durable").drain(0.7F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancedefence2.png"))
 			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.15F)).exclusionType("enhance_defence")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_defence_2"));
-	public static final Prayer.PrayerBuilder ENHANCE_DEFENCE_3 = Prayer.builder().name("Robust")
+	public static final Prayer.PrayerBuilder ENHANCE_DEFENCE_3 = Prayer.builder().name("Robust").drain(2F)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancedefence3.png"))
 			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.25F)).exclusionType("enhance_defence")
 			.registryName(new ResourceLocation(Prayers.MOD_ID, "enhance_defence_3"));
