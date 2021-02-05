@@ -1,13 +1,5 @@
 package me.superckl.prayers.effects;
 
-import java.lang.reflect.Type;
-
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.util.DamageSource;
@@ -50,11 +42,6 @@ public class DamageEffect extends PrayerEffect{
 			this.description = builder.toString();
 		}
 		return this.description;
-	}
-
-	@Override
-	public DamageEffect clone() {
-		return new DamageEffect(this.type, this.isIncoming, this.isPercentage, this.amount);
 	}
 
 	@SubscribeEvent
@@ -100,36 +87,6 @@ public class DamageEffect extends PrayerEffect{
 
 		public boolean matches(final DamageSource source) {
 			return this == DamageType.ALL || this == DamageType.getType(source);
-		}
-
-	}
-
-	public static class Serializer implements PrayerEffect.EffectSerializer<DamageEffect>{
-
-		public static final String DAMAGE_TYPE_KEY = "damage_type";
-		public static final String INCOMING_KEY = "incoming";
-		public static final String PERCENTAGE_KEY = "percentage";
-		public static final String AMOUNT_KEY = "amount";
-
-		@Override
-		public DamageEffect deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context)
-				throws JsonParseException {
-			final JsonObject base = json.getAsJsonObject();
-			final DamageType type = DamageType.valueOf(base.get(Serializer.DAMAGE_TYPE_KEY).getAsString());
-			final boolean isIncoming = base.get(Serializer.INCOMING_KEY).getAsBoolean();
-			final boolean isPercentage = base.get(Serializer.PERCENTAGE_KEY).getAsBoolean();
-			final float amount = base.get(Serializer.AMOUNT_KEY).getAsFloat();
-			return new DamageEffect(type, isIncoming, isPercentage, amount);
-		}
-
-		@Override
-		public JsonElement serialize(final DamageEffect src, final Type typeOfSrc, final JsonSerializationContext context) {
-			final JsonObject base = new JsonObject();
-			base.addProperty(Serializer.DAMAGE_TYPE_KEY, src.type.name());
-			base.addProperty(Serializer.INCOMING_KEY, src.isIncoming);
-			base.addProperty(Serializer.PERCENTAGE_KEY, src.isPercentage);
-			base.addProperty(Serializer.AMOUNT_KEY, src.amount);
-			return base;
 		}
 
 	}

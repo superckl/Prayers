@@ -1,21 +1,10 @@
 package me.superckl.prayers;
 
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -168,65 +157,6 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 				Prayer.ENHANCE_DEFENCE_1, Prayer.ENHANCE_DEFENCE_2, Prayer.ENHANCE_DEFENCE_3,
 				Prayer.PROTECT_MAGIC, Prayer.PROTECT_MELEE, Prayer.PROTECT_RANGE).stream().map(PrayerBuilder::build)
 				.map(Prayer::getRegistryName).collect(Collectors.toList());
-	}
-
-	public static class Serializer implements JsonSerializer<Prayer>, JsonDeserializer<Prayer>{
-
-		public static final String NAME_KEY = "name";
-		public static final String DRAIN_KEY = "drain";
-		public static final String EXCLUSION_TYPES_KEY = "exclusion_types";
-		public static final String TEXTURE_KEY = "texture";
-		public static final String EFFECTS_KEY = "effects";
-		public static final String EFFECT_NAME_KEY = "effect_name";
-		public static final String EFFECT_KEY = "effect";
-
-		private final Gson EFFECT_GSON = PrayerEffect.registerGsonAdapters(new GsonBuilder()).create();
-
-		@Override
-		public Prayer deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context)
-				throws JsonParseException {
-			final JsonObject base = json.getAsJsonObject();
-			final PrayerBuilder builder = Prayer.builder().name(base.get(Serializer.NAME_KEY).getAsString()).drain(base.get(Serializer.DRAIN_KEY).getAsFloat());
-			builder.texture(new ResourceLocation(base.get(Serializer.TEXTURE_KEY).getAsString()));
-
-			final JsonArray excludeJson = base.getAsJsonArray(Serializer.EXCLUSION_TYPES_KEY);
-			final List<String> exclusionTypes = Lists.newArrayList();
-			excludeJson.forEach(element -> exclusionTypes.add(element.getAsString()));
-			builder.exclusionTypes(exclusionTypes);
-
-			final JsonArray effectJson = base.getAsJsonArray(Serializer.EFFECTS_KEY);
-			effectJson.forEach(element -> {
-				final JsonObject effectObj = element.getAsJsonObject();
-				final ResourceLocation name = new ResourceLocation(effectObj.get(Serializer.EFFECT_NAME_KEY).getAsString());
-				final PrayerEffect.EffectEntry<?> entry = PrayerEffect.lookup(name);
-				if(entry == null)
-					throw new IllegalArgumentException(String.format("No effect found with name %s!", name.toString()));
-				builder.effect(() -> this.EFFECT_GSON.fromJson(effectObj.get(Serializer.EFFECT_KEY).getAsString(), entry.getEffectClass()));
-			});
-			return builder.build();
-		}
-
-		@Override
-		public JsonElement serialize(final Prayer src, final Type typeOfSrc, final JsonSerializationContext context) {
-			final JsonObject base = new JsonObject();
-			base.addProperty(Serializer.NAME_KEY, src.name);
-			base.addProperty(Serializer.DRAIN_KEY, src.drain);
-			base.addProperty(Serializer.TEXTURE_KEY, src.texture.toString());
-			final JsonArray excludeTypes = new JsonArray();
-			src.exclusionTypes.forEach(exclude -> excludeTypes.add(exclude));
-			base.add(Serializer.EXCLUSION_TYPES_KEY, excludeTypes);
-			final JsonArray effects = new JsonArray();
-			src.effects.forEach(effect -> {
-				final JsonObject effectObj = new JsonObject();
-				final PrayerEffect.EffectEntry<?> entry = PrayerEffect.lookup(effect.getClass());
-				effectObj.addProperty(Serializer.EFFECT_NAME_KEY, entry.getName().toString());
-				effectObj.addProperty(Serializer.EFFECT_KEY, this.EFFECT_GSON.toJson(effect));
-				effects.add(effectObj);
-			});
-			base.add(Serializer.EFFECTS_KEY, effects);
-			return base;
-		}
-
 	}
 
 }

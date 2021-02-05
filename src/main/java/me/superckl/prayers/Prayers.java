@@ -13,10 +13,11 @@ import me.superckl.prayers.client.gui.RenderTickHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.network.packet.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.PacketDeactivatePrayer;
+import me.superckl.prayers.network.packet.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
-import me.superckl.prayers.server.CommandSetPrayerPoints;
+import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.user.DefaultPrayerUser;
 import me.superckl.prayers.user.IPrayerUser;
 import net.minecraft.command.CommandSource;
@@ -82,6 +83,8 @@ public class Prayers
 				PacketSetPrayerPoints::encode, PacketSetPrayerPoints::decode, PacketSetPrayerPoints::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSyncPrayerUser.class,
 				PacketSyncPrayerUser::encode, PacketSyncPrayerUser::decode, PacketSyncPrayerUser::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetPrayerLevel.class,
+				PacketSetPrayerLevel::encode, PacketSetPrayerLevel::decode, PacketSetPrayerLevel::handle);
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {
@@ -111,7 +114,7 @@ public class Prayers
 		final SuggestionProvider<CommandSource> simpleFloatEx = (context, builder) -> builder.suggest(0).suggest(10).buildFuture();
 		final LiteralArgumentBuilder<CommandSource> set = Commands.literal("set").then(Commands.literal("prayer_points")
 				.then(Commands.argument("targets", EntityArgument.entities())
-						.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleFloatEx).executes(CommandSetPrayerPoints::execute))));
+						.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleFloatEx).executes(CommandSet::prayerPoints))));
 
 		root = root.then(set);
 		e.getDispatcher().register(root);
