@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
@@ -110,13 +111,14 @@ public class Prayers
 	
 	@SubscribeEvent
 	public void registerCommands(final RegisterCommandsEvent e) {
-		LiteralArgumentBuilder<CommandSource> root = Commands.literal(Prayers.MOD_ID);
-		final SuggestionProvider<CommandSource> simpleFloatEx = (context, builder) -> builder.suggest(0).suggest(10).buildFuture();
-		final LiteralArgumentBuilder<CommandSource> set = Commands.literal("set").then(Commands.literal("prayer_points")
-				.then(Commands.argument("targets", EntityArgument.entities())
-						.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleFloatEx).executes(CommandSet::prayerPoints))));
+		final SuggestionProvider<CommandSource> simpleNumberEx = (context, builder) -> builder.suggest(1).suggest(10).buildFuture();
+		LiteralArgumentBuilder<CommandSource> root = Commands.literal(Prayers.MOD_ID).then(Commands.literal("set")
+				.then(Commands.literal("points").then(Commands.argument("targets", EntityArgument.entities())
+				.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleNumberEx)
+				.executes(CommandSet::prayerPoints)))).then(Commands.literal("level")
+				.then(Commands.argument("targets", EntityArgument.entities()).then(Commands.argument("level", IntegerArgumentType.integer(1))
+				.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))));
 
-		root = root.then(set);
 		e.getDispatcher().register(root);
 	}
 
