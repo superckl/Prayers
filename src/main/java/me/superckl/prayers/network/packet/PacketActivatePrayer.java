@@ -36,28 +36,22 @@ public class PacketActivatePrayer extends PrayersPacket{
 	}
 
 	@Override
-	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		super.handle(supplier);
 		final Context context = supplier.get();
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
-			context.enqueueWork(() -> {
-				final Entity entity = Minecraft.getInstance().world.getEntityByID(this.entityID);
-				final LazyOptional<IPrayerUser> user = entity.getCapability(Prayers.PRAYER_USER_CAPABILITY);
-				user.orElseThrow(() -> new IllegalStateException(String.format("Was told to activate prayer %s on entity %s without prayer capabilities!",
-						this.prayer.getRegistryName().toString(), entity.toString())))
-				.activatePrayer(this.prayer);});
+			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().world).activatePrayer(this.prayer));
 		else
 			context.enqueueWork(() -> {
 				//Check the client is not attempting to activate a prayer an another entity
 				if (this.entityID != context.getSender().getEntityId()) {
+					//Respond with a deactivate packet if they are
 					PrayersPacketHandler.INSTANCE.reply(PacketDeactivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;
 				}
-				final LazyOptional<IPrayerUser> user = context.getSender().getCapability(Prayers.PRAYER_USER_CAPABILITY);
-				final IPrayerUser prayerUser = user.orElseThrow(() -> new IllegalStateException(String.format("Player %s asked to activate prayer %s without prayer capabilities!",
-						context.getSender().getDisplayName().getString(),this.prayer.getRegistryName().toString())));
+				IPrayerUser prayerUser = this.getUser(context.getSender());
 				if(!prayerUser.canActivatePrayer(this.prayer))
+					//Tell the player they cannot activate that prayer
 					PrayersPacketHandler.INSTANCE.reply(PacketDeactivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 				else
 					prayerUser.activatePrayer(this.prayer);

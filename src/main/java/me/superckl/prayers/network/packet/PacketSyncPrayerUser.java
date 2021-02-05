@@ -43,10 +43,7 @@ public class PacketSyncPrayerUser extends PrayersPacket{
 		//Only the server should be sending these packets.
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
 			context.enqueueWork(() -> {
-				final Entity entity = Minecraft.getInstance().world.getEntityByID(this.entityID);
-				final LazyOptional<IPrayerUser> user = entity.getCapability(Prayers.PRAYER_USER_CAPABILITY);
-				final IPrayerUser prayerUser = user.orElseThrow(() -> new IllegalStateException(String.format("Was told to sync prayer data on entity %s without prayer capabilities!",
-						entity.toString())));
+				final IPrayerUser prayerUser = this.getUser(Minecraft.getInstance().world);
 				Prayers.PRAYER_USER_CAPABILITY.getStorage().readNBT(Prayers.PRAYER_USER_CAPABILITY, prayerUser, null, this.userNBT);});
 	}
 

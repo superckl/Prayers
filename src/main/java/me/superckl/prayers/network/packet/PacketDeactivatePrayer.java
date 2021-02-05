@@ -41,24 +41,16 @@ public class PacketDeactivatePrayer  extends PrayersPacket{
 		super.handle(supplier);
 		final Context context = supplier.get();
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
-			context.enqueueWork(() -> {
-				final Entity entity = Minecraft.getInstance().world.getEntityByID(this.entityID);
-				final LazyOptional<IPrayerUser> user = entity.getCapability(Prayers.PRAYER_USER_CAPABILITY);
-				user.orElseThrow(() -> new IllegalStateException(String.format("Was told to deactivate prayer %s on entity %s without prayer capabilities!",
-						this.prayer.getRegistryName().toString(), entity.toString())))
-				.deactivatePrayer(this.prayer);
-			});
+			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().world).deactivatePrayer(this.prayer));
 		else
 			context.enqueueWork(() -> {
 				//Check the client is not attempting to deactivate a prayer an another entity
 				if (this.entityID != context.getSender().getEntityId()) {
+					//Tell the client they can't deactivate that prayer
 					PrayersPacketHandler.INSTANCE.reply(PacketActivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;
 				}
-				final LazyOptional<IPrayerUser> user = context.getSender().getCapability(Prayers.PRAYER_USER_CAPABILITY);
-				user.orElseThrow(() -> new IllegalStateException(String.format("Player %s asked to deactivate prayer %s without prayer capabilities!",
-						context.getSender().getDisplayName().getString(),this.prayer.getRegistryName().toString())))
-				.deactivatePrayer(this.prayer);
+				this.getUser(context.getSender()).deactivatePrayer(this.prayer);
 			});
 	}
 
