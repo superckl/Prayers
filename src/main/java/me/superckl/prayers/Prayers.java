@@ -1,7 +1,10 @@
 package me.superckl.prayers;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 
+import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -36,9 +39,11 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -61,10 +66,12 @@ public class Prayers
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
 		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Prayer.class, this::registerPrayers);
+
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
-		MinecraftForge.EVENT_BUS.register(this);
 		CapabilityManager.INSTANCE.register(IPrayerUser.class, new DefaultPrayerUser.Storage(), DefaultPrayerUser::new);
 		int pIndex = 0;
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketActivatePrayer.class,
@@ -89,14 +96,15 @@ public class Prayers
 
 	private void registerPrayers(final RegistryEvent.Register<Prayer> e) {
 		final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
-		registry.registerAll(Prayer.POTENCY_1, Prayer.POTENCY_2,
-				Prayer.ENHANCE_MELEE_1, Prayer.ENHANCE_MELEE_2, Prayer.ENHANCE_MELEE_3,
-				Prayer.ENHANCE_MAGIC_1, Prayer.ENHANCE_MAGIC_2, Prayer.ENHANCE_MAGIC_3,
-				Prayer.ENHANCE_RANGE_1, Prayer.ENHANCE_RANGE_2, Prayer.ENHANCE_RANGE_3,
-				Prayer.ENHANCE_DEFENCE_1, Prayer.ENHANCE_DEFENCE_2, Prayer.ENHANCE_DEFENCE_3,
-				Prayer.PROTECT_MAGIC, Prayer.PROTECT_MELEE, Prayer.PROTECT_RANGE);
+		final List<String> configPrays = Lists.newArrayList(Config.getInstance().getPrayers().get());
+		Prayer.all().forEach(prayer -> {
+			if(configPrays.remove(prayer.getRegistryName().toString()))
+				registry.register(prayer);
+		});
+		if(!configPrays.isEmpty())
+			LogHelper.warn("Prayers in config file do not have corresponding registry entry: "+configPrays.toString());
 	}
-
+	
 	@SubscribeEvent
 	public void registerCommands(final RegisterCommandsEvent e) {
 		LiteralArgumentBuilder<CommandSource> root = Commands.literal(Prayers.MOD_ID);
@@ -157,7 +165,7 @@ public class Prayers
 	//Deactivates all prayers when an entity dies
 	@SubscribeEvent
 	public void onDeath(final LivingDeathEvent e) {
-		e.getEntity().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> user.deactivateAllPrayers());
+		e.getEntity().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(IPrayerUser::deactivateAllPrayers);
 	}
 
 }

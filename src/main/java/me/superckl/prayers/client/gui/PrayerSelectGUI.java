@@ -41,6 +41,8 @@ public class PrayerSelectGUI extends Screen{
 		final Iterator<Prayer> it = prayers.iterator();
 		while(it.hasNext()) {
 			final Prayer prayer  = it.next();
+			if(!prayer.isEnabled())
+				continue;
 			final Button prayerButton = new PrayerButton(prayer, x+this.guiLeft, y+this.guiTop, 16, 16);
 			this.buttons.add(prayerButton);
 			this.addListener(prayerButton);

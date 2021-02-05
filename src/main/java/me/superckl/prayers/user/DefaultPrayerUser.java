@@ -43,6 +43,8 @@ public class DefaultPrayerUser implements IPrayerUser{
 
 	@Override
 	public boolean canActivatePrayer(final Prayer prayer) {
+		if(!prayer.isEnabled())
+			return false;
 		final Set<String> excludes = Sets.newHashSet();
 		this.activePrayers.forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
 		return Collections.disjoint(prayer.getExclusionTypes(), excludes);

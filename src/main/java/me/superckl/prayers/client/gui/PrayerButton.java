@@ -28,7 +28,7 @@ public class PrayerButton extends ImageButton{
 
 	@Override
 	public void renderButton(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
-		if(this.prayer.isEnabled(this.mc.player))
+		if(this.prayer.isActive(this.mc.player))
 			PrayerButton.drawOpenRect(matrixStack, this.x-2, this.y-2, 1, 20, 20);
 		super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
 	}
