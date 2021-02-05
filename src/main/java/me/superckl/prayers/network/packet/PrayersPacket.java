@@ -26,15 +26,15 @@ public abstract class PrayersPacket {
 		supplier.get().setPacketHandled(true);
 	}
 
-	protected IPrayerUser getUser(World world) {
+	protected IPrayerUser getUser(final World world) {
 		return this.getUser(world.getEntityByID(this.entityID));
 	}
-	
-	protected IPrayerUser getUser(Entity entity) {
+
+	protected IPrayerUser getUser(final Entity entity) {
 		return entity.getCapability(Prayers.PRAYER_USER_CAPABILITY)
 				.orElseThrow(() -> new IllegalStateException(String.format("Accepted packet for entity %s with no prayer capability!", entity.toString())));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T extends PrayersPacketBuilder<?, ?>> T decode(final T builder, final PacketBuffer buffer){
 		//Calling entityID does not return "T", but it is of type T

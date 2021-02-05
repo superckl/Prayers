@@ -33,16 +33,16 @@ public class Config {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(Config.instance::onConfigLoad);
 		return specPair.getValue();
 	}
-	
-	private void onConfigLoad(ModConfigEvent e) {
+
+	private void onConfigLoad(final ModConfigEvent e) {
 		this.applyConfig();
 	}
-	
+
 	private void applyConfig() {
-		List<String> enabled = this.prayers.get();
-		GameRegistry.findRegistry(Prayer.class).getValues().forEach(prayer -> 
-			prayer.setEnabled(enabled.contains(prayer.getRegistryName().toString()))
-		);
+		final List<String> enabled = this.prayers.get();
+		GameRegistry.findRegistry(Prayer.class).getValues().forEach(prayer ->
+		prayer.setEnabled(enabled.contains(prayer.getRegistryName().toString()))
+				);
 	}
 
 }

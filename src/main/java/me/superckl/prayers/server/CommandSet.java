@@ -41,7 +41,7 @@ public class CommandSet {
 		context.getSource().sendFeedback(new StringTextComponent(String.format("%d entities targeted, set points for %d living entities", targets.size(), pointsSet)), true);
 		return pointsSet;
 	}
-	
+
 	public static int prayerLevel(final CommandContext<CommandSource> context) throws CommandSyntaxException {
 		final Collection<? extends Entity> targets = EntityArgument.getEntitiesAllowingNone(context, "targets");
 		if(targets.isEmpty()) {

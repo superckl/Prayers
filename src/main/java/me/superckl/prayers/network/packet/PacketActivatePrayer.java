@@ -4,13 +4,10 @@ import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.Prayer;
-import me.superckl.prayers.Prayers;
 import me.superckl.prayers.user.IPrayerUser;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -49,7 +46,7 @@ public class PacketActivatePrayer extends PrayersPacket{
 					PrayersPacketHandler.INSTANCE.reply(PacketDeactivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;
 				}
-				IPrayerUser prayerUser = this.getUser(context.getSender());
+				final IPrayerUser prayerUser = this.getUser(context.getSender());
 				if(!prayerUser.canActivatePrayer(this.prayer))
 					//Tell the player they cannot activate that prayer
 					PrayersPacketHandler.INSTANCE.reply(PacketDeactivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);

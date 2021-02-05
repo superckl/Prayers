@@ -108,16 +108,16 @@ public class Prayers
 		if(!configPrays.isEmpty())
 			LogHelper.warn("Prayers in config file do not have corresponding registry entry: "+configPrays.toString());
 	}
-	
+
 	@SubscribeEvent
 	public void registerCommands(final RegisterCommandsEvent e) {
 		final SuggestionProvider<CommandSource> simpleNumberEx = (context, builder) -> builder.suggest(1).suggest(10).buildFuture();
-		LiteralArgumentBuilder<CommandSource> root = Commands.literal(Prayers.MOD_ID).then(Commands.literal("set")
+		final LiteralArgumentBuilder<CommandSource> root = Commands.literal(Prayers.MOD_ID).then(Commands.literal("set")
 				.then(Commands.literal("points").then(Commands.argument("targets", EntityArgument.entities())
-				.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleNumberEx)
-				.executes(CommandSet::prayerPoints)))).then(Commands.literal("level")
-				.then(Commands.argument("targets", EntityArgument.entities()).then(Commands.argument("level", IntegerArgumentType.integer(1))
-				.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))));
+						.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleNumberEx)
+								.executes(CommandSet::prayerPoints)))).then(Commands.literal("level")
+										.then(Commands.argument("targets", EntityArgument.entities()).then(Commands.argument("level", IntegerArgumentType.integer(1))
+												.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))));
 
 		e.getDispatcher().register(root);
 	}

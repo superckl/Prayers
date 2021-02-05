@@ -3,12 +3,8 @@ package me.superckl.prayers.network.packet;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.Prayers;
-import me.superckl.prayers.user.IPrayerUser;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
