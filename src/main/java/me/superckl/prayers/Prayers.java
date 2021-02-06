@@ -59,11 +59,11 @@ public class Prayers
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
 		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Prayer.class, this::registerPrayers);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
 		event.enqueueWork(() -> {
-			ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
 			MinecraftForge.EVENT_BUS.register(this);
 			MinecraftForge.EVENT_BUS.register(new CapabilityEventHandler());
 		});
