@@ -35,7 +35,7 @@ public class CapabilityEventHandler {
 		if(e.getPlayer() instanceof ServerPlayerEntity) {
 			final IPrayerUser user = IPrayerUser.getUser(e.getPlayer());
 			final INBT userNBT = Prayers.PRAYER_USER_CAPABILITY.getStorage().writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null);
-			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e.getPlayer()),
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(e::getPlayer),
 					PacketSyncPrayerUser.builder().entityID(e.getPlayer().getEntityId()).userNBT(userNBT).build());
 		}
 	}

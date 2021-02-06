@@ -12,10 +12,12 @@ public class KeyBindings {
 
 	public static final KeyBinding OPEN_PRAYER_GUI = new KeyBinding("Open Prayer GUI", GLFW.GLFW_KEY_O, "Prayers");
 
+	private static Minecraft mc = Minecraft.getInstance();
+
 	@SubscribeEvent
 	public static void onKeyPress(final KeyInputEvent e) {
 		if (KeyBindings.OPEN_PRAYER_GUI.isPressed())
-			Minecraft.getInstance().displayGuiScreen(new PrayerSelectGUI());
+			KeyBindings.mc.displayGuiScreen(new PrayerSelectGUI());
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import me.superckl.prayers.Prayer;
+import me.superckl.prayers.client.input.KeyBindings;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.StringTextComponent;
@@ -60,6 +61,15 @@ public class PrayerSelectGUI extends Screen{
 	public void render(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
 		this.renderBackground(matrixStack);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
+	}
+
+	@Override
+	public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
+		if(KeyBindings.OPEN_PRAYER_GUI.getKey().getKeyCode() == keyCode) {
+			this.closeScreen();
+			return true;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 }
