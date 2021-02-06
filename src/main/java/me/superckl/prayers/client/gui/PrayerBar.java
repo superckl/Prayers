@@ -5,7 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import lombok.AllArgsConstructor;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.user.IPrayerUser;
+import me.superckl.prayers.capability.IPrayerUser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.ResourceLocation;

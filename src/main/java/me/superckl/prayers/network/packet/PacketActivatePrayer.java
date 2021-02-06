@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.Prayer;
-import me.superckl.prayers.user.IPrayerUser;
+import me.superckl.prayers.capability.IPrayerUser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;

@@ -3,7 +3,7 @@ package me.superckl.prayers.network.packet;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.user.IPrayerUser;
+import me.superckl.prayers.capability.IPrayerUser;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;

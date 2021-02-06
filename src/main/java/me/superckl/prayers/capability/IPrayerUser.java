@@ -1,4 +1,4 @@
-package me.superckl.prayers.user;
+package me.superckl.prayers.capability;
 
 import java.util.Collection;
 import java.util.Collections;
