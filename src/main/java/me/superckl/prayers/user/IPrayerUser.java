@@ -12,7 +12,7 @@ import net.minecraft.entity.Entity;
 
 public interface IPrayerUser{
 
-	public default boolean canActivatePrayer(final Prayer prayer) {
+	default boolean canActivatePrayer(final Prayer prayer) {
 		if(!prayer.isEnabled() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
 			return false;
 		final Set<String> excludes = Sets.newHashSet();
@@ -52,9 +52,9 @@ public interface IPrayerUser{
 		else
 			this.activatePrayer(prayer);
 	}
-	
+
 	default void applyDrain() {
-		float drain = (float) this.getActivePrayers().stream().mapToDouble((prayer) -> prayer.getDrain()).sum();
+		final float drain = (float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum();
 		float newPoints = this.getCurrentPrayerPoints()-drain/20F;
 		if (newPoints < 0) {
 			newPoints = 0;

@@ -158,7 +158,7 @@ public class Prayers
 	public void onLivingTick(final LivingUpdateEvent e) {
 		IPrayerUser.getUser(e.getEntityLiving()).applyDrain();
 	}
-	
+
 	//Updates clients of an entity's prayer data when they begin tracking
 	@SubscribeEvent
 	public void onPlayerTrack(final PlayerEvent.StartTracking e) {
