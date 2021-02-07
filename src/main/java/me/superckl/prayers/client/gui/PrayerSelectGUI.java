@@ -6,8 +6,10 @@ import java.util.Iterator;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import it.unimi.dsi.fastutil.ints.IntComparators;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.capability.IPrayerUser;
 import me.superckl.prayers.client.input.KeyBindings;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -38,7 +40,6 @@ public class PrayerSelectGUI extends Screen{
 
 		final int spacing = 4;
 		final int numCols = 6;
-		final int numRows = 4;
 		final int startX = this.guiLeft+9;
 
 		int y = this.guiTop+29;
@@ -47,11 +48,15 @@ public class PrayerSelectGUI extends Screen{
 
 		final Collection<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues();
 		//TODO Sort by level req
-		final Iterator<Prayer> it = prayers.iterator();
+
+		final Iterator<Prayer> it = prayers.stream().sorted((p1, p2) -> IntComparators.NATURAL_COMPARATOR.compare(p1.getLevel(), p2.getLevel())).iterator();
 		while(it.hasNext()) {
 			final Prayer prayer  = it.next();
 			if(!prayer.isEnabled())
 				continue;
+			final IPrayerUser user = IPrayerUser.getUser(this.minecraft.player);
+			if(user.getPrayerLevel() < prayer.getLevel())
+				break;
 			final Button prayerButton = new PrayerButton(prayer, x, y, 16, 16);
 			this.buttons.add(prayerButton);
 			this.addListener(prayerButton);

@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 public interface IPrayerUser{
 
 	default boolean canActivatePrayer(final Prayer prayer) {
-		if(!prayer.isEnabled() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
+		if(!prayer.isEnabled() || this.getPrayerLevel() < prayer.getLevel() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
 			return false;
 		final Set<String> excludes = Sets.newHashSet();
 		this.getActivePrayers().forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
