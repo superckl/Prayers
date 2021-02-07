@@ -4,23 +4,30 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import me.superckl.prayers.Prayer;
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.client.input.KeyBindings;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class PrayerSelectGUI extends Screen{
 
-	protected int xSize = 176;
-	protected int ySize = 166;
+	public static ResourceLocation PRAYER_GUI_TEXTURE = new ResourceLocation(Prayers.MOD_ID, "textures/gui/select_gui.png");
+
+	protected int xSize = 147;
+	protected int ySize = 116;
 	protected int guiLeft;
 	protected int guiTop;
 
+	protected PrayerBar prayerBar = new PrayerBar(true, true);
+
 	public PrayerSelectGUI() {
-		super(new StringTextComponent("Prayers GUI"));
+		super(new StringTextComponent("Prayers"));
 	}
 
 	@Override
@@ -29,22 +36,23 @@ public class PrayerSelectGUI extends Screen{
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
 
-		final int numCols = 5;
-		final int spacing = (this.xSize-16*(numCols+2))/(numCols+1);
-		final int excess = this.xSize-16*numCols-spacing*(numCols-1);
-		final int startX = excess/2;
+		final int spacing = 4;
+		final int numCols = 6;
+		final int numRows = 4;
+		final int startX = this.guiLeft+9;
 
-		int y = 10;
+		int y = this.guiTop+29;
 		int x = startX;
 		int j = 0;
 
 		final Collection<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues();
+		//TODO Sort by level req
 		final Iterator<Prayer> it = prayers.iterator();
 		while(it.hasNext()) {
 			final Prayer prayer  = it.next();
 			if(!prayer.isEnabled())
 				continue;
-			final Button prayerButton = new PrayerButton(prayer, x+this.guiLeft, y+this.guiTop, 16, 16);
+			final Button prayerButton = new PrayerButton(prayer, x, y, 16, 16);
 			this.buttons.add(prayerButton);
 			this.addListener(prayerButton);
 			x += 16+spacing;
@@ -60,6 +68,14 @@ public class PrayerSelectGUI extends Screen{
 	@Override
 	public void render(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
 		this.renderBackground(matrixStack);
+		this.minecraft.getTextureManager().bindTexture(PrayerSelectGUI.PRAYER_GUI_TEXTURE);
+		RenderSystem.enableDepthTest();
+		this.blit(matrixStack, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+		final int scrollBarX = this.guiLeft+134;
+		final int scrollBarY = this.guiTop+25;
+		final int textureU = this.needsScrollBars() ? 154:147;
+		this.blit(matrixStack, scrollBarX, scrollBarY, textureU, 0, 7, 9);
+		this.prayerBar.renderAt(matrixStack, this.guiLeft+5, this.guiTop+4);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 
@@ -70,6 +86,10 @@ public class PrayerSelectGUI extends Screen{
 			return true;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
+	private boolean needsScrollBars() {
+		return this.buttons.size() > 6*4;
 	}
 
 }

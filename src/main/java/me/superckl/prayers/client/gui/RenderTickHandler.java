@@ -6,7 +6,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class RenderTickHandler {
 
-	private final PrayerBar widget = new PrayerBar(true);
+	private final PrayerBar widget = new PrayerBar(true, false);
 
 	//This event renders the player's prayer points
 	@SubscribeEvent
