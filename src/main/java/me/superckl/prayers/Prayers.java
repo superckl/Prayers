@@ -60,6 +60,9 @@ public class Prayers
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
 		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Prayer.class, this::registerPrayers);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
+		
+		ModBlocks.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModItems.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
