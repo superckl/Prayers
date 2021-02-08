@@ -1,0 +1,7 @@
+{
+	"parent": "prayers:block/altar",
+	"textures": {
+		"texture": "minecraft:block/sandstone",
+		"particle": "minecraft:block/sandstone"
+	}
+}

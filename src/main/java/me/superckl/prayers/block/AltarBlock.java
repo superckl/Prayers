@@ -1,9 +1,15 @@
 package me.superckl.prayers.block;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
+
+import com.google.common.collect.Sets;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -16,6 +22,7 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -30,6 +37,18 @@ import net.minecraft.world.IWorld;
 //Much of this is inspired by FourWayBlock, it's just unfortunately not quite applicable here
 public class AltarBlock extends Block implements IWaterLoggable{
 
+	@RequiredArgsConstructor
+	@Getter
+	public enum AltarTypes{
+		SANDSTONE(100, 1F/48000F),
+		GILDED_SANDSTONE(1000, 1F/24000F),
+		MARBLE(100000, 1F/24000F);
+
+		private final float maxPoints;
+		private final float rechargeRate;
+
+	}
+
 	public static final BooleanProperty NORTH = SixWayBlock.NORTH;
 	public static final BooleanProperty EAST = SixWayBlock.EAST;
 	public static final BooleanProperty SOUTH = SixWayBlock.SOUTH;
@@ -38,12 +57,14 @@ public class AltarBlock extends Block implements IWaterLoggable{
 	protected static final Map<Direction, BooleanProperty> FACING_TO_PROPERTY_MAP = SixWayBlock.FACING_TO_PROPERTY_MAP.entrySet().stream().filter(facingProperty -> facingProperty.getKey().getAxis().isHorizontal()).collect(Util.toMapCollector());
 	protected final VoxelShape[] shapes;
 	private final Object2IntMap<BlockState> statePaletteMap = new Object2IntOpenHashMap<>();
+	private final AltarTypes type;
 
-	public AltarBlock() {
+	public AltarBlock(final AltarTypes type) {
 		super(AbstractBlock.Properties.create(Material.ROCK).setRequiresTool().hardnessAndResistance(2.0F, 6.0F));
+		this.type = type;
 		this.setDefaultState(this.stateContainer.getBaseState()
-				.with(NORTH, Boolean.valueOf(false)).with(EAST, Boolean.valueOf(false)).with(SOUTH, Boolean.valueOf(false))
-				.with(WEST, Boolean.valueOf(false)).with(WATERLOGGED, Boolean.valueOf(false)));
+				.with(AltarBlock.NORTH, false).with(AltarBlock.EAST, false).with(AltarBlock.SOUTH, false)
+				.with(AltarBlock.WEST, false).with(AltarBlock.WATERLOGGED, false));
 		this.shapes = this.makeShapes();
 	}
 
@@ -54,17 +75,17 @@ public class AltarBlock extends Block implements IWaterLoggable{
 
 	@Override
 	public VoxelShape getCollisionShape(final BlockState state, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
-		return this.getShape(state, reader, pos, context);
+		return this.shapes[this.getIndex(state)];
 	}
 
 	@Override
 	public VoxelShape getRenderShape(final BlockState state, final IBlockReader reader, final BlockPos pos) {
-		return this.getShape(state, reader, pos, null);
+		return this.shapes[this.getIndex(state)];
 	}
 
 	@Override
 	public VoxelShape getRayTraceShape(final BlockState state, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
-		return this.getShape(state, reader, pos, context);
+		return this.shapes[this.getIndex(state)];
 	}
 
 	@Override
@@ -79,13 +100,23 @@ public class AltarBlock extends Block implements IWaterLoggable{
 
 		return facing.getAxis().getPlane() == Direction.Plane.HORIZONTAL ?
 				state.with(AltarBlock.FACING_TO_PROPERTY_MAP.get(facing),
-						this.canConnect(facingState, facingState.isSolidSide(world, facingPos, facing.getOpposite()), facing.getOpposite()))
+						this.canConnect(facingState))
 				: state;
 	}
 
 	@Override
 	protected void fillStateContainer(final StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(AltarBlock.NORTH, AltarBlock.EAST, AltarBlock.WEST, AltarBlock.SOUTH, AltarBlock.WATERLOGGED);
+	}
+
+	@Override
+	public boolean hasTileEntity(final BlockState state) {
+		return true;
+	}
+
+	@Override
+	public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
+		return super.createTileEntity(state, world);
 	}
 
 	@Override
@@ -102,17 +133,15 @@ public class AltarBlock extends Block implements IWaterLoggable{
 		final BlockState blockStateSouth = blockReader.getBlockState(blockSouth);
 		final BlockState blockStateWest = blockReader.getBlockState(blockWest);
 		return super.getStateForPlacement(context)
-				.with(AltarBlock.NORTH, this.canConnect(blockStateNorth, blockStateNorth.isSolidSide(blockReader, blockNorth, Direction.SOUTH), Direction.SOUTH))
-				.with(AltarBlock.EAST, this.canConnect(blockStateEast, blockStateEast.isSolidSide(blockReader, blockEast, Direction.WEST), Direction.WEST))
-				.with(AltarBlock.SOUTH, this.canConnect(blockStateSouth, blockStateSouth.isSolidSide(blockReader, blockSouth, Direction.NORTH), Direction.NORTH))
-				.with(AltarBlock.WEST, this.canConnect(blockStateWest, blockStateWest.isSolidSide(blockReader, blockWest, Direction.EAST), Direction.EAST))
+				.with(AltarBlock.NORTH, this.canConnect(blockStateNorth))
+				.with(AltarBlock.EAST, this.canConnect(blockStateEast))
+				.with(AltarBlock.SOUTH, this.canConnect(blockStateSouth))
+				.with(AltarBlock.WEST, this.canConnect(blockStateWest))
 				.with(AltarBlock.WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
 	}
 
-
-
-	public boolean canConnect(final BlockState state, final boolean isSideSolid, final Direction direction) {
-		return state.getBlock() instanceof AltarBlock;
+	public boolean canConnect(final BlockState state) {
+		return state.getBlock() instanceof AltarBlock && ((AltarBlock) state.getBlock()).type == this.type;
 	}
 
 	@Override
@@ -213,6 +242,36 @@ public class AltarBlock extends Block implements IWaterLoggable{
 
 			return i;
 		});
+	}
+
+	public static VoxelShape connectAltars(final BlockState altar, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
+		if(!(altar.getBlock() instanceof AltarBlock))
+			return VoxelShapes.empty();
+		final Set<BlockPos> visited = Sets.newHashSet();
+		final VoxelShape shape = VoxelShapes.empty();
+		return AltarBlock.recursiveVisit(altar, reader, pos, visited, (nextAltar, nextPos) -> {
+			final BlockPos shifted = nextPos.subtract(pos);
+			return nextAltar.getRenderShape(reader, nextPos).withOffset(shifted.getX(), shifted.getY(), shifted.getZ());
+		}, VoxelShapes::or, shape);
+	}
+
+	private static <T> T recursiveVisit(final BlockState altar, final IBlockReader reader, final BlockPos pos, final Set<BlockPos> visited,
+			final BiFunction<BlockState, BlockPos, T> biFun, final BiFunction<T, T, T> joiner, T base) {
+		if(visited.contains(pos))
+			return base;
+		visited.add(pos);
+		final BlockState state = reader.getBlockState(pos);
+		if(((AltarBlock) altar.getBlock()).canConnect(state))
+			base = joiner.apply(base, biFun.apply(state, pos));
+		else
+			return base;
+
+		base = AltarBlock.recursiveVisit(altar, reader, pos.north(), visited, biFun, joiner, base);
+		base = AltarBlock.recursiveVisit(altar, reader, pos.east(), visited, biFun, joiner, base);
+		base = AltarBlock.recursiveVisit(altar, reader, pos.south(), visited, biFun, joiner, base);
+		base = AltarBlock.recursiveVisit(altar, reader, pos.west(), visited, biFun, joiner, base);
+
+		return base;
 	}
 
 }

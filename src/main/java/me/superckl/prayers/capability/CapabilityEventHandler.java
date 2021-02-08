@@ -1,12 +1,14 @@
 package me.superckl.prayers.capability;
 
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.block.TileEntityAltar;
 import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.INBT;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -21,9 +23,19 @@ public class CapabilityEventHandler {
 
 	//Attaches the prayer capability to all living entities
 	@SubscribeEvent
-	public void attachUser(final AttachCapabilitiesEvent<Entity> e) {
+	public void attachUserEntity(final AttachCapabilitiesEvent<Entity> e) {
 		if (e.getObject() instanceof LivingEntity) {
-			final DefaultPrayerUser.Provider provider = new DefaultPrayerUser.Provider();
+			final IPrayerUser.Provider provider = new IPrayerUser.Provider(new DefaultPrayerUser());
+			e.addCapability(new ResourceLocation(Prayers.MOD_ID, "prayer_user"), provider);
+			e.addListener(provider::invalidate);
+		}
+	}
+
+	//Attaches the prayer capability to altar tiles
+	@SubscribeEvent
+	public void attachUserTile(final AttachCapabilitiesEvent<TileEntity> e) {
+		if (e.getObject() instanceof TileEntityAltar) {
+			final IPrayerUser.Provider provider = new IPrayerUser.Provider(new AltarPrayerUser());
 			e.addCapability(new ResourceLocation(Prayers.MOD_ID, "prayer_user"), provider);
 			e.addListener(provider::invalidate);
 		}

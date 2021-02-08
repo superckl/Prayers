@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "prayers:block/altar"
+        "model": "prayers:block/sandstone_altar"
       }
     },
     {
@@ -10,7 +10,7 @@
         "west": "true"
       },
       "apply": {
-        "model": "prayers:block/altar_part",
+        "model": "prayers:block/sandstone_altar_part",
         "uvlock": true
       }
     },
@@ -19,7 +19,7 @@
         "north": "true"
       },
       "apply": {
-        "model": "prayers:block/altar_part",
+        "model": "prayers:block/sandstone_altar_part",
         "y": 90,
         "uvlock": true
       }
@@ -29,7 +29,7 @@
         "east": "true"
       },
       "apply": {
-        "model": "prayers:block/altar_part",
+        "model": "prayers:block/sandstone_altar_part",
         "y": 180,
         "uvlock": true
       }
@@ -39,7 +39,7 @@
         "south": "true"
       },
       "apply": {
-        "model": "prayers:block/altar_part",
+        "model": "prayers:block/sandstone_altar_part",
         "y": 270,
         "uvlock": true
       }

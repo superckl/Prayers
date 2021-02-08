@@ -1,0 +1,48 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "prayers:block/gilded_sandstone_altar"
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "prayers:block/gilded_sandstone_altar_part",
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "prayers:block/gilded_sandstone_altar_part",
+        "y": 90,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "prayers:block/gilded_sandstone_altar_part",
+        "y": 180,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "prayers:block/gilded_sandstone_altar_part",
+        "y": 270,
+        "uvlock": true
+      }
+    }
+  ]
+}

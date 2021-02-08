@@ -60,9 +60,10 @@ public class Prayers
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
 		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Prayer.class, this::registerPrayers);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
-		
+
 		ModBlocks.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModItems.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModTiles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
@@ -70,7 +71,7 @@ public class Prayers
 			MinecraftForge.EVENT_BUS.register(this);
 			MinecraftForge.EVENT_BUS.register(new CapabilityEventHandler());
 		});
-		CapabilityManager.INSTANCE.register(IPrayerUser.class, new DefaultPrayerUser.Storage(), DefaultPrayerUser::new);
+		CapabilityManager.INSTANCE.register(IPrayerUser.class, new IPrayerUser.Storage(), DefaultPrayerUser::new);
 		int pIndex = 0;
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketActivatePrayer.class,
 				PacketActivatePrayer::encode, PacketActivatePrayer::decode, PacketActivatePrayer::handle);

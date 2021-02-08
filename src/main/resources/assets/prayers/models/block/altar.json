@@ -1,8 +1,7 @@
 {
 	"parent": "minecraft:block/cube_all",
 	"textures": {
-		"texture": "prayers:block/altar_marble",
-		"particle": "prayers:block/altar_marble"
+		"particle": "#texture"
 	},
 	"elements": [
 		{
