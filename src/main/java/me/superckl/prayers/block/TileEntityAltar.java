@@ -1,6 +1,7 @@
 package me.superckl.prayers.block;
 
 import me.superckl.prayers.ModTiles;
+import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -10,8 +11,11 @@ import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 
-	public TileEntityAltar() {
-		super(ModTiles.ALTAR_BLOCK.get());
+	private final AltarTypes type;
+
+	public TileEntityAltar(final AltarTypes type) {
+		super(ModTiles.ALTARS.get(type).get());
+		this.type = type;
 	}
 
 	@Override

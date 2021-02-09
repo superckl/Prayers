@@ -1,6 +1,6 @@
 {
 	"parent": "prayers:block/altar_part",
 	"textures": {
-		"texture": "prayers:block/altar_marble"
+		"pillar": "prayers:block/altar_marble"
 	}
 }

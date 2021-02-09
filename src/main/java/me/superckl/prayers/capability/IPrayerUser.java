@@ -11,7 +11,6 @@ import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
-import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -19,6 +18,7 @@ import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -77,7 +77,7 @@ public interface IPrayerUser{
 		this.setCurrentPrayerPoints(newPoints);
 	}
 
-	static IPrayerUser getUser(final Entity entity) {
+	static IPrayerUser getUser(final ICapabilityProvider entity) {
 		return entity.getCapability(Prayers.PRAYER_USER_CAPABILITY)
 				.orElseThrow(() -> new IllegalStateException(String.format("Received entity %s with no prayer capability!", entity.toString())));
 	}

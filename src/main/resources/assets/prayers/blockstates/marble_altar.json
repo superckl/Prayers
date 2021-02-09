@@ -10,8 +10,7 @@
         "west": "true"
       },
       "apply": {
-        "model": "prayers:block/marble_altar_part",
-        "uvlock": true
+        "model": "prayers:block/marble_altar_part"
       }
     },
     {
@@ -20,8 +19,7 @@
       },
       "apply": {
         "model": "prayers:block/marble_altar_part",
-        "y": 90,
-        "uvlock": true
+        "y": 90
       }
     },
     {
@@ -30,8 +28,7 @@
       },
       "apply": {
         "model": "prayers:block/marble_altar_part",
-        "y": 180,
-        "uvlock": true
+        "y": 180
       }
     },
     {
@@ -40,8 +37,7 @@
       },
       "apply": {
         "model": "prayers:block/marble_altar_part",
-        "y": 270,
-        "uvlock": true
+        "y": 270
       }
     }
   ]

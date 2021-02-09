@@ -1,5 +1,7 @@
 package me.superckl.prayers;
 
+import java.util.EnumMap;
+
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import net.minecraft.block.Block;
@@ -11,8 +13,11 @@ public class ModBlocks {
 
 	public static final DeferredRegister<Block> REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, Prayers.MOD_ID);
 
-	public static final RegistryObject<Block> SANDSTONE_ALTAR = ModBlocks.REGISTER.register("sandstone_altar", () -> new AltarBlock(AltarTypes.SANDSTONE));
-	public static final RegistryObject<Block> GILDED_SANDSTONE_ALTAR = ModBlocks.REGISTER.register("gilded_sandstone_altar", () -> new AltarBlock(AltarTypes.GILDED_SANDSTONE));
-	public static final RegistryObject<Block> MARBLE_ALTAR = ModBlocks.REGISTER.register("marble_altar", () -> new AltarBlock(AltarTypes.MARBLE));
+	public static final EnumMap<AltarTypes, RegistryObject<? extends AltarBlock>> ALTARS = new EnumMap<>(AltarTypes.class);
+
+	static {
+		for (final AltarTypes type : AltarTypes.values())
+			ModBlocks.ALTARS.put(type, ModBlocks.REGISTER.register(type.name().toLowerCase()+"_altar", () -> new AltarBlock(type)));
+	}
 
 }
