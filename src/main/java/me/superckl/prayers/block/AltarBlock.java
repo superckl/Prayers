@@ -2,7 +2,8 @@ package me.superckl.prayers.block;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 import com.google.common.collect.Sets;
 
@@ -10,6 +11,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.util.MathUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,12 +42,13 @@ public class AltarBlock extends Block implements IWaterLoggable{
 	@RequiredArgsConstructor
 	@Getter
 	public enum AltarTypes{
-		SANDSTONE(100, 1F/48000F),
-		GILDED_SANDSTONE(1000, 1F/24000F),
-		MARBLE(100000, 1F/24000F);
+		SANDSTONE(100, 1F/48000F, 2),
+		GILDED_SANDSTONE(1000, 1F/24000F, 4),
+		MARBLE(100000, 1F/24000F, 5);
 
 		private final float maxPoints;
 		private final float rechargeRate;
+		private final int maxConnected;
 
 	}
 
@@ -244,34 +247,27 @@ public class AltarBlock extends Block implements IWaterLoggable{
 		});
 	}
 
-	public static VoxelShape connectAltars(final BlockState altar, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
-		if(!(altar.getBlock() instanceof AltarBlock))
-			return VoxelShapes.empty();
-		final Set<BlockPos> visited = Sets.newHashSet();
-		final VoxelShape shape = VoxelShapes.empty();
-		return AltarBlock.recursiveVisit(altar, reader, pos, visited, (nextAltar, nextPos) -> {
-			final BlockPos shifted = nextPos.subtract(pos);
-			return nextAltar.getRenderShape(reader, nextPos).withOffset(shifted.getX(), shifted.getY(), shifted.getZ());
-		}, VoxelShapes::or, shape);
+	public static Set<BlockPos> findConnected(final IBlockReader reader, final BlockPos origin) {
+		if(!(reader.getBlockState(origin).getBlock() instanceof AltarBlock))
+			return Sets.newHashSet();
+		final BiPredicate<BlockPos, BlockPos> canConnect = (pos1, pos2) -> {
+			final BlockState bs1 = reader.getBlockState(pos1);
+			final BlockState bs2 = reader.getBlockState(pos2);
+			if(!(bs1.getBlock() instanceof AltarBlock))
+				return false;
+			return ((AltarBlock) bs1.getBlock()).canConnect(bs2);
+		};
+		final Function<BlockPos, Set<BlockPos>> neighborhoodSupplier = pos -> Sets.newHashSet(pos.north(), pos.east(), pos.south(), pos.west());
+		return MathUtil.dsf(origin, canConnect, neighborhoodSupplier);
 	}
 
-	private static <T> T recursiveVisit(final BlockState altar, final IBlockReader reader, final BlockPos pos, final Set<BlockPos> visited,
-			final BiFunction<BlockState, BlockPos, T> biFun, final BiFunction<T, T, T> joiner, T base) {
-		if(visited.contains(pos))
-			return base;
-		visited.add(pos);
-		final BlockState state = reader.getBlockState(pos);
-		if(((AltarBlock) altar.getBlock()).canConnect(state))
-			base = joiner.apply(base, biFun.apply(state, pos));
-		else
-			return base;
+	public static VoxelShape connectAltars(final BlockState altar, final IBlockReader reader, final BlockPos origin) {
+		final Set<BlockPos> connected = AltarBlock.findConnected(reader, origin);
 
-		base = AltarBlock.recursiveVisit(altar, reader, pos.north(), visited, biFun, joiner, base);
-		base = AltarBlock.recursiveVisit(altar, reader, pos.east(), visited, biFun, joiner, base);
-		base = AltarBlock.recursiveVisit(altar, reader, pos.south(), visited, biFun, joiner, base);
-		base = AltarBlock.recursiveVisit(altar, reader, pos.west(), visited, biFun, joiner, base);
-
-		return base;
+		return connected.stream().map(pos -> {
+			final BlockPos diff = pos.subtract(origin);
+			return reader.getBlockState(pos).getShape(reader, pos).withOffset(diff.getX(), diff.getY(), diff.getZ());
+		}).reduce(VoxelShapes::or).orElse(VoxelShapes.empty());
 	}
 
 }

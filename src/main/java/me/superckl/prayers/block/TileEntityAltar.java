@@ -19,6 +19,12 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	}
 
 	@Override
+	public void onLoad() {
+		// TODO Auto-generated method stub
+		super.onLoad();
+	}
+
+	@Override
 	public void tick() {
 		// TODO Auto-generated method stub
 

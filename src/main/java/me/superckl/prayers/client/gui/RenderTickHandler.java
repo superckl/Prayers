@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
@@ -40,7 +39,7 @@ public class RenderTickHandler {
 		if(renderBlock.getBlock() instanceof AltarBlock) {
 			e.setCanceled(true);
 			final Vector3d proj = e.getInfo().getProjectedView();
-			final VoxelShape connected = AltarBlock.connectAltars(renderBlock, this.mc.world, pos, ISelectionContext.forEntity(e.getInfo().getRenderViewEntity()));
+			final VoxelShape connected = AltarBlock.connectAltars(renderBlock, this.mc.world, pos);
 			RenderTickHandler.drawShape(e.getMatrix(), e.getBuffers().getBuffer(RenderType.getLines()), connected,
 					pos.getX()-proj.x, pos.getY()-proj.y, pos.getZ()-proj.z, 0, 0, 0, 0.4F);
 		}
