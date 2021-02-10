@@ -22,10 +22,12 @@ import me.superckl.prayers.network.packet.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.server.CommandSet;
+import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -40,6 +42,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -119,6 +122,11 @@ public class Prayers
 												.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))));
 
 		e.getDispatcher().register(root);
+	}
+
+	//Called to ensure the overworld saved data is the one we use
+	public void onServerStarting(final FMLServerStartingEvent e) {
+		AltarsSavedData.get(e.getServer().getWorld(World.OVERWORLD));
 	}
 
 }

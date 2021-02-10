@@ -1,19 +1,27 @@
 package me.superckl.prayers.client.gui;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import me.superckl.prayers.block.AltarBlock;
+import me.superckl.prayers.block.TileEntityAltar;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class RenderTickHandler {
@@ -29,6 +37,25 @@ public class RenderTickHandler {
 			final int height = e.getWindow().getScaledHeight();
 			final int startY = height - 21 + (20 - PrayerBar.HEIGHT)/2;
 			this.widget.renderAt(e.getMatrixStack(), 8, startY);
+		}
+		if(this.mc.player.isSneaking() && this.mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK) {
+			final BlockPos hit = ((BlockRayTraceResult) this.mc.objectMouseOver).getPos();
+			if(this.mc.world.getBlockState(hit).getBlock() instanceof AltarBlock) {
+				final TileEntityAltar altar = (TileEntityAltar) this.mc.world.getTileEntity(hit);
+				final List<TileEntityAltar> altars = altar.getConnected();
+				final double current = altars.stream().mapToDouble(TileEntityAltar::getCurrentPoints).sum();
+				final double max = altars.stream().mapToDouble(TileEntityAltar::getMaxPoints).sum();
+				final List<String> toWrite = Lists.newArrayList();
+				toWrite.add("Valid: "+altar.isValidMultiblock());
+				toWrite.add("Owner: "+(altar.getOwner() == null ? "None":UsernameCache.getLastKnownUsername(altar.getOwner())));
+				toWrite.add("Points: "+String.format("%.2f/%.2f", current, max));
+				final int height = this.mc.getMainWindow().getScaledHeight();
+				final int width = this.mc.getMainWindow().getScaledWidth();
+				for (int i = 0; i < toWrite.size(); i++)
+					this.mc.fontRenderer.drawString(e.getMatrixStack(), toWrite.get(i),
+							width/2-this.mc.fontRenderer.getStringWidth(toWrite.get(i))/2,
+							height/2+5*(i+1)+this.mc.fontRenderer.FONT_HEIGHT*i, TextFormatting.WHITE.getColor());
+			}
 		}
 	}
 

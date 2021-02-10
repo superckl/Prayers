@@ -20,6 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -136,7 +137,7 @@ public interface IPrayerUser{
 			instance.setPrayerLevel(parent.getInt(Storage.LEVEL_KEY));
 			instance.setMaxPointsBoost(parent.getFloat(Storage.MAX_BOOST_KEY));
 			instance.setCurrentPrayerPoints(parent.getFloat(Storage.CURRENT_POINTS_KEY));
-			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, StringNBT.valueOf("").getId());
+			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
 			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getString()))));
 		}

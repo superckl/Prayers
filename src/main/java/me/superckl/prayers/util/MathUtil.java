@@ -1,9 +1,13 @@
 package me.superckl.prayers.util;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import net.minecraft.util.math.BlockPos;
 
 public class MathUtil {
 
@@ -28,6 +32,10 @@ public class MathUtil {
 		final Set<T> neighbors = neighborhoodSupplier.apply(origin);
 		neighbors.removeIf(neighbor -> !hasEdge.test(origin, neighbor));
 		neighbors.forEach(neighbor -> MathUtil.recursiveVisit(neighbor, visited, hasEdge, neighborhoodSupplier));
+	}
+
+	public static List<int[]> toIntList(final Set<BlockPos> blocks){
+		return blocks.stream().map(pos -> new int[] {pos.getX(), pos.getY(), pos.getZ()}).collect(Collectors.toList());
 	}
 
 }

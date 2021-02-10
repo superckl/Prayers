@@ -11,6 +11,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.ModTiles;
+import me.superckl.prayers.capability.IPrayerUser;
 import me.superckl.prayers.util.MathUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -18,23 +20,30 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.IWaterLoggable;
 import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 
 //Much of this is inspired by FourWayBlock, it's just unfortunately not quite applicable here
 public class AltarBlock extends Block implements IWaterLoggable{
@@ -119,7 +128,7 @@ public class AltarBlock extends Block implements IWaterLoggable{
 
 	@Override
 	public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
-		return super.createTileEntity(state, world);
+		return ModTiles.ALTARS.get(this.type).get().create();
 	}
 
 	@Override
@@ -141,6 +150,29 @@ public class AltarBlock extends Block implements IWaterLoggable{
 				.with(AltarBlock.SOUTH, this.canConnect(blockStateSouth))
 				.with(AltarBlock.WEST, this.canConnect(blockStateWest))
 				.with(AltarBlock.WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+	}
+
+	@Override
+	public void onBlockPlacedBy(final World worldIn, final BlockPos pos, final BlockState state, final LivingEntity placer, final ItemStack stack) {
+		if(placer instanceof PlayerEntity) {
+			final TileEntityAltar altar = (TileEntityAltar) worldIn.getTileEntity(pos);
+			altar.checkMultiblock(true);
+			altar.setOwner(((PlayerEntity) placer).getUniqueID(), true);
+		}
+	}
+
+	@Override
+	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
+			final Hand handIn, final BlockRayTraceResult hit) {
+		if(player.isSneaking())
+			return ActionResultType.PASS;
+		final TileEntityAltar altar = (TileEntityAltar) worldIn.getTileEntity(pos);
+		if (altar.setOwner(player.getUniqueID(), true))
+			return ActionResultType.SUCCESS;
+		final IPrayerUser user = IPrayerUser.getUser(player);
+		if(altar.rechargeUser(user) > 0)
+			return ActionResultType.SUCCESS;
+		return ActionResultType.FAIL;
 	}
 
 	public boolean canConnect(final BlockState state) {
