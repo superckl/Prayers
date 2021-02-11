@@ -18,6 +18,7 @@ public class DefaultPrayerUser implements IPrayerUser{
 	@Getter
 	private float maxPointsBoost;
 	private float maxPoints;
+	private float xp;
 
 	private final Set<Prayer> activePrayers = Sets.newIdentityHashSet();
 
@@ -98,6 +99,23 @@ public class DefaultPrayerUser implements IPrayerUser{
 
 	protected float computeMaxPoints() {
 		return 10*this.prayerLevel+this.maxPointsBoost;
+	}
+
+	@Override
+	public int giveXP(final float xp) {
+		this.xp += xp;
+		this.computeLevel();
+		return this.prayerLevel;
+	}
+
+	@Override
+	public void setXP(final float xp) {
+		this.xp = xp;
+	}
+
+	@Override
+	public float getXP() {
+		return this.xp;
 	}
 
 }

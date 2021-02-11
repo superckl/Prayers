@@ -27,6 +27,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public interface IPrayerUser{
 
+	float xp = 0;
+
 	default boolean canActivatePrayer(final Prayer prayer) {
 		if(!prayer.isEnabled() || this.getPrayerLevel() < prayer.getLevel() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
 			return false;
@@ -57,9 +59,32 @@ public interface IPrayerUser{
 
 	int setPrayerLevel(int level);
 
+	int giveXP(float xp);
+
+	void setXP(float xp);
+
+	float getXP();
+
 	Collection<Prayer> getActivePrayers();
 
 	void deactivateAllPrayers();
+
+	default void computeLevel() {
+		float xp = this.getXP();
+		while(xp >= this.xpForLevel()) {
+			xp -= this.xpForLevel();
+			this.setPrayerLevel(this.getPrayerLevel()+1);
+		}
+		this.setXP(xp);
+	}
+
+	default int xpForLevel() {
+		final int level = this.getPrayerLevel();
+		if (level >= 30)
+			return 112 + (level - 30) * 9;
+		else
+			return level >= 15 ? 37 + (level - 15) * 5 : 7 + level * 2;
+	}
 
 	default void togglePrayer(final Prayer prayer) {
 		if (this.isPrayerActive(prayer))
@@ -118,6 +143,7 @@ public interface IPrayerUser{
 		public static final String LEVEL_KEY = "prayer_level";
 		public static final String CURRENT_POINTS_KEY = "current_prayer_points";
 		public static final String ENABLED_PRAYERS_KEY = "enabled_prayers";
+		public static final String XP_KEY = "xp";
 
 		@Override
 		public CompoundNBT writeNBT(final Capability<IPrayerUser> capability, final IPrayerUser instance, final Direction side) {
@@ -125,6 +151,7 @@ public interface IPrayerUser{
 			parent.putInt(Storage.LEVEL_KEY, instance.getPrayerLevel());
 			parent.putFloat(Storage.MAX_BOOST_KEY, instance.getMaxPointsBoost());
 			parent.putFloat(Storage.CURRENT_POINTS_KEY, instance.getCurrentPrayerPoints());
+			parent.putFloat(Storage.XP_KEY, instance.getXP());
 			final ListNBT enabled = new ListNBT();
 			instance.getActivePrayers().forEach(prayer -> enabled.add(StringNBT.valueOf(prayer.getRegistryName().toString())));
 			parent.put(Storage.ENABLED_PRAYERS_KEY, enabled);
@@ -137,6 +164,7 @@ public interface IPrayerUser{
 			instance.setPrayerLevel(parent.getInt(Storage.LEVEL_KEY));
 			instance.setMaxPointsBoost(parent.getFloat(Storage.MAX_BOOST_KEY));
 			instance.setCurrentPrayerPoints(parent.getFloat(Storage.CURRENT_POINTS_KEY));
+			instance.setXP(parent.getFloat(Storage.XP_KEY));
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
 			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getString()))));
