@@ -70,6 +70,8 @@ public class Prayers
 		ModItems.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModTiles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModParticles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		Prayer.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		AltarItem.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
@@ -101,6 +103,7 @@ public class Prayers
 
 	private void createRegistry(final RegistryEvent.NewRegistry e) {
 		new RegistryBuilder<Prayer>().setName(new ResourceLocation(Prayers.MOD_ID, "prayers")).setType(Prayer.class).create();
+		new RegistryBuilder<AltarItem>().setName(new ResourceLocation(Prayers.MOD_ID, "altar_items")).setType(AltarItem.class).create();
 	}
 
 	@SubscribeEvent

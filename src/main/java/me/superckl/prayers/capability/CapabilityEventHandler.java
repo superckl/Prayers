@@ -3,12 +3,12 @@ package me.superckl.prayers.capability;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.INBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability.IStorage;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -32,12 +32,11 @@ public class CapabilityEventHandler {
 	//Sync prayer data when a client logs in
 	@SubscribeEvent
 	public void onPlayerLogin(final PlayerLoggedInEvent e) {
-		if(e.getPlayer() instanceof ServerPlayerEntity) {
-			final IPrayerUser user = IPrayerUser.getUser(e.getPlayer());
-			final INBT userNBT = Prayers.PRAYER_USER_CAPABILITY.getStorage().writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null);
-			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(e::getPlayer),
-					PacketSyncPrayerUser.builder().entityID(e.getPlayer().getEntityId()).userNBT(userNBT).build());
-		}
+		final AltarsSavedData data = AltarsSavedData.get((ServerWorld)e.getPlayer().world);
+		if(data.hasPendingXP(e.getPlayer().getUniqueID()))
+			IPrayerUser.getUser(e.getPlayer()).giveXP(data.getAndRemoveXP(e.getPlayer().getUniqueID()));
+		PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(e::getPlayer),
+				PacketSyncPrayerUser.fromPlayer(e.getPlayer()));
 	}
 
 	//Clones prayer data when a player dies
@@ -45,8 +44,7 @@ public class CapabilityEventHandler {
 	public void onPlayerClone(final PlayerEvent.Clone e) {
 		e.getOriginal().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> {
 			final IPrayerUser newUser =  IPrayerUser.getUser(e.getPlayer());
-			final IStorage<IPrayerUser> storage = Prayers.PRAYER_USER_CAPABILITY.getStorage();
-			storage.readNBT(Prayers.PRAYER_USER_CAPABILITY, newUser, null, storage.writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null));
+			Prayers.PRAYER_USER_CAPABILITY.readNBT(newUser, null, Prayers.PRAYER_USER_CAPABILITY.writeNBT(user, null));
 		});
 	}
 
@@ -62,8 +60,7 @@ public class CapabilityEventHandler {
 			return;
 		e.getEntity().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> {
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) e.getPlayer()),
-					PacketSyncPrayerUser.builder().entityID(e.getEntity().getEntityId())
-					.userNBT(Prayers.PRAYER_USER_CAPABILITY.getStorage().writeNBT(Prayers.PRAYER_USER_CAPABILITY, user, null)).build());
+					PacketSyncPrayerUser.fromPlayer(e.getPlayer()));
 		});
 	}
 

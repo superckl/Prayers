@@ -122,12 +122,12 @@ public interface IPrayerUser{
 
 		@Override
 		public  INBT serializeNBT() {
-			return Prayers.PRAYER_USER_CAPABILITY.getStorage().writeNBT(Prayers.PRAYER_USER_CAPABILITY, this.instance, null);
+			return Prayers.PRAYER_USER_CAPABILITY.writeNBT(this.instance, null);
 		}
 
 		@Override
 		public void deserializeNBT(final INBT nbt) {
-			Prayers.PRAYER_USER_CAPABILITY.getStorage().readNBT(Prayers.PRAYER_USER_CAPABILITY, this.instance, null, nbt);
+			Prayers.PRAYER_USER_CAPABILITY.readNBT(this.instance, null, nbt);
 		}
 
 		public void invalidate() {

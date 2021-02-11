@@ -164,15 +164,17 @@ public class AltarBlock extends Block implements IWaterLoggable{
 	@Override
 	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
-		if(player.isSneaking())
-			return ActionResultType.PASS;
 		final TileEntityAltar altar = (TileEntityAltar) worldIn.getTileEntity(pos);
-		if (altar.setOwner(player.getUniqueID(), true))
-			return ActionResultType.SUCCESS;
-		final IPrayerUser user = IPrayerUser.getUser(player);
-		if(altar.rechargeUser(user) > 0)
-			return ActionResultType.SUCCESS;
-		return ActionResultType.FAIL;
+		if(!player.isSneaking()) {
+			if (altar.setOwner(player.getUniqueID(), true))
+				return ActionResultType.SUCCESS;
+			if(player.getHeldItem(handIn).isEmpty()) {
+				final IPrayerUser user = IPrayerUser.getUser(player);
+				if(altar.rechargeUser(user) > 0)
+					return ActionResultType.SUCCESS;
+			}
+		}
+		return altar.onActivateBy(player, handIn);
 	}
 
 	public boolean canConnect(final BlockState state) {

@@ -5,12 +5,15 @@ import java.util.UUID;
 
 import com.google.common.collect.Maps;
 
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import me.superckl.prayers.Prayers;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.common.util.Constants;
 
 public class AltarsSavedData extends WorldSavedData{
 
@@ -20,8 +23,11 @@ public class AltarsSavedData extends WorldSavedData{
 	public static String ALTAR_DATA_KEY = "altar_data";
 	public static String PLAYER_ID_KEY = "player_id";
 	public static String BLOCK_POS_KEY = "position";
+	public static String PENDING_XP_KEY = "pending_xp";
+	public static String XP_KEY = "xp";
 
 	private final Map<UUID, BlockPos> ownedAltars = Maps.newHashMap();
+	private final Object2FloatMap<UUID> pendingXP = new Object2FloatOpenHashMap<>();
 
 	private AltarsSavedData() {
 		super(AltarsSavedData.DATA_NAME);
@@ -44,14 +50,36 @@ public class AltarsSavedData extends WorldSavedData{
 		return this.ownedAltars.remove(id);
 	}
 
+	public boolean hasPendingXP(final UUID id) {
+		return this.pendingXP.containsKey(id);
+	}
+
+	public float getAndRemoveXP(final UUID id) {
+		return this.pendingXP.removeFloat(id);
+	}
+
+	public void addPendingXP(final UUID id, final float xp) {
+		if(this.hasPendingXP(id))
+			this.pendingXP.put(id, this.pendingXP.getFloat(id)+xp);
+		else
+			this.pendingXP.put(id, xp);
+	}
+
 	@Override
 	public void read(final CompoundNBT nbt) {
-		final ListNBT altars = nbt.getList(AltarsSavedData.ALTAR_DATA_KEY, nbt.getId());
+		final ListNBT altars = nbt.getList(AltarsSavedData.ALTAR_DATA_KEY, Constants.NBT.TAG_COMPOUND);
 		altars.forEach(subNBT -> {
 			final CompoundNBT playerData = (CompoundNBT) subNBT;
 			final UUID playerID = playerData.getUniqueId(AltarsSavedData.PLAYER_ID_KEY);
 			final int[] posData = playerData.getIntArray(AltarsSavedData.BLOCK_POS_KEY);
 			this.ownedAltars.put(playerID, new BlockPos(posData[0], posData[1], posData[2]));
+		});
+		final ListNBT pending = nbt.getList(AltarsSavedData.PENDING_XP_KEY, Constants.NBT.TAG_COMPOUND);
+		pending.forEach(subNBT -> {
+			final CompoundNBT playerData = (CompoundNBT) subNBT;
+			final UUID playerID = playerData.getUniqueId(AltarsSavedData.PLAYER_ID_KEY);
+			final float xp = playerData.getFloat(AltarsSavedData.XP_KEY);
+			this.pendingXP.put(playerID, xp);
 		});
 	}
 
@@ -65,6 +93,14 @@ public class AltarsSavedData extends WorldSavedData{
 			altars.add(playerData);
 		});
 		nbt.put(AltarsSavedData.ALTAR_DATA_KEY, altars);
+		final ListNBT pending = new ListNBT();
+		this.pendingXP.forEach((id, xp) -> {
+			final CompoundNBT playerData = new CompoundNBT();
+			playerData.putUniqueId(AltarsSavedData.PLAYER_ID_KEY, id);
+			playerData.putFloat(AltarsSavedData.XP_KEY, xp);
+			pending.add(playerData);
+		});
+		nbt.put(AltarsSavedData.PENDING_XP_KEY, pending);
 		return nbt;
 	}
 

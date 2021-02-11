@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.IPrayerUser;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.network.PacketBuffer;
@@ -42,7 +43,11 @@ public class PacketSyncPrayerUser extends PrayersPacket{
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
 			context.enqueueWork(() -> {
 				final IPrayerUser prayerUser = this.getUser(Minecraft.getInstance().world);
-				Prayers.PRAYER_USER_CAPABILITY.getStorage().readNBT(Prayers.PRAYER_USER_CAPABILITY, prayerUser, null, this.userNBT);});
+				Prayers.PRAYER_USER_CAPABILITY.readNBT(prayerUser, null, this.userNBT);});
+	}
+
+	public static PacketSyncPrayerUser fromPlayer(final PlayerEntity player){
+		return PacketSyncPrayerUser.builder().entityID(player.getEntityId()).userNBT(Prayers.PRAYER_USER_CAPABILITY.writeNBT(IPrayerUser.getUser(player), null)).build();
 	}
 
 }

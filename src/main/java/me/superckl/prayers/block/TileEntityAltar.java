@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
+import me.superckl.prayers.AltarItem;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.capability.IPrayerUser;
 import me.superckl.prayers.init.ModParticles;
@@ -18,6 +19,8 @@ import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.IntArrayNBT;
 import net.minecraft.nbt.ListNBT;
@@ -25,6 +28,8 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.server.ServerWorld;
@@ -40,6 +45,9 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	public static String CONNECTED_KEY = "connected";
 	public static String MAX_POINTS_KEY = "max_points";
 	public static String CURRENT_POINTS_KEY = "current_points";
+	public static String ALTAR_ITEM_KEY = "altar_item";
+	public static String ITEM_PROGRESS_KEY = "item_progress";
+	public static String ITEM_OWNER_KEY = "item_owner";
 
 	private final Random rand = new Random();
 
@@ -49,6 +57,11 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	private Set<BlockPos> connected = ImmutableSet.of();
 	private float maxPoints = 0;
 	private float currentPoints = 0;
+
+	private ItemStack altarItem = ItemStack.EMPTY;
+	private UUID altarItemOwner;
+	private int itemTicks;
+	private int reqTicks;
 
 	public TileEntityAltar(final AltarTypes altarType) {
 		super(ModTiles.ALTARS.get(altarType).get());
@@ -194,16 +207,79 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 				this.currentPoints = this.maxPoints;
 			this.markDirty();
 		}
+		this.updateItem();
+	}
+
+	public void updateItem() {
+		if(this.altarItem.isEmpty())
+			return;
+		if(++this.itemTicks >= this.reqTicks) {
+			final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
+			final AltarItem aItem = AltarItem.find(this.altarItem);
+			if(player == null)
+				AltarsSavedData.get((ServerWorld) this.world).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
+			else
+				IPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
+			this.clearItem();
+		}
+		this.markDirty();
+	}
+
+	public void clearItem() {
+		this.altarItem = ItemStack.EMPTY;
+		this.altarItemOwner = null;
+		this.reqTicks = 0;
+		this.itemTicks = 0;
+		this.markDirty();
 	}
 
 	public void spawnActiveParticle() {
 		if(this.world.isRemote)
 			return;
 
+		int clearance = 0;
+		final BlockPos pos = this.pos.up();
+		while (clearance < 3) {
+			final BlockState state = this.world.getBlockState(pos);
+			if(!state.getBlock().isAir(state, this.world, pos))
+				break;
+			clearance++;
+		}
+		if(clearance == 0)
+			return;
+		final double yAdj = 1.5+this.rand.nextDouble();
+		if(yAdj >= clearance)
+			return;
+
 		final double posX = this.pos.getX()+this.rand.nextDouble();
-		final double posY = this.pos.getY()+1.5+this.rand.nextDouble();
+		final double posY = this.pos.getY()+yAdj;
 		final double posZ = this.pos.getZ()+this.rand.nextDouble();
 		((ServerWorld)this.world).spawnParticle(ModParticles.PRAYER_PARTICLE.get(), posX, posY, posZ, 0, 0, 0, 0, 0);
+	}
+
+	public ActionResultType onActivateBy(final PlayerEntity player, final Hand hand) {
+		if(player.isSneaking()) {
+			if(!this.altarItem.isEmpty() && player.getHeldItem(hand).isEmpty()) {
+				player.setHeldItem(hand, this.altarItem);
+				this.clearItem();
+				return ActionResultType.SUCCESS;
+			}
+		}else if(this.altarItem.isEmpty()){
+			final ItemStack held = player.getHeldItem(hand);
+			final AltarItem aItem = AltarItem.find(held);
+			if(aItem != null && aItem.canSacrifice()) {
+				this.altarItem = held.copy();
+				this.altarItem.setCount(1);
+				held.shrink(1);
+				this.altarItemOwner = player.getUniqueID();
+				this.itemTicks = 0;
+				this.reqTicks = aItem.getSacrificeTicks();
+				this.markDirty();
+				return ActionResultType.SUCCESS;
+			}else
+				return ActionResultType.FAIL;
+		}
+		return ActionResultType.PASS;
 	}
 
 	public boolean canRegen() {
@@ -218,6 +294,11 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 			altarNBT.putUniqueId(TileEntityAltar.OWNER_KEY, this.owner);
 		altarNBT.putFloat(TileEntityAltar.CURRENT_POINTS_KEY, this.currentPoints);
 		altarNBT.putFloat(TileEntityAltar.MAX_POINTS_KEY, this.maxPoints);
+		if(!this.altarItem.isEmpty()) {
+			altarNBT.put(TileEntityAltar.ALTAR_ITEM_KEY, this.altarItem.write(new CompoundNBT()));
+			altarNBT.putInt(TileEntityAltar.ITEM_PROGRESS_KEY, this.itemTicks);
+			altarNBT.putUniqueId(TileEntityAltar.ITEM_OWNER_KEY, this.altarItemOwner);
+		}
 		final ListNBT connectedList = new ListNBT();
 		MathUtil.toIntList(this.connected).forEach(connected -> connectedList.add(new IntArrayNBT(connected)));
 		altarNBT.put(TileEntityAltar.CONNECTED_KEY, connectedList);
@@ -232,6 +313,12 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		this.validMultiblock = altarNBT.getBoolean(TileEntityAltar.VALID_KEY);
 		this.maxPoints = altarNBT.getFloat(TileEntityAltar.MAX_POINTS_KEY);
 		this.currentPoints = altarNBT.getFloat(TileEntityAltar.CURRENT_POINTS_KEY);
+		if(altarNBT.contains(TileEntityAltar.ALTAR_ITEM_KEY)) {
+			this.altarItem = ItemStack.read((CompoundNBT) altarNBT.get(TileEntityAltar.ALTAR_ITEM_KEY));
+			this.itemTicks = altarNBT.getInt(TileEntityAltar.ITEM_PROGRESS_KEY);
+			this.altarItemOwner = altarNBT.getUniqueId(TileEntityAltar.ITEM_OWNER_KEY);
+			this.reqTicks = AltarItem.find(this.altarItem).getSacrificeTicks();
+		}
 		if(altarNBT.contains(TileEntityAltar.OWNER_KEY))
 			this.owner = altarNBT.getUniqueId(TileEntityAltar.OWNER_KEY);
 		final ListNBT connectedList = altarNBT.getList(TileEntityAltar.CONNECTED_KEY, Constants.NBT.TAG_INT_ARRAY);

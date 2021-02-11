@@ -47,8 +47,6 @@ public class PrayerSelectGUI extends Screen{
 		int j = 0;
 
 		final Collection<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues();
-		//TODO Sort by level req
-
 		final Iterator<Prayer> it = prayers.stream().sorted((p1, p2) -> IntComparators.NATURAL_COMPARATOR.compare(p1.getLevel(), p2.getLevel())).iterator();
 		while(it.hasNext()) {
 			final Prayer prayer  = it.next();
