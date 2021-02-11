@@ -15,6 +15,11 @@ import me.superckl.prayers.capability.DefaultPrayerUser;
 import me.superckl.prayers.capability.IPrayerUser;
 import me.superckl.prayers.client.gui.RenderTickHandler;
 import me.superckl.prayers.client.input.KeyBindings;
+import me.superckl.prayers.client.particle.PrayerParticle;
+import me.superckl.prayers.init.ModBlocks;
+import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.init.ModParticles;
+import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.network.packet.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.PacketSetPrayerLevel;
@@ -23,11 +28,13 @@ import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -61,12 +68,14 @@ public class Prayers
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerParticleFactory);
 		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Prayer.class, this::registerPrayers);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
 
 		ModBlocks.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModItems.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModTiles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModParticles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
@@ -127,6 +136,11 @@ public class Prayers
 	//Called to ensure the overworld saved data is the one we use
 	public void onServerStarting(final FMLServerStartingEvent e) {
 		AltarsSavedData.get(e.getServer().getWorld(World.OVERWORLD));
+	}
+
+	@SuppressWarnings("resource")
+	public void registerParticleFactory(final ParticleFactoryRegisterEvent e) {
+		Minecraft.getInstance().particles.registerFactory(ModParticles.PRAYER_PARTICLE.get(), PrayerParticle.Factory::new);
 	}
 
 }

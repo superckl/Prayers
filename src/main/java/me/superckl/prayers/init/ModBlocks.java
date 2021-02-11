@@ -1,7 +1,8 @@
-package me.superckl.prayers;
+package me.superckl.prayers.init;
 
 import java.util.EnumMap;
 
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import net.minecraft.block.Block;

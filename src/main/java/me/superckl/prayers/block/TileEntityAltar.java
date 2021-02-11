@@ -2,6 +2,7 @@ package me.superckl.prayers.block;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -10,9 +11,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
-import me.superckl.prayers.ModTiles;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.init.ModParticles;
+import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.block.BlockState;
@@ -38,6 +40,8 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	public static String CONNECTED_KEY = "connected";
 	public static String MAX_POINTS_KEY = "max_points";
 	public static String CURRENT_POINTS_KEY = "current_points";
+
+	private final Random rand = new Random();
 
 	private final AltarTypes altarType;
 	private boolean validMultiblock = false;
@@ -182,12 +186,24 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	public void tick() {
 		if (!this.canRegen())
 			return;
+		if(this.rand.nextDouble() < 0.015F)
+			this.spawnActiveParticle();
 		if(this.currentPoints < this.maxPoints) {
 			this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
 			if(this.currentPoints > this.maxPoints)
 				this.currentPoints = this.maxPoints;
 			this.markDirty();
 		}
+	}
+
+	public void spawnActiveParticle() {
+		if(this.world.isRemote)
+			return;
+
+		final double posX = this.pos.getX()+this.rand.nextDouble();
+		final double posY = this.pos.getY()+1.5+this.rand.nextDouble();
+		final double posZ = this.pos.getZ()+this.rand.nextDouble();
+		((ServerWorld)this.world).spawnParticle(ModParticles.PRAYER_PARTICLE.get(), posX, posY, posZ, 0, 0, 0, 0, 0);
 	}
 
 	public boolean canRegen() {
