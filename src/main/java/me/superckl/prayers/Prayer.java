@@ -125,7 +125,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 		return IPrayerUser.getUser(entity).isPrayerActive(this);
 	}
 
-	public static List<Prayer> all(){
+	public static List<Prayer> defaults(){
 		return Lists.newArrayList(Prayer.POTENCY_1, Prayer.POTENCY_2,
 				Prayer.ENHANCE_MELEE_1, Prayer.ENHANCE_MELEE_2, Prayer.ENHANCE_MELEE_3,
 				Prayer.ENHANCE_MAGIC_1, Prayer.ENHANCE_MAGIC_2, Prayer.ENHANCE_MAGIC_3,
@@ -134,7 +134,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 				Prayer.PROTECT_MAGIC, Prayer.PROTECT_MELEE, Prayer.PROTECT_RANGE).stream().map(RegistryObject::get).collect(Collectors.toList());
 	}
 
-	public static List<ResourceLocation> allLocations(){
+	public static List<ResourceLocation> defaultLocations(){
 		return Lists.newArrayList(Prayer.POTENCY_1, Prayer.POTENCY_2,
 				Prayer.ENHANCE_MELEE_1, Prayer.ENHANCE_MELEE_2, Prayer.ENHANCE_MELEE_3,
 				Prayer.ENHANCE_MAGIC_1, Prayer.ENHANCE_MAGIC_2, Prayer.ENHANCE_MAGIC_3,

@@ -22,7 +22,7 @@ public class Config {
 
 	private Config(final ForgeConfigSpec.Builder builder) {
 		this.prayers = builder.comment("List of all prayer resource locations Prayers will load.").define("Prayers",
-				Prayer.allLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList()));
+				Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList()));
 	}
 
 	public static ForgeConfigSpec setup() {
