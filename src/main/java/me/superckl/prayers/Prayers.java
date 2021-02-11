@@ -1,10 +1,7 @@
 package me.superckl.prayers;
 
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 
-import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -45,13 +42,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(Prayers.MOD_ID)
@@ -69,7 +64,6 @@ public class Prayers
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerParticleFactory);
-		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Prayer.class, this::registerPrayers);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
 
 		ModBlocks.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -107,17 +101,6 @@ public class Prayers
 
 	private void createRegistry(final RegistryEvent.NewRegistry e) {
 		new RegistryBuilder<Prayer>().setName(new ResourceLocation(Prayers.MOD_ID, "prayers")).setType(Prayer.class).create();
-	}
-
-	private void registerPrayers(final RegistryEvent.Register<Prayer> e) {
-		final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
-		final List<String> configPrays = Lists.newArrayList(Config.getInstance().getPrayers().get());
-		Prayer.all().forEach(prayer -> {
-			if(configPrays.remove(prayer.getRegistryName().toString()))
-				registry.register(prayer);
-		});
-		if(!configPrays.isEmpty())
-			LogHelper.warn("Prayers in config file do not have corresponding registry entry: "+configPrays.toString());
 	}
 
 	@SubscribeEvent
