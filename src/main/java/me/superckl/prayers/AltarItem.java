@@ -20,8 +20,8 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 
 	@ObjectHolder("minecraft:bone")
 	public static Item ITEM_BONE = null;
-	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(1).sacrificeTicks(20)
-			.offerPoints(1).offerTicks(20).matcher(stack -> ItemStack.areItemsEqual(stack, new ItemStack(AltarItem.ITEM_BONE)))::build);
+	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(1).sacrificeTicks(30)
+			.offerPoints(1).offerTicks(40).matcher(stack -> ItemStack.areItemsEqual(stack, new ItemStack(AltarItem.ITEM_BONE)))::build);
 
 	@Default
 	private final float offerPoints = 0;

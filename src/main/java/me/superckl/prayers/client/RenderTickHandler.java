@@ -1,4 +1,4 @@
-package me.superckl.prayers.client.gui;
+package me.superckl.prayers.client;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.TileEntityAltar;
+import me.superckl.prayers.client.gui.PrayerBar;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;

@@ -1,5 +1,6 @@
 package me.superckl.prayers.client.particle;
 
+import me.superckl.prayers.init.ModParticles;
 import net.minecraft.client.particle.IAnimatedSprite;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.IParticleRenderType;
@@ -18,6 +19,19 @@ public class PrayerParticle extends SpriteTexturedParticle{
 		this.rotSpeed = ((float)Math.random() - 0.5F) * 0.005F;
 		this.motionY = -.012;
 		this.maxAge = 1000;
+		this.multiplyParticleScaleBy(0.15F);
+	}
+
+	protected PrayerParticle(final ClientWorld world, final double x, final double y, final double z,
+			final double xSpeed, final double ySpeed, final double zSpeed) {
+		super(world, x, y, z, xSpeed, ySpeed, zSpeed);
+		this.motionX = xSpeed;
+		this.motionY = ySpeed;
+		this.motionZ = zSpeed;
+		this.rotSpeed = ((float)Math.random() - 0.5F) * 0.005F;
+		this.maxAge = 20;
+		this.canCollide = false;
+		this.multiplyParticleScaleBy(0.1F);
 	}
 
 	@Override
@@ -57,9 +71,13 @@ public class PrayerParticle extends SpriteTexturedParticle{
 		@Override
 		public Particle makeParticle(final BasicParticleType typeIn, final ClientWorld worldIn, final double x, final double y, final double z,
 				final double xSpeed, final double ySpeed, final double zSpeed) {
-			final PrayerParticle particle = new PrayerParticle(worldIn, x, y, z);
+			PrayerParticle particle;
+			if(typeIn == ModParticles.ITEM_SACRIFICE.get())
+				particle = new PrayerParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
+			else
+				particle = new PrayerParticle(worldIn, x, y, z);
 			particle.selectSpriteRandomly(this.spriteSet);
-			particle.multiplyParticleScaleBy(0.15F);
+			particle.setSize(1F, 1F);
 			return particle;
 		}
 

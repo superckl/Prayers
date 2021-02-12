@@ -10,7 +10,8 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import me.superckl.prayers.capability.CapabilityEventHandler;
 import me.superckl.prayers.capability.DefaultPrayerUser;
 import me.superckl.prayers.capability.IPrayerUser;
-import me.superckl.prayers.client.gui.RenderTickHandler;
+import me.superckl.prayers.client.AltarRenderer;
+import me.superckl.prayers.client.RenderTickHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.client.particle.PrayerParticle;
 import me.superckl.prayers.init.ModBlocks;
@@ -99,6 +100,7 @@ public class Prayers
 			MinecraftForge.EVENT_BUS.register(KeyBindings.class);
 		});
 		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYER_GUI);
+		ModTiles.ALTARS.values().forEach(tileTypeObj -> ClientRegistry.bindTileEntityRenderer(tileTypeObj.get(), AltarRenderer::new));
 	}
 
 	private void createRegistry(final RegistryEvent.NewRegistry e) {
@@ -126,7 +128,8 @@ public class Prayers
 
 	@SuppressWarnings("resource")
 	public void registerParticleFactory(final ParticleFactoryRegisterEvent e) {
-		Minecraft.getInstance().particles.registerFactory(ModParticles.PRAYER_PARTICLE.get(), PrayerParticle.Factory::new);
+		Minecraft.getInstance().particles.registerFactory(ModParticles.ALTAR_ACTIVE.get(), PrayerParticle.Factory::new);
+		Minecraft.getInstance().particles.registerFactory(ModParticles.ITEM_SACRIFICE.get(), PrayerParticle.Factory::new);
 	}
 
 }

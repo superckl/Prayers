@@ -11,6 +11,7 @@ public class ModParticles {
 
 	public static DeferredRegister<ParticleType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, Prayers.MOD_ID);
 
-	public static RegistryObject<BasicParticleType> PRAYER_PARTICLE = ModParticles.REGISTER.register("prayer_particle", () -> new BasicParticleType(false));
+	public static RegistryObject<BasicParticleType> ALTAR_ACTIVE = ModParticles.REGISTER.register("altar_active", () -> new BasicParticleType(false));
+	public static RegistryObject<BasicParticleType> ITEM_SACRIFICE = ModParticles.REGISTER.register("item_sacrifice", () -> new BasicParticleType(false));
 
 }

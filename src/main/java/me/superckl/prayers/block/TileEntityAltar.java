@@ -26,11 +26,16 @@ import net.minecraft.nbt.IntArrayNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants;
@@ -46,6 +51,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	public static String MAX_POINTS_KEY = "max_points";
 	public static String CURRENT_POINTS_KEY = "current_points";
 	public static String ALTAR_ITEM_KEY = "altar_item";
+	public static String DIRECTION_KEY = "item_direction";
 	public static String ITEM_PROGRESS_KEY = "item_progress";
 	public static String ITEM_OWNER_KEY = "item_owner";
 
@@ -59,6 +65,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	private float currentPoints = 0;
 
 	private ItemStack altarItem = ItemStack.EMPTY;
+	private Direction itemDirection;
 	private UUID altarItemOwner;
 	private int itemTicks;
 	private int reqTicks;
@@ -199,7 +206,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	public void tick() {
 		if (!this.canRegen())
 			return;
-		if(this.rand.nextDouble() < 0.015F)
+		if(this.rand.nextFloat() < 0.015F)
 			this.spawnActiveParticle();
 		if(this.currentPoints < this.maxPoints) {
 			this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
@@ -213,6 +220,17 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	public void updateItem() {
 		if(this.altarItem.isEmpty())
 			return;
+		if(!this.world.isRemote && this.rand.nextFloat() < 0.15F) {
+			final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
+			if(player != null) {
+				final Vector3d altarTop = new Vector3d(this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5)
+						.add((2*this.rand.nextDouble()-1)*.15, this.rand.nextDouble()*.05, (2*this.rand.nextDouble()-1)*.15);
+				Vector3d toPlayer = player.getPositionVec().add(0, player.getEyeHeight()-0.35, 0).subtract(altarTop);
+				final double mag = toPlayer.length();
+				toPlayer = toPlayer.scale(1/mag);
+				((ServerWorld)this.world).spawnParticle(ModParticles.ITEM_SACRIFICE.get(), altarTop.x, altarTop.y, altarTop.z, 0, toPlayer.x, toPlayer.y, toPlayer.z, mag/20);
+			}
+		}
 		if(++this.itemTicks >= this.reqTicks) {
 			final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
 			final AltarItem aItem = AltarItem.find(this.altarItem);
@@ -221,12 +239,17 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 			else
 				IPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
 			this.clearItem();
+			if(!this.world.isRemote) {
+				((ServerWorld)this.world).spawnParticle(ParticleTypes.SMOKE, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
+				((ServerWorld)this.world).playSound(null, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.02F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
+			}
 		}
 		this.markDirty();
 	}
 
 	public void clearItem() {
 		this.altarItem = ItemStack.EMPTY;
+		this.itemDirection = null;
 		this.altarItemOwner = null;
 		this.reqTicks = 0;
 		this.itemTicks = 0;
@@ -254,13 +277,13 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		final double posX = this.pos.getX()+this.rand.nextDouble();
 		final double posY = this.pos.getY()+yAdj;
 		final double posZ = this.pos.getZ()+this.rand.nextDouble();
-		((ServerWorld)this.world).spawnParticle(ModParticles.PRAYER_PARTICLE.get(), posX, posY, posZ, 0, 0, 0, 0, 0);
+		((ServerWorld)this.world).spawnParticle(ModParticles.ALTAR_ACTIVE.get(), posX, posY, posZ, 0, 0, 0, 0, 0);
 	}
 
 	public ActionResultType onActivateBy(final PlayerEntity player, final Hand hand) {
 		if(player.isSneaking()) {
 			if(!this.altarItem.isEmpty() && player.getHeldItem(hand).isEmpty()) {
-				player.setHeldItem(hand, this.altarItem);
+				player.addItemStackToInventory(this.altarItem);
 				this.clearItem();
 				return ActionResultType.SUCCESS;
 			}
@@ -270,10 +293,13 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 			if(aItem != null && aItem.canSacrifice()) {
 				this.altarItem = held.copy();
 				this.altarItem.setCount(1);
-				held.shrink(1);
+				if(!player.isCreative())
+					held.shrink(1);
 				this.altarItemOwner = player.getUniqueID();
 				this.itemTicks = 0;
 				this.reqTicks = aItem.getSacrificeTicks();
+				this.itemDirection = Direction.getFacingFromVector(this.pos.getX()-player.getPosX(),
+						this.pos.getY()-player.getPosY(), this.pos.getZ()-player.getPosZ());
 				this.markDirty();
 				return ActionResultType.SUCCESS;
 			}else
@@ -298,6 +324,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 			altarNBT.put(TileEntityAltar.ALTAR_ITEM_KEY, this.altarItem.write(new CompoundNBT()));
 			altarNBT.putInt(TileEntityAltar.ITEM_PROGRESS_KEY, this.itemTicks);
 			altarNBT.putUniqueId(TileEntityAltar.ITEM_OWNER_KEY, this.altarItemOwner);
+			altarNBT.putIntArray(TileEntityAltar.DIRECTION_KEY, new int[] {this.itemDirection.getXOffset(), this.itemDirection.getYOffset(), this.itemDirection.getZOffset()});
 		}
 		final ListNBT connectedList = new ListNBT();
 		MathUtil.toIntList(this.connected).forEach(connected -> connectedList.add(new IntArrayNBT(connected)));
@@ -315,6 +342,8 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		this.currentPoints = altarNBT.getFloat(TileEntityAltar.CURRENT_POINTS_KEY);
 		if(altarNBT.contains(TileEntityAltar.ALTAR_ITEM_KEY)) {
 			this.altarItem = ItemStack.read((CompoundNBT) altarNBT.get(TileEntityAltar.ALTAR_ITEM_KEY));
+			final int[] dirs = altarNBT.getIntArray(TileEntityAltar.DIRECTION_KEY);
+			this.itemDirection = Direction.getFacingFromVector(dirs[0], dirs[1], dirs[2]);
 			this.itemTicks = altarNBT.getInt(TileEntityAltar.ITEM_PROGRESS_KEY);
 			this.altarItemOwner = altarNBT.getUniqueId(TileEntityAltar.ITEM_OWNER_KEY);
 			this.reqTicks = AltarItem.find(this.altarItem).getSacrificeTicks();
