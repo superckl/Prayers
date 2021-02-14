@@ -77,7 +77,6 @@ public class PrayerParticle extends SpriteTexturedParticle{
 			else
 				particle = new PrayerParticle(worldIn, x, y, z);
 			particle.selectSpriteRandomly(this.spriteSet);
-			particle.setSize(1F, 1F);
 			return particle;
 		}
 

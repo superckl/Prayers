@@ -11,6 +11,7 @@ import me.superckl.prayers.capability.CapabilityEventHandler;
 import me.superckl.prayers.capability.DefaultPrayerUser;
 import me.superckl.prayers.capability.IPrayerUser;
 import me.superckl.prayers.client.AltarRenderer;
+import me.superckl.prayers.client.OfferingStandRenderer;
 import me.superckl.prayers.client.RenderTickHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.client.particle.PrayerParticle;
@@ -101,6 +102,7 @@ public class Prayers
 		});
 		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYER_GUI);
 		ModTiles.ALTARS.values().forEach(tileTypeObj -> ClientRegistry.bindTileEntityRenderer(tileTypeObj.get(), AltarRenderer::new));
+		ClientRegistry.bindTileEntityRenderer(ModTiles.OFFERING_STAND.get(), OfferingStandRenderer::new);
 	}
 
 	private void createRegistry(final RegistryEvent.NewRegistry e) {

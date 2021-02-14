@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;
 import net.minecraft.block.AbstractBlock;
@@ -34,6 +35,7 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Mirror;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -47,6 +49,8 @@ import net.minecraft.world.World;
 
 //Much of this is inspired by FourWayBlock, it's just unfortunately not quite applicable here
 public class AltarBlock extends Block implements IWaterLoggable{
+
+	public static final Set<ResourceLocation> validTopBlocks = Sets.newHashSet(new ResourceLocation("minecraft", "torch"), new ResourceLocation("minecraft", "air"), ModBlocks.OFFERING_STAND.getId());
 
 	@RequiredArgsConstructor
 	@Getter
@@ -155,7 +159,7 @@ public class AltarBlock extends Block implements IWaterLoggable{
 	@Override
 	public void onBlockPlacedBy(final World worldIn, final BlockPos pos, final BlockState state, final LivingEntity placer, final ItemStack stack) {
 		if(placer instanceof PlayerEntity) {
-			final TileEntityAltar altar = (TileEntityAltar) worldIn.getTileEntity(pos);
+			final AltarTileEntity altar = (AltarTileEntity) worldIn.getTileEntity(pos);
 			altar.checkMultiblock(true);
 			altar.setOwner(((PlayerEntity) placer).getUniqueID(), true);
 		}
@@ -164,7 +168,7 @@ public class AltarBlock extends Block implements IWaterLoggable{
 	@Override
 	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
-		final TileEntityAltar altar = (TileEntityAltar) worldIn.getTileEntity(pos);
+		final AltarTileEntity altar = (AltarTileEntity) worldIn.getTileEntity(pos);
 		if(!player.isSneaking()) {
 			if (altar.setOwner(player.getUniqueID(), true))
 				return ActionResultType.SUCCESS;

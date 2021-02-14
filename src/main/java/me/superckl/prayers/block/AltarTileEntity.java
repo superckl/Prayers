@@ -42,7 +42,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants;
 
 @Getter
-public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
+public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 
 	public static String ALTAR_KEY = "altar_data";
 	public static String VALID_KEY = "valid_multiblock";
@@ -71,7 +71,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	private int itemTicks;
 	private int reqTicks;
 
-	public TileEntityAltar(final AltarTypes altarType) {
+	public AltarTileEntity(final AltarTypes altarType) {
 		super(ModTiles.ALTARS.get(altarType).get());
 		this.altarType = altarType;
 	}
@@ -93,9 +93,9 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 				this.currentPoints = 0;
 			}
 		} else {
-			final List<TileEntityAltar> tiles = TileEntityAltar.toAltars(connected, this.world);
+			final List<AltarTileEntity> tiles = AltarTileEntity.toAltars(connected, this.world);
 			if(numConnected <= this.altarType.getMaxConnected()) {
-				final float points = (float) (tiles.stream().mapToDouble(TileEntityAltar::getCurrentPoints).sum()/numConnected);
+				final float points = (float) (tiles.stream().mapToDouble(AltarTileEntity::getCurrentPoints).sum()/numConnected);
 				final float maxPoints = this.altarType.getMaxPoints()*numConnected; //TODO diminishing returns
 				tiles.forEach(tile -> {
 					tile.validMultiblock = true;
@@ -118,12 +118,18 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		return connected;
 	}
 
-	public List<TileEntityAltar> getConnected(){
-		return TileEntityAltar.toAltars(this.connected, this.world);
+	public List<AltarTileEntity> getConnected(){
+		return AltarTileEntity.toAltars(this.connected, this.world);
 	}
 
-	public static List<TileEntityAltar> toAltars(final Set<BlockPos> blockPos, final IBlockReader reader){
-		return blockPos.stream().map(pos -> (TileEntityAltar) reader.getTileEntity(pos)).collect(Collectors.toList());
+	public static List<AltarTileEntity> toAltars(final Set<BlockPos> blockPos, final IBlockReader reader){
+		return blockPos.stream().map(pos -> (AltarTileEntity) reader.getTileEntity(pos)).collect(Collectors.toList());
+	}
+
+	public void addPoints(final float points) {
+		this.currentPoints += points;
+		if(this.currentPoints > this.maxPoints)
+			this.currentPoints = this.maxPoints;
 	}
 
 	private void invalidateMultiblock(final boolean reCheck) {
@@ -137,7 +143,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 				final BlockPos pos = it.next();
 				if(visited.contains(pos))
 					continue;
-				visited.addAll(((TileEntityAltar) this.world.getTileEntity(pos)).checkMultiblock(false));
+				visited.addAll(((AltarTileEntity) this.world.getTileEntity(pos)).checkMultiblock(false));
 			}
 		}
 		this.setOwner(null, false);
@@ -184,8 +190,8 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		final float current = user.getCurrentPrayerPoints();
 		final float max = user.getMaxPrayerPoints();
 		if(current < max) {
-			final List<TileEntityAltar> altars = this.getConnected();
-			final float altarCharge = (float) altars.stream().mapToDouble(TileEntityAltar::getCurrentPoints).sum();
+			final List<AltarTileEntity> altars = this.getConnected();
+			final float altarCharge = (float) altars.stream().mapToDouble(AltarTileEntity::getCurrentPoints).sum();
 			final float recharge = Math.min(altarCharge, max-current);
 			altars.forEach(altar -> {
 				altar.currentPoints -= recharge/altars.size();
@@ -205,7 +211,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 
 	@Override
 	public void tick() {
-		if(!this.altarItem.isEmpty() && !this.isTopClear()) {
+		if(!this.altarItem.isEmpty() && !this.isTopClear(true)) {
 			if(!this.world.isRemote) {
 				final double x = this.world.rand.nextFloat() * 0.5 + 0.25;
 				final double y = 1+this.world.rand.nextFloat() * 0.1;
@@ -270,19 +276,16 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	}
 
 	public void spawnActiveParticle() {
-		if(this.world.isRemote)
+		if(this.world.isRemote || !this.isTopClear(false))
 			return;
-
-		int clearance = 0;
-		final BlockPos pos = this.pos.up();
+		int clearance = 1;
+		final BlockPos pos = this.pos.add(0, 2, 0);
 		while (clearance < 3) {
 			final BlockState state = this.world.getBlockState(pos);
 			if(!state.getBlock().isAir(state, this.world, pos))
 				break;
 			clearance++;
 		}
-		if(clearance == 0)
-			return;
 		final double yAdj = 1.5+this.rand.nextDouble();
 		if(yAdj >= clearance)
 			return;
@@ -300,7 +303,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 				this.clearItem();
 				return ActionResultType.SUCCESS;
 			}
-		}else if(this.altarItem.isEmpty() && this.isTopClear()){
+		}else if(this.altarItem.isEmpty() && this.isTopClear(true)){
 			final ItemStack held = player.getHeldItem(hand);
 			final AltarItem aItem = AltarItem.find(held);
 			if(aItem != null && aItem.canSacrifice()) {
@@ -321,10 +324,10 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		return ActionResultType.PASS;
 	}
 
-	public boolean isTopClear() {
+	public boolean isTopClear(final boolean requireAir) {
 		final BlockPos up = this.pos.up();
 		final BlockState state = this.world.getBlockState(up);
-		return state.getBlock().isAir(state, this.world, up);
+		return requireAir ? state.getBlock().isAir(state, this.world, up):AltarBlock.validTopBlocks.contains(state.getBlock().delegate.name());
 	}
 
 	public boolean canRegen() {
@@ -334,42 +337,42 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 	@Override
 	public CompoundNBT write(final CompoundNBT compound) {
 		final CompoundNBT altarNBT = new CompoundNBT();
-		altarNBT.putBoolean(TileEntityAltar.VALID_KEY, this.validMultiblock);
+		altarNBT.putBoolean(AltarTileEntity.VALID_KEY, this.validMultiblock);
 		if(this.owner != null)
-			altarNBT.putUniqueId(TileEntityAltar.OWNER_KEY, this.owner);
-		altarNBT.putFloat(TileEntityAltar.CURRENT_POINTS_KEY, this.currentPoints);
-		altarNBT.putFloat(TileEntityAltar.MAX_POINTS_KEY, this.maxPoints);
+			altarNBT.putUniqueId(AltarTileEntity.OWNER_KEY, this.owner);
+		altarNBT.putFloat(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
+		altarNBT.putFloat(AltarTileEntity.MAX_POINTS_KEY, this.maxPoints);
 		if(!this.altarItem.isEmpty()) {
-			altarNBT.put(TileEntityAltar.ALTAR_ITEM_KEY, this.altarItem.write(new CompoundNBT()));
-			altarNBT.putInt(TileEntityAltar.ITEM_PROGRESS_KEY, this.itemTicks);
-			altarNBT.putUniqueId(TileEntityAltar.ITEM_OWNER_KEY, this.altarItemOwner);
-			altarNBT.putIntArray(TileEntityAltar.DIRECTION_KEY, new int[] {this.itemDirection.getXOffset(), this.itemDirection.getYOffset(), this.itemDirection.getZOffset()});
+			altarNBT.put(AltarTileEntity.ALTAR_ITEM_KEY, this.altarItem.write(new CompoundNBT()));
+			altarNBT.putInt(AltarTileEntity.ITEM_PROGRESS_KEY, this.itemTicks);
+			altarNBT.putUniqueId(AltarTileEntity.ITEM_OWNER_KEY, this.altarItemOwner);
+			altarNBT.putIntArray(AltarTileEntity.DIRECTION_KEY, new int[] {this.itemDirection.getXOffset(), this.itemDirection.getYOffset(), this.itemDirection.getZOffset()});
 		}
 		final ListNBT connectedList = new ListNBT();
 		MathUtil.toIntList(this.connected).forEach(connected -> connectedList.add(new IntArrayNBT(connected)));
-		altarNBT.put(TileEntityAltar.CONNECTED_KEY, connectedList);
-		compound.put(TileEntityAltar.ALTAR_KEY, altarNBT);
+		altarNBT.put(AltarTileEntity.CONNECTED_KEY, connectedList);
+		compound.put(AltarTileEntity.ALTAR_KEY, altarNBT);
 		return super.write(compound);
 	}
 
 	@Override
 	public void read(final BlockState state, final CompoundNBT nbt) {
 		super.read(state, nbt);
-		final CompoundNBT altarNBT = nbt.getCompound(TileEntityAltar.ALTAR_KEY);
-		this.validMultiblock = altarNBT.getBoolean(TileEntityAltar.VALID_KEY);
-		this.maxPoints = altarNBT.getFloat(TileEntityAltar.MAX_POINTS_KEY);
-		this.currentPoints = altarNBT.getFloat(TileEntityAltar.CURRENT_POINTS_KEY);
-		if(altarNBT.contains(TileEntityAltar.ALTAR_ITEM_KEY)) {
-			this.altarItem = ItemStack.read((CompoundNBT) altarNBT.get(TileEntityAltar.ALTAR_ITEM_KEY));
-			final int[] dirs = altarNBT.getIntArray(TileEntityAltar.DIRECTION_KEY);
+		final CompoundNBT altarNBT = nbt.getCompound(AltarTileEntity.ALTAR_KEY);
+		this.validMultiblock = altarNBT.getBoolean(AltarTileEntity.VALID_KEY);
+		this.maxPoints = altarNBT.getFloat(AltarTileEntity.MAX_POINTS_KEY);
+		this.currentPoints = altarNBT.getFloat(AltarTileEntity.CURRENT_POINTS_KEY);
+		if(altarNBT.contains(AltarTileEntity.ALTAR_ITEM_KEY)) {
+			this.altarItem = ItemStack.read(altarNBT.getCompound(AltarTileEntity.ALTAR_ITEM_KEY));
+			final int[] dirs = altarNBT.getIntArray(AltarTileEntity.DIRECTION_KEY);
 			this.itemDirection = Direction.getFacingFromVector(dirs[0], dirs[1], dirs[2]);
-			this.itemTicks = altarNBT.getInt(TileEntityAltar.ITEM_PROGRESS_KEY);
-			this.altarItemOwner = altarNBT.getUniqueId(TileEntityAltar.ITEM_OWNER_KEY);
+			this.itemTicks = altarNBT.getInt(AltarTileEntity.ITEM_PROGRESS_KEY);
+			this.altarItemOwner = altarNBT.getUniqueId(AltarTileEntity.ITEM_OWNER_KEY);
 			this.reqTicks = AltarItem.find(this.altarItem).getSacrificeTicks();
 		}
-		if(altarNBT.contains(TileEntityAltar.OWNER_KEY))
-			this.owner = altarNBT.getUniqueId(TileEntityAltar.OWNER_KEY);
-		final ListNBT connectedList = altarNBT.getList(TileEntityAltar.CONNECTED_KEY, Constants.NBT.TAG_INT_ARRAY);
+		if(altarNBT.contains(AltarTileEntity.OWNER_KEY))
+			this.owner = altarNBT.getUniqueId(AltarTileEntity.OWNER_KEY);
+		final ListNBT connectedList = altarNBT.getList(AltarTileEntity.CONNECTED_KEY, Constants.NBT.TAG_INT_ARRAY);
 		final Set<BlockPos> connected = Sets.newHashSet();
 		connectedList.stream().map(inbt -> ((IntArrayNBT) inbt).getIntArray()).forEach(array -> connected.add(new BlockPos(array[0], array[1], array[2])));
 		this.connected = ImmutableSet.copyOf(connected);
@@ -390,10 +393,10 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		if(this.world.isRemote)
 			return null;
 		final CompoundNBT nbt = new CompoundNBT();
-		nbt.putBoolean(TileEntityAltar.HAS_OWNER_KEY, this.owner != null);
+		nbt.putBoolean(AltarTileEntity.HAS_OWNER_KEY, this.owner != null);
 		if(this.owner!= null)
-			nbt.putUniqueId(TileEntityAltar.OWNER_KEY, this.owner);
-		nbt.putFloat(TileEntityAltar.CURRENT_POINTS_KEY, this.currentPoints);
+			nbt.putUniqueId(AltarTileEntity.OWNER_KEY, this.owner);
+		nbt.putFloat(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
 		return new SUpdateTileEntityPacket(this.pos, -1, nbt);
 	}
 
@@ -402,11 +405,11 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 		if(!this.world.isRemote)
 			return;
 		final CompoundNBT nbt = pkt.getNbtCompound();
-		if(nbt.getBoolean(TileEntityAltar.HAS_OWNER_KEY))
-			this.owner = nbt.getUniqueId(TileEntityAltar.OWNER_KEY);
+		if(nbt.getBoolean(AltarTileEntity.HAS_OWNER_KEY))
+			this.owner = nbt.getUniqueId(AltarTileEntity.OWNER_KEY);
 		else
 			this.owner = null;
-		this.currentPoints = nbt.getFloat(TileEntityAltar.CURRENT_POINTS_KEY);
+		this.currentPoints = nbt.getFloat(AltarTileEntity.CURRENT_POINTS_KEY);
 	}
 
 }

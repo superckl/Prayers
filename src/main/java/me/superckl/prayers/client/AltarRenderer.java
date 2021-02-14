@@ -2,7 +2,7 @@ package me.superckl.prayers.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import me.superckl.prayers.block.TileEntityAltar;
+import me.superckl.prayers.block.AltarTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -13,7 +13,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class AltarRenderer extends TileEntityRenderer<TileEntityAltar>{
+public class AltarRenderer extends TileEntityRenderer<AltarTileEntity>{
 
 	private final ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
 
@@ -22,7 +22,7 @@ public class AltarRenderer extends TileEntityRenderer<TileEntityAltar>{
 	}
 
 	@Override
-	public void render(final TileEntityAltar tileEntityIn, final float partialTicks, final MatrixStack matrixStackIn,
+	public void render(final AltarTileEntity tileEntityIn, final float partialTicks, final MatrixStack matrixStackIn,
 			final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
 		if(tileEntityIn.getAltarItem().isEmpty())
 			return;

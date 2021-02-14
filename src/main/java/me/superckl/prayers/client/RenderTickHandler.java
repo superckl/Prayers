@@ -7,7 +7,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import me.superckl.prayers.block.AltarBlock;
-import me.superckl.prayers.block.TileEntityAltar;
+import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.client.gui.PrayerBar;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -42,10 +42,10 @@ public class RenderTickHandler {
 		if(this.mc.player.isSneaking() && this.mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK) {
 			final BlockPos hit = ((BlockRayTraceResult) this.mc.objectMouseOver).getPos();
 			if(this.mc.world.getBlockState(hit).getBlock() instanceof AltarBlock) {
-				final TileEntityAltar altar = (TileEntityAltar) this.mc.world.getTileEntity(hit);
-				final List<TileEntityAltar> altars = altar.getConnected();
-				final double current = altars.stream().mapToDouble(TileEntityAltar::getCurrentPoints).sum();
-				final double max = altars.stream().mapToDouble(TileEntityAltar::getMaxPoints).sum();
+				final AltarTileEntity altar = (AltarTileEntity) this.mc.world.getTileEntity(hit);
+				final List<AltarTileEntity> altars = altar.getConnected();
+				final double current = altars.stream().mapToDouble(AltarTileEntity::getCurrentPoints).sum();
+				final double max = altars.stream().mapToDouble(AltarTileEntity::getMaxPoints).sum();
 				final List<String> toWrite = Lists.newArrayList();
 				toWrite.add("Valid: "+altar.isValidMultiblock());
 				toWrite.add("Owner: "+(altar.getOwner() == null ? "None":UsernameCache.getLastKnownUsername(altar.getOwner())));

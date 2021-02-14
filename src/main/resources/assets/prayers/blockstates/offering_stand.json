@@ -1,0 +1,39 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "prayers:block/offering_stand"
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "prayers:block/offering_stand",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "prayers:block/offering_stand",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "prayers:block/offering_stand",
+        "y": 270
+      }
+    }
+  ]
+}

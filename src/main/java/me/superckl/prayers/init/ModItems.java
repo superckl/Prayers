@@ -24,6 +24,8 @@ public class ModItems {
 
 	public static final DeferredRegister<Item> REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, Prayers.MOD_ID);
 
+	public static final RegistryObject<BlockItem> OFFERING_STAND = ModItems.REGISTER.register("offering_stand",
+			() -> new BlockItem(ModBlocks.OFFERING_STAND.get(), new Item.Properties().group(ModItems.PRAYERS_GROUP)));
 	public static final EnumMap<AltarTypes, RegistryObject<? extends BlockItem>> ALTARS = new EnumMap<>(AltarTypes.class);
 
 	static {
