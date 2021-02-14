@@ -19,6 +19,7 @@ import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -204,17 +205,29 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 
 	@Override
 	public void tick() {
-		if (!this.canRegen())
-			return;
-		if(this.rand.nextFloat() < 0.015F)
-			this.spawnActiveParticle();
-		if(this.currentPoints < this.maxPoints) {
-			this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
-			if(this.currentPoints > this.maxPoints)
-				this.currentPoints = this.maxPoints;
+		if(!this.altarItem.isEmpty() && !this.isTopClear()) {
+			if(!this.world.isRemote) {
+				final double x = this.world.rand.nextFloat() * 0.5 + 0.25;
+				final double y = 1+this.world.rand.nextFloat() * 0.1;
+				final double z = this.world.rand.nextFloat() * 0.5 + 0.25;
+				final ItemEntity itemEntity = new ItemEntity(this.world, this.pos.getX() + x, this.pos.getY() + y, this.pos.getZ() + z, this.altarItem);
+				itemEntity.setDefaultPickupDelay();
+				this.world.addEntity(itemEntity);
+			}
+			this.clearItem();
 			this.markDirty();
 		}
-		this.updateItem();
+		if (this.canRegen()) {
+			if(this.rand.nextFloat() < 0.015F)
+				this.spawnActiveParticle();
+			if(this.currentPoints < this.maxPoints) {
+				this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
+				if(this.currentPoints > this.maxPoints)
+					this.currentPoints = this.maxPoints;
+				this.markDirty();
+			}
+			this.updateItem();
+		}
 	}
 
 	public void updateItem() {
@@ -287,7 +300,7 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 				this.clearItem();
 				return ActionResultType.SUCCESS;
 			}
-		}else if(this.altarItem.isEmpty()){
+		}else if(this.altarItem.isEmpty() && this.isTopClear()){
 			final ItemStack held = player.getHeldItem(hand);
 			final AltarItem aItem = AltarItem.find(held);
 			if(aItem != null && aItem.canSacrifice()) {
@@ -306,6 +319,12 @@ public class TileEntityAltar extends TileEntity implements ITickableTileEntity{
 				return ActionResultType.FAIL;
 		}
 		return ActionResultType.PASS;
+	}
+
+	public boolean isTopClear() {
+		final BlockPos up = this.pos.up();
+		final BlockState state = this.world.getBlockState(up);
+		return state.getBlock().isAir(state, this.world, up);
 	}
 
 	public boolean canRegen() {
