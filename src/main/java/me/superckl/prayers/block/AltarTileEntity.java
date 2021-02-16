@@ -118,6 +118,18 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		return connected;
 	}
 
+	public float getMaxPoints() {
+		if(!this.validMultiblock)
+			return this.maxPoints;
+		return (float) this.getConnected().stream().mapToDouble(altar -> altar.maxPoints).sum();
+	}
+
+	public float getCurrentPoints() {
+		if(!this.validMultiblock)
+			return this.currentPoints;
+		return (float) this.getConnected().stream().mapToDouble(altar -> altar.currentPoints).sum();
+	}
+
 	public List<AltarTileEntity> getConnected(){
 		return AltarTileEntity.toAltars(this.connected, this.world);
 	}
@@ -203,7 +215,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		final float max = user.getMaxPrayerPoints();
 		if(current < max) {
 			final List<AltarTileEntity> altars = this.getConnected();
-			final float altarCharge = (float) altars.stream().mapToDouble(AltarTileEntity::getCurrentPoints).sum();
+			final float altarCharge = this.getCurrentPoints();
 			final float recharge = Math.min(altarCharge, max-current);
 			altars.forEach(altar -> {
 				altar.currentPoints -= recharge/altars.size();
@@ -313,7 +325,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			if(!this.altarItem.isEmpty() && player.getHeldItem(hand).isEmpty()) {
 				player.addItemStackToInventory(this.altarItem);
 				this.clearItem();
-				return ActionResultType.SUCCESS;
+				return player.world.isRemote ? ActionResultType.SUCCESS:ActionResultType.CONSUME;
 			}
 		}else if(this.altarItem.isEmpty() && this.isTopClear(true)){
 			final ItemStack held = player.getHeldItem(hand);
@@ -326,10 +338,9 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 				this.altarItemOwner = player.getUniqueID();
 				this.itemTicks = 0;
 				this.reqTicks = aItem.getSacrificeTicks();
-				this.itemDirection = Direction.getFacingFromVector(this.pos.getX()-player.getPosX(),
-						this.pos.getY()-player.getPosY(), this.pos.getZ()-player.getPosZ());
+				this.itemDirection = Direction.fromAngle(player.rotationYawHead);
 				this.markDirty();
-				return ActionResultType.SUCCESS;
+				return player.world.isRemote ? ActionResultType.SUCCESS:ActionResultType.CONSUME;
 			}else
 				return ActionResultType.FAIL;
 		}

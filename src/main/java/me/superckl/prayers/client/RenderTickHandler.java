@@ -8,10 +8,16 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarTileEntity;
+import me.superckl.prayers.block.OfferingStandBlock;
+import me.superckl.prayers.block.OfferingStandTileEntity;
 import me.superckl.prayers.client.gui.PrayerBar;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -29,6 +35,7 @@ public class RenderTickHandler {
 
 	private final PrayerBar widget = new PrayerBar(true, false);
 	private final Minecraft mc = Minecraft.getInstance();
+	private final ItemRenderer itemRender = this.mc.getItemRenderer();
 
 	//This event renders the player's prayer points
 	@SubscribeEvent
@@ -41,11 +48,11 @@ public class RenderTickHandler {
 		}
 		if(this.mc.player.isSneaking() && this.mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK) {
 			final BlockPos hit = ((BlockRayTraceResult) this.mc.objectMouseOver).getPos();
-			if(this.mc.world.getBlockState(hit).getBlock() instanceof AltarBlock) {
+			final Block hitBlock = this.mc.world.getBlockState(hit).getBlock();
+			if(hitBlock instanceof AltarBlock) {
 				final AltarTileEntity altar = (AltarTileEntity) this.mc.world.getTileEntity(hit);
-				final List<AltarTileEntity> altars = altar.getConnected();
-				final double current = altars.stream().mapToDouble(AltarTileEntity::getCurrentPoints).sum();
-				final double max = altars.stream().mapToDouble(AltarTileEntity::getMaxPoints).sum();
+				final double current = altar.getCurrentPoints();
+				final double max = altar.getMaxPoints();
 				final List<String> toWrite = Lists.newArrayList();
 				toWrite.add("Valid: "+altar.isValidMultiblock());
 				toWrite.add("Owner: "+(altar.getOwner() == null ? "None":UsernameCache.getLastKnownUsername(altar.getOwner())));
@@ -56,6 +63,18 @@ public class RenderTickHandler {
 					this.mc.fontRenderer.drawString(e.getMatrixStack(), toWrite.get(i),
 							width/2-this.mc.fontRenderer.getStringWidth(toWrite.get(i))/2,
 							height/2+5*(i+1)+this.mc.fontRenderer.FONT_HEIGHT*i, TextFormatting.WHITE.getColor());
+			}else if(hitBlock instanceof OfferingStandBlock) {
+				final OfferingStandTileEntity offeringStand = (OfferingStandTileEntity) this.mc.world.getTileEntity(hit);
+				final ItemStack item = offeringStand.getItem();
+				if(!item.isEmpty()) {
+					FontRenderer font = item.getItem().getFontRenderer(item);
+					if(font == null)
+						font = this.mc.fontRenderer;
+					final int height = this.mc.getMainWindow().getScaledHeight();
+					final int width = this.mc.getMainWindow().getScaledWidth();
+					this.itemRender.renderItemAndEffectIntoGUI(item, width/2-8, height/2+4);
+					this.itemRender.renderItemOverlayIntoGUI(font, item, width/2-8, height/2+4, null);
+				}
 			}
 		}
 	}

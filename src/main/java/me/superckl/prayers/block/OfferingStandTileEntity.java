@@ -41,8 +41,8 @@ public class OfferingStandTileEntity extends TileEntity implements ITickableTile
 	public void tick() {
 		if(this.item.isEmpty())
 			return;
+		this.itemAge++;
 		this.findValidAltar().ifPresent(altar -> {
-			this.itemAge++;
 			if(++this.itemTicks >= this.reqTicks) {
 				final AltarItem aItem = AltarItem.find(this.item);
 				if(aItem.getOfferPoints() <= altar.getMaxPoints()-altar.getCurrentPoints() || altar.getCurrentPoints() == 0) {
@@ -63,7 +63,7 @@ public class OfferingStandTileEntity extends TileEntity implements ITickableTile
 			if(!this.item.isEmpty() && player.getHeldItem(hand).isEmpty()) {
 				player.addItemStackToInventory(this.item);
 				this.clearItem();
-				return ActionResultType.SUCCESS;
+				return this.world.isRemote ? ActionResultType.SUCCESS : ActionResultType.CONSUME;
 			}
 		}else if(this.item.isEmpty()){
 			final ItemStack held = player.getHeldItem(hand);
@@ -75,9 +75,20 @@ public class OfferingStandTileEntity extends TileEntity implements ITickableTile
 				this.itemTicks = 0;
 				this.reqTicks = aItem.getOfferTicks();
 				this.markDirty();
-				return ActionResultType.SUCCESS;
-			}else
-				return ActionResultType.FAIL;
+				return this.world.isRemote ? ActionResultType.SUCCESS : ActionResultType.CONSUME;
+			}
+		}else {
+			final ItemStack held = player.getHeldItem(hand);
+			if(held.isItemEqual(this.item) && ItemStack.areItemStackTagsEqual(held, this.item)) {
+				final int toAdd = Math.min(this.item.getMaxStackSize()-this.item.getCount(), held.getCount());
+				if(toAdd == 0)
+					return ActionResultType.PASS;
+				this.item.grow(toAdd);
+				if(!player.isCreative())
+					held.shrink(toAdd);
+				this.markDirty();
+				return this.world.isRemote ? ActionResultType.SUCCESS : ActionResultType.CONSUME;
+			}
 		}
 		return ActionResultType.PASS;
 	}

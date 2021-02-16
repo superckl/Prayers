@@ -8,11 +8,8 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -22,64 +19,23 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-public class OfferingStandBlock extends Block{
+public class OfferingStandBlock extends ShapedBlock{
 
-	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-	protected final VoxelShape shape;
-
 	public OfferingStandBlock() {
-		super(AbstractBlock.Properties.create(Material.IRON, MaterialColor.IRON).setRequiresTool().hardnessAndResistance(5.0F, 6.0F).sound(SoundType.METAL));
-		this.setDefaultState(this.stateContainer.getBaseState().with(OfferingStandBlock.FACING, Direction.NORTH).with(OfferingStandBlock.WATERLOGGED, false));
-		this.shape = this.getShape();
-	}
-
-	@Override
-	public VoxelShape getShape(final BlockState state, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
-		return this.shape;
-	}
-
-	@Override
-	public VoxelShape getCollisionShape(final BlockState state, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
-		return this.shape;
-	}
-
-	@Override
-	public VoxelShape getRenderShape(final BlockState state, final IBlockReader reader, final BlockPos pos) {
-		return this.shape;
-	}
-
-	@Override
-	public VoxelShape getRayTraceShape(final BlockState state, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
-		return this.shape;
-	}
-
-	@Override
-	public FluidState getFluidState(final BlockState state) {
-		return state.get(AltarBlock.WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : Fluids.EMPTY.getDefaultState();
-	}
-
-	@Override
-	public BlockState updatePostPlacement(final BlockState state, final Direction facing, final BlockState facingState, final IWorld world, final BlockPos currentPos, final BlockPos facingPos) {
-		if (state.get(AltarBlock.WATERLOGGED))
-			world.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(world));
-
-		return state;
+		super(AbstractBlock.Properties.create(Material.IRON, MaterialColor.IRON).setRequiresTool().hardnessAndResistance(5.0F, 6.0F).sound(SoundType.METAL), true);
+		this.setDefaultState(this.getDefaultState().with(OfferingStandBlock.FACING, Direction.NORTH));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(final BlockItemUseContext context) {
-		final FluidState fluidState = context.getWorld().getFluidState(context.getPos());
-		return super.getStateForPlacement(context).with(OfferingStandBlock.FACING, context.getPlacementHorizontalFacing().getOpposite())
-				.with(OfferingStandBlock.WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+		return super.getStateForPlacement(context).with(OfferingStandBlock.FACING, context.getPlacementHorizontalFacing().getOpposite());
 	}
 
 	@Override
@@ -108,7 +64,8 @@ public class OfferingStandBlock extends Block{
 		super.onReplaced(state, worldIn, pos, newState, isMoving);
 	}
 
-	protected VoxelShape getShape() {
+	@Override
+	protected VoxelShape[] getShapes() {
 		final VoxelShape base = Block.makeCuboidShape(5, 0, 5, 11, 1, 11);
 		final VoxelShape pillar = Block.makeCuboidShape(7, 1, 7, 9, 4, 9);
 		final VoxelShape top_base_n = Block.makeCuboidShape(7, 4, 6, 9, 5, 7);
@@ -128,14 +85,20 @@ public class OfferingStandBlock extends Block{
 		final VoxelShape top_side_top_s = Block.makeCuboidShape(7, 6, 10, 9, 7, 11);
 		final VoxelShape top_side_top_w = Block.makeCuboidShape(5, 6, 7, 6, 7, 9);
 
-		return VoxelShapes.or(base, pillar, top_base_n, top_base_e, top_base_s, top_base_w, trim_1,
+		return new VoxelShape[] {VoxelShapes.or(base, pillar, top_base_n, top_base_e, top_base_s, top_base_w, trim_1,
 				trim_2, trim_3, trim_4, top_side_n, top_side_e, top_side_s, top_side_w, top_side_top_n,
-				top_side_top_e, top_side_top_s, top_side_top_w);
+				top_side_top_e, top_side_top_s, top_side_top_w)};
 	}
 
 	@Override
 	protected void fillStateContainer(final StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(OfferingStandBlock.FACING, OfferingStandBlock.WATERLOGGED);
+		builder.add(OfferingStandBlock.FACING);
+		super.fillStateContainer(builder);
+	}
+
+	@Override
+	protected int getIndex(final BlockState state) {
+		return 0;
 	}
 
 }
