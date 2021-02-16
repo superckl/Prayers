@@ -10,6 +10,7 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
@@ -96,6 +97,15 @@ public class OfferingStandBlock extends Block{
 			final Hand handIn, final BlockRayTraceResult hit) {
 		final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getTileEntity(pos);
 		return offering_stand.onActivateBy(player, handIn);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
+		final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getTileEntity(pos);
+		if(!offering_stand.getItem().isEmpty())
+			InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), offering_stand.getItem());
+		super.onReplaced(state, worldIn, pos, newState, isMoving);
 	}
 
 	protected VoxelShape getShape() {

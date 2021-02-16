@@ -1,24 +1,35 @@
 package me.superckl.prayers.block;
 
+import java.util.Random;
+
+import lombok.Getter;
 import me.superckl.prayers.AltarItem;
 import me.superckl.prayers.init.ModTiles;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.LazyOptional;
 
+@Getter
 public class OfferingStandTileEntity extends TileEntity implements ITickableTileEntity{
 
 	public static String OFFERING_STAND_KEY = "offering_stand_data";
 	public static String ITEM_KEY = "item";
 	public static String ITEM_PROGRESS_KEY = "item_progress";
 
+	private final Random rand = new Random();
+
 	private ItemStack item = ItemStack.EMPTY;
+	private int itemAge;
 	private int itemTicks;
 	private int reqTicks;
 
@@ -31,14 +42,17 @@ public class OfferingStandTileEntity extends TileEntity implements ITickableTile
 		if(this.item.isEmpty())
 			return;
 		this.findValidAltar().ifPresent(altar -> {
+			this.itemAge++;
 			if(++this.itemTicks >= this.reqTicks) {
 				final AltarItem aItem = AltarItem.find(this.item);
 				if(aItem.getOfferPoints() <= altar.getMaxPoints()-altar.getCurrentPoints() || altar.getCurrentPoints() == 0) {
 					altar.addPoints(aItem.getOfferPoints());
 					this.decrementItem();
-					//TODO particle effect
-				} else
-					this.itemTicks--;
+					if(!this.world.isRemote) {
+						((ServerWorld)this.world).spawnParticle(ParticleTypes.SMOKE, this.pos.getX()+0.5, this.pos.getY()+7F/16F, this.pos.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
+						((ServerWorld)this.world).playSound(null, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.01F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
+					}
+				}
 			}
 			this.markDirty();
 		});
@@ -80,6 +94,7 @@ public class OfferingStandTileEntity extends TileEntity implements ITickableTile
 		this.item = ItemStack.EMPTY;
 		this.itemTicks = 0;
 		this.reqTicks = 0;
+		this.itemAge = 0;
 		this.markDirty();
 	}
 
@@ -112,6 +127,16 @@ public class OfferingStandTileEntity extends TileEntity implements ITickableTile
 			this.reqTicks = AltarItem.find(this.item).getOfferTicks();
 		}
 		super.read(state, nbt);
+	}
+
+	@Override
+	public CompoundNBT getUpdateTag() {
+		return this.write(new CompoundNBT());
+	}
+
+	@Override
+	public void handleUpdateTag(final BlockState state, final CompoundNBT tag) {
+		this.read(state, tag);
 	}
 
 }

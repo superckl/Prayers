@@ -126,10 +126,22 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		return blockPos.stream().map(pos -> (AltarTileEntity) reader.getTileEntity(pos)).collect(Collectors.toList());
 	}
 
-	public void addPoints(final float points) {
+	public float addPoints(final float points) {
+		final List<AltarTileEntity> connected = this.getConnected();
+		final float toAdd = points/connected.size();
+		return (float) connected.stream().mapToDouble(altar -> altar.addPointsInternal(toAdd)).sum();
+	}
+
+	private float addPointsInternal(final float points) {
+		if(this.currentPoints >= this.maxPoints)
+			return 0;
 		this.currentPoints += points;
-		if(this.currentPoints > this.maxPoints)
+		if(this.currentPoints > this.maxPoints) {
+			final float diff = this.maxPoints - this.currentPoints;
 			this.currentPoints = this.maxPoints;
+			return diff;
+		}
+		return points;
 	}
 
 	private void invalidateMultiblock(final boolean reCheck) {
