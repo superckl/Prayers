@@ -1,0 +1,44 @@
+{
+  	"multipart": [
+    {
+      "apply": {
+        "model": "prayers:block/crafting_stand"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "prayers:block/crafting_stand_n"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "prayers:block/crafting_stand_n",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "prayers:block/crafting_stand_n",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "prayers:block/crafting_stand_n",
+        "y": 270
+      }
+    }
+  ]
+}
