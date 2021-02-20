@@ -18,6 +18,7 @@ import me.superckl.prayers.client.particle.PrayerParticle;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
+import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.network.packet.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.PacketDeactivatePrayer;
@@ -72,6 +73,7 @@ public class Prayers
 		ModItems.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModTiles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModParticles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModRecipes.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		Prayer.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		AltarItem.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
