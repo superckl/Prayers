@@ -4,8 +4,8 @@ import java.util.EnumMap;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock;
-import me.superckl.prayers.block.CraftingStandBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
+import me.superckl.prayers.block.CraftingStandBlock;
 import me.superckl.prayers.block.OfferingStandBlock;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.RegistryObject;

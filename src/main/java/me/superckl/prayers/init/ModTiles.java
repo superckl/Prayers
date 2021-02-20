@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.block.AltarTileEntity;
+import me.superckl.prayers.block.CraftingStandTileEntity;
 import me.superckl.prayers.block.OfferingStandTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
@@ -15,7 +16,10 @@ public class ModTiles {
 
 	public static final DeferredRegister<TileEntityType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, Prayers.MOD_ID);
 
-	public static final RegistryObject<TileEntityType<OfferingStandTileEntity>> OFFERING_STAND = ModTiles.REGISTER.register("offering_stand", () -> TileEntityType.Builder.create(OfferingStandTileEntity::new, ModBlocks.OFFERING_STAND.get()).build(null));
+	public static final RegistryObject<TileEntityType<OfferingStandTileEntity>> OFFERING_STAND = ModTiles.REGISTER.register("offering_stand",
+			() -> TileEntityType.Builder.create(OfferingStandTileEntity::new, ModBlocks.OFFERING_STAND.get()).build(null));
+	public static final RegistryObject<TileEntityType<CraftingStandTileEntity>> CRAFTING_STAND = ModTiles.REGISTER.register("crafting_stand",
+			() -> TileEntityType.Builder.create(CraftingStandTileEntity::new, ModBlocks.CRAFTING_STAND.get()).build(null));
 	public static final EnumMap<AltarTypes, RegistryObject<TileEntityType<? extends AltarTileEntity>>> ALTARS = new EnumMap<>(AltarTypes.class);
 
 	static {

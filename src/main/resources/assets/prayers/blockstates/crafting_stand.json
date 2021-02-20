@@ -1,6 +1,21 @@
 {
   	"multipart": [
+  	{
+  	  "when": {
+        "center": "false",
+        "north": "false",
+        "east": "false",
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "prayers:block/crafting_stand"
+      }
+  	},
     {
+      "when": {
+        "center": "true"
+      },
       "apply": {
         "model": "prayers:block/crafting_stand"
       }
