@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import me.superckl.prayers.init.ModTiles;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -83,10 +84,15 @@ public class CraftingStandTileEntity extends TileEntity implements ISidedInvento
 
 	@Override
 	public int[] getSlotsForFace(final Direction side) {
-		if(CraftingStandTileEntity.dirToSlot.containsKey(side))
+		if(CraftingStandTileEntity.dirToSlot.containsKey(side) && this.hasStand(side))
 			return new int[] {CraftingStandTileEntity.dirToSlot.getInt(side)};
 		else
 			return new int[0];
+	}
+
+	public boolean hasStand(final Direction dir) {
+		final BlockState state = this.getBlockState();
+		return ((CraftingStandBlock)state.getBlock()).hasStand(state, dir);
 	}
 
 	@Override
