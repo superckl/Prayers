@@ -58,9 +58,11 @@ public class OfferingStandBlock extends ShapedBlock{
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
-		final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getTileEntity(pos);
-		InventoryHelper.dropInventoryItems(worldIn, pos, offering_stand);
-		super.onReplaced(state, worldIn, pos, newState, isMoving);
+		if(!state.isIn(newState.getBlock())) {
+			final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getTileEntity(pos);
+			InventoryHelper.dropInventoryItems(worldIn, pos, offering_stand);
+			super.onReplaced(state, worldIn, pos, newState, isMoving);
+		}
 	}
 
 	@Override

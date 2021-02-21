@@ -19,6 +19,8 @@ import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -99,6 +101,16 @@ public class AltarBlock extends FourWayShapedBlock{
 				if(altar.rechargeUser(player) > 0)
 					return ActionResultType.CONSUME;
 		return altar.onActivateBy(player, handIn);
+	}
+
+	@Override
+	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
+		if(!state.isIn(newState.getBlock())) {
+			final AltarTileEntity te = (AltarTileEntity) worldIn.getTileEntity(pos);
+			if(!te.getAltarItem().isEmpty())
+				InventoryHelper.dropInventoryItems(worldIn, pos, new Inventory(te.getAltarItem()));
+			super.onReplaced(state, worldIn, pos, newState, isMoving);
+		}
 	}
 
 	@Override

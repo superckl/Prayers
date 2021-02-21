@@ -71,6 +71,7 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	public boolean isItemValidForSlot(final int index, final ItemStack stack) {
 		return AltarItem.find(stack) != null;
 	}
+
 	protected LazyOptional<AltarTileEntity> findValidAltar() {
 		final TileEntity below = this.world.getTileEntity(this.pos.down());
 		if(below != null && below instanceof AltarTileEntity) {

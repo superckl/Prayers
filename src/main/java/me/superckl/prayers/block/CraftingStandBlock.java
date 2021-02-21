@@ -1,5 +1,9 @@
 package me.superckl.prayers.block;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -8,7 +12,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.TileEntity;
@@ -59,6 +66,25 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	@Override
 	public boolean isReplaceable(final BlockState state, final BlockItemUseContext context) {
 		return context.getItem().getItem() == this.asItem() && this.findNextPlacement(state, context) != state;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
+		final CraftingStandTileEntity crafting_stand = (CraftingStandTileEntity) worldIn.getTileEntity(pos);
+		if(state.isIn(newState.getBlock())) {
+			final List<ItemStack> stacks = Lists.newArrayList();
+			Direction.Plane.HORIZONTAL.forEach(dir -> {
+				if(state.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir)) && !newState.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir)))
+					stacks.add(crafting_stand.removeStackFromSlot(CraftingStandTileEntity.dirToSlot.getInt(dir)));
+			});
+			if(state.get(CraftingStandBlock.CENTER) && !newState.get(CraftingStandBlock.CENTER))
+				stacks.add(crafting_stand.removeStackFromSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP)));
+			InventoryHelper.dropInventoryItems(worldIn, pos, new Inventory(stacks.toArray(new ItemStack[stacks.size()])));
+		}else {
+			InventoryHelper.dropInventoryItems(worldIn, pos, crafting_stand);
+			super.onReplaced(state, worldIn, pos, newState, isMoving);
+		}
 	}
 
 	@Override

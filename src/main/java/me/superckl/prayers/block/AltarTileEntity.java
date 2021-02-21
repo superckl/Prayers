@@ -342,11 +342,13 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 				return ActionResultType.CONSUME;
 			}
 		}else if(this.altarItem.isEmpty() && this.isTopClear(true)){
-			ItemStack held = player.getHeldItem(hand);
-			if(player.isCreative())
-				held = held.copy();
-			if(this.setItem(held.split(1), player.getUniqueID(), Direction.fromAngle(player.rotationYawHead)))
+			final ItemStack toPlace = player.getHeldItem(hand).copy();
+			toPlace.setCount(1);
+			if(this.setItem(toPlace, player.getUniqueID(), Direction.fromAngle(player.rotationYawHead))) {
+				if(!player.isCreative())
+					player.getHeldItem(hand).shrink(1);
 				return ActionResultType.CONSUME;
+			}
 		}
 		return ActionResultType.PASS;
 	}
