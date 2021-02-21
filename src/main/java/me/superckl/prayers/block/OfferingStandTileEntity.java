@@ -29,7 +29,6 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	private final Random rand = new Random();
 
-	private int itemAge;
 	private int itemTicks;
 	private int reqTicks;
 
@@ -41,7 +40,6 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	public void tick() {
 		if(this.world.isRemote || this.getStackInSlot(0).isEmpty())
 			return;
-		this.itemAge++;
 		this.findValidAltar().ifPresent(altar -> {
 			if(++this.itemTicks >= this.reqTicks) {
 				final AltarItem aItem = AltarItem.find(this.getStackInSlot(0));
@@ -63,7 +61,6 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	@Override
 	public void onSlotChange(final int slot, final boolean itemChanged) {
 		if(itemChanged) {
-			this.itemAge = 0;
 			this.itemTicks = 0;
 			this.reqTicks = this.getStackInSlot(0).isEmpty() ? 0:AltarItem.find(this.getStackInSlot(0)).getOfferTicks();
 		}
