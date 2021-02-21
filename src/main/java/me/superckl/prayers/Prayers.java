@@ -21,12 +21,14 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
-import me.superckl.prayers.network.packet.PacketActivatePrayer;
-import me.superckl.prayers.network.packet.PacketDeactivatePrayer;
-import me.superckl.prayers.network.packet.PacketSetPrayerLevel;
-import me.superckl.prayers.network.packet.PacketSetPrayerPoints;
-import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
+import me.superckl.prayers.network.packet.PacketInventorySlotChanged;
+import me.superckl.prayers.network.packet.PacketSetAltarItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
+import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
+import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
+import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
+import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.client.Minecraft;
@@ -96,6 +98,10 @@ public class Prayers
 				PacketSyncPrayerUser::encode, PacketSyncPrayerUser::decode, PacketSyncPrayerUser::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetPrayerLevel.class,
 				PacketSetPrayerLevel::encode, PacketSetPrayerLevel::decode, PacketSetPrayerLevel::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketInventorySlotChanged.class,
+				PacketInventorySlotChanged::encode, PacketInventorySlotChanged::decode, PacketInventorySlotChanged::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetAltarItem.class,
+				PacketSetAltarItem::encode, PacketSetAltarItem::decode, PacketSetAltarItem::handle);
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {

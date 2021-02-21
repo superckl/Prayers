@@ -1,10 +1,11 @@
-package me.superckl.prayers.network.packet;
+package me.superckl.prayers.network.packet.user;
 
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -14,7 +15,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 @SuperBuilder
-public class PacketDeactivatePrayer  extends PrayersPacket{
+public class PacketDeactivatePrayer  extends PrayerUserPacket{
 
 	private final Prayer prayer;
 
@@ -25,11 +26,11 @@ public class PacketDeactivatePrayer  extends PrayersPacket{
 	}
 
 	public static PacketDeactivatePrayer decode(final PacketBuffer buffer) {
-		final ResourceLocation loc = new ResourceLocation(buffer.readString(PrayersPacket.BUFFER_STRING_LENGTH));
+		final ResourceLocation loc = new ResourceLocation(buffer.readString(PrayerUserPacket.BUFFER_STRING_LENGTH));
 		final Prayer prayer = GameRegistry.findRegistry(Prayer.class).getValue(loc);
 		if (prayer == null)
 			throw new IllegalArgumentException(String.format("Invalid prayer location %s!", loc.toString()));
-		return PrayersPacket.decode(PacketDeactivatePrayer.builder(), buffer).prayer(prayer).build();
+		return PrayerUserPacket.decode(PacketDeactivatePrayer.builder(), buffer).prayer(prayer).build();
 	}
 
 	@Override

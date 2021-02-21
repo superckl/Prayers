@@ -1,8 +1,8 @@
 package me.superckl.prayers.capability;
 
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.network.packet.PacketSyncPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

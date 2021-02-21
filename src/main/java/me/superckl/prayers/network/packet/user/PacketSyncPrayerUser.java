@@ -1,4 +1,4 @@
-package me.superckl.prayers.network.packet;
+package me.superckl.prayers.network.packet.user;
 
 import java.util.function.Supplier;
 
@@ -15,7 +15,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 @SuperBuilder
-public class PacketSyncPrayerUser extends PrayersPacket{
+public class PacketSyncPrayerUser extends PrayerUserPacket{
 
 	public static final String USER_KEY = "prayer_user";
 
@@ -31,7 +31,7 @@ public class PacketSyncPrayerUser extends PrayersPacket{
 
 	public static PacketSyncPrayerUser decode(final PacketBuffer buffer) {
 		final CompoundNBT nbt = buffer.readCompoundTag();
-		return PrayersPacket.decode(PacketSyncPrayerUser.builder(), buffer).userNBT(nbt.get(PacketSyncPrayerUser.USER_KEY)).build();
+		return PrayerUserPacket.decode(PacketSyncPrayerUser.builder(), buffer).userNBT(nbt.get(PacketSyncPrayerUser.USER_KEY)).build();
 	}
 
 	@Override

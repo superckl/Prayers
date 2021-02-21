@@ -4,9 +4,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.capability.IPrayerUser;
-import me.superckl.prayers.network.packet.PacketActivatePrayer;
-import me.superckl.prayers.network.packet.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
+import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;

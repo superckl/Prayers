@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.capability.IPrayerUser;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;
@@ -39,7 +38,8 @@ import net.minecraft.world.World;
 //Much of this is inspired by FourWayBlock, it's just unfortunately not quite applicable here
 public class AltarBlock extends FourWayShapedBlock{
 
-	public static final Set<ResourceLocation> validTopBlocks = Sets.newHashSet(new ResourceLocation("minecraft", "torch"), new ResourceLocation("minecraft", "air"), ModBlocks.OFFERING_STAND.getId());
+	public static final Set<ResourceLocation> validTopBlocks = Sets.newHashSet(new ResourceLocation("minecraft", "torch"),
+			new ResourceLocation("minecraft", "air"), ModBlocks.OFFERING_STAND.getId(), ModBlocks.CRAFTING_STAND.getId());
 
 	@RequiredArgsConstructor
 	@Getter
@@ -90,15 +90,14 @@ public class AltarBlock extends FourWayShapedBlock{
 	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
 		final AltarTileEntity altar = (AltarTileEntity) worldIn.getTileEntity(pos);
-		if(!player.isSneaking()) {
-			if (altar.setOwner(player.getUniqueID(), true))
-				return worldIn.isRemote ? ActionResultType.SUCCESS:ActionResultType.CONSUME;
-			if(player.getHeldItem(handIn).isEmpty()) {
-				final IPrayerUser user = IPrayerUser.getUser(player);
-				if(altar.rechargeUser(user) > 0)
-					return worldIn.isRemote ? ActionResultType.SUCCESS:ActionResultType.CONSUME;
-			}
-		}
+		if(!player.isSneaking())
+			if(worldIn.isRemote)
+				return ActionResultType.SUCCESS;
+			else if (altar.setOwner(player.getUniqueID(), true))
+				return ActionResultType.CONSUME;
+			else if(player.getHeldItem(handIn).isEmpty())
+				if(altar.rechargeUser(player) > 0)
+					return ActionResultType.CONSUME;
 		return altar.onActivateBy(player, handIn);
 	}
 

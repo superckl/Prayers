@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.init.ModRecipes;
-import me.superckl.prayers.network.packet.PrayersPacket;
+import me.superckl.prayers.network.packet.user.PrayerUserPacket;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -86,7 +86,7 @@ public class AltarCraftingRecipe implements IRecipe<IInventory>{
 
 		@Override
 		public AltarCraftingRecipe read(final ResourceLocation recipeId, final PacketBuffer buffer) {
-			final String group = buffer.readString(PrayersPacket.BUFFER_STRING_LENGTH);
+			final String group = buffer.readString(PrayerUserPacket.BUFFER_STRING_LENGTH);
 			final NonNullList<Ingredient> ingredients = NonNullList.create();
 			for (int i = 0; i < buffer.readInt(); i++)
 				ingredients.add(Ingredient.read(buffer));
@@ -97,7 +97,7 @@ public class AltarCraftingRecipe implements IRecipe<IInventory>{
 
 		@Override
 		public void write(final PacketBuffer buffer, final AltarCraftingRecipe recipe) {
-			buffer.writeString(recipe.group, PrayersPacket.BUFFER_STRING_LENGTH);
+			buffer.writeString(recipe.group, PrayerUserPacket.BUFFER_STRING_LENGTH);
 			buffer.writeInt(recipe.ingredients.size());
 			recipe.ingredients.forEach(ing -> ing.write(buffer));
 			buffer.writeItemStack(recipe.output);

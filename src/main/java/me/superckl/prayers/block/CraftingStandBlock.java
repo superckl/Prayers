@@ -6,19 +6,24 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 
 public class CraftingStandBlock extends FourWayShapedBlock{
 
@@ -64,6 +69,18 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	@Override
 	public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
 		return new CraftingStandTileEntity();
+	}
+
+	@Override
+	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
+			final Hand handIn, final BlockRayTraceResult hit) {
+		final CraftingStandTileEntity craftingStand = (CraftingStandTileEntity) worldIn.getTileEntity(pos);
+		final Vector3d hitVec = hit.getHitVec();
+		final Vector3d dirVec = hitVec.subtract(Math.floor(hitVec.x)+0.5, hitVec.y, Math.floor(hitVec.z)+0.5);
+		Direction dir = Direction.getFacingFromVector(dirVec.x, 0, dirVec.z);
+		if(Math.abs(dirVec.x) <= 1.5F/16 && Math.abs(dirVec.z) <= 1.5F/16)
+			dir = Direction.UP;
+		return craftingStand.onActivate(player, handIn, dir);
 	}
 
 	public BlockState findNextPlacement(final BlockState state, final BlockItemUseContext context) {
@@ -133,7 +150,7 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 		shapes[north | west] = VoxelShapes.or(shapes[north], stand_w);
 
 		shapes[north | east | south] = VoxelShapes.or(shapes[north | east], stand_s);
-		shapes[north | east | west] = VoxelShapes.or(shapes[north], stand_w);
+		shapes[north | east | west] = VoxelShapes.or(shapes[north | east], stand_w);
 		shapes[north | south | west] = VoxelShapes.or(shapes[north | south], stand_w);
 
 		shapes[north | east | south | west] = VoxelShapes.or(shapes[north | east | south], stand_w);

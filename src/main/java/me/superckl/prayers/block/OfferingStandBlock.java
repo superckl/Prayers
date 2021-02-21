@@ -59,8 +59,7 @@ public class OfferingStandBlock extends ShapedBlock{
 	@Override
 	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
 		final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getTileEntity(pos);
-		if(!offering_stand.getItem().isEmpty())
-			InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), offering_stand.getItem());
+		InventoryHelper.dropInventoryItems(worldIn, pos, offering_stand);
 		super.onReplaced(state, worldIn, pos, newState, isMoving);
 	}
 

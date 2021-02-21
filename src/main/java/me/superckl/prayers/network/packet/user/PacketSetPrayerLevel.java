@@ -1,4 +1,4 @@
-package me.superckl.prayers.network.packet;
+package me.superckl.prayers.network.packet.user;
 
 import java.util.function.Supplier;
 
@@ -10,18 +10,18 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 @SuperBuilder
-public class PacketSetPrayerPoints extends PrayersPacket{
+public class PacketSetPrayerLevel extends PrayerUserPacket{
 
-	private final float amount;
+	private final int level;
 
 	@Override
 	public void encode(final PacketBuffer buffer) {
 		super.encode(buffer);
-		buffer.writeFloat(this.amount);
+		buffer.writeInt(this.level);
 	}
 
-	public static PacketSetPrayerPoints decode(final PacketBuffer buffer) {
-		return PrayersPacket.decode(PacketSetPrayerPoints.builder(), buffer).amount(buffer.readFloat()).build();
+	public static PacketSetPrayerLevel decode(final PacketBuffer buffer) {
+		return PrayerUserPacket.decode(PacketSetPrayerLevel.builder(), buffer).level(buffer.readInt()).build();
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class PacketSetPrayerPoints extends PrayersPacket{
 		final Context context = supplier.get();
 		//Only the server should be sending this packet, and never on login
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT)
-			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().world).setCurrentPrayerPoints(this.amount));
+			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().world).setPrayerLevel(this.level));
 	}
 
 }

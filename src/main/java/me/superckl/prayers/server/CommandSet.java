@@ -8,9 +8,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import me.superckl.prayers.capability.IPrayerUser;
-import me.superckl.prayers.network.packet.PacketSetPrayerLevel;
-import me.superckl.prayers.network.packet.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
+import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;

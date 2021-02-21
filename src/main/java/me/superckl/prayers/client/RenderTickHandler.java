@@ -65,7 +65,7 @@ public class RenderTickHandler {
 							height/2+5*(i+1)+this.mc.fontRenderer.FONT_HEIGHT*i, TextFormatting.WHITE.getColor());
 			}else if(hitBlock instanceof OfferingStandBlock) {
 				final OfferingStandTileEntity offeringStand = (OfferingStandTileEntity) this.mc.world.getTileEntity(hit);
-				final ItemStack item = offeringStand.getItem();
+				final ItemStack item = offeringStand.getStackInSlot(0);
 				if(!item.isEmpty()) {
 					FontRenderer font = item.getItem().getFontRenderer(item);
 					if(font == null)
