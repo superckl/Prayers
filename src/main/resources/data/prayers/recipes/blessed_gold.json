@@ -1,0 +1,12 @@
+{
+  "type": "prayers:altar_crafting",
+  "points": 50,
+  "ingredients": [
+    {
+      "item": "minecraft:gold_ingot"
+    }
+  ],
+  "result": {
+    "item": "prayers:blessed_gold"
+  }
+}

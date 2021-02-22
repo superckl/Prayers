@@ -142,9 +142,9 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	public LazyOptional<Pair<AltarCraftingRecipe, int[]>> findRecipe(){
 		final List<AltarCraftingRecipe> recipes = this.world.getRecipeManager().getRecipesForType(AltarCraftingRecipe.TYPE);
+		final List<ItemStack> inventory = this.items.subList(0, 4);
 		for(final AltarCraftingRecipe recipe:recipes) {
 			final List<Ingredient> ingredients = recipe.getIngredients();
-			final List<ItemStack> inventory = this.items.subList(0, 4);
 			final int[] mapping = RecipeMatcher.findMatches(inventory, ingredients);
 			if(mapping != null)
 				if(this.canRecipeOutput(recipe))

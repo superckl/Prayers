@@ -4,7 +4,6 @@ import java.util.EnumMap;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
-import me.superckl.prayers.item.CraftingStandItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -27,9 +26,12 @@ public class ModItems {
 
 	public static final RegistryObject<BlockItem> OFFERING_STAND = ModItems.REGISTER.register("offering_stand",
 			() -> new BlockItem(ModBlocks.OFFERING_STAND.get(), new Item.Properties().group(ModItems.PRAYERS_GROUP)));
-	public static final RegistryObject<CraftingStandItem> CRAFTING_STAND = ModItems.REGISTER.register("crafting_stand",
-			() -> new CraftingStandItem(ModBlocks.CRAFTING_STAND.get(), new Item.Properties().group(ModItems.PRAYERS_GROUP)));
+	public static final RegistryObject<BlockItem> CRAFTING_STAND = ModItems.REGISTER.register("crafting_stand",
+			() -> new BlockItem(ModBlocks.CRAFTING_STAND.get(), new Item.Properties().group(ModItems.PRAYERS_GROUP)));
 	public static final EnumMap<AltarTypes, RegistryObject<? extends BlockItem>> ALTARS = new EnumMap<>(AltarTypes.class);
+	public static final RegistryObject<Item> BLESSED_GOLD = ModItems.REGISTER.register("blessed_gold",
+			() -> new Item(new Item.Properties().group(ModItems.PRAYERS_GROUP)));
+
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())

@@ -158,13 +158,14 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		if(this.currentPoints > this.maxPoints) {
 			final float diff = this.maxPoints - this.currentPoints;
 			this.currentPoints = this.maxPoints;
+			this.syncToClientLight();
 			return diff;
 		}else if(this.currentPoints < 0) {
 			final float diff = this.currentPoints;
 			this.currentPoints = 0;
+			this.syncToClientLight();
 			return points - diff;
 		}
-		this.syncToClientLight();
 		return points;
 	}
 

@@ -89,6 +89,10 @@ public class AltarCraftingRecipe implements IRecipe<IInventory>{
 				else
 					ingredientCounts.add(1);
 			});
+			while(ingredients.size() < 4) {
+				ingredients.add(Ingredient.fromStacks(ItemStack.EMPTY));
+				ingredientCounts.add(0);
+			}
 			final ItemStack result = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "result"));
 			final float points = JSONUtils.getFloat(json, "points");
 			return new AltarCraftingRecipe(recipeId, group, ingredients, ingredientCounts, result, points);
