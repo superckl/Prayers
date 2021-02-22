@@ -40,7 +40,6 @@ public abstract class InteractableInventoryTileEntity extends TileEntity impleme
 		if(player.isSneaking()) {
 			if(!stack.isEmpty() && player.getHeldItem(hand).isEmpty()) {
 				player.addItemStackToInventory(stack);
-				this.setInventorySlotContents(slot, ItemStack.EMPTY);
 				this.onSlotChange(slot, true);
 				return ActionResultType.CONSUME;
 			}

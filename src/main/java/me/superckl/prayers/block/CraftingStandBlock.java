@@ -1,33 +1,30 @@
 package me.superckl.prayers.block;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -43,11 +40,17 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 
 	@Override
 	public BlockState getStateForPlacement(final BlockItemUseContext context) {
+		BlockState state = context.getWorld().getBlockState(context.getPos());
+		if(!state.isIn(this))
+			state = super.getStateForPlacement(context).with(CraftingStandBlock.CENTER, false);
 		final Vector3d hit = context.getHitVec();
 		final Vector3d dirVec = hit.subtract(Math.floor(hit.x)+0.5, 0, Math.floor(hit.z)+0.5);
-		final Direction dir = Direction.getFacingFromVector(dirVec.getX(), 0, dirVec.getZ());
-
-		return super.getStateForPlacement(context).with(CraftingStandBlock.CENTER, false).with(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir), true);
+		final float tolerance = state.get(CraftingStandBlock.CENTER) ? 1.5F:2.75F;
+		final Direction dir = CraftingStandBlock.directionFromVec(dirVec, tolerance/16);
+		if(state.isIn(this) && state.get(CraftingStandBlock.propertyFromDirection(dir)))
+			return state;
+		else
+			return state.with(CraftingStandBlock.propertyFromDirection(dir), true);
 	}
 
 	@Override
@@ -60,12 +63,12 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	}
 
 	public boolean hasStand(final BlockState state, final Direction dir) {
-		return dir == Direction.UP ? state.get(CraftingStandBlock.CENTER):state.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir));
+		return state.get(CraftingStandBlock.propertyFromDirection(dir));
 	}
 
 	@Override
 	public boolean isReplaceable(final BlockState state, final BlockItemUseContext context) {
-		return context.getItem().getItem() == this.asItem() && this.findNextPlacement(state, context) != state;
+		return context.getItem().getItem() == this.asItem() && this.getStateForPlacement(context) != state;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -73,18 +76,34 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
 		final CraftingStandTileEntity crafting_stand = (CraftingStandTileEntity) worldIn.getTileEntity(pos);
 		if(state.isIn(newState.getBlock())) {
-			final List<ItemStack> stacks = Lists.newArrayList();
+			final NonNullList<ItemStack> stacks = NonNullList.create();
 			Direction.Plane.HORIZONTAL.forEach(dir -> {
-				if(state.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir)) && !newState.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir)))
+				if(state.get(CraftingStandBlock.propertyFromDirection(dir)) && !newState.get(CraftingStandBlock.propertyFromDirection(dir)))
 					stacks.add(crafting_stand.removeStackFromSlot(CraftingStandTileEntity.dirToSlot.getInt(dir)));
 			});
 			if(state.get(CraftingStandBlock.CENTER) && !newState.get(CraftingStandBlock.CENTER))
 				stacks.add(crafting_stand.removeStackFromSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP)));
-			InventoryHelper.dropInventoryItems(worldIn, pos, new Inventory(stacks.toArray(new ItemStack[stacks.size()])));
+			InventoryHelper.dropItems(worldIn, pos, stacks);
 		}else {
 			InventoryHelper.dropInventoryItems(worldIn, pos, crafting_stand);
 			super.onReplaced(state, worldIn, pos, newState, isMoving);
 		}
+	}
+
+	public static Direction directionFromVec(final Vector3d dirVec, final float tolerance) {
+		if(Math.abs(dirVec.x) <= tolerance && Math.abs(dirVec.z) <= tolerance)
+			return Direction.UP;
+		else
+			return Direction.getFacingFromVector(dirVec.x, 0, dirVec.z);
+	}
+
+	public static Property<Boolean> propertyFromDirection(final Direction dir){
+		if(dir == Direction.UP)
+			return CraftingStandBlock.CENTER;
+		else if(dir == Direction.DOWN)
+			throw new IllegalArgumentException("Down is not a valid direction!");
+		else
+			return FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir);
 	}
 
 	@Override
@@ -103,37 +122,17 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 		final CraftingStandTileEntity craftingStand = (CraftingStandTileEntity) worldIn.getTileEntity(pos);
 		final Vector3d hitVec = hit.getHitVec();
 		final Vector3d dirVec = hitVec.subtract(Math.floor(hitVec.x)+0.5, hitVec.y, Math.floor(hitVec.z)+0.5);
-		Direction dir = Direction.getFacingFromVector(dirVec.x, 0, dirVec.z);
-		if(Math.abs(dirVec.x) <= 1.5F/16 && Math.abs(dirVec.z) <= 1.5F/16)
-			dir = Direction.UP;
-		return craftingStand.onActivate(player, handIn, dir);
-	}
-
-	public BlockState findNextPlacement(final BlockState state, final BlockItemUseContext context) {
-		final Direction[] toCheck = new Direction[] {Direction.NORTH, Direction.EAST};
-		Direction empty = null;
-		for(final Direction dir:toCheck) {
-			final Direction opposite = dir.getOpposite();
-			if(state.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir))) {
-				if(!state.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(opposite)))
-					return state.with(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(opposite), true);
-				else if(!state.get(CraftingStandBlock.CENTER))
-					return state.with(CraftingStandBlock.CENTER, true);
-			} else if(state.get(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(opposite)))
-				return state.with(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir), true);
-			else
-				empty = dir;
+		final Direction dir = CraftingStandBlock.directionFromVec(dirVec, 1.5F/16);
+		if(player.isSneaking() && player.getHeldItem(handIn).isEmpty() && craftingStand.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(dir)).isEmpty()) {
+			BlockState newState = state.with(CraftingStandBlock.propertyFromDirection(dir), false);
+			if(!newState.get(CraftingStandBlock.CENTER) && !FourWayShapedBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(newState::get))
+				newState = newState.get(ShapedBlock.WATERLOGGED) ? Blocks.WATER.getDefaultState():Blocks.AIR.getDefaultState();
+				worldIn.setBlockState(pos, newState);
+				final ItemStack toDrop = new ItemStack(this::asItem);
+				if(!player.addItemStackToInventory(toDrop))
+					InventoryHelper.dropItems(worldIn, pos, NonNullList.from(ItemStack.EMPTY, toDrop));
 		}
-		if(empty == null)
-			return state;
-		final Vector3d hit = context.getHitVec();
-		final Vector3d dirVec = hit.subtract(Math.floor(hit.x)+0.5, 0, Math.floor(hit.z)+0.5);
-		final Vector3i emptyVec = empty.getDirectionVec();
-		final double emptyDot = emptyVec.getX()*dirVec.getX()+emptyVec.getZ()*dirVec.getZ();
-		if(emptyDot > 0)
-			return state.with(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(empty), true);
-		else
-			return state.with(FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(empty.getOpposite()), true);
+		return craftingStand.onActivate(player, handIn, dir);
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package me.superckl.prayers.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayers;
@@ -31,6 +33,7 @@ public class AltarCraftingRecipe implements IRecipe<IInventory>{
 	private final ResourceLocation id;
 	private final String group;
 	private final NonNullList<Ingredient> ingredients;
+	private final IntList ingredientCounts;
 	private final ItemStack output;
 	private final float points;
 
@@ -78,28 +81,42 @@ public class AltarCraftingRecipe implements IRecipe<IInventory>{
 			if(ingredientsJson.size() == 0 || ingredientsJson.size() > 4)
 				throw new IllegalArgumentException("Altar recipe "+recipeId.toString()+" has invalid number of ingredients "+ingredientsJson.size());
 			final NonNullList<Ingredient> ingredients = NonNullList.create();
-			ingredientsJson.forEach(element -> ingredients.add(Ingredient.deserialize(element)));
+			final IntList ingredientCounts = new IntArrayList();
+			ingredientsJson.forEach(element -> {
+				ingredients.add(Ingredient.deserialize(element));
+				if(element.getAsJsonObject().has("count"))
+					ingredientCounts.add(JSONUtils.getInt(element, "count"));
+				else
+					ingredientCounts.add(1);
+			});
 			final ItemStack result = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "result"));
 			final float points = JSONUtils.getFloat(json, "points");
-			return new AltarCraftingRecipe(recipeId, group, ingredients, result, points);
+			return new AltarCraftingRecipe(recipeId, group, ingredients, ingredientCounts, result, points);
 		}
 
 		@Override
 		public AltarCraftingRecipe read(final ResourceLocation recipeId, final PacketBuffer buffer) {
 			final String group = buffer.readString(PrayerUserPacket.BUFFER_STRING_LENGTH);
 			final NonNullList<Ingredient> ingredients = NonNullList.create();
-			for (int i = 0; i < buffer.readInt(); i++)
+			final IntList ingredientCounts = new IntArrayList();
+			final int numIng = buffer.readInt();
+			for (int i = 0; i < numIng; i++) {
 				ingredients.add(Ingredient.read(buffer));
+				ingredientCounts.add(buffer.readInt());
+			}
 			final ItemStack result = buffer.readItemStack();
 			final float points = buffer.readFloat();
-			return new AltarCraftingRecipe(recipeId, group, ingredients, result, points);
+			return new AltarCraftingRecipe(recipeId, group, ingredients, ingredientCounts, result, points);
 		}
 
 		@Override
 		public void write(final PacketBuffer buffer, final AltarCraftingRecipe recipe) {
 			buffer.writeString(recipe.group, PrayerUserPacket.BUFFER_STRING_LENGTH);
 			buffer.writeInt(recipe.ingredients.size());
-			recipe.ingredients.forEach(ing -> ing.write(buffer));
+			for (int i = 0; i < recipe.ingredients.size(); i++) {
+				recipe.ingredients.get(i).write(buffer);
+				buffer.writeInt(recipe.ingredientCounts.getInt(i));
+			}
 			buffer.writeItemStack(recipe.output);
 			buffer.writeFloat(recipe.points);
 		}

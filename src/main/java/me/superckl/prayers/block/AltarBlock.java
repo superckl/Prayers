@@ -19,7 +19,6 @@ import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
@@ -28,6 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -46,12 +46,13 @@ public class AltarBlock extends FourWayShapedBlock{
 	@RequiredArgsConstructor
 	@Getter
 	public enum AltarTypes{
-		SANDSTONE(100, 1F/48000F, 2),
-		GILDED_SANDSTONE(1000, 1F/24000F, 4),
-		MARBLE(100000, 1F/24000F, 5);
+		SANDSTONE(100, 1F/48000F, 2/20F, 2),
+		GILDED_SANDSTONE(1000, 1F/24000F, 4/20F, 4),
+		MARBLE(100000, 1F/24000F, 10/20F, 5);
 
 		private final float maxPoints;
 		private final float rechargeRate;
+		private final float transferRate;
 		private final int maxConnected;
 
 	}
@@ -103,12 +104,13 @@ public class AltarBlock extends FourWayShapedBlock{
 		return altar.onActivateBy(player, handIn);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
 		if(!state.isIn(newState.getBlock())) {
 			final AltarTileEntity te = (AltarTileEntity) worldIn.getTileEntity(pos);
 			if(!te.getAltarItem().isEmpty())
-				InventoryHelper.dropInventoryItems(worldIn, pos, new Inventory(te.getAltarItem()));
+				InventoryHelper.dropItems(worldIn, pos, NonNullList.from(ItemStack.EMPTY, te.getAltarItem()));
 			super.onReplaced(state, worldIn, pos, newState, isMoving);
 		}
 	}

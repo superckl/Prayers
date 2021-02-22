@@ -149,14 +149,20 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		return (float) connected.stream().mapToDouble(altar -> altar.addPointsInternal(toAdd)).sum();
 	}
 
+	public float removePoints(final float points) {
+		return -this.addPoints(-points);
+	}
+
 	private float addPointsInternal(final float points) {
-		if(this.currentPoints >= this.maxPoints)
-			return 0;
 		this.currentPoints += points;
 		if(this.currentPoints > this.maxPoints) {
 			final float diff = this.maxPoints - this.currentPoints;
 			this.currentPoints = this.maxPoints;
 			return diff;
+		}else if(this.currentPoints < 0) {
+			final float diff = this.currentPoints;
+			this.currentPoints = 0;
+			return points - diff;
 		}
 		this.syncToClientLight();
 		return points;
