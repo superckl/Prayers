@@ -21,8 +21,9 @@ public class Config {
 	private final ConfigValue<List<String>> prayers;
 
 	private Config(final ForgeConfigSpec.Builder builder) {
-		this.prayers = builder.comment("List of all prayer resource locations Prayers will load.").define("Prayers",
-				Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList()));
+		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
+		builder.comment("List of prayer resource resource locations to enable. Defaults are ").comment(prayerLocs.toArray(new String[prayerLocs.size()]));
+		this.prayers = builder.define("Prayers", prayerLocs);
 	}
 
 	public static ForgeConfigSpec setup() {

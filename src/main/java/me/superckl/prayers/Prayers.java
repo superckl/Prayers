@@ -17,8 +17,10 @@ import me.superckl.prayers.client.RenderTickHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.client.particle.PrayerParticle;
 import me.superckl.prayers.init.ModBlocks;
+import me.superckl.prayers.init.ModEffects;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
+import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.network.packet.PacketInventorySlotChanged;
@@ -77,6 +79,8 @@ public class Prayers
 		ModTiles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModParticles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		ModRecipes.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModEffects.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModPotions.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		Prayer.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		AltarItem.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}

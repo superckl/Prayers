@@ -62,6 +62,15 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 		return state;
 	}
 
+	public BlockState subtractStands(BlockState from, final BlockState state) {
+		if(state.get(CraftingStandBlock.CENTER))
+			from = from.with(CraftingStandBlock.CENTER, false);
+		for(final Property<Boolean> prop:FourWayShapedBlock.FACING_TO_PROPERTY_MAP.values())
+			if(state.get(prop))
+				from = from.with(prop, false);
+		return from;
+	}
+
 	public boolean hasStand(final BlockState state, final Direction dir) {
 		return state.get(CraftingStandBlock.propertyFromDirection(dir));
 	}

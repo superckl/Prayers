@@ -4,5 +4,17 @@
   "block.prayers.marble_altar": "Marble Altar",
   "block.prayers.crafting_stand": "Crafting Stand",
   "block.prayers.offering_stand": "Offering Stand",
-  "item.prayers.blessed_gold": "Blessed Gold"
+  "item.prayers.blessed_gold": "Blessed Gold",
+  "item.prayers.blessed_gold_nugget": "Blessed Gold Nugget",
+  "item.prayers.gilded_bone": "Gilded Bone",
+  "item.prayers.blessed_water": "Blessed Water",
+  "itemGroup.prayers": "Prayers",
+  "effect.prayers.instant_prayer": "Instant Prayer Points",
+  "effect.prayers.prayer_regen": "Prayer Point Regeneration",
+  "item.minecraft.potion.effect.instant_prayer": "Prayer Potion",
+  "item.minecraft.splash_potion.effect.instant_prayer": "Splash Prayer Potion",
+  "item.minecraft.lingering_potion.effect.instant_prayer": "Lingering Prayer Potion",
+  "item.minecraft.potion.effect.prayer_regen": "Prayer Renewal Potion",
+  "item.minecraft.splash_potion.effect.prayer_regen": "Splash Prayer Renewal Potion",
+  "item.minecraft.lingering_potion.effect.prayer_regen": "Lingering Prayer Renewal Potion"
 }

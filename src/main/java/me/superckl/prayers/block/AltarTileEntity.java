@@ -25,6 +25,7 @@ import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.IntArrayNBT;
@@ -158,12 +159,10 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		if(this.currentPoints > this.maxPoints) {
 			final float diff = this.maxPoints - this.currentPoints;
 			this.currentPoints = this.maxPoints;
-			this.syncToClientLight();
 			return diff;
 		}else if(this.currentPoints < 0) {
 			final float diff = this.currentPoints;
 			this.currentPoints = 0;
-			this.syncToClientLight();
 			return points - diff;
 		}
 		return points;
@@ -206,12 +205,12 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 				this.getConnected().forEach(tile -> {
 					tile.owner = owner;
 					tile.markDirty();
-					tile.syncToClientLight();
+					tile.syncToClientLight(null);
 				});
 			else {
 				this.owner = owner;
 				this.markDirty();
-				this.syncToClientLight();
+				this.syncToClientLight(null);
 			}
 			//Send update packets to client
 			if(owner != null)
@@ -233,7 +232,6 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			final float recharge = Math.min(altarCharge, max-current);
 			altars.forEach(altar -> {
 				altar.currentPoints -= recharge/altars.size();
-				altar.syncToClientLight(); //We can't use block events for this because it's a float
 			});
 			user.setCurrentPrayerPoints(current+recharge);
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
@@ -244,26 +242,29 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		return 0;
 	}
 
-	public void syncToClientLight() {
-		this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE | Constants.BlockFlags.NO_RERENDER);
+	public void syncToClientLight(final ServerPlayerEntity player) {
+		if(player == null)
+			this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE | Constants.BlockFlags.NO_RERENDER);
+		else
+			PacketDistributor.PLAYER.with(() -> player).send(this.getUpdatePacket());
 	}
 
 	@Override
 	public void tick() {
+		if(this.world.isRemote)
+			return;
 		if(!this.altarItem.isEmpty() && !this.isTopClear(true)) {
-			if(!this.world.isRemote) {
-				final double x = this.world.rand.nextFloat() * 0.5 + 0.25;
-				final double y = 1+this.world.rand.nextFloat() * 0.1;
-				final double z = this.world.rand.nextFloat() * 0.5 + 0.25;
-				final ItemEntity itemEntity = new ItemEntity(this.world, this.pos.getX() + x, this.pos.getY() + y, this.pos.getZ() + z, this.altarItem);
-				itemEntity.setDefaultPickupDelay();
-				this.world.addEntity(itemEntity);
-			}
+			final double x = this.world.rand.nextFloat() * 0.5 + 0.25;
+			final double y = 1+this.world.rand.nextFloat() * 0.1;
+			final double z = this.world.rand.nextFloat() * 0.5 + 0.25;
+			final ItemEntity itemEntity = new ItemEntity(this.world, this.pos.getX() + x, this.pos.getY() + y, this.pos.getZ() + z, this.altarItem);
+			itemEntity.setDefaultPickupDelay();
+			this.world.addEntity(itemEntity);
 			this.clearItem();
 			this.markDirty();
 		}
 		if (this.canRegen()) {
-			if(!this.world.isRemote && this.rand.nextFloat() < 0.015F)
+			if(this.rand.nextFloat() < 0.015F)
 				this.spawnActiveParticle();
 			if(this.currentPoints < this.maxPoints) {
 				this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
@@ -276,10 +277,10 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	}
 
 	public void updateItem() {
-		if(this.altarItem.isEmpty())
+		if(this.world.isRemote || this.altarItem.isEmpty())
 			return;
 		//Update visuals on client, but only do xp and particles on server.
-		if(!this.world.isRemote && this.rand.nextFloat() < 0.15F) {
+		if(this.rand.nextFloat() < 0.15F) {
 			final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
 			if(player != null) {
 				final Vector3d altarTop = new Vector3d(this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5)
@@ -291,18 +292,16 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			}
 		}
 		if(++this.itemTicks >= this.reqTicks) {
-			if(!this.world.isRemote) {
-				final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
-				final AltarItem aItem = AltarItem.find(this.altarItem);
-				if(player == null)
-					AltarsSavedData.get((ServerWorld) this.world).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
-				else {
-					IPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
-					PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), PacketSyncPrayerUser.fromPlayer(player));
-				}
-				((ServerWorld)this.world).spawnParticle(ParticleTypes.SMOKE, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
-				((ServerWorld)this.world).playSound(null, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.02F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
+			final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
+			final AltarItem aItem = AltarItem.find(this.altarItem);
+			if(player == null)
+				AltarsSavedData.get((ServerWorld) this.world).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
+			else {
+				IPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
+				PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), PacketSyncPrayerUser.fromPlayer(player));
 			}
+			((ServerWorld)this.world).spawnParticle(ParticleTypes.SMOKE, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
+			((ServerWorld)this.world).playSound(null, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.02F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
 			this.clearItem();
 		}
 		this.markDirty();
@@ -342,6 +341,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	public ActionResultType onActivateBy(final PlayerEntity player, final Hand hand) {
 		if(this.world.isRemote)
 			return ActionResultType.SUCCESS;
+		if(player instanceof ServerPlayerEntity)
+			this.getConnected().forEach(altar -> altar.syncToClientLight((ServerPlayerEntity) player));
 		if(player.isSneaking()) {
 			if(!this.altarItem.isEmpty() && player.getHeldItem(hand).isEmpty()) {
 				player.addItemStackToInventory(this.altarItem);

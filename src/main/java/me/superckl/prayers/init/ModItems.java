@@ -14,7 +14,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ModItems {
 
-	public static final ItemGroup PRAYERS_GROUP = new ItemGroup("Prayers") {
+	public static final ItemGroup PRAYERS_GROUP = new ItemGroup(Prayers.MOD_ID) {
 
 		@Override
 		public ItemStack createIcon() {
@@ -30,6 +30,12 @@ public class ModItems {
 			() -> new BlockItem(ModBlocks.CRAFTING_STAND.get(), new Item.Properties().group(ModItems.PRAYERS_GROUP)));
 	public static final EnumMap<AltarTypes, RegistryObject<? extends BlockItem>> ALTARS = new EnumMap<>(AltarTypes.class);
 	public static final RegistryObject<Item> BLESSED_GOLD = ModItems.REGISTER.register("blessed_gold",
+			() -> new Item(new Item.Properties().group(ModItems.PRAYERS_GROUP)));
+	public static final RegistryObject<Item> BLESSED_GOLD_NUGGET = ModItems.REGISTER.register("blessed_gold_nugget",
+			() -> new Item(new Item.Properties().group(ModItems.PRAYERS_GROUP)));
+	public static final RegistryObject<Item> GILDED_BONE = ModItems.REGISTER.register("gilded_bone",
+			() -> new Item(new Item.Properties().group(ModItems.PRAYERS_GROUP)));
+	public static final RegistryObject<Item> BLESSED_WATER = ModItems.REGISTER.register("blessed_water",
 			() -> new Item(new Item.Properties().group(ModItems.PRAYERS_GROUP)));
 
 

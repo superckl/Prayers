@@ -4,6 +4,7 @@ import java.util.Random;
 
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
+import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
 import net.minecraft.block.BlockState;
@@ -44,7 +45,7 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 			if(++this.itemTicks >= this.reqTicks) {
 				final AltarItem aItem = AltarItem.find(this.getStackInSlot(0));
 				if(aItem.getOfferPoints() <= altar.getMaxPoints()-altar.getCurrentPoints() || altar.getCurrentPoints() == 0) {
-					altar.addPoints(aItem.getOfferPoints());
+					LogHelper.info(altar.addPoints(aItem.getOfferPoints()));
 					this.decrStackSize(0, 1);
 					this.itemTicks = 0;
 					((ServerWorld)this.world).spawnParticle(ParticleTypes.SMOKE, this.pos.getX()+0.5, this.pos.getY()+7F/16F, this.pos.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);

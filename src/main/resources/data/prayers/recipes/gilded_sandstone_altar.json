@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GDG",
+    "DAD",
+    "GDG"
+  ],
+  "key": {
+    "G": {
+      "item": "prayers:blessed_gold"
+    },
+    "A": {
+      "item": "prayers:sandstone_altar"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result":{
+    "item": "prayers:gilded_sandstone_altar"
+  }
+}

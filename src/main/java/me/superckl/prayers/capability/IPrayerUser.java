@@ -103,6 +103,12 @@ public interface IPrayerUser{
 		this.setCurrentPrayerPoints(newPoints);
 	}
 
+	default float addPoints(final float points) {
+		final float toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());
+		this.setCurrentPrayerPoints(this.getCurrentPrayerPoints()+toAdd);
+		return toAdd;
+	}
+
 	static IPrayerUser getUser(final ICapabilityProvider entity) {
 		return entity.getCapability(Prayers.PRAYER_USER_CAPABILITY)
 				.orElseThrow(() -> new IllegalStateException(String.format("Received entity %s with no prayer capability!", entity.toString())));
