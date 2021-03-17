@@ -22,7 +22,7 @@ public class Config {
 
 	private Config(final ForgeConfigSpec.Builder builder) {
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
-		String[] comment = new String[prayerLocs.size()+1];
+		final String[] comment = new String[prayerLocs.size()+1];
 		comment[0] = "List of prayer resource locations to enable. Defaults are ";
 		for(int i = 0; i < prayerLocs.size(); i++)
 			comment[i + 1] = prayerLocs.get(i);
