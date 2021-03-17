@@ -1,5 +1,6 @@
 {
   "type": "prayers:altar_crafting",
+  "group": "blessing",
   "points": 40,
   "ingredients": [
     {

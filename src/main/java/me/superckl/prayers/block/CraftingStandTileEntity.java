@@ -9,14 +9,14 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
-import me.superckl.prayers.recipe.AltarCraftingRecipe;
+import me.superckl.prayers.recipe.AbstractAltarCraftingRecipe;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -25,7 +25,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.RecipeMatcher;
 
 public class CraftingStandTileEntity extends InteractableInventoryTileEntity implements ISidedInventory, ITickableTileEntity{
 
@@ -40,7 +39,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 		CraftingStandTileEntity.dirToSlot.keySet().forEach(dir -> map.put(CraftingStandTileEntity.dirToSlot.getInt(dir), dir));
 	});
 
-	private AltarCraftingRecipe activeRecipe;
+	private AbstractAltarCraftingRecipe activeRecipe;
 	private int[] recipeMapping;
 	private float consumedPoints;
 	private boolean inventoryChanged = true;
@@ -58,15 +57,15 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	public void tick() {
 		if(this.world.isRemote)
 			return;
-		if(this.activeRecipe == null || this.inventoryChanged) {
+		if(this.inventoryChanged) {
 			this.inventoryChanged = false;
-			final LazyOptional<Pair<AltarCraftingRecipe, int[]>> pair = this.findRecipe();
+			final LazyOptional<Pair<AbstractAltarCraftingRecipe, int[]>> pair = this.findRecipe();
 			if(pair.isPresent()) {
-				final AltarCraftingRecipe recipe = pair.orElse(null).getKey();
+				final AbstractAltarCraftingRecipe recipe = pair.orElse(null).getKey();
 				final int[] mapping = pair.orElse(null).getValue();
 				boolean enoughItem = true;
 				for (int i = 0; i < mapping.length; i++)
-					if(this.getStackInSlot(i).getCount() < recipe.getIngredientCounts().getInt(mapping[i])) {
+					if(this.getStackInSlot(i).getCount() < recipe.getIngredientCounts()[mapping[i]]) {
 						enoughItem = false;
 						break;
 					}
@@ -81,7 +80,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 					this.clearRecipe();
 			} else
 				this.clearRecipe();
-		}else
+		}else if(this.activeRecipe != null)
 			this.tickCrafting();
 	}
 
@@ -107,24 +106,34 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	protected void finishCrafting() {
 		for(int i = 0; i < this.recipeMapping.length; i++)
-			this.decrStackSize(i, this.activeRecipe.getIngredientCounts().getInt(this.recipeMapping[i]));
+			this.decrStackSize(i, this.activeRecipe.getIngredientCounts()[this.recipeMapping[i]]);
 		final ItemStack output = this.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP));
 		if(output.isEmpty())
-			this.setInventorySlotContents(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP), this.activeRecipe.getOutput().copy());
+			this.setInventorySlotContents(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP), this.activeRecipe.getRecipeOutput().copy());
 		else
-			output.grow(this.activeRecipe.getOutput().getCount());
+			output.grow(this.activeRecipe.getRecipeOutput().getCount());
 		this.activeRecipe = null;
 		this.recipeMapping = null;
 		this.consumedPoints = 0;
 	}
 
-	protected boolean canRecipeOutput(final AltarCraftingRecipe recipe) {
+	protected boolean canRecipeOutput(final AbstractAltarCraftingRecipe recipe) {
 		if(!this.hasOutputSlot())
 			return false;
 		final ItemStack output = this.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP));
-		return output.isEmpty() || ItemStack.areItemsEqual(output, recipe.getOutput()) && ItemStack.areItemStackTagsEqual(output, recipe.getOutput()) && output.getCount()+recipe.getOutput().getCount() < output.getMaxStackSize();
+		return output.isEmpty() || ItemStack.areItemsEqual(output, recipe.getRecipeOutput()) && ItemStack.areItemStackTagsEqual(output, recipe.getRecipeOutput()) && output.getCount()+recipe.getRecipeOutput().getCount() < output.getMaxStackSize();
 	}
 
+	public boolean isCrafting() {
+		return this.activeRecipe != null;
+	}
+	
+	public float getCraftingProgress() {
+		if(!this.isCrafting())
+			return 0;
+		return this.consumedPoints/this.activeRecipe.getPoints();
+	}
+	
 	@Override
 	public void onSlotChange(final int slot, final boolean itemChanged) {
 		this.inventoryChanged = true;
@@ -140,12 +149,11 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			return LazyOptional.empty();
 	}
 
-	public LazyOptional<Pair<AltarCraftingRecipe, int[]>> findRecipe(){
-		final List<AltarCraftingRecipe> recipes = this.world.getRecipeManager().getRecipesForType(AltarCraftingRecipe.TYPE);
+	public LazyOptional<Pair<AbstractAltarCraftingRecipe, int[]>> findRecipe(){
+		final List<AbstractAltarCraftingRecipe> recipes = this.world.getRecipeManager().getRecipesForType(AbstractAltarCraftingRecipe.TYPE);
 		final List<ItemStack> inventory = this.items.subList(0, 4);
-		for(final AltarCraftingRecipe recipe:recipes) {
-			final List<Ingredient> ingredients = recipe.getIngredients();
-			final int[] mapping = RecipeMatcher.findMatches(inventory, ingredients);
+		for(final AbstractAltarCraftingRecipe recipe:recipes) {
+			final int[] mapping = recipe.findMapping(inventory);
 			if(mapping != null)
 				if(this.canRecipeOutput(recipe))
 					return LazyOptional.of(() -> Pair.of(recipe, mapping));

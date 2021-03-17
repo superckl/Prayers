@@ -1,55 +1,58 @@
 package me.superckl.prayers.recipe;
 
+import java.util.List;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.Prayers;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.network.packet.user.PrayerUserPacket;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraftforge.common.util.RecipeMatcher;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-@RequiredArgsConstructor
 @Getter
-public class AltarCraftingRecipe implements IRecipe<IInventory>{
+public class AltarCraftingRecipe extends AbstractAltarCraftingRecipe{
 
-	public static final IRecipeType<AltarCraftingRecipe> TYPE = IRecipeType.register(new ResourceLocation(Prayers.MOD_ID, "altar_crafting").toString());
-
-	private final ResourceLocation id;
-	private final String group;
 	private final NonNullList<Ingredient> ingredients;
 	private final IntList ingredientCounts;
 	private final ItemStack output;
-	private final float points;
+
+	public AltarCraftingRecipe(final ResourceLocation id, final String group, final NonNullList<Ingredient> ingredients, final IntList ingredientCounts, final ItemStack output, final float points) {
+		super(id, group, points);
+		while(ingredients.size() < 4) {
+			ingredients.add(Ingredient.EMPTY);
+			ingredientCounts.add(0);
+		}
+		this.ingredients = ingredients;
+		this.ingredientCounts = ingredientCounts;
+		this.output = output;
+	}
 
 	@Override
-	public boolean matches(final IInventory inv, final World worldIn) {
-		return false;
+	public int[] findMapping(final List<ItemStack> inventory) {
+		return RecipeMatcher.findMatches(inventory, this.ingredients);
+	}
+
+	@Override
+	public int[] getIngredientCounts() {
+		return this.ingredientCounts.toIntArray();
 	}
 
 	@Override
 	public ItemStack getCraftingResult(final IInventory inv) {
-		return this.output;
-	}
-
-	@Override
-	public boolean canFit(final int width, final int height) {
-		return true;
+		return this.output.copy();
 	}
 
 	@Override
@@ -58,18 +61,8 @@ public class AltarCraftingRecipe implements IRecipe<IInventory>{
 	}
 
 	@Override
-	public ResourceLocation getId() {
-		return this.id;
-	}
-
-	@Override
 	public IRecipeSerializer<?> getSerializer() {
 		return ModRecipes.ALTAR_SERIALIZER.get();
-	}
-
-	@Override
-	public IRecipeType<?> getType() {
-		return AltarCraftingRecipe.TYPE;
 	}
 
 	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<AltarCraftingRecipe>{
@@ -89,10 +82,6 @@ public class AltarCraftingRecipe implements IRecipe<IInventory>{
 				else
 					ingredientCounts.add(1);
 			});
-			while(ingredients.size() < 4) {
-				ingredients.add(Ingredient.fromStacks(ItemStack.EMPTY));
-				ingredientCounts.add(0);
-			}
 			final ItemStack result = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "result"));
 			final float points = JSONUtils.getFloat(json, "points");
 			return new AltarCraftingRecipe(recipeId, group, ingredients, ingredientCounts, result, points);
