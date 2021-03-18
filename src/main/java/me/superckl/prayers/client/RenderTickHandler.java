@@ -91,6 +91,14 @@ public class RenderTickHandler {
 
 					final CraftingStandTileEntity te = (CraftingStandTileEntity) this.mc.world.getTileEntity(hit);
 					toRender = te.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(dir));
+					if(te.isCrafting()) {
+						final int height = this.mc.getMainWindow().getScaledHeight();
+						final int width = this.mc.getMainWindow().getScaledWidth();
+						final String progress = String.format("Progress: %2.0f", 100*te.getCraftingProgress()).concat("%");
+						final int offset = toRender.isEmpty() ? 5: 24;
+						this.mc.fontRenderer.drawString(e.getMatrixStack(), progress, width/2-this.mc.fontRenderer.getStringWidth(progress)/2,
+								height/2+offset, TextFormatting.WHITE.getColor());
+					}
 				}
 				if(!toRender.isEmpty()) {
 					FontRenderer font = toRender.getItem().getFontRenderer(toRender);

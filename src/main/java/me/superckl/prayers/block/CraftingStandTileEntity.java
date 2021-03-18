@@ -15,16 +15,21 @@ import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
 import me.superckl.prayers.recipe.AbstractAltarCraftingRecipe;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class CraftingStandTileEntity extends InteractableInventoryTileEntity implements ISidedInventory, ITickableTileEntity{
 
@@ -49,48 +54,38 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	}
 
 	public ActionResultType onActivate(final PlayerEntity player, final Hand hand, final Direction dir) {
+		if(player instanceof ServerPlayerEntity)
+			this.syncToClientLight((ServerPlayerEntity) player);
 		final int slot = CraftingStandTileEntity.dirToSlot.getInt(dir);
 		return this.onInteract(player, hand, slot);
 	}
 
 	@Override
 	public void tick() {
-		if(this.world.isRemote)
-			return;
 		if(this.inventoryChanged) {
 			this.inventoryChanged = false;
-			final LazyOptional<Pair<AbstractAltarCraftingRecipe, int[]>> pair = this.findRecipe();
-			if(pair.isPresent()) {
-				final AbstractAltarCraftingRecipe recipe = pair.orElse(null).getKey();
-				final int[] mapping = pair.orElse(null).getValue();
-				boolean enoughItem = true;
-				for (int i = 0; i < mapping.length; i++)
-					if(this.getStackInSlot(i).getCount() < recipe.getIngredientCounts()[mapping[i]]) {
-						enoughItem = false;
-						break;
-					}
-				if(enoughItem) {
-					if(this.activeRecipe != recipe) {
-						this.activeRecipe = recipe;
-						this.recipeMapping = mapping;
-						this.consumedPoints = 0;
-					}
-					this.tickCrafting();
-				} else
-					this.clearRecipe();
-			} else
-				this.clearRecipe();
-		}else if(this.activeRecipe != null)
+			this.updateRecipe(true);
+		}
+		if(this.activeRecipe != null)
 			this.tickCrafting();
 	}
 
-	public void clearRecipe() {
+	@Override
+	public void onLoad() {
+		this.inventoryChanged = false;
+		this.updateRecipe(false);
+	}
+
+	public void clearRecipe(final boolean clearPoints) {
 		this.activeRecipe = null;
 		this.recipeMapping = null;
-		this.consumedPoints = 0;
+		if(clearPoints)
+			this.consumedPoints = 0;
 	}
 
 	protected void tickCrafting() {
+		if(this.world.isRemote)
+			return;
 		this.findValidAltar().ifPresent(altar -> {
 			if(!this.canRecipeOutput(this.activeRecipe))
 				return; //no room to output, don't tick
@@ -112,9 +107,8 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			this.setInventorySlotContents(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP), this.activeRecipe.getRecipeOutput().copy());
 		else
 			output.grow(this.activeRecipe.getRecipeOutput().getCount());
-		this.activeRecipe = null;
-		this.recipeMapping = null;
-		this.consumedPoints = 0;
+		this.markDirty();
+		this.clearRecipe(true);
 	}
 
 	protected boolean canRecipeOutput(final AbstractAltarCraftingRecipe recipe) {
@@ -127,13 +121,13 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	public boolean isCrafting() {
 		return this.activeRecipe != null;
 	}
-	
+
 	public float getCraftingProgress() {
 		if(!this.isCrafting())
 			return 0;
 		return this.consumedPoints/this.activeRecipe.getPoints();
 	}
-	
+
 	@Override
 	public void onSlotChange(final int slot, final boolean itemChanged) {
 		this.inventoryChanged = true;
@@ -149,18 +143,39 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			return LazyOptional.empty();
 	}
 
-	public LazyOptional<Pair<AbstractAltarCraftingRecipe, int[]>> findRecipe(){
+	public void updateRecipe(final boolean clearPoints){
 		final List<AbstractAltarCraftingRecipe> recipes = this.world.getRecipeManager().getRecipesForType(AbstractAltarCraftingRecipe.TYPE);
 		final List<ItemStack> inventory = this.items.subList(0, 4);
+		LogHelper.info(recipes.size());
+		inventory.forEach(LogHelper::info);
+		Pair<AbstractAltarCraftingRecipe, int[]> pair = null;
 		for(final AbstractAltarCraftingRecipe recipe:recipes) {
 			final int[] mapping = recipe.findMapping(inventory);
-			if(mapping != null)
-				if(this.canRecipeOutput(recipe))
-					return LazyOptional.of(() -> Pair.of(recipe, mapping));
-				else
-					return LazyOptional.empty(); //return because the matching recipe cannot output
+			if(mapping != null) {
+				pair = Pair.of(recipe, mapping);
+				break;
+			}
 		}
-		return LazyOptional.empty();
+		if(pair != null) {
+			final AbstractAltarCraftingRecipe recipe = pair.getKey();
+			final int[] mapping = pair.getValue();
+			boolean enoughItem = true;
+			for (int i = 0; i < mapping.length; i++)
+				if(this.getStackInSlot(i).getCount() < recipe.getIngredientCounts()[mapping[i]]) {
+					enoughItem = false;
+					break;
+				}
+			if(enoughItem) {
+				if(this.activeRecipe != recipe) {
+					this.activeRecipe = recipe;
+					this.recipeMapping = mapping;
+					if(clearPoints)
+						this.consumedPoints = 0;
+				}
+			} else
+				this.clearRecipe(clearPoints);
+		} else
+			this.clearRecipe(clearPoints);
 	}
 
 	@Override
@@ -199,7 +214,9 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	public CompoundNBT write(final CompoundNBT compound) {
 		final CompoundNBT craft_data = new CompoundNBT();
 		super.writeInventory(craft_data);
+		craft_data.putFloat("points", this.consumedPoints);
 		compound.put(CraftingStandTileEntity.CRAFTING_STAND_KEY, craft_data);
+
 		return super.write(compound);
 	}
 
@@ -207,7 +224,15 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	public void read(final BlockState state, final CompoundNBT nbt) {
 		final CompoundNBT craft_data = nbt.getCompound(CraftingStandTileEntity.CRAFTING_STAND_KEY);
 		this.readInventory(craft_data);
+		this.consumedPoints = craft_data.getFloat("points");
 		super.read(state, nbt);
+	}
+
+	public void syncToClientLight(final ServerPlayerEntity player) {
+		if(player == null)
+			this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE | Constants.BlockFlags.NO_RERENDER);
+		else
+			PacketDistributor.PLAYER.with(() -> player).send(this.getUpdatePacket());
 	}
 
 	@Override
@@ -218,6 +243,24 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	@Override
 	public void handleUpdateTag(final BlockState state, final CompoundNBT tag) {
 		this.read(state, tag);
+	}
+
+	@Override
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		if(this.world.isRemote)
+			return null;
+		final CompoundNBT nbt = new CompoundNBT();
+		nbt.putFloat("points", this.consumedPoints);
+		return new SUpdateTileEntityPacket(this.pos, -1, nbt);
+	}
+
+	@Override
+	public void onDataPacket(final NetworkManager net, final SUpdateTileEntityPacket pkt) {
+		if(!this.world.isRemote)
+			return;
+		this.updateRecipe(true);
+		final CompoundNBT nbt = pkt.getNbtCompound();
+		this.consumedPoints = nbt.getFloat("points");
 	}
 
 }
