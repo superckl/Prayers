@@ -29,13 +29,13 @@ public class OfferingStandBlock extends ShapedBlock{
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	public OfferingStandBlock() {
-		super(AbstractBlock.Properties.create(Material.IRON, MaterialColor.IRON).setRequiresTool().hardnessAndResistance(5.0F, 6.0F).sound(SoundType.METAL), true);
-		this.setDefaultState(this.getDefaultState().with(OfferingStandBlock.FACING, Direction.NORTH));
+		super(AbstractBlock.Properties.of(Material.METAL, MaterialColor.METAL).requiresCorrectToolForDrops().strength(5.0F, 6.0F).sound(SoundType.METAL), true);
+		this.registerDefaultState(this.defaultBlockState().setValue(OfferingStandBlock.FACING, Direction.NORTH));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(final BlockItemUseContext context) {
-		return super.getStateForPlacement(context).with(OfferingStandBlock.FACING, context.getPlacementHorizontalFacing().getOpposite());
+		return super.getStateForPlacement(context).setValue(OfferingStandBlock.FACING, context.getNearestLookingDirection().getOpposite());
 	}
 
 	@Override
@@ -49,42 +49,42 @@ public class OfferingStandBlock extends ShapedBlock{
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
+	public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
-		final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getTileEntity(pos);
+		final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getBlockEntity(pos);
 		return offering_stand.onActivateBy(player, handIn);
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
-		if(!state.isIn(newState.getBlock())) {
-			final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getTileEntity(pos);
-			InventoryHelper.dropInventoryItems(worldIn, pos, offering_stand);
-			super.onReplaced(state, worldIn, pos, newState, isMoving);
+	public void onRemove(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
+		if(!state.is(newState.getBlock())) {
+			final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getBlockEntity(pos);
+			InventoryHelper.dropContents(worldIn, pos, offering_stand);
+			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
 	}
 
 	@Override
 	protected VoxelShape[] getShapes() {
-		final VoxelShape base = Block.makeCuboidShape(5, 0, 5, 11, 1, 11);
-		final VoxelShape pillar = Block.makeCuboidShape(7, 1, 7, 9, 4, 9);
-		final VoxelShape top_base_n = Block.makeCuboidShape(7, 4, 6, 9, 5, 7);
-		final VoxelShape top_base_e = Block.makeCuboidShape(9, 4, 7, 10, 5, 9);
-		final VoxelShape top_base_s = Block.makeCuboidShape(7, 4, 9, 9, 5, 10);
-		final VoxelShape top_base_w = Block.makeCuboidShape(6, 4, 7, 7, 5, 9);
-		final VoxelShape trim_1 = Block.makeCuboidShape(9, 5, 9, 10, 6, 10);
-		final VoxelShape trim_2 = Block.makeCuboidShape(9, 5, 6, 10, 6, 7);
-		final VoxelShape trim_3 = Block.makeCuboidShape(6, 5, 6, 7, 6, 7);
-		final VoxelShape trim_4 = Block.makeCuboidShape(6, 5, 9, 7, 6, 10);
-		final VoxelShape top_side_n = Block.makeCuboidShape(6, 5, 5, 10, 6, 6);
-		final VoxelShape top_side_e = Block.makeCuboidShape(10, 5, 6, 11, 6, 10);
-		final VoxelShape top_side_s = Block.makeCuboidShape(6, 5, 10, 10, 6, 11);
-		final VoxelShape top_side_w = Block.makeCuboidShape(5, 5, 6, 6, 6, 10);
-		final VoxelShape top_side_top_n = Block.makeCuboidShape(7, 6, 5, 9, 7, 6);
-		final VoxelShape top_side_top_e = Block.makeCuboidShape(10, 6, 7, 11, 7, 9);
-		final VoxelShape top_side_top_s = Block.makeCuboidShape(7, 6, 10, 9, 7, 11);
-		final VoxelShape top_side_top_w = Block.makeCuboidShape(5, 6, 7, 6, 7, 9);
+		final VoxelShape base = Block.box(5, 0, 5, 11, 1, 11);
+		final VoxelShape pillar = Block.box(7, 1, 7, 9, 4, 9);
+		final VoxelShape top_base_n = Block.box(7, 4, 6, 9, 5, 7);
+		final VoxelShape top_base_e = Block.box(9, 4, 7, 10, 5, 9);
+		final VoxelShape top_base_s = Block.box(7, 4, 9, 9, 5, 10);
+		final VoxelShape top_base_w = Block.box(6, 4, 7, 7, 5, 9);
+		final VoxelShape trim_1 = Block.box(9, 5, 9, 10, 6, 10);
+		final VoxelShape trim_2 = Block.box(9, 5, 6, 10, 6, 7);
+		final VoxelShape trim_3 = Block.box(6, 5, 6, 7, 6, 7);
+		final VoxelShape trim_4 = Block.box(6, 5, 9, 7, 6, 10);
+		final VoxelShape top_side_n = Block.box(6, 5, 5, 10, 6, 6);
+		final VoxelShape top_side_e = Block.box(10, 5, 6, 11, 6, 10);
+		final VoxelShape top_side_s = Block.box(6, 5, 10, 10, 6, 11);
+		final VoxelShape top_side_w = Block.box(5, 5, 6, 6, 6, 10);
+		final VoxelShape top_side_top_n = Block.box(7, 6, 5, 9, 7, 6);
+		final VoxelShape top_side_top_e = Block.box(10, 6, 7, 11, 7, 9);
+		final VoxelShape top_side_top_s = Block.box(7, 6, 10, 9, 7, 11);
+		final VoxelShape top_side_top_w = Block.box(5, 6, 7, 6, 7, 9);
 
 		return new VoxelShape[] {VoxelShapes.or(base, pillar, top_base_n, top_base_e, top_base_s, top_base_w, trim_1,
 				trim_2, trim_3, trim_4, top_side_n, top_side_e, top_side_s, top_side_w, top_side_top_n,
@@ -92,9 +92,9 @@ public class OfferingStandBlock extends ShapedBlock{
 	}
 
 	@Override
-	protected void fillStateContainer(final StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(final StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(OfferingStandBlock.FACING);
-		super.fillStateContainer(builder);
+		super.createBlockStateDefinition(builder);
 	}
 
 	@Override

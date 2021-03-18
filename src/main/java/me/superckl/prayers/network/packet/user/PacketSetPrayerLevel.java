@@ -30,7 +30,7 @@ public class PacketSetPrayerLevel extends PrayerUserPacket{
 		final Context context = supplier.get();
 		//Only the server should be sending this packet, and never on login
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT)
-			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().world).setPrayerLevel(this.level));
+			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().level).setPrayerLevel(this.level));
 	}
 
 }

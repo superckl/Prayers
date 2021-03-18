@@ -47,15 +47,15 @@ public class DamageEffect extends PrayerEffect{
 	@SubscribeEvent
 	public void onLivingHurt(final LivingHurtEvent e) {
 		final DamageSource s = e.getSource();
-		if(s.isDamageAbsolute())
+		if(s.isBypassArmor())
 			return;
 		boolean apply = this.type.matches(s);
 		if(!apply)
 			return;
 		if(this.isIncoming)
 			apply = apply && this.getOwner().isActive(e.getEntity());
-		else if(s.getTrueSource() != null)
-			apply = apply && this.getOwner().isActive(s.getTrueSource());
+		else if(s.getDirectEntity() != null)
+			apply = apply && this.getOwner().isActive(s.getDirectEntity());
 		if(!apply)
 			return;
 		if(this.isPercentage)
@@ -73,11 +73,11 @@ public class DamageEffect extends PrayerEffect{
 		private final String name;
 
 		public static DamageType getType(final DamageSource source) {
-			if(source.isMagicDamage())
+			if(source.isMagic())
 				return DamageType.MAGIC;
 			else if(source.isProjectile())
 				return DamageType.RANGE;
-			else if(source.isFireDamage())
+			else if(source.isFire())
 				return DamageType.FIRE;
 			else if(source instanceof EntityDamageSource && !source.isExplosion())
 				return DamageType.MELEE;

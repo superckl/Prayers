@@ -17,14 +17,14 @@ public class OfferingStandRenderer extends TileEntityRenderer<OfferingStandTileE
 	@Override
 	public void render(final OfferingStandTileEntity tileEntityIn, final float partialTicks, final MatrixStack matrixStackIn,
 			final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
-		if(tileEntityIn.getStackInSlot(0).isEmpty())
+		if(tileEntityIn.getItem(0).isEmpty())
 			return;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		final Vector3f renderLoc = new Vector3f(0.5F, 7/16F, 0.5F);
-		matrixStackIn.translate(renderLoc.getX(), renderLoc.getY(), renderLoc.getZ());
+		matrixStackIn.translate(renderLoc.x(), renderLoc.y(), renderLoc.z());
 		matrixStackIn.scale(0.4F, 0.4F, 0.4F);
-		RenderHelper.renderFloatingItemStack(matrixStackIn, bufferIn, partialTicks, combinedLightIn, combinedOverlayIn, tileEntityIn.getStackInSlot(0));
-		matrixStackIn.pop();
+		RenderHelper.renderFloatingItemStack(matrixStackIn, bufferIn, partialTicks, combinedLightIn, combinedOverlayIn, tileEntityIn.getItem(0));
+		matrixStackIn.popPose();
 	}
 
 }

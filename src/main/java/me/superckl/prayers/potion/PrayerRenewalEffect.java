@@ -14,12 +14,12 @@ public class PrayerRenewalEffect extends Effect{
 	}
 
 	@Override
-	public void performEffect(final LivingEntity entityLivingBaseIn, final int amplifier) {
+	public void applyEffectTick(final LivingEntity entityLivingBaseIn, final int amplifier) {
 		IPrayerUser.getUser(entityLivingBaseIn).addPoints(1);
 	}
 
 	@Override
-	public boolean isReady(final int duration, final int amplifier) {
+	public boolean isDurationEffectTick(final int duration, final int amplifier) {
 		final int time = 30 >> amplifier;
 		if(time > 0)
 			return duration % time == 0;

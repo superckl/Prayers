@@ -20,16 +20,16 @@ public class CraftingStandRenderer extends TileEntityRenderer<CraftingStandTileE
 	public void render(final CraftingStandTileEntity tileEntityIn, final float partialTicks, final MatrixStack matrixStackIn,
 			final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
 		for (final int i:CraftingStandTileEntity.slotToDir.keySet()) {
-			final ItemStack stack = tileEntityIn.getStackInSlot(i);
+			final ItemStack stack = tileEntityIn.getItem(i);
 			if(stack.isEmpty())
 				continue;
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			final Direction dir = CraftingStandTileEntity.slotToDir.get(i);
-			final Vector3f offset = new Vector3f(0.5F+dir.getXOffset()*5.5F/16F, 2F/16F, 0.5F+dir.getZOffset()*5.5F/16F);
-			matrixStackIn.translate(offset.getX(), offset.getY(), offset.getZ());
+			final Vector3f offset = new Vector3f(0.5F+dir.getStepX()*5.5F/16F, 2F/16F, 0.5F+dir.getStepZ()*5.5F/16F);
+			matrixStackIn.translate(offset.x(), offset.y(), offset.z());
 			matrixStackIn.scale(0.3F, 0.3F, 0.3F);
 			RenderHelper.renderFloatingItemStack(matrixStackIn, bufferIn, partialTicks, combinedLightIn, combinedOverlayIn, stack);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 
 	}

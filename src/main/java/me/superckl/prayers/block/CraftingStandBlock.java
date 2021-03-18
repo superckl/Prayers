@@ -34,68 +34,68 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	public static final BooleanProperty CENTER = BooleanProperty.create("center");
 
 	public CraftingStandBlock() {
-		super(AbstractBlock.Properties.create(Material.IRON, MaterialColor.IRON).setRequiresTool().hardnessAndResistance(5.0F, 6.0F).sound(SoundType.METAL), true);
-		this.setDefaultState(this.getDefaultState().with(CraftingStandBlock.CENTER, true));
+		super(AbstractBlock.Properties.of(Material.METAL, MaterialColor.METAL).requiresCorrectToolForDrops().strength(5.0F, 6.0F).sound(SoundType.METAL), true);
+		this.registerDefaultState(this.defaultBlockState().setValue(CraftingStandBlock.CENTER, true));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(final BlockItemUseContext context) {
-		BlockState state = context.getWorld().getBlockState(context.getPos());
-		if(!state.isIn(this))
-			state = super.getStateForPlacement(context).with(CraftingStandBlock.CENTER, false);
-		final Vector3d hit = context.getHitVec();
+		BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+		if(!state.is(this))
+			state = super.getStateForPlacement(context).setValue(CraftingStandBlock.CENTER, false);
+		final Vector3d hit = context.getClickLocation();
 		final Vector3d dirVec = hit.subtract(Math.floor(hit.x)+0.5, 0, Math.floor(hit.z)+0.5);
-		final float tolerance = state.get(CraftingStandBlock.CENTER) ? 1.5F:2.75F;
+		final float tolerance = state.getValue(CraftingStandBlock.CENTER) ? 1.5F:2.75F;
 		final Direction dir = CraftingStandBlock.directionFromVec(dirVec, tolerance/16);
-		if(state.isIn(this) && state.get(CraftingStandBlock.propertyFromDirection(dir)))
+		if(state.is(this) && state.getValue(CraftingStandBlock.propertyFromDirection(dir)))
 			return state;
 		else
-			return state.with(CraftingStandBlock.propertyFromDirection(dir), true);
+			return state.setValue(CraftingStandBlock.propertyFromDirection(dir), true);
 	}
 
 	@Override
-	public BlockState updatePostPlacement(final BlockState state, final Direction facing, final BlockState facingState, final IWorld world,
+	public BlockState updateShape(final BlockState state, final Direction facing, final BlockState facingState, final IWorld world,
 			final BlockPos currentPos, final BlockPos facingPos) {
 		//Need to bypass FourWayShapedBlock here, do this manually
-		if (state.get(ShapedBlock.WATERLOGGED))
-			world.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+		if (state.getValue(ShapedBlock.WATERLOGGED))
+			world.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		return state;
 	}
 
 	public BlockState subtractStands(BlockState from, final BlockState state) {
-		if(state.get(CraftingStandBlock.CENTER))
-			from = from.with(CraftingStandBlock.CENTER, false);
+		if(state.getValue(CraftingStandBlock.CENTER))
+			from = from.setValue(CraftingStandBlock.CENTER, false);
 		for(final Property<Boolean> prop:FourWayShapedBlock.FACING_TO_PROPERTY_MAP.values())
-			if(state.get(prop))
-				from = from.with(prop, false);
+			if(state.getValue(prop))
+				from = from.setValue(prop, false);
 		return from;
 	}
 
 	public boolean hasStand(final BlockState state, final Direction dir) {
-		return state.get(CraftingStandBlock.propertyFromDirection(dir));
+		return state.getValue(CraftingStandBlock.propertyFromDirection(dir));
 	}
 
 	@Override
-	public boolean isReplaceable(final BlockState state, final BlockItemUseContext context) {
-		return context.getItem().getItem() == this.asItem() && this.getStateForPlacement(context) != state;
+	public boolean canBeReplaced(final BlockState state, final BlockItemUseContext context) {
+		return context.getItemInHand().getItem() == this.asItem() && this.getStateForPlacement(context) != state;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
-		final CraftingStandTileEntity crafting_stand = (CraftingStandTileEntity) worldIn.getTileEntity(pos);
-		if(state.isIn(newState.getBlock())) {
+	public void onRemove(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
+		final CraftingStandTileEntity crafting_stand = (CraftingStandTileEntity) worldIn.getBlockEntity(pos);
+		if(state.is(newState.getBlock())) {
 			final NonNullList<ItemStack> stacks = NonNullList.create();
 			Direction.Plane.HORIZONTAL.forEach(dir -> {
-				if(state.get(CraftingStandBlock.propertyFromDirection(dir)) && !newState.get(CraftingStandBlock.propertyFromDirection(dir)))
-					stacks.add(crafting_stand.removeStackFromSlot(CraftingStandTileEntity.dirToSlot.getInt(dir)));
+				if(state.getValue(CraftingStandBlock.propertyFromDirection(dir)) && !newState.getValue(CraftingStandBlock.propertyFromDirection(dir)))
+					stacks.add(crafting_stand.removeItemNoUpdate(CraftingStandTileEntity.dirToSlot.getInt(dir)));
 			});
-			if(state.get(CraftingStandBlock.CENTER) && !newState.get(CraftingStandBlock.CENTER))
-				stacks.add(crafting_stand.removeStackFromSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP)));
-			InventoryHelper.dropItems(worldIn, pos, stacks);
+			if(state.getValue(CraftingStandBlock.CENTER) && !newState.getValue(CraftingStandBlock.CENTER))
+				stacks.add(crafting_stand.removeItemNoUpdate(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP)));
+			InventoryHelper.dropContents(worldIn, pos, stacks);
 		}else {
-			InventoryHelper.dropInventoryItems(worldIn, pos, crafting_stand);
-			super.onReplaced(state, worldIn, pos, newState, isMoving);
+			InventoryHelper.dropContents(worldIn, pos, crafting_stand);
+			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
 	}
 
@@ -103,7 +103,7 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 		if(Math.abs(dirVec.x) <= tolerance && Math.abs(dirVec.z) <= tolerance)
 			return Direction.UP;
 		else
-			return Direction.getFacingFromVector(dirVec.x, 0, dirVec.z);
+			return Direction.getNearest(dirVec.x, 0, dirVec.z);
 	}
 
 	public static Property<Boolean> propertyFromDirection(final Direction dir){
@@ -126,47 +126,47 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
+	public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
-		final CraftingStandTileEntity craftingStand = (CraftingStandTileEntity) worldIn.getTileEntity(pos);
-		final Vector3d hitVec = hit.getHitVec();
+		final CraftingStandTileEntity craftingStand = (CraftingStandTileEntity) worldIn.getBlockEntity(pos);
+		final Vector3d hitVec = hit.getLocation();
 		final Vector3d dirVec = hitVec.subtract(Math.floor(hitVec.x)+0.5, hitVec.y, Math.floor(hitVec.z)+0.5);
 		final Direction dir = CraftingStandBlock.directionFromVec(dirVec, 1.5F/16);
-		if(player.isSneaking() && player.getHeldItem(handIn).isEmpty() && craftingStand.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(dir)).isEmpty()) {
-			BlockState newState = state.with(CraftingStandBlock.propertyFromDirection(dir), false);
-			if(!newState.get(CraftingStandBlock.CENTER) && !FourWayShapedBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(newState::get))
-				newState = newState.get(ShapedBlock.WATERLOGGED) ? Blocks.WATER.getDefaultState():Blocks.AIR.getDefaultState();
-				worldIn.setBlockState(pos, newState);
+		if(player.isCrouching() && player.getItemInHand(handIn).isEmpty() && craftingStand.getItem(CraftingStandTileEntity.dirToSlot.getInt(dir)).isEmpty()) {
+			BlockState newState = state.setValue(CraftingStandBlock.propertyFromDirection(dir), false);
+			if(!newState.getValue(CraftingStandBlock.CENTER) && !FourWayShapedBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(newState::getValue))
+				newState = newState.getValue(ShapedBlock.WATERLOGGED) ? Blocks.WATER.defaultBlockState():Blocks.AIR.defaultBlockState();
+				worldIn.setBlockAndUpdate(pos, newState);
 				final ItemStack toDrop = new ItemStack(this::asItem);
-				if(!player.addItemStackToInventory(toDrop))
-					InventoryHelper.dropItems(worldIn, pos, NonNullList.from(ItemStack.EMPTY, toDrop));
+				if(!player.addItem(toDrop))
+					InventoryHelper.dropContents(worldIn, pos, NonNullList.of(ItemStack.EMPTY, toDrop));
 		}
 		return craftingStand.onActivate(player, handIn, dir);
 	}
 
 	@Override
 	protected VoxelShape[] getShapes() {
-		final VoxelShape base = Block.makeCuboidShape(7, 0, 7, 9, 0.5, 9);
-		final VoxelShape connector_1 = Block.makeCuboidShape(7, 0.5, 7, 7.5, 1, 7.5);
-		final VoxelShape connector_2 = Block.makeCuboidShape(7, 0.5, 8.5, 7.5, 1, 9);
-		final VoxelShape connector_3 = Block.makeCuboidShape(8.5, 0.5, 8.5, 9, 1, 9);
-		final VoxelShape connector_4 = Block.makeCuboidShape(8.5, 0.5, 7, 9, 1, 7.5);
-		final VoxelShape side_top_n = Block.makeCuboidShape(7.5, 1, 9, 8.5, 1.5, 9.5);
-		final VoxelShape side_top_s = Block.makeCuboidShape(7.5, 1, 6.5, 8.5, 1.5, 7);
-		final VoxelShape side_top_e = Block.makeCuboidShape(9, 1, 7.5, 9.5, 1.5, 8.5);
-		final VoxelShape side_top_w = Block.makeCuboidShape(6.5, 1, 7.5, 7, 1.5, 8.5);
-		final VoxelShape side_n = Block.makeCuboidShape(7, 0.5, 9, 9, 1, 9.5);
-		final VoxelShape side_s = Block.makeCuboidShape(7, 0.5, 6.5, 9, 1, 7);
-		final VoxelShape side_e = Block.makeCuboidShape(9, 0.5, 7, 9.5, 1, 9);
-		final VoxelShape side_w = Block.makeCuboidShape(6.5, 0.5, 7, 7, 1, 9);
+		final VoxelShape base = Block.box(7, 0, 7, 9, 0.5, 9);
+		final VoxelShape connector_1 = Block.box(7, 0.5, 7, 7.5, 1, 7.5);
+		final VoxelShape connector_2 = Block.box(7, 0.5, 8.5, 7.5, 1, 9);
+		final VoxelShape connector_3 = Block.box(8.5, 0.5, 8.5, 9, 1, 9);
+		final VoxelShape connector_4 = Block.box(8.5, 0.5, 7, 9, 1, 7.5);
+		final VoxelShape side_top_n = Block.box(7.5, 1, 9, 8.5, 1.5, 9.5);
+		final VoxelShape side_top_s = Block.box(7.5, 1, 6.5, 8.5, 1.5, 7);
+		final VoxelShape side_top_e = Block.box(9, 1, 7.5, 9.5, 1.5, 8.5);
+		final VoxelShape side_top_w = Block.box(6.5, 1, 7.5, 7, 1.5, 8.5);
+		final VoxelShape side_n = Block.box(7, 0.5, 9, 9, 1, 9.5);
+		final VoxelShape side_s = Block.box(7, 0.5, 6.5, 9, 1, 7);
+		final VoxelShape side_e = Block.box(9, 0.5, 7, 9.5, 1, 9);
+		final VoxelShape side_w = Block.box(6.5, 0.5, 7, 7, 1, 9);
 
 		final VoxelShape stand = VoxelShapes.or(base, connector_1, connector_2, connector_3, connector_4, side_n,
 				side_s, side_e, side_w, side_top_n, side_top_s, side_top_e, side_top_w);
 
-		final VoxelShape stand_n = stand.withOffset(0, 0, -5.5/16);
-		final VoxelShape stand_s = stand.withOffset(0, 0, 5.5/16);
-		final VoxelShape stand_e = stand.withOffset(5.5/16, 0, 0);
-		final VoxelShape stand_w = stand.withOffset(-5.5/16, 0, 0);
+		final VoxelShape stand_n = stand.move(0, 0, -5.5/16);
+		final VoxelShape stand_s = stand.move(0, 0, 5.5/16);
+		final VoxelShape stand_e = stand.move(5.5/16, 0, 0);
+		final VoxelShape stand_w = stand.move(-5.5/16, 0, 0);
 
 		final int north = FourWayShapedBlock.getMask(Direction.NORTH);
 		final int east = FourWayShapedBlock.getMask(Direction.EAST);
@@ -216,15 +216,15 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	@Override
 	protected int getIndex(final BlockState state) {
 		int ind = super.getIndex(state);
-		if(state.get(CraftingStandBlock.CENTER))
+		if(state.getValue(CraftingStandBlock.CENTER))
 			ind |= 16;
 		return ind;
 	}
 
 	@Override
-	protected void fillStateContainer(final Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
 		builder.add(CraftingStandBlock.CENTER);
-		super.fillStateContainer(builder);
+		super.createBlockStateDefinition(builder);
 	}
 
 	@Override

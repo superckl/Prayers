@@ -34,27 +34,27 @@ public abstract class InteractableInventoryTileEntity extends TileEntity impleme
 	}
 
 	public ActionResultType onInteract(final PlayerEntity player, final Hand hand, final int slot) {
-		if(this.world.isRemote)
+		if(this.level.isClientSide)
 			return ActionResultType.SUCCESS;
-		final ItemStack stack = this.getStackInSlot(slot);
-		if(player.isSneaking()) {
-			if(!stack.isEmpty() && player.getHeldItem(hand).isEmpty()) {
-				player.addItemStackToInventory(stack);
+		final ItemStack stack = this.getItem(slot);
+		if(player.isCrouching()) {
+			if(!stack.isEmpty() && player.getItemInHand(hand).isEmpty()) {
+				player.addItem(stack);
 				this.onSlotChange(slot, true);
 				return ActionResultType.CONSUME;
 			}
 		}else if(stack.isEmpty()) {
-			final ItemStack held = player.getHeldItem(hand);
-			if(this.isItemValidForSlot(slot, held)) {
-				this.setInventorySlotContents(slot, held.copy());
+			final ItemStack held = player.getItemInHand(hand);
+			if(this.canPlaceItem(slot, held)) {
+				this.setItem(slot, held.copy());
 				if(!player.isCreative())
-					player.setHeldItem(hand, ItemStack.EMPTY);
+					player.setItemInHand(hand, ItemStack.EMPTY);
 				this.onSlotChange(slot, true);
 				return ActionResultType.CONSUME;
 			}
 		}else {
-			final ItemStack held = player.getHeldItem(hand);
-			if(held.isItemEqual(stack) && ItemStack.areItemStackTagsEqual(held, stack)) {
+			final ItemStack held = player.getItemInHand(hand);
+			if(held.sameItem(stack) && ItemStack.tagMatches(held, stack)) {
 				final int toAdd = Math.min(stack.getMaxStackSize()-stack.getCount(), held.getCount());
 				if(toAdd == 0)
 					return ActionResultType.PASS;
@@ -69,12 +69,7 @@ public abstract class InteractableInventoryTileEntity extends TileEntity impleme
 	}
 
 	public void onSlotChange(final int slot, final boolean itemChanged) {
-		this.markDirty();
-	}
-
-	@Override
-	public int getSizeInventory() {
-		return this.invSize;
+		this.setChanged();
 	}
 
 	@Override
@@ -83,14 +78,14 @@ public abstract class InteractableInventoryTileEntity extends TileEntity impleme
 	}
 
 	@Override
-	public ItemStack getStackInSlot(final int index) {
+	public ItemStack getItem(final int index) {
 		return this.items.get(index);
 	}
 
 	@Override
-	public ItemStack decrStackSize(final int index, final int count) {
-		final ItemStack stack = ItemStackHelper.getAndSplit(this.items, index, count);
-		if(this.getStackInSlot(index).isEmpty() && !stack.isEmpty())
+	public ItemStack removeItem(final int index, final int count) {
+		final ItemStack stack = ItemStackHelper.removeItem(this.items, index, count);
+		if(this.getItem(index).isEmpty() && !stack.isEmpty())
 			this.onSlotChange(index, true);
 		else
 			this.onSlotChange(index, false);
@@ -98,48 +93,53 @@ public abstract class InteractableInventoryTileEntity extends TileEntity impleme
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(final int index) {
-		final ItemStack stack = ItemStackHelper.getAndRemove(this.items, index);
+	public ItemStack removeItemNoUpdate(final int index) {
+		final ItemStack stack = ItemStackHelper.takeItem(this.items, index);
 		this.onSlotChange(index, true);
 		return stack;
 	}
 
 	@Override
-	public void setInventorySlotContents(final int index, final ItemStack stack) {
+	public void setItem(final int index, final ItemStack stack) {
 		final ItemStack oldStack = this.items.set(index, stack);
-		if (stack.getCount() > this.getInventoryStackLimit())
-			stack.setCount(this.getInventoryStackLimit());
-		this.onSlotChange(index, !stack.isItemEqual(oldStack));
+		if (stack.getCount() > this.getMaxStackSize())
+			stack.setCount(this.getMaxStackSize());
+		this.onSlotChange(index, !stack.sameItem(oldStack));
 	}
 
 	@Override
-	public boolean isUsableByPlayer(final PlayerEntity player) {
+	public int getContainerSize() {
+		return this.invSize;
+	}
+
+	@Override
+	public boolean stillValid(final PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 		this.items.clear();
 		this.onSlotChange(-1, true);
 	}
 
 	@Override
-	public void markDirty() {
+	public void setChanged() {
 		this.detectAndSendChanges();
-		super.markDirty();
+		super.setChanged();
 	}
 
 	public void detectAndSendChanges() {
 		for (int i = 0; i < this.invSize; i++) {
 			final ItemStack backup = this.itemsBack.get(i);
 			final ItemStack stack = this.items.get(i);
-			if(!ItemStack.areItemStacksEqual(backup, stack)) {
+			if(!ItemStack.matches(backup, stack)) {
 				final boolean clientChanged = !backup.equals(stack, true);
 				final ItemStack copy = stack.copy();
 				this.itemsBack.set(i, copy);
-				if(!this.world.isRemote && clientChanged)
-					PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> this.world.getChunkAt(this.pos)),
-							new PacketInventorySlotChanged(this.pos, i, copy));
+				if(!this.level.isClientSide && clientChanged)
+					PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> this.level.getChunkAt(this.worldPosition)),
+							new PacketInventorySlotChanged(this.worldPosition, i, copy));
 			}
 		}
 	}
@@ -147,14 +147,14 @@ public abstract class InteractableInventoryTileEntity extends TileEntity impleme
 	public void readInventory(final CompoundNBT nbt) {
 		final ListNBT inv = nbt.getList(InteractableInventoryTileEntity.INV_KEY, Constants.NBT.TAG_COMPOUND);
 		for(int i = 0; i < this.invSize; i++)
-			this.items.set(i, ItemStack.read(inv.getCompound(i)));
+			this.items.set(i, ItemStack.of(inv.getCompound(i)));
 		for(int i = 0; i < this.invSize; i++)
 			this.itemsBack.set(i, this.items.get(i).copy());
 	}
 
 	public CompoundNBT writeInventory(final CompoundNBT compound) {
 		final ListNBT inv = new ListNBT();
-		this.items.forEach(stack -> inv.add(stack.write(new CompoundNBT())));
+		this.items.forEach(stack -> inv.add(stack.save(new CompoundNBT())));
 		compound.put(InteractableInventoryTileEntity.INV_KEY, inv);
 		return compound;
 	}

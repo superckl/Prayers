@@ -173,7 +173,7 @@ public interface IPrayerUser{
 			instance.setXP(parent.getFloat(Storage.XP_KEY));
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
-			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getString()))));
+			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
 		}
 
 	}

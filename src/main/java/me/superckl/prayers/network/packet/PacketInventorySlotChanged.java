@@ -28,20 +28,20 @@ public class PacketInventorySlotChanged {
 	public void encode(final PacketBuffer buffer) {
 		buffer.writeBlockPos(this.pos);
 		buffer.writeInt(this.slot);
-		buffer.writeItemStack(this.stack);
+		buffer.writeItem(this.stack);
 	}
 
 	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				if(!Minecraft.getInstance().world.isAreaLoaded(this.pos, 0))
+				if(!Minecraft.getInstance().level.isAreaLoaded(this.pos, 0))
 					return;
-				final TileEntity te = Minecraft.getInstance().world.getTileEntity(this.pos);
+				final TileEntity te = Minecraft.getInstance().level.getBlockEntity(this.pos);
 				if(!(te instanceof InteractableInventoryTileEntity))
 					return;
 				final InteractableInventoryTileEntity iTE = (InteractableInventoryTileEntity) te;
-				iTE.setInventorySlotContents(this.slot, this.stack);
+				iTE.setItem(this.slot, this.stack);
 			});
 		supplier.get().setPacketHandled(true);
 	}
@@ -49,7 +49,7 @@ public class PacketInventorySlotChanged {
 	public static PacketInventorySlotChanged decode(final PacketBuffer buffer) {
 		final BlockPos pos = buffer.readBlockPos();
 		final int slot = buffer.readInt();
-		return new PacketInventorySlotChanged(pos, slot, buffer.readItemStack());
+		return new PacketInventorySlotChanged(pos, slot, buffer.readItem());
 	}
 
 }

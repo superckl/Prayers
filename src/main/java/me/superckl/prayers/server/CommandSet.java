@@ -21,9 +21,9 @@ import net.minecraftforge.fml.network.PacketDistributor;
 public class CommandSet {
 
 	public static int prayerPoints(final CommandContext<CommandSource> context) throws CommandSyntaxException {
-		final Collection<? extends Entity> targets = EntityArgument.getEntitiesAllowingNone(context, "targets");
+		final Collection<? extends Entity> targets = EntityArgument.getOptionalEntities(context, "targets");
 		if(targets.isEmpty()) {
-			context.getSource().sendFeedback(new StringTextComponent("No entities targeted."), true);
+			context.getSource().sendSuccess(new StringTextComponent("No entities targeted."), true);
 			return 0;
 		}
 		final float points = FloatArgumentType.getFloat(context, "amount");
@@ -35,16 +35,16 @@ public class CommandSet {
 			user.setCurrentPrayerPoints(points);
 			pointsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
-					PacketSetPrayerPoints.builder().entityID(e.getEntityId()).amount(points).build());
+					PacketSetPrayerPoints.builder().entityID(e.getId()).amount(points).build());
 		}
-		context.getSource().sendFeedback(new StringTextComponent(String.format("%d entities targeted, set points for %d living entities", targets.size(), pointsSet)), true);
+		context.getSource().sendSuccess(new StringTextComponent(String.format("%d entities targeted, set points for %d living entities", targets.size(), pointsSet)), true);
 		return pointsSet;
 	}
 
 	public static int prayerLevel(final CommandContext<CommandSource> context) throws CommandSyntaxException {
-		final Collection<? extends Entity> targets = EntityArgument.getEntitiesAllowingNone(context, "targets");
+		final Collection<? extends Entity> targets = EntityArgument.getOptionalEntities(context, "targets");
 		if(targets.isEmpty()) {
-			context.getSource().sendFeedback(new StringTextComponent("No entities targeted."), true);
+			context.getSource().sendSuccess(new StringTextComponent("No entities targeted."), true);
 			return 0;
 		}
 		final int level = IntegerArgumentType.getInteger(context, "level");
@@ -56,9 +56,9 @@ public class CommandSet {
 			user.setPrayerLevel(level);
 			levelsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
-					PacketSetPrayerLevel.builder().entityID(e.getEntityId()).level(level).build());
+					PacketSetPrayerLevel.builder().entityID(e.getId()).level(level).build());
 		}
-		context.getSource().sendFeedback(new StringTextComponent(String.format("%d entities targeted, set level for %d living entities", targets.size(), levelsSet)), true);
+		context.getSource().sendSuccess(new StringTextComponent(String.format("%d entities targeted, set level for %d living entities", targets.size(), levelsSet)), true);
 		return levelsSet;
 	}
 

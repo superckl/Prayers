@@ -62,11 +62,11 @@ public class AltarBlock extends FourWayShapedBlock{
 	public static final BooleanProperty SOUTH = SixWayBlock.SOUTH;
 	public static final BooleanProperty WEST = SixWayBlock.WEST;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-	protected static final Map<Direction, BooleanProperty> FACING_TO_PROPERTY_MAP = SixWayBlock.FACING_TO_PROPERTY_MAP.entrySet().stream().filter(facingProperty -> facingProperty.getKey().getAxis().isHorizontal()).collect(Util.toMapCollector());
+	protected static final Map<Direction, BooleanProperty> FACING_TO_PROPERTY_MAP = SixWayBlock.PROPERTY_BY_DIRECTION.entrySet().stream().filter(facingProperty -> facingProperty.getKey().getAxis().isHorizontal()).collect(Util.toMap());
 	private final AltarTypes type;
 
 	public AltarBlock(final AltarTypes type) {
-		super(AbstractBlock.Properties.create(Material.ROCK).setRequiresTool().hardnessAndResistance(2.0F, 6.0F), true);
+		super(AbstractBlock.Properties.of(Material.STONE).requiresCorrectToolForDrops().strength(2.0F, 6.0F), true);
 		this.type = type;
 	}
 
@@ -81,24 +81,24 @@ public class AltarBlock extends FourWayShapedBlock{
 	}
 
 	@Override
-	public void onBlockPlacedBy(final World worldIn, final BlockPos pos, final BlockState state, final LivingEntity placer, final ItemStack stack) {
+	public void setPlacedBy(final World worldIn, final BlockPos pos, final BlockState state, final LivingEntity placer, final ItemStack stack) {
 		if(placer instanceof PlayerEntity) {
-			final AltarTileEntity altar = (AltarTileEntity) worldIn.getTileEntity(pos);
+			final AltarTileEntity altar = (AltarTileEntity) worldIn.getBlockEntity(pos);
 			altar.checkMultiblock(true);
-			altar.setOwner(((PlayerEntity) placer).getUniqueID(), true);
+			altar.setOwner(((PlayerEntity) placer).getUUID(), true);
 		}
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
+	public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
-		final AltarTileEntity altar = (AltarTileEntity) worldIn.getTileEntity(pos);
-		if(!player.isSneaking())
-			if(worldIn.isRemote)
+		final AltarTileEntity altar = (AltarTileEntity) worldIn.getBlockEntity(pos);
+		if(!player.isCrouching())
+			if(worldIn.isClientSide)
 				return ActionResultType.SUCCESS;
-			else if (altar.setOwner(player.getUniqueID(), true))
+			else if (altar.setOwner(player.getUUID(), true))
 				return ActionResultType.CONSUME;
-			else if(player.getHeldItem(handIn).isEmpty())
+			else if(player.getItemInHand(handIn).isEmpty())
 				if(altar.rechargeUser(player) > 0)
 					return ActionResultType.CONSUME;
 		return altar.onActivateBy(player, handIn);
@@ -106,12 +106,12 @@ public class AltarBlock extends FourWayShapedBlock{
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onReplaced(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
-		if(!state.isIn(newState.getBlock())) {
-			final AltarTileEntity te = (AltarTileEntity) worldIn.getTileEntity(pos);
+	public void onRemove(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
+		if(!state.is(newState.getBlock())) {
+			final AltarTileEntity te = (AltarTileEntity) worldIn.getBlockEntity(pos);
 			if(!te.getAltarItem().isEmpty())
-				InventoryHelper.dropItems(worldIn, pos, NonNullList.from(ItemStack.EMPTY, te.getAltarItem()));
-			super.onReplaced(state, worldIn, pos, newState, isMoving);
+				InventoryHelper.dropContents(worldIn, pos, NonNullList.of(ItemStack.EMPTY, te.getAltarItem()));
+			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
 	}
 
@@ -122,15 +122,15 @@ public class AltarBlock extends FourWayShapedBlock{
 
 	@Override
 	protected VoxelShape[] getShapes() {
-		final VoxelShape base = Block.makeCuboidShape(0, 0, 0, 16, 1, 16);
-		final VoxelShape top = Block.makeCuboidShape(0, 15, 0, 16, 16, 16);
-		final VoxelShape center = Block.makeCuboidShape(3, 1, 3, 13, 15, 13);
+		final VoxelShape base = Block.box(0, 0, 0, 16, 1, 16);
+		final VoxelShape top = Block.box(0, 15, 0, 16, 16, 16);
+		final VoxelShape center = Block.box(3, 1, 3, 13, 15, 13);
 		final VoxelShape indepAltar = VoxelShapes.or(base, top, center);
 
-		final VoxelShape westExt = Block.makeCuboidShape(0, 1, 3, 3, 15, 13);
-		final VoxelShape northExt = Block.makeCuboidShape(3, 1, 0, 13, 15, 3);
-		final VoxelShape eastExt = Block.makeCuboidShape(13, 1, 3, 16, 15, 13);
-		final VoxelShape southExt = Block.makeCuboidShape(3, 1, 13, 13, 15, 16);
+		final VoxelShape westExt = Block.box(0, 1, 3, 3, 15, 13);
+		final VoxelShape northExt = Block.box(3, 1, 0, 13, 15, 3);
+		final VoxelShape eastExt = Block.box(13, 1, 3, 16, 15, 13);
+		final VoxelShape southExt = Block.box(3, 1, 13, 13, 15, 16);
 
 		final int north = FourWayShapedBlock.getMask(Direction.NORTH);
 		final int east = FourWayShapedBlock.getMask(Direction.EAST);
@@ -189,9 +189,10 @@ public class AltarBlock extends FourWayShapedBlock{
 	public static VoxelShape connectAltars(final BlockState altar, final IBlockReader reader, final BlockPos origin) {
 		final Set<BlockPos> connected = AltarBlock.findConnected(reader, origin);
 
+
 		return connected.stream().map(pos -> {
 			final BlockPos diff = pos.subtract(origin);
-			return reader.getBlockState(pos).getShape(reader, pos).withOffset(diff.getX(), diff.getY(), diff.getZ());
+			return reader.getBlockState(pos).getShape(reader, pos).move(diff.getX(), diff.getY(), diff.getZ());
 		}).reduce(VoxelShapes::or).orElse(VoxelShapes.empty());
 	}
 

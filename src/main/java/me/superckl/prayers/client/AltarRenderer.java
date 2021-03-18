@@ -26,21 +26,21 @@ public class AltarRenderer extends TileEntityRenderer<AltarTileEntity>{
 			final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
 		if(tileEntityIn.getAltarItem().isEmpty())
 			return;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		final Vector3f renderLoc = new Vector3f(0.5F, 1, 0.5F);
-		matrixStackIn.translate(renderLoc.getX(), renderLoc.getY(), renderLoc.getZ());
+		matrixStackIn.translate(renderLoc.x(), renderLoc.y(), renderLoc.z());
 
 		final Direction dir = tileEntityIn.getItemDirection();
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(90F));
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-90F));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90F));
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-90F));
 
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(90+dir.getHorizontalAngle()));
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(90+dir.toYRot()));
 		final float current = tileEntityIn.getItemTicks();
 		final float max = tileEntityIn.getReqTicks();
 		final float scale = 0.6F*(current == 0? 1:MathHelper.lerp(partialTicks, 1-(current-1)/max, 1-current/max));
 		matrixStackIn.scale(scale, scale, scale);
-		this.itemRender.renderItem(tileEntityIn.getAltarItem(), TransformType.FIXED, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
-		matrixStackIn.pop();
+		this.itemRender.renderStatic(tileEntityIn.getAltarItem(), TransformType.FIXED, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
+		matrixStackIn.popPose();
 	}
 
 }

@@ -32,9 +32,9 @@ public class CapabilityEventHandler {
 	//Sync prayer data when a client logs in
 	@SubscribeEvent
 	public void onPlayerLogin(final PlayerLoggedInEvent e) {
-		final AltarsSavedData data = AltarsSavedData.get((ServerWorld)e.getPlayer().world);
-		if(data.hasPendingXP(e.getPlayer().getUniqueID()))
-			IPrayerUser.getUser(e.getPlayer()).giveXP(data.getAndRemoveXP(e.getPlayer().getUniqueID()));
+		final AltarsSavedData data = AltarsSavedData.get((ServerWorld)e.getPlayer().level);
+		if(data.hasPendingXP(e.getPlayer().getUUID()))
+			IPrayerUser.getUser(e.getPlayer()).giveXP(data.getAndRemoveXP(e.getPlayer().getUUID()));
 		PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(e::getPlayer),
 				PacketSyncPrayerUser.fromPlayer(e.getPlayer()));
 	}

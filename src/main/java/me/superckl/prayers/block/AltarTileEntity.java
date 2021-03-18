@@ -83,13 +83,13 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	}
 
 	@Override
-	public void remove() {
+	public void setRemoved() {
 		this.invalidateMultiblock(true);
-		super.remove();
+		super.setRemoved();
 	}
 
 	public Set<BlockPos> checkMultiblock(final boolean newlyPlaced) {
-		final Set<BlockPos> connected = ImmutableSet.copyOf(AltarBlock.findConnected(this.world, this.pos));
+		final Set<BlockPos> connected = ImmutableSet.copyOf(AltarBlock.findConnected(this.level, this.worldPosition));
 		final int numConnected = connected.size();
 		if(numConnected == 1) {
 			this.connected = connected;
@@ -99,7 +99,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 				this.currentPoints = 0;
 			}
 		} else {
-			final List<AltarTileEntity> tiles = AltarTileEntity.toAltars(connected, this.world);
+			final List<AltarTileEntity> tiles = AltarTileEntity.toAltars(connected, this.level);
 			if(numConnected <= this.altarType.getMaxConnected()) {
 				final float points = (float) (tiles.stream().mapToDouble(AltarTileEntity::getCurrentPoints).sum()/numConnected);
 				final float maxPoints = this.altarType.getMaxPoints()*numConnected; //TODO diminishing returns
@@ -108,19 +108,19 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 					tile.connected = connected;
 					tile.maxPoints = maxPoints/numConnected;
 					tile.currentPoints = points;
-					tile.markDirty();
+					tile.setChanged();
 				});
 			} else {
 				tiles.forEach(tile -> {
 					tile.connected = connected;
 					tile.invalidateMultiblock(false);
-					tile.markDirty();
+					tile.setChanged();
 				});
 				if(newlyPlaced)
 					this.maxPoints = 0;
 			}
 		}
-		this.markDirty();
+		this.setChanged();
 		return connected;
 	}
 
@@ -137,11 +137,11 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	}
 
 	public List<AltarTileEntity> getConnected(){
-		return AltarTileEntity.toAltars(this.connected, this.world);
+		return AltarTileEntity.toAltars(this.connected, this.level);
 	}
 
 	public static List<AltarTileEntity> toAltars(final Set<BlockPos> blockPos, final IBlockReader reader){
-		return blockPos.stream().map(pos -> (AltarTileEntity) reader.getTileEntity(pos)).collect(Collectors.toList());
+		return blockPos.stream().map(pos -> (AltarTileEntity) reader.getBlockEntity(pos)).collect(Collectors.toList());
 	}
 
 	public float addPoints(final float points) {
@@ -172,18 +172,18 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		this.validMultiblock = false;
 		if(reCheck) {
 			final Set<BlockPos> connected = Sets.newHashSet(this.connected);
-			connected.remove(this.pos);
+			connected.remove(this.worldPosition);
 			final Set<BlockPos> visited = Sets.newHashSet();
 			final Iterator<BlockPos> it = connected.iterator();
 			while(it.hasNext()) {
 				final BlockPos pos = it.next();
 				if(visited.contains(pos))
 					continue;
-				visited.addAll(((AltarTileEntity) this.world.getTileEntity(pos)).checkMultiblock(false));
+				visited.addAll(((AltarTileEntity) this.level.getBlockEntity(pos)).checkMultiblock(false));
 			}
 		}
 		this.setOwner(null, false);
-		this.markDirty();
+		this.setChanged();
 	}
 
 	/**
@@ -195,33 +195,33 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	public boolean setOwner(final UUID owner, final boolean propogate) {
 		if(owner != null && (!this.validMultiblock || this.owner != null && owner.equals(this.owner)))
 			return false;
-		if(!this.world.isRemote) {
-			final AltarsSavedData savedData = AltarsSavedData.get((ServerWorld) this.world);
+		if(!this.level.isClientSide) {
+			final AltarsSavedData savedData = AltarsSavedData.get((ServerWorld) this.level);
 			if(owner == null && this.owner != null)
-				AltarsSavedData.get((ServerWorld) this.world).removeAltar(this.owner);
+				AltarsSavedData.get((ServerWorld) this.level).removeAltar(this.owner);
 			else if(savedData.ownsAltar(owner))
 				return false;
 			if(propogate)
 				this.getConnected().forEach(tile -> {
 					tile.owner = owner;
-					tile.markDirty();
+					tile.setChanged();
 					tile.syncToClientLight(null);
 				});
 			else {
 				this.owner = owner;
-				this.markDirty();
+				this.setChanged();
 				this.syncToClientLight(null);
 			}
 			//Send update packets to client
 			if(owner != null)
-				savedData.setAltar(owner, this.pos);
+				savedData.setAltar(owner, this.worldPosition);
 			return true;
 		}
 		return false;
 	}
 
 	public float rechargeUser(final PlayerEntity player) {
-		if(this.world.isRemote || !this.canRegen())
+		if(this.level.isClientSide || !this.canRegen())
 			return 0;
 		final IPrayerUser user = IPrayerUser.getUser(player);
 		final float current = user.getCurrentPrayerPoints();
@@ -235,8 +235,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			});
 			user.setCurrentPrayerPoints(current+recharge);
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
-					PacketSetPrayerPoints.builder().entityID(player.getEntityId()).amount(user.getCurrentPrayerPoints()).build());
-			this.markDirty();
+					PacketSetPrayerPoints.builder().entityID(player.getId()).amount(user.getCurrentPrayerPoints()).build());
+			this.setChanged();
 			return recharge;
 		}
 		return 0;
@@ -244,24 +244,24 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 
 	public void syncToClientLight(final ServerPlayerEntity player) {
 		if(player == null)
-			this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE | Constants.BlockFlags.NO_RERENDER);
+			this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE | Constants.BlockFlags.NO_RERENDER);
 		else
 			PacketDistributor.PLAYER.with(() -> player).send(this.getUpdatePacket());
 	}
 
 	@Override
 	public void tick() {
-		if(this.world.isRemote)
+		if(this.level.isClientSide)
 			return;
 		if(!this.altarItem.isEmpty() && !this.isTopClear(true)) {
-			final double x = this.world.rand.nextFloat() * 0.5 + 0.25;
-			final double y = 1+this.world.rand.nextFloat() * 0.1;
-			final double z = this.world.rand.nextFloat() * 0.5 + 0.25;
-			final ItemEntity itemEntity = new ItemEntity(this.world, this.pos.getX() + x, this.pos.getY() + y, this.pos.getZ() + z, this.altarItem);
-			itemEntity.setDefaultPickupDelay();
-			this.world.addEntity(itemEntity);
+			final double x = this.level.random.nextFloat() * 0.5 + 0.25;
+			final double y = 1+this.level.random.nextFloat() * 0.1;
+			final double z = this.level.random.nextFloat() * 0.5 + 0.25;
+			final ItemEntity itemEntity = new ItemEntity(this.level, this.worldPosition.getX() + x, this.worldPosition.getY() + y, this.worldPosition.getZ() + z, this.altarItem);
+			itemEntity.setDefaultPickUpDelay();
+			this.level.addFreshEntity(itemEntity);
 			this.clearItem();
-			this.markDirty();
+			this.setChanged();
 		}
 		if (this.canRegen()) {
 			if(this.rand.nextFloat() < 0.015F)
@@ -270,41 +270,41 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 				this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
 				if(this.currentPoints > this.maxPoints)
 					this.currentPoints = this.maxPoints;
-				this.markDirty();
+				this.setChanged();
 			}
 			this.updateItem();
 		}
 	}
 
 	public void updateItem() {
-		if(this.world.isRemote || this.altarItem.isEmpty())
+		if(this.level.isClientSide || this.altarItem.isEmpty())
 			return;
 		//Update visuals on client, but only do xp and particles on server.
 		if(this.rand.nextFloat() < 0.15F) {
-			final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
+			final PlayerEntity player = this.level.getPlayerByUUID(this.altarItemOwner);
 			if(player != null) {
-				final Vector3d altarTop = new Vector3d(this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5)
+				final Vector3d altarTop = new Vector3d(this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5)
 						.add((2*this.rand.nextDouble()-1)*.15, this.rand.nextDouble()*.05, (2*this.rand.nextDouble()-1)*.15);
-				Vector3d toPlayer = player.getPositionVec().add(0, player.getEyeHeight()-0.35, 0).subtract(altarTop);
+				Vector3d toPlayer = player.position().add(0, player.getEyeHeight()-0.35, 0).subtract(altarTop);
 				final double mag = toPlayer.length();
 				toPlayer = toPlayer.scale(1/mag);
-				((ServerWorld)this.world).spawnParticle(ModParticles.ITEM_SACRIFICE.get(), altarTop.x, altarTop.y, altarTop.z, 0, toPlayer.x, toPlayer.y, toPlayer.z, mag/20);
+				((ServerWorld)this.level).sendParticles(ModParticles.ITEM_SACRIFICE.get(), altarTop.x, altarTop.y, altarTop.z, 0, toPlayer.x, toPlayer.y, toPlayer.z, mag/20);
 			}
 		}
 		if(++this.itemTicks >= this.reqTicks) {
-			final PlayerEntity player = this.world.getPlayerByUuid(this.altarItemOwner);
+			final PlayerEntity player = this.level.getPlayerByUUID(this.altarItemOwner);
 			final AltarItem aItem = AltarItem.find(this.altarItem);
 			if(player == null)
-				AltarsSavedData.get((ServerWorld) this.world).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
+				AltarsSavedData.get((ServerWorld) this.level).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
 			else {
 				IPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
 				PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), PacketSyncPrayerUser.fromPlayer(player));
 			}
-			((ServerWorld)this.world).spawnParticle(ParticleTypes.SMOKE, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
-			((ServerWorld)this.world).playSound(null, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.02F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
+			((ServerWorld)this.level).sendParticles(ParticleTypes.SMOKE, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
+			((ServerWorld)this.level).playSound(null, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, SoundEvents.FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.02F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
 			this.clearItem();
 		}
-		this.markDirty();
+		this.setChanged();
 	}
 
 	public void clearItem() {
@@ -313,7 +313,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		this.altarItemOwner = null;
 		this.reqTicks = 0;
 		this.itemTicks = 0;
-		this.markDirty();
+		this.setChanged();
 		this.syncItem();
 	}
 
@@ -321,10 +321,10 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		if(!this.isTopClear(false))
 			return;
 		int clearance = 1;
-		final BlockPos pos = this.pos.add(0, 2, 0);
+		final BlockPos pos = this.worldPosition.offset(0, 2, 0);
 		while (clearance < 3) {
-			final BlockState state = this.world.getBlockState(pos);
-			if(!state.getBlock().isAir(state, this.world, pos))
+			final BlockState state = this.level.getBlockState(pos);
+			if(!state.getBlock().isAir(state, this.level, pos))
 				break;
 			clearance++;
 		}
@@ -332,29 +332,29 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		if(yAdj >= clearance)
 			return;
 
-		final double posX = this.pos.getX()+this.rand.nextDouble();
-		final double posY = this.pos.getY()+yAdj;
-		final double posZ = this.pos.getZ()+this.rand.nextDouble();
-		((ServerWorld)this.world).spawnParticle(ModParticles.ALTAR_ACTIVE.get(), posX, posY, posZ, 0, 0, 0, 0, 0);
+		final double posX = this.worldPosition.getX()+this.rand.nextDouble();
+		final double posY = this.worldPosition.getY()+yAdj;
+		final double posZ = this.worldPosition.getZ()+this.rand.nextDouble();
+		((ServerWorld)this.level).sendParticles(ModParticles.ALTAR_ACTIVE.get(), posX, posY, posZ, 0, 0, 0, 0, 0);
 	}
 
 	public ActionResultType onActivateBy(final PlayerEntity player, final Hand hand) {
-		if(this.world.isRemote)
+		if(this.level.isClientSide)
 			return ActionResultType.SUCCESS;
 		if(player instanceof ServerPlayerEntity)
 			this.getConnected().forEach(altar -> altar.syncToClientLight((ServerPlayerEntity) player));
-		if(player.isSneaking()) {
-			if(!this.altarItem.isEmpty() && player.getHeldItem(hand).isEmpty()) {
-				player.addItemStackToInventory(this.altarItem);
+		if(player.isCrouching()) {
+			if(!this.altarItem.isEmpty() && player.getItemInHand(hand).isEmpty()) {
+				player.addItem(this.altarItem);
 				this.clearItem();
 				return ActionResultType.CONSUME;
 			}
 		}else if(this.altarItem.isEmpty() && this.isTopClear(true)){
-			final ItemStack toPlace = player.getHeldItem(hand).copy();
+			final ItemStack toPlace = player.getItemInHand(hand).copy();
 			toPlace.setCount(1);
-			if(this.setItem(toPlace, player.getUniqueID(), Direction.fromAngle(player.rotationYawHead))) {
+			if(this.setItem(toPlace, player.getUUID(), Direction.fromYRot(player.yHeadRot))) {
 				if(!player.isCreative())
-					player.getHeldItem(hand).shrink(1);
+					player.getItemInHand(hand).shrink(1);
 				return ActionResultType.CONSUME;
 			}
 		}
@@ -373,23 +373,23 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		this.itemTicks = 0;
 		this.reqTicks = aItem.getSacrificeTicks();
 		this.itemDirection = dir;
-		this.markDirty();
+		this.setChanged();
 		this.syncItem();
 		return true;
 	}
 
 	protected void syncItem() {
-		if(this.world.isRemote)
+		if(this.level.isClientSide)
 			return;
 		//We don't sync the item owner because the client doesn't care about it. All particles and xp logic are done server-side
-		PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> this.world.getChunkAt(this.pos)),
-				new PacketSetAltarItem(this.pos, this.altarItem, this.itemDirection));
+		PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> this.level.getChunkAt(this.worldPosition)),
+				new PacketSetAltarItem(this.worldPosition, this.altarItem, this.itemDirection));
 	}
 
 	public boolean isTopClear(final boolean requireAir) {
-		final BlockPos up = this.pos.up();
-		final BlockState state = this.world.getBlockState(up);
-		return requireAir ? state.getBlock().isAir(state, this.world, up):AltarBlock.validTopBlocks.contains(state.getBlock().delegate.name());
+		final BlockPos up = this.worldPosition.above();
+		final BlockState state = this.level.getBlockState(up);
+		return requireAir ? state.getBlock().isAir(state, this.level, up):AltarBlock.validTopBlocks.contains(state.getBlock().delegate.name());
 	}
 
 	public boolean canRegen() {
@@ -397,79 +397,79 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	}
 
 	@Override
-	public CompoundNBT write(final CompoundNBT compound) {
+	public CompoundNBT save(final CompoundNBT compound) {
 		final CompoundNBT altarNBT = new CompoundNBT();
 		altarNBT.putBoolean(AltarTileEntity.VALID_KEY, this.validMultiblock);
 		if(this.owner != null)
-			altarNBT.putUniqueId(AltarTileEntity.OWNER_KEY, this.owner);
+			altarNBT.putUUID(AltarTileEntity.OWNER_KEY, this.owner);
 		altarNBT.putFloat(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
 		altarNBT.putFloat(AltarTileEntity.MAX_POINTS_KEY, this.maxPoints);
 		if(!this.altarItem.isEmpty()) {
-			altarNBT.put(AltarTileEntity.ALTAR_ITEM_KEY, this.altarItem.write(new CompoundNBT()));
+			altarNBT.put(AltarTileEntity.ALTAR_ITEM_KEY, this.altarItem.save(new CompoundNBT()));
 			altarNBT.putInt(AltarTileEntity.ITEM_PROGRESS_KEY, this.itemTicks);
-			altarNBT.putUniqueId(AltarTileEntity.ITEM_OWNER_KEY, this.altarItemOwner);
-			altarNBT.putIntArray(AltarTileEntity.DIRECTION_KEY, new int[] {this.itemDirection.getXOffset(), this.itemDirection.getYOffset(), this.itemDirection.getZOffset()});
+			altarNBT.putUUID(AltarTileEntity.ITEM_OWNER_KEY, this.altarItemOwner);
+			altarNBT.putIntArray(AltarTileEntity.DIRECTION_KEY, new int[] {this.itemDirection.getStepX(), this.itemDirection.getStepY(), this.itemDirection.getStepZ()});
 		}
 		final ListNBT connectedList = new ListNBT();
 		MathUtil.toIntList(this.connected).forEach(connected -> connectedList.add(new IntArrayNBT(connected)));
 		altarNBT.put(AltarTileEntity.CONNECTED_KEY, connectedList);
 		compound.put(AltarTileEntity.ALTAR_KEY, altarNBT);
-		return super.write(compound);
+		return super.save(compound);
 	}
 
 	@Override
-	public void read(final BlockState state, final CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(final BlockState state, final CompoundNBT nbt) {
+		super.load(state, nbt);
 		final CompoundNBT altarNBT = nbt.getCompound(AltarTileEntity.ALTAR_KEY);
 		this.validMultiblock = altarNBT.getBoolean(AltarTileEntity.VALID_KEY);
 		this.maxPoints = altarNBT.getFloat(AltarTileEntity.MAX_POINTS_KEY);
 		this.currentPoints = altarNBT.getFloat(AltarTileEntity.CURRENT_POINTS_KEY);
 		if(altarNBT.contains(AltarTileEntity.ALTAR_ITEM_KEY)) {
-			this.altarItem = ItemStack.read(altarNBT.getCompound(AltarTileEntity.ALTAR_ITEM_KEY));
+			this.altarItem = ItemStack.of(altarNBT.getCompound(AltarTileEntity.ALTAR_ITEM_KEY));
 			final int[] dirs = altarNBT.getIntArray(AltarTileEntity.DIRECTION_KEY);
-			this.itemDirection = Direction.getFacingFromVector(dirs[0], dirs[1], dirs[2]);
+			this.itemDirection = Direction.getNearest(dirs[0], dirs[1], dirs[2]);
 			this.itemTicks = altarNBT.getInt(AltarTileEntity.ITEM_PROGRESS_KEY);
-			this.altarItemOwner = altarNBT.getUniqueId(AltarTileEntity.ITEM_OWNER_KEY);
+			this.altarItemOwner = altarNBT.getUUID(AltarTileEntity.ITEM_OWNER_KEY);
 			this.reqTicks = AltarItem.find(this.altarItem).getSacrificeTicks();
 		}
 		if(altarNBT.contains(AltarTileEntity.OWNER_KEY))
-			this.owner = altarNBT.getUniqueId(AltarTileEntity.OWNER_KEY);
+			this.owner = altarNBT.getUUID(AltarTileEntity.OWNER_KEY);
 		final ListNBT connectedList = altarNBT.getList(AltarTileEntity.CONNECTED_KEY, Constants.NBT.TAG_INT_ARRAY);
 		final Set<BlockPos> connected = Sets.newHashSet();
-		connectedList.stream().map(inbt -> ((IntArrayNBT) inbt).getIntArray()).forEach(array -> connected.add(new BlockPos(array[0], array[1], array[2])));
+		connectedList.stream().map(inbt -> ((IntArrayNBT) inbt).getAsIntArray()).forEach(array -> connected.add(new BlockPos(array[0], array[1], array[2])));
 		this.connected = ImmutableSet.copyOf(connected);
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 
 	@Override
 	public void handleUpdateTag(final BlockState state, final CompoundNBT tag) {
-		this.read(state, tag);
+		this.load(state, tag);
 	}
 
 	//These methods are called on each altar that needs to be updated, so read and modify fields directly
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		if(this.world.isRemote)
+		if(this.level.isClientSide)
 			return null;
 		final CompoundNBT nbt = new CompoundNBT();
 		nbt.putBoolean(AltarTileEntity.HAS_OWNER_KEY, this.owner != null);
 		if(this.owner!= null)
-			nbt.putUniqueId(AltarTileEntity.OWNER_KEY, this.owner);
+			nbt.putUUID(AltarTileEntity.OWNER_KEY, this.owner);
 		nbt.putFloat(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
-		return new SUpdateTileEntityPacket(this.pos, -1, nbt);
+		return new SUpdateTileEntityPacket(this.worldPosition, -1, nbt);
 	}
 
 	@Override
 	public void onDataPacket(final NetworkManager net, final SUpdateTileEntityPacket pkt) {
-		if(!this.world.isRemote)
+		if(!this.level.isClientSide)
 			return;
-		final CompoundNBT nbt = pkt.getNbtCompound();
+		final CompoundNBT nbt = pkt.getTag();
 		if(nbt.getBoolean(AltarTileEntity.HAS_OWNER_KEY))
-			this.owner = nbt.getUniqueId(AltarTileEntity.OWNER_KEY);
+			this.owner = nbt.getUUID(AltarTileEntity.OWNER_KEY);
 		else
 			this.owner = null;
 		this.currentPoints = nbt.getFloat(AltarTileEntity.CURRENT_POINTS_KEY);

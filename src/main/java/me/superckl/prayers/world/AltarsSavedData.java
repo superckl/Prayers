@@ -41,12 +41,12 @@ public class AltarsSavedData extends WorldSavedData{
 	}
 
 	public BlockPos setAltar(final UUID id, final BlockPos pos) {
-		this.markDirty();
-		return this.ownedAltars.put(id, pos.toImmutable());
+		this.setDirty();
+		return this.ownedAltars.put(id, pos.immutable());
 	}
 
 	public BlockPos removeAltar(final UUID id) {
-		this.markDirty();
+		this.setDirty();
 		return this.ownedAltars.remove(id);
 	}
 
@@ -66,29 +66,29 @@ public class AltarsSavedData extends WorldSavedData{
 	}
 
 	@Override
-	public void read(final CompoundNBT nbt) {
+	public void load(final CompoundNBT nbt) {
 		final ListNBT altars = nbt.getList(AltarsSavedData.ALTAR_DATA_KEY, Constants.NBT.TAG_COMPOUND);
 		altars.forEach(subNBT -> {
 			final CompoundNBT playerData = (CompoundNBT) subNBT;
-			final UUID playerID = playerData.getUniqueId(AltarsSavedData.PLAYER_ID_KEY);
+			final UUID playerID = playerData.getUUID(AltarsSavedData.PLAYER_ID_KEY);
 			final int[] posData = playerData.getIntArray(AltarsSavedData.BLOCK_POS_KEY);
 			this.ownedAltars.put(playerID, new BlockPos(posData[0], posData[1], posData[2]));
 		});
 		final ListNBT pending = nbt.getList(AltarsSavedData.PENDING_XP_KEY, Constants.NBT.TAG_COMPOUND);
 		pending.forEach(subNBT -> {
 			final CompoundNBT playerData = (CompoundNBT) subNBT;
-			final UUID playerID = playerData.getUniqueId(AltarsSavedData.PLAYER_ID_KEY);
+			final UUID playerID = playerData.getUUID(AltarsSavedData.PLAYER_ID_KEY);
 			final float xp = playerData.getFloat(AltarsSavedData.XP_KEY);
 			this.pendingXP.put(playerID, xp);
 		});
 	}
 
 	@Override
-	public CompoundNBT write(final CompoundNBT nbt) {
+	public CompoundNBT save(final CompoundNBT nbt) {
 		final ListNBT altars = new ListNBT();
 		this.ownedAltars.forEach((id, pos) -> {
 			final CompoundNBT playerData = new CompoundNBT();
-			playerData.putUniqueId(AltarsSavedData.PLAYER_ID_KEY, id);
+			playerData.putUUID(AltarsSavedData.PLAYER_ID_KEY, id);
 			playerData.putIntArray(AltarsSavedData.BLOCK_POS_KEY, new int[] {pos.getX(), pos.getY(), pos.getZ()});
 			altars.add(playerData);
 		});
@@ -96,7 +96,7 @@ public class AltarsSavedData extends WorldSavedData{
 		final ListNBT pending = new ListNBT();
 		this.pendingXP.forEach((id, xp) -> {
 			final CompoundNBT playerData = new CompoundNBT();
-			playerData.putUniqueId(AltarsSavedData.PLAYER_ID_KEY, id);
+			playerData.putUUID(AltarsSavedData.PLAYER_ID_KEY, id);
 			playerData.putFloat(AltarsSavedData.XP_KEY, xp);
 			pending.add(playerData);
 		});
@@ -114,7 +114,7 @@ public class AltarsSavedData extends WorldSavedData{
 	 * @return The singular saved data instance
 	 */
 	public static AltarsSavedData get(final ServerWorld world) {
-		return  world.getSavedData().getOrCreate(() -> AltarsSavedData.INSTANCE == null ? new AltarsSavedData() : AltarsSavedData.INSTANCE, AltarsSavedData.DATA_NAME);
+		return  world.getDataStorage().computeIfAbsent(() -> AltarsSavedData.INSTANCE == null ? new AltarsSavedData() : AltarsSavedData.INSTANCE, AltarsSavedData.DATA_NAME);
 	}
 
 }

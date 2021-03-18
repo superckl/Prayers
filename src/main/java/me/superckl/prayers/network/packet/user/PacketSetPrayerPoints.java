@@ -30,7 +30,7 @@ public class PacketSetPrayerPoints extends PrayerUserPacket{
 		final Context context = supplier.get();
 		//Only the server should be sending this packet, and never on login
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT)
-			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().world).setCurrentPrayerPoints(this.amount));
+			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().level).setCurrentPrayerPoints(this.amount));
 	}
 
 }

@@ -16,8 +16,8 @@ public class KeyBindings {
 
 	@SubscribeEvent
 	public static void onKeyPress(final KeyInputEvent e) {
-		if (KeyBindings.OPEN_PRAYER_GUI.isPressed())
-			KeyBindings.mc.displayGuiScreen(new PrayerSelectGUI());
+		if (KeyBindings.OPEN_PRAYER_GUI.isDown())
+			KeyBindings.mc.setScreen(new PrayerSelectGUI());
 	}
 
 }

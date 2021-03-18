@@ -22,18 +22,18 @@ public class PacketSetAltarItem {
 
 	public void encode(final PacketBuffer buffer) {
 		buffer.writeBlockPos(this.pos);
-		buffer.writeItemStack(this.stack);
+		buffer.writeItem(this.stack);
 		if(!this.stack.isEmpty())
-			buffer.writeEnumValue(this.dir);
+			buffer.writeEnum(this.dir);
 	}
 
 	public static PacketSetAltarItem decode(final PacketBuffer buffer) {
 		final BlockPos pos = buffer.readBlockPos();
-		final ItemStack stack = buffer.readItemStack();
+		final ItemStack stack = buffer.readItem();
 		if(stack.isEmpty())
 			return new PacketSetAltarItem(pos, stack, null);
 		else {
-			final Direction dir = buffer.readEnumValue(Direction.class);
+			final Direction dir = buffer.readEnum(Direction.class);
 			return new PacketSetAltarItem(pos, stack, dir);
 		}
 	}
@@ -42,9 +42,9 @@ public class PacketSetAltarItem {
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				if(!Minecraft.getInstance().world.isAreaLoaded(this.pos, 0))
+				if(!Minecraft.getInstance().level.isAreaLoaded(this.pos, 0))
 					return;
-				final TileEntity te = Minecraft.getInstance().world.getTileEntity(this.pos);
+				final TileEntity te = Minecraft.getInstance().level.getBlockEntity(this.pos);
 				if(!(te instanceof AltarTileEntity))
 					return;
 				final AltarTileEntity aTE = (AltarTileEntity) te;

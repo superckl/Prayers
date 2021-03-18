@@ -139,13 +139,13 @@ public class Prayers
 
 	//Called to ensure the overworld saved data is the one we use
 	public void onServerStarting(final FMLServerStartingEvent e) {
-		AltarsSavedData.get(e.getServer().getWorld(World.OVERWORLD));
+		AltarsSavedData.get(e.getServer().getLevel(World.OVERWORLD));
 	}
 
 	@SuppressWarnings("resource")
 	public void registerParticleFactory(final ParticleFactoryRegisterEvent e) {
-		Minecraft.getInstance().particles.registerFactory(ModParticles.ALTAR_ACTIVE.get(), PrayerParticle.Factory::new);
-		Minecraft.getInstance().particles.registerFactory(ModParticles.ITEM_SACRIFICE.get(), PrayerParticle.Factory::new);
+		Minecraft.getInstance().particleEngine.register(ModParticles.ALTAR_ACTIVE.get(), PrayerParticle.Factory::new);
+		Minecraft.getInstance().particleEngine.register(ModParticles.ITEM_SACRIFICE.get(), PrayerParticle.Factory::new);
 	}
 
 }

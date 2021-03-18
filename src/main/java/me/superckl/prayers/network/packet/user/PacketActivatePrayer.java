@@ -21,12 +21,12 @@ public class PacketActivatePrayer extends PrayerUserPacket{
 
 	@Override
 	public void encode(final PacketBuffer buffer) {
-		buffer.writeString(this.prayer.getRegistryName().toString());
+		buffer.writeUtf(this.prayer.getRegistryName().toString());
 		super.encode(buffer);
 	}
 
 	public static PacketActivatePrayer decode(final PacketBuffer buffer) {
-		final ResourceLocation loc = new ResourceLocation(buffer.readString(PrayerUserPacket.BUFFER_STRING_LENGTH));
+		final ResourceLocation loc = new ResourceLocation(buffer.readUtf(PrayerUserPacket.BUFFER_STRING_LENGTH));
 		final Prayer prayer = GameRegistry.findRegistry(Prayer.class).getValue(loc);
 		if (prayer == null)
 			throw new IllegalArgumentException(String.format("Invalid prayer location %s!", loc.toString()));
@@ -38,11 +38,11 @@ public class PacketActivatePrayer extends PrayerUserPacket{
 		super.handle(supplier);
 		final Context context = supplier.get();
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
-			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().world).activatePrayer(this.prayer));
+			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().level).activatePrayer(this.prayer));
 		else
 			context.enqueueWork(() -> {
 				//Check the client is not attempting to activate a prayer an another entity
-				if (this.entityID != context.getSender().getEntityId()) {
+				if (this.entityID != context.getSender().getId()) {
 					//Respond with a deactivate packet if they are
 					PrayersPacketHandler.INSTANCE.reply(PacketDeactivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;

@@ -25,12 +25,12 @@ public class PacketSyncPrayerUser extends PrayerUserPacket{
 	public void encode(final PacketBuffer buffer) {
 		final CompoundNBT nbt = new CompoundNBT();
 		nbt.put(PacketSyncPrayerUser.USER_KEY, this.userNBT);
-		buffer.writeCompoundTag(nbt);
+		buffer.writeNbt(nbt);
 		super.encode(buffer);
 	}
 
 	public static PacketSyncPrayerUser decode(final PacketBuffer buffer) {
-		final CompoundNBT nbt = buffer.readCompoundTag();
+		final CompoundNBT nbt = buffer.readNbt();
 		return PrayerUserPacket.decode(PacketSyncPrayerUser.builder(), buffer).userNBT(nbt.get(PacketSyncPrayerUser.USER_KEY)).build();
 	}
 
@@ -42,12 +42,12 @@ public class PacketSyncPrayerUser extends PrayerUserPacket{
 		//Only the server should be sending these packets.
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
 			context.enqueueWork(() -> {
-				final IPrayerUser prayerUser = this.getUser(Minecraft.getInstance().world);
+				final IPrayerUser prayerUser = this.getUser(Minecraft.getInstance().level);
 				Prayers.PRAYER_USER_CAPABILITY.readNBT(prayerUser, null, this.userNBT);});
 	}
 
 	public static PacketSyncPrayerUser fromPlayer(final PlayerEntity player){
-		return PacketSyncPrayerUser.builder().entityID(player.getEntityId()).userNBT(Prayers.PRAYER_USER_CAPABILITY.writeNBT(IPrayerUser.getUser(player), null)).build();
+		return PacketSyncPrayerUser.builder().entityID(player.getId()).userNBT(Prayers.PRAYER_USER_CAPABILITY.writeNBT(IPrayerUser.getUser(player), null)).build();
 	}
 
 }

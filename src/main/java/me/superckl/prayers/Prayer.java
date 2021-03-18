@@ -118,7 +118,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 		});
 		this.tooltipDescription = Lists.newArrayList(new StringTextComponent(this.name));
 		this.effects.forEach(effect -> this.tooltipDescription.add(new StringTextComponent(effect.getDescription())
-				.setStyle(Style.EMPTY.setItalic(true))));
+				.setStyle(Style.EMPTY.withItalic(true))));
 	}
 
 	public boolean isActive(final Entity entity) {

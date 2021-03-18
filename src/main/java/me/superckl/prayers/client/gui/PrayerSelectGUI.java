@@ -56,8 +56,7 @@ public class PrayerSelectGUI extends Screen{
 			if(user.getPrayerLevel() < prayer.getLevel())
 				break;
 			final Button prayerButton = new PrayerButton(prayer, x, y, 16, 16);
-			this.buttons.add(prayerButton);
-			this.addListener(prayerButton);
+			this.addButton(prayerButton);
 			x += 16+spacing;
 			j++;
 			if (j == numCols) {
@@ -71,7 +70,7 @@ public class PrayerSelectGUI extends Screen{
 	@Override
 	public void render(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
 		this.renderBackground(matrixStack);
-		this.minecraft.getTextureManager().bindTexture(PrayerSelectGUI.PRAYER_GUI_TEXTURE);
+		this.minecraft.getTextureManager().bind(PrayerSelectGUI.PRAYER_GUI_TEXTURE);
 		RenderSystem.enableDepthTest();
 		this.blit(matrixStack, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 		final int scrollBarX = this.guiLeft+134;
@@ -84,8 +83,8 @@ public class PrayerSelectGUI extends Screen{
 
 	@Override
 	public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
-		if(KeyBindings.OPEN_PRAYER_GUI.getKey().getKeyCode() == keyCode) {
-			this.closeScreen();
+		if(KeyBindings.OPEN_PRAYER_GUI.getKey().getValue() == keyCode) {
+			this.onClose();
 			return true;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);

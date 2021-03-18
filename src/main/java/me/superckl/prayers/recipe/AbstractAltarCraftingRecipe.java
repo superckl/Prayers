@@ -31,7 +31,7 @@ public abstract class AbstractAltarCraftingRecipe implements IRecipe<IInventory>
 	}
 
 	@Override
-	public boolean canFit(final int width, final int height) {
+	public boolean canCraftInDimensions(final int width, final int height) {
 		return false;
 	}
 

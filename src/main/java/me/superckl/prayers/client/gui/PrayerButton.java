@@ -42,7 +42,7 @@ public class PrayerButton extends ImageButton{
 
 	@Override
 	public void renderToolTip(final MatrixStack matrixStack, final int mouseX, final int mouseY) {
-		this.mc.currentScreen.renderWrappedToolTip(matrixStack, this.prayer.getTooltipDescription(), mouseX, mouseY, this.mc.fontRenderer);
+		this.mc.screen.renderWrappedToolTip(matrixStack, this.prayer.getTooltipDescription(), mouseX, mouseY, this.mc.font);
 	}
 
 	@Override
@@ -50,14 +50,14 @@ public class PrayerButton extends ImageButton{
 		final IPrayerUser user = IPrayerUser.getUser(this.mc.player);
 		if(user.isPrayerActive(this.prayer)) {
 			user.deactivatePrayer(this.prayer);
-			super.playDownSound(this.mc.getSoundHandler());
-			PrayersPacketHandler.INSTANCE.sendToServer(PacketDeactivatePrayer.builder().entityID(this.mc.player.getEntityId()).prayer(this.prayer).build());
+			super.playDownSound(this.mc.getSoundManager());
+			PrayersPacketHandler.INSTANCE.sendToServer(PacketDeactivatePrayer.builder().entityID(this.mc.player.getId()).prayer(this.prayer).build());
 		}else if(!user.canActivatePrayer(this.prayer))
-			this.mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ITEM_SHIELD_BREAK, 1.0F));
+			this.mc.getSoundManager().play(SimpleSound.forUI(SoundEvents.SHIELD_BREAK, 1.0F));
 		else {
 			user.activatePrayer(this.prayer);
-			super.playDownSound(this.mc.getSoundHandler());
-			PrayersPacketHandler.INSTANCE.sendToServer(PacketActivatePrayer.builder().entityID(this.mc.player.getEntityId()).prayer(this.prayer).build());
+			super.playDownSound(this.mc.getSoundManager());
+			PrayersPacketHandler.INSTANCE.sendToServer(PacketActivatePrayer.builder().entityID(this.mc.player.getId()).prayer(this.prayer).build());
 		}
 	}
 

@@ -51,12 +51,12 @@ public class AltarCraftingRecipe extends AbstractAltarCraftingRecipe{
 	}
 
 	@Override
-	public ItemStack getCraftingResult(final IInventory inv) {
+	public ItemStack assemble(final IInventory inv) {
 		return this.output.copy();
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return this.output.copy();
 	}
 
@@ -68,49 +68,49 @@ public class AltarCraftingRecipe extends AbstractAltarCraftingRecipe{
 	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<AltarCraftingRecipe>{
 
 		@Override
-		public AltarCraftingRecipe read(final ResourceLocation recipeId, final JsonObject json) {
-			final String group = JSONUtils.getString(json, "group", "");
+		public AltarCraftingRecipe fromJson(final ResourceLocation recipeId, final JsonObject json) {
+			final String group = JSONUtils.getAsString(json, "group", "");
 			final JsonArray ingredientsJson = json.get("ingredients").getAsJsonArray();
 			if(ingredientsJson.size() == 0 || ingredientsJson.size() > 4)
 				throw new IllegalArgumentException("Altar recipe "+recipeId.toString()+" has invalid number of ingredients "+ingredientsJson.size());
 			final NonNullList<Ingredient> ingredients = NonNullList.create();
 			final IntList ingredientCounts = new IntArrayList();
 			ingredientsJson.forEach(element -> {
-				ingredients.add(Ingredient.deserialize(element));
+				ingredients.add(Ingredient.fromJson(element));
 				if(element.getAsJsonObject().has("count"))
-					ingredientCounts.add(JSONUtils.getInt(element, "count"));
+					ingredientCounts.add(JSONUtils.getAsInt(element.getAsJsonObject(), "count"));
 				else
 					ingredientCounts.add(1);
 			});
-			final ItemStack result = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "result"));
-			final float points = JSONUtils.getFloat(json, "points");
+			final ItemStack result = ShapedRecipe.itemFromJson(JSONUtils.getAsJsonObject(json, "result"));
+			final float points = JSONUtils.getAsFloat(json, "points");
 			return new AltarCraftingRecipe(recipeId, group, ingredients, ingredientCounts, result, points);
 		}
 
 		@Override
-		public AltarCraftingRecipe read(final ResourceLocation recipeId, final PacketBuffer buffer) {
-			final String group = buffer.readString(PrayerUserPacket.BUFFER_STRING_LENGTH);
+		public AltarCraftingRecipe fromNetwork(final ResourceLocation recipeId, final PacketBuffer buffer) {
+			final String group = buffer.readUtf(PrayerUserPacket.BUFFER_STRING_LENGTH);
 			final NonNullList<Ingredient> ingredients = NonNullList.create();
 			final IntList ingredientCounts = new IntArrayList();
 			final int numIng = buffer.readInt();
 			for (int i = 0; i < numIng; i++) {
-				ingredients.add(Ingredient.read(buffer));
+				ingredients.add(Ingredient.fromNetwork(buffer));
 				ingredientCounts.add(buffer.readInt());
 			}
-			final ItemStack result = buffer.readItemStack();
+			final ItemStack result = buffer.readItem();
 			final float points = buffer.readFloat();
 			return new AltarCraftingRecipe(recipeId, group, ingredients, ingredientCounts, result, points);
 		}
 
 		@Override
-		public void write(final PacketBuffer buffer, final AltarCraftingRecipe recipe) {
-			buffer.writeString(recipe.group, PrayerUserPacket.BUFFER_STRING_LENGTH);
+		public void toNetwork(final PacketBuffer buffer, final AltarCraftingRecipe recipe) {
+			buffer.writeUtf(recipe.group, PrayerUserPacket.BUFFER_STRING_LENGTH);
 			buffer.writeInt(recipe.ingredients.size());
 			for (int i = 0; i < recipe.ingredients.size(); i++) {
-				recipe.ingredients.get(i).write(buffer);
+				recipe.ingredients.get(i).toNetwork(buffer);
 				buffer.writeInt(recipe.ingredientCounts.getInt(i));
 			}
-			buffer.writeItemStack(recipe.output);
+			buffer.writeItem(recipe.output);
 			buffer.writeFloat(recipe.points);
 		}
 

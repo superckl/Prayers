@@ -28,7 +28,7 @@ public abstract class ShapedBlock extends Block implements IWaterLoggable{
 		super(properties);
 		this.shapes = this.getShapes();
 		this.waterLoggable = waterLoggable;
-		this.setDefaultState(this.stateContainer.getBaseState().with(ShapedBlock.WATERLOGGED, false));
+		this.registerDefaultState(this.defaultBlockState().setValue(ShapedBlock.WATERLOGGED, false));
 	}
 
 	@Override
@@ -42,47 +42,49 @@ public abstract class ShapedBlock extends Block implements IWaterLoggable{
 	}
 
 	@Override
-	public VoxelShape getRenderShape(final BlockState state, final IBlockReader reader, final BlockPos pos) {
+	public VoxelShape getInteractionShape(final BlockState state, final IBlockReader reader, final BlockPos pos) {
 		return this.shapes[this.getIndex(state)];
 	}
 
 	@Override
-	public VoxelShape getRayTraceShape(final BlockState state, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
+	public VoxelShape getVisualShape(final BlockState state, final IBlockReader reader, final BlockPos pos, final ISelectionContext context) {
 		return this.shapes[this.getIndex(state)];
 	}
 
 	@Override
 	public FluidState getFluidState(final BlockState state) {
-		return state.get(ShapedBlock.WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : Fluids.EMPTY.getDefaultState();
+		return state.getValue(ShapedBlock.WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
 	}
 
 	@Override
-	public boolean canContainFluid(final IBlockReader worldIn, final BlockPos pos, final BlockState state, final Fluid fluidIn) {
+	public boolean canPlaceLiquid(final IBlockReader worldIn, final BlockPos pos, final BlockState state, final Fluid fluidIn) {
 		if(this.waterLoggable)
-			return IWaterLoggable.super.canContainFluid(worldIn, pos, state, fluidIn);
+			return IWaterLoggable.super.canPlaceLiquid(worldIn, pos, state, fluidIn);
 		else
 			return false;
 	}
 
 	@Override
 	public BlockState getStateForPlacement(final BlockItemUseContext context) {
-		final FluidState fluidState = context.getWorld().getFluidState(context.getPos());
+		final FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
 		final BlockState state =  super.getStateForPlacement(context);
 		if(this.waterLoggable)
-			return state.with(ShapedBlock.WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+			return state.setValue(ShapedBlock.WATERLOGGED, fluidState.getType() == Fluids.WATER);
 		else
-			return state.with(ShapedBlock.WATERLOGGED, false);
+			return state.setValue(ShapedBlock.WATERLOGGED, false);
 	}
 
+
+
 	@Override
-	public BlockState updatePostPlacement(final BlockState state, final Direction facing, final BlockState facingState, final IWorld world, final BlockPos currentPos, final BlockPos facingPos) {
-		if (state.get(ShapedBlock.WATERLOGGED))
-			world.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+	public BlockState updateShape(final BlockState state, final Direction facing, final BlockState facingState, final IWorld world, final BlockPos currentPos, final BlockPos facingPos) {
+		if (state.getValue(ShapedBlock.WATERLOGGED))
+			world.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		return state;
 	}
 
 	@Override
-	protected void fillStateContainer(final StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(final StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(ShapedBlock.WATERLOGGED);
 	}
 

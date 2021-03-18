@@ -38,17 +38,17 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	@Override
 	public void tick() {
-		if(this.world.isRemote || this.getStackInSlot(0).isEmpty())
+		if(this.level.isClientSide || this.getItem(0).isEmpty())
 			return;
 		this.findValidAltar().ifPresent(altar -> {
 			if(++this.itemTicks >= this.reqTicks) {
-				final AltarItem aItem = AltarItem.find(this.getStackInSlot(0));
+				final AltarItem aItem = AltarItem.find(this.getItem(0));
 				if(aItem.getOfferPoints() <= altar.getMaxPoints()-altar.getCurrentPoints() || altar.getCurrentPoints() == 0) {
 					altar.addPoints(aItem.getOfferPoints());
-					this.decrStackSize(0, 1);
+					this.removeItem(0, 1);
 					this.itemTicks = 0;
-					((ServerWorld)this.world).spawnParticle(ParticleTypes.SMOKE, this.pos.getX()+0.5, this.pos.getY()+7F/16F, this.pos.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
-					((ServerWorld)this.world).playSound(null, this.pos.getX()+0.5, this.pos.getY()+1, this.pos.getZ()+0.5, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.01F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
+					((ServerWorld)this.level).sendParticles(ParticleTypes.SMOKE, this.worldPosition.getX()+0.5, this.worldPosition.getY()+7F/16F, this.worldPosition.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
+					((ServerWorld)this.level).playSound(null, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, SoundEvents.FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.01F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
 				}
 			}
 		});
@@ -62,18 +62,18 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	public void onSlotChange(final int slot, final boolean itemChanged) {
 		if(itemChanged) {
 			this.itemTicks = 0;
-			this.reqTicks = this.getStackInSlot(0).isEmpty() ? 0:AltarItem.find(this.getStackInSlot(0)).getOfferTicks();
+			this.reqTicks = this.getItem(0).isEmpty() ? 0:AltarItem.find(this.getItem(0)).getOfferTicks();
 		}
 		super.onSlotChange(slot, itemChanged);
 	}
 
 	@Override
-	public boolean isItemValidForSlot(final int index, final ItemStack stack) {
+	public boolean canPlaceItem(final int index, final ItemStack stack) {
 		return AltarItem.find(stack) != null;
 	}
 
 	protected LazyOptional<AltarTileEntity> findValidAltar() {
-		final TileEntity below = this.world.getTileEntity(this.pos.down());
+		final TileEntity below = this.level.getBlockEntity(this.worldPosition.below());
 		if(below != null && below instanceof AltarTileEntity) {
 			final AltarTileEntity altar = (AltarTileEntity) below;
 			return altar.canRegen() ? LazyOptional.of(() -> altar):LazyOptional.empty();
@@ -82,34 +82,34 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	}
 
 	@Override
-	public CompoundNBT write(final CompoundNBT compound) {
+	public CompoundNBT save(final CompoundNBT compound) {
 		final CompoundNBT offer_data = new CompoundNBT();
 		this.writeInventory(offer_data);
-		if(!this.getStackInSlot(0).isEmpty())
+		if(!this.getItem(0).isEmpty())
 			offer_data.putInt(OfferingStandTileEntity.ITEM_PROGRESS_KEY, this.itemTicks);
 		compound.put(OfferingStandTileEntity.OFFERING_STAND_KEY, offer_data);
-		return super.write(compound);
+		return super.save(compound);
 	}
 
 	@Override
-	public void read(final BlockState state, final CompoundNBT nbt) {
+	public void load(final BlockState state, final CompoundNBT nbt) {
 		final CompoundNBT offer_data = nbt.getCompound(OfferingStandTileEntity.OFFERING_STAND_KEY);
 		this.readInventory(offer_data);
-		if(!this.getStackInSlot(0).isEmpty()) {
+		if(!this.getItem(0).isEmpty()) {
 			this.itemTicks = offer_data.getInt(OfferingStandTileEntity.ITEM_PROGRESS_KEY);
-			this.reqTicks = AltarItem.find(this.getStackInSlot(0)).getOfferTicks();
+			this.reqTicks = AltarItem.find(this.getItem(0)).getOfferTicks();
 		}
-		super.read(state, nbt);
+		super.load(state, nbt);
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 
 	@Override
 	public void handleUpdateTag(final BlockState state, final CompoundNBT tag) {
-		this.read(state, tag);
+		this.load(state, tag);
 	}
 
 }
