@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import me.superckl.prayers.LogHelper;
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
 import me.superckl.prayers.recipe.AbstractAltarCraftingRecipe;
@@ -18,6 +19,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -26,6 +28,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
@@ -62,9 +65,12 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	@Override
 	public void tick() {
+		if(this.world.isRemote)
+			return;
 		if(this.inventoryChanged) {
 			this.inventoryChanged = false;
 			this.updateRecipe(true);
+			this.syncToClientLight(null);
 		}
 		if(this.activeRecipe != null)
 			this.tickCrafting();
@@ -251,6 +257,8 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			return null;
 		final CompoundNBT nbt = new CompoundNBT();
 		nbt.putFloat("points", this.consumedPoints);
+		if(this.activeRecipe != null)
+			nbt.putString("recipe", this.activeRecipe.getId().toString());
 		return new SUpdateTileEntityPacket(this.pos, -1, nbt);
 	}
 
@@ -261,6 +269,8 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 		this.updateRecipe(true);
 		final CompoundNBT nbt = pkt.getNbtCompound();
 		this.consumedPoints = nbt.getFloat("points");
+		if(nbt.contains("recipe"))
+			this.activeRecipe = (AbstractAltarCraftingRecipe) this.world.getRecipeManager().getRecipe(new ResourceLocation(nbt.getString("recipe"))).get();
 	}
 
 }
