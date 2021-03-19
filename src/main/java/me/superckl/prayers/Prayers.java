@@ -31,16 +31,22 @@ import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
+import me.superckl.prayers.potion.PotionTransformRecipe;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -89,6 +95,12 @@ public class Prayers
 		event.enqueueWork(() -> {
 			MinecraftForge.EVENT_BUS.register(this);
 			MinecraftForge.EVENT_BUS.register(new CapabilityEventHandler());
+			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
+					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
+			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.REDSTONE, ModPotions.PRAYER_RENEWAL::get));
+			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.GLOWSTONE_DUST, ModPotions.STRONG_INSTANT_PRAYER::get));
+			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.PRAYER_RENEWAL::get, Items.REDSTONE, ModPotions.LONG_PRAYER_RENEWAL::get));
+
 		});
 		CapabilityManager.INSTANCE.register(IPrayerUser.class, new IPrayerUser.Storage(), DefaultPrayerUser::new);
 		int pIndex = 0;

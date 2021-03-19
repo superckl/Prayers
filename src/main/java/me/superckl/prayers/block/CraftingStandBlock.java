@@ -136,10 +136,10 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 			BlockState newState = state.setValue(CraftingStandBlock.propertyFromDirection(dir), false);
 			if(!newState.getValue(CraftingStandBlock.CENTER) && !FourWayShapedBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(newState::getValue))
 				newState = newState.getValue(ShapedBlock.WATERLOGGED) ? Blocks.WATER.defaultBlockState():Blocks.AIR.defaultBlockState();
-				worldIn.setBlockAndUpdate(pos, newState);
-				final ItemStack toDrop = new ItemStack(this::asItem);
-				if(!player.addItem(toDrop))
-					InventoryHelper.dropContents(worldIn, pos, NonNullList.of(ItemStack.EMPTY, toDrop));
+			worldIn.setBlockAndUpdate(pos, newState);
+			final ItemStack toDrop = new ItemStack(this::asItem);
+			if(!player.addItem(toDrop))
+				InventoryHelper.dropContents(worldIn, pos, NonNullList.of(ItemStack.EMPTY, toDrop));
 		}
 		return craftingStand.onActivate(player, handIn, dir);
 	}

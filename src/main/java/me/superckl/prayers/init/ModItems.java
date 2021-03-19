@@ -36,8 +36,7 @@ public class ModItems {
 	public static final RegistryObject<Item> GILDED_BONE = ModItems.REGISTER.register("gilded_bone",
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> BLESSED_WATER = ModItems.REGISTER.register("blessed_water",
-			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
-
+			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP).stacksTo(1)));
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())
