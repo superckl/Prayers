@@ -27,6 +27,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -47,6 +48,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	private AbstractAltarCraftingRecipe activeRecipe;
 	private int[] recipeMapping;
 	private float consumedPoints;
+	private int lastPercentage;
 	private boolean inventoryChanged = true;
 
 	public CraftingStandTileEntity() {
@@ -82,6 +84,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	public void clearRecipe(final boolean clearPoints) {
 		this.activeRecipe = null;
 		this.recipeMapping = null;
+		this.lastPercentage = 0;
 		if(clearPoints)
 			this.consumedPoints = 0;
 	}
@@ -97,6 +100,10 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			final float toTransfer = Math.min(transfer, reqPoints-this.consumedPoints);
 			final float transferred = altar.removePoints(toTransfer);
 			this.consumedPoints += transferred;
+			int lastPercentage = MathHelper.floor(this.getCraftingProgress()*100);
+			if(lastPercentage > this.lastPercentage)
+				this.syncToClientLight(null); //Sync to the client when the percentage changes for display
+			this.lastPercentage = lastPercentage;
 			if(this.consumedPoints >= reqPoints)
 				this.finishCrafting();
 		});
