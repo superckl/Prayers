@@ -1,0 +1,19 @@
+{
+  "type": "prayers:altar_crafting",
+  "group": "blessing",
+  "points": 500,
+  "ingredients": [
+    {
+      "item": "minecraft:polished_andesite"
+    },
+    {
+      "item": "prayers:blessed_gold"
+    },
+    {
+      "item": "prayers:blessed_water"
+    }
+  ],
+  "result": {
+    "item": "prayers:sacred_marble"
+  }
+}
