@@ -31,9 +31,7 @@ public class ModItems {
 	public static final EnumMap<AltarTypes, RegistryObject<? extends BlockItem>> ALTARS = new EnumMap<>(AltarTypes.class);
 	public static final RegistryObject<BlockItem> SACRED_MARBLE = ModItems.REGISTER.register("sacred_marble",
 			() -> new BlockItem(ModBlocks.SACRED_MARBLE.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
-	public static final RegistryObject<Item> BLESSED_GOLD = ModItems.REGISTER.register("blessed_gold",
-			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
-	public static final RegistryObject<Item> BLESSED_GOLD_NUGGET = ModItems.REGISTER.register("blessed_gold_nugget",
+	public static final RegistryObject<Item> GOLD_LEAF = ModItems.REGISTER.register("gold_leaf",
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> GILDED_BONE = ModItems.REGISTER.register("gilded_bone",
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
