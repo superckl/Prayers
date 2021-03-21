@@ -10,7 +10,7 @@ import net.minecraft.potion.EffectType;
 public class PrayerRenewalEffect extends Effect{
 
 	public PrayerRenewalEffect() {
-		super(EffectType.BENEFICIAL, Color.RED.darker().getRGB());
+		super(EffectType.BENEFICIAL, 0x69150e);
 	}
 
 	@Override

@@ -10,7 +10,7 @@ import net.minecraft.potion.InstantEffect;
 public class InstantPrayerEffect extends InstantEffect{
 
 	public InstantPrayerEffect() {
-		super(EffectType.BENEFICIAL, Color.CYAN.getRGB());
+		super(EffectType.BENEFICIAL, 0x3bc492);
 	}
 
 	@Override
