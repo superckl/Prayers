@@ -2,6 +2,7 @@ package me.superckl.prayers.block;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -9,6 +10,8 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import lombok.Getter;
+import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
 import me.superckl.prayers.recipe.AbstractAltarCraftingRecipe;
@@ -26,8 +29,12 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -45,6 +52,9 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 		CraftingStandTileEntity.dirToSlot.keySet().forEach(dir -> map.put(CraftingStandTileEntity.dirToSlot.getInt(dir), dir));
 	});
 
+	private final Random rand = new Random();
+
+	@Getter
 	private AbstractAltarCraftingRecipe activeRecipe;
 	private int[] recipeMapping;
 	private float consumedPoints;
@@ -100,7 +110,20 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			final float toTransfer = Math.min(transfer, reqPoints-this.consumedPoints);
 			final float transferred = altar.removePoints(toTransfer);
 			this.consumedPoints += transferred;
-			int lastPercentage = MathHelper.floor(this.getCraftingProgress()*100);
+
+			for(final Direction dir:Direction.Plane.HORIZONTAL) {
+				if(this.getItem(CraftingStandTileEntity.dirToSlot.getInt(dir)).isEmpty() || this.rand.nextFloat() >= 0.05F)
+					continue;
+				final Vector3d centerPos = new Vector3d(this.worldPosition.getX()+0.5, this.worldPosition.getY()+3D/16, this.worldPosition.getZ()+0.5);
+				final Vector3d itemPos = centerPos.add(5.5/16*dir.getStepX(), 0, 5.5/16*dir.getStepZ())
+						.add((2*this.rand.nextDouble()-1)*.05, this.rand.nextDouble()*.05, (2*this.rand.nextDouble()-1)*.05);
+				Vector3d toCenter = centerPos.subtract(itemPos);
+				final double mag = toCenter.length();
+				toCenter = toCenter.scale(1/mag);
+				((ServerWorld)this.level).sendParticles(ModParticles.ITEM_SACRIFICE.get(), itemPos.x, itemPos.y, itemPos.z, 0, toCenter.x, toCenter.y, toCenter.z, mag/20);
+			}
+
+			final int lastPercentage = MathHelper.floor(this.getCraftingProgress()*100);
 			if(lastPercentage > this.lastPercentage)
 				this.syncToClientLight(null); //Sync to the client when the percentage changes for display
 			this.lastPercentage = lastPercentage;
@@ -119,6 +142,8 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			output.grow(this.activeRecipe.getResultItem().getCount());
 		this.setChanged();
 		this.clearRecipe(true);
+		if(!this.level.isClientSide)
+			((ServerWorld)this.level).playSound(null, this.worldPosition.getX()+0.5, this.worldPosition.getY(), this.worldPosition.getZ()+0.5, SoundEvents.TRIDENT_RETURN, SoundCategory.BLOCKS, 0.5F, 1);
 	}
 
 	protected boolean canRecipeOutput(final AbstractAltarCraftingRecipe recipe) {
@@ -136,6 +161,15 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 		if(!this.isCrafting())
 			return 0;
 		return this.consumedPoints/this.activeRecipe.getPoints();
+	}
+
+	public boolean willCraftingConsume(final int slot) {
+		if(!this.isCrafting())
+			return false;
+		final ItemStack stack = this.getItem(slot);
+		if(stack.isEmpty())
+			return false;
+		return stack.getCount() <= this.getActiveRecipe().getIngredientCounts()[this.recipeMapping[slot]];
 	}
 
 	@Override

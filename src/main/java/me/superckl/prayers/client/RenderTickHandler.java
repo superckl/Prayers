@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
-import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.block.CraftingStandBlock;
@@ -149,7 +148,7 @@ public class RenderTickHandler {
 					matrix.pushPose();
 					matrix.translate(renderPos.getX()-proj.x, renderPos.getY()-proj.y, renderPos.getZ()-proj.z);
 					final IRenderTypeBuffer.Impl buffer = this.mc.renderBuffers().bufferSource();
-					this.mc.getBlockRenderer().renderBlock(newState, matrix, new AlphaMultipliedBlockVertexBuffer(buffer, 0.4F),
+					this.mc.getBlockRenderer().renderBlock(newState, matrix, new RenderHelper.AlphaMultipliedVertexBuffer(buffer, Atlases.translucentCullBlockSheet(), 0.4F),
 							WorldRenderer.getLightColor(this.mc.level, renderPos), OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
 					matrix.popPose();
 					buffer.endBatch();
@@ -164,62 +163,6 @@ public class RenderTickHandler {
 			bufferIn.vertex(matrix4f, (float)(x1 + x), (float)(y1 + y), (float)(z1 + z)).color(red, green, blue, alpha).endVertex();
 			bufferIn.vertex(matrix4f, (float)(x2 + x), (float)(y2 + y), (float)(z2 + z)).color(red, green, blue, alpha).endVertex();
 		});
-	}
-
-	@RequiredArgsConstructor
-	public static class AlphaMultipliedBlockVertexBuffer implements IRenderTypeBuffer{
-
-		private final IRenderTypeBuffer wrapped;
-		private final float alphaMultiplier;
-
-		@Override
-		public IVertexBuilder getBuffer(final RenderType type) {
-			return new AlphaMultipliedVertexBuilder(this.wrapped.getBuffer(Atlases.translucentCullBlockSheet()), this.alphaMultiplier);
-		}
-
-	}
-
-	@RequiredArgsConstructor
-	public static class AlphaMultipliedVertexBuilder implements IVertexBuilder{
-
-		private final IVertexBuilder builder;
-		private final float alphaMultiplier;
-
-		@Override
-		public IVertexBuilder color(final int red, final int green, final int blue, final int alpha) {
-			return this.builder.color(red, green, blue, (int) (this.alphaMultiplier*alpha));
-		}
-
-		@Override
-		public IVertexBuilder vertex(final double x, final double y, final double z) {
-			return this.builder.vertex(x, y, z);
-		}
-
-		@Override
-		public IVertexBuilder uv(final float u, final float v) {
-			return this.builder.uv(u, v);
-		}
-
-		@Override
-		public IVertexBuilder overlayCoords(final int u, final int v) {
-			return this.builder.overlayCoords(u, v);
-		}
-
-		@Override
-		public IVertexBuilder uv2(final int u, final int v) {
-			return this.builder.uv2(u, v);
-		}
-
-		@Override
-		public IVertexBuilder normal(final float x, final float y, final float z) {
-			return this.builder.normal(x, y, z);
-		}
-
-		@Override
-		public void endVertex() {
-			this.builder.endVertex();
-		}
-
 	}
 
 }

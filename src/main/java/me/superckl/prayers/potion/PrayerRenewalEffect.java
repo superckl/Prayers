@@ -1,7 +1,5 @@
 package me.superckl.prayers.potion;
 
-import java.awt.Color;
-
 import me.superckl.prayers.capability.IPrayerUser;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
