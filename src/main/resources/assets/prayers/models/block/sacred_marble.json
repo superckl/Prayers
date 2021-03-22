@@ -1,3 +1,6 @@
 {
-	"parent": "minecraft:block/polished_diorite"
+	"parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "prayers:block/sacred_marble"
+  }
 }
