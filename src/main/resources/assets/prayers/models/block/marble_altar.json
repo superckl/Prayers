@@ -1,9 +1,6 @@
 {
 	"parent": "prayers:block/altar",
 	"textures": {
-		"top": "prayers:block/altar_marble",
-		"pillar": "prayers:block/altar_marble",
-		"bottom": "prayers:block/altar_marble",
-		"particle": "prayers:block/altar_marble"
+		"texture": "prayers:block/marble_altar"
 	}
 }

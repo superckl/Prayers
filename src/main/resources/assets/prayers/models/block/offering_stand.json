@@ -2,7 +2,7 @@
 	"parent": "minecraft:block/cube_all",
 	"textures": {
 		"texture": "minecraft:block/iron_block",
-		"particle": "prayers:block/iron_block"
+		"particle": "#texture"
 	},
 	"elements": [
 		{
