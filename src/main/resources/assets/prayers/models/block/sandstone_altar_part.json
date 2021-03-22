@@ -1,6 +1,6 @@
 {
 	"parent": "prayers:block/altar_part",
 	"textures": {
-		"pillar": "minecraft:block/cut_sandstone"
+		"texture": "prayers:block/sandstone_altar"
 	}
 }

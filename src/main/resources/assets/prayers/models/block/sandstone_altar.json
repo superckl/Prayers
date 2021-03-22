@@ -1,9 +1,6 @@
 {
 	"parent": "prayers:block/altar",
 	"textures": {
-		"top": "minecraft:block/sandstone_top",
-		"pillar": "minecraft:block/cut_sandstone",
-		"bottom": "#top",
-		"particle": "#pillar"
+		"texture": "prayers:block/sandstone_altar"
 	}
 }
