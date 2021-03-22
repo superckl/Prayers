@@ -95,6 +95,7 @@ public class Prayers
 		event.enqueueWork(() -> {
 			MinecraftForge.EVENT_BUS.register(this);
 			MinecraftForge.EVENT_BUS.register(new CapabilityEventHandler());
+			MinecraftForge.EVENT_BUS.register(AltarItem.class);
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
 					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
 			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.REDSTONE, ModPotions.PRAYER_RENEWAL::get));
