@@ -101,7 +101,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		} else {
 			final List<AltarTileEntity> tiles = AltarTileEntity.toAltars(connected, this.level);
 			if(numConnected <= this.altarType.getMaxConnected()) {
-				final float points = (float) (tiles.stream().mapToDouble(AltarTileEntity::getCurrentPoints).sum()/numConnected);
+				final float points = (float) (tiles.stream().mapToDouble(te -> te.currentPoints).sum()/numConnected);
 				final float maxPoints = this.altarType.getMaxPoints()*numConnected; //TODO diminishing returns
 				tiles.forEach(tile -> {
 					tile.validMultiblock = true;
@@ -192,22 +192,32 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	 * @param propogate If this tile entity should propagate the new owner to all connected altars
 	 * @return If the owner was changed
 	 */
-	public boolean setOwner(final UUID owner, final boolean propogate) {
+	public boolean setOwner(UUID owner, final boolean propogate) {
 		if(owner != null && (!this.validMultiblock || this.owner != null && owner.equals(this.owner)))
 			return false;
 		if(!this.level.isClientSide) {
 			final AltarsSavedData savedData = AltarsSavedData.get((ServerWorld) this.level);
 			if(owner == null && this.owner != null)
 				AltarsSavedData.get((ServerWorld) this.level).removeAltar(this.owner);
-			else if(savedData.ownsAltar(owner))
-				return false;
-			if(propogate)
+			else if(savedData.ownsAltar(owner)) {
+				//Does this altar already have an owner?
+				owner = null;
+				for(final AltarTileEntity te:this.getConnected())
+					if(te.owner != null) {
+						owner = te.owner;
+						break;
+					}
+				if(owner == null)
+					return false;
+			}
+			if(propogate) {
+				final UUID toAssign = owner;
 				this.getConnected().forEach(tile -> {
-					tile.owner = owner;
+					tile.owner = toAssign;
 					tile.setChanged();
 					tile.syncToClientLight(null);
 				});
-			else {
+			}else {
 				this.owner = owner;
 				this.setChanged();
 				this.syncToClientLight(null);
