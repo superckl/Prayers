@@ -28,7 +28,7 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(0.5F).sacrificeTicks(30)
 			.offerPoints(1).offerTicks(40).matcher(stack -> ItemStack.isSame(stack, new ItemStack(AltarItem.ITEM_BONE)))::build);
 	public static RegistryObject<AltarItem> GILDED_BONE = AltarItem.REGISTER.register("gilded_bone", AltarItem.builder().sacrificeXP(10).sacrificeTicks(50)
-			.offerPoints(70).offerTicks(100).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONE.get())))::build);
+			.offerPoints(70).offerTicks(100).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONE::get)))::build);
 
 	@Default
 	private final float offerPoints = 0;
