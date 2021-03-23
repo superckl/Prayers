@@ -8,6 +8,8 @@
   "item.prayers.gold_leaf": "Gold Leaf",
   "item.prayers.gilded_bone": "Gilded Bone",
   "item.prayers.blessed_water": "Blessed Water",
+  "item.prayers.vessel": "Vessel",
+  "item.prayers.vessel_full": "Souly Grail",
   "itemGroup.prayers": "Prayers",
   "effect.prayers.instant_prayer": "Instant Prayer",
   "effect.prayers.prayer_regen": "Prayer Renewal",

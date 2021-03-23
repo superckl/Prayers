@@ -4,6 +4,7 @@ import java.util.EnumMap;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
+import me.superckl.prayers.item.SoulOrbItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -37,6 +38,7 @@ public class ModItems {
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> BLESSED_WATER = ModItems.REGISTER.register("blessed_water",
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP).stacksTo(1)));
+	public static final RegistryObject<SoulOrbItem> SOUL_ORB = ModItems.REGISTER.register("vessel", SoulOrbItem::new);
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())

@@ -54,10 +54,10 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 				return altarItem.get();
 		return null;
 	}
-	
+
 	@SubscribeEvent
-	public static void fillTooltip(ItemTooltipEvent e) {
-		AltarItem aItem = AltarItem.find(e.getItemStack());
+	public static void fillTooltip(final ItemTooltipEvent e) {
+		final AltarItem aItem = AltarItem.find(e.getItemStack());
 		if(aItem == null)
 			return;
 		e.getToolTip().add(new StringTextComponent("Altar offering:").withStyle(TextFormatting.BLUE));
