@@ -56,6 +56,7 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -78,23 +79,24 @@ public class Prayers
 
 	public Prayers() {
 		LogHelper.setLogger(LogManager.getFormatterLogger(Prayers.MOD_ID));
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::initColors);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::createRegistry);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerParticleFactory);
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		bus.addListener(this::commonSetup);
+		bus.addListener(this::clientSetup);
+		bus.addListener(this::initColors);
+		bus.addListener(this::createRegistry);
+		bus.addListener(this::registerParticleFactory);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
 
-		ModBlocks.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		ModItems.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		ModTiles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		ModParticles.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		ModRecipes.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		ModEffects.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		ModPotions.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		Prayer.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		AltarItem.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-		ModLoot.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModBlocks.REGISTER.register(bus);
+		ModItems.REGISTER.register(bus);
+		ModTiles.REGISTER.register(bus);
+		ModParticles.REGISTER.register(bus);
+		ModRecipes.REGISTER.register(bus);
+		ModEffects.REGISTER.register(bus);
+		ModPotions.REGISTER.register(bus);
+		Prayer.REGISTER.register(bus);
+		AltarItem.REGISTER.register(bus);
+		ModLoot.REGISTER.register(bus);
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
