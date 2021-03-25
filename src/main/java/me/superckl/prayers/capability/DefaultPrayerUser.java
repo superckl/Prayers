@@ -2,12 +2,13 @@ package me.superckl.prayers.capability;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import me.superckl.prayers.Prayer;
+import net.minecraftforge.registries.IRegistryDelegate;
 
 public class DefaultPrayerUser implements IPrayerUser{
 
@@ -20,7 +21,8 @@ public class DefaultPrayerUser implements IPrayerUser{
 	private float maxPoints;
 	private float xp;
 
-	private final Set<Prayer> activePrayers = Sets.newIdentityHashSet();
+	private final Set<IRegistryDelegate<Prayer>> activePrayers = Sets.newIdentityHashSet();
+	private final Set<IRegistryDelegate<Prayer>> unlockedPrayers = Sets.newHashSet();
 
 	public DefaultPrayerUser() {
 		this.prayerLevel = 1;
@@ -31,12 +33,12 @@ public class DefaultPrayerUser implements IPrayerUser{
 
 	@Override
 	public void activatePrayer(final Prayer prayer) {
-		this.activePrayers.add(prayer);
+		this.activePrayers.add(prayer.delegate);
 	}
 
 	@Override
 	public void deactivatePrayer(final Prayer prayer) {
-		this.activePrayers.remove(prayer);
+		this.activePrayers.remove(prayer.delegate);
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class DefaultPrayerUser implements IPrayerUser{
 
 	@Override
 	public boolean isPrayerActive(final Prayer prayer) {
-		return this.activePrayers.contains(prayer);
+		return this.activePrayers.contains(prayer.delegate);
 	}
 
 	@Override
@@ -94,7 +96,7 @@ public class DefaultPrayerUser implements IPrayerUser{
 
 	@Override
 	public Collection<Prayer> getActivePrayers() {
-		return ImmutableSet.copyOf(this.activePrayers);
+		return this.activePrayers.stream().map(IRegistryDelegate::get).collect(Collectors.toSet());
 	}
 
 	protected float computeMaxPoints() {
@@ -116,6 +118,23 @@ public class DefaultPrayerUser implements IPrayerUser{
 	@Override
 	public float getXP() {
 		return this.xp;
+	}
+
+	@Override
+	public boolean unlockPrayer(Prayer prayer) {
+		if(!prayer.isRequiresTome())
+			return false;
+		return this.unlockedPrayers.add(prayer.delegate);
+	}
+
+	@Override
+	public boolean isUnlocked(Prayer prayer) {
+		return this.unlockedPrayers.contains(prayer.delegate);
+	}
+	
+	@Override
+	public Collection<Prayer> getUnlockedPrayers() {
+		return this.unlockedPrayers.stream().map(IRegistryDelegate::get).collect(Collectors.toSet());
 	}
 
 }

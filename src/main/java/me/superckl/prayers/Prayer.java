@@ -95,6 +95,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	private final int level;
 	private final List<PrayerEffect> effects;
 	private final List<String> exclusionTypes;
+	private final boolean requiresTome;
 	private final ResourceLocation texture;
 	private final List<ITextComponent> tooltipDescription;
 	@Setter
@@ -103,12 +104,13 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	//We require a supplier for effects so that a new instance can be created every time the prayer is built.
 	@Builder
 	private Prayer(final String name, final float drain, final int level, @Singular final List<Supplier<PrayerEffect>> effects, @Singular final List<String> exclusionTypes,
-			final ResourceLocation texture) {
+			final boolean requiresTome, final ResourceLocation texture) {
 		this.name = name;
 		this.drain = drain;
 		this.level = level;
 		this.texture = texture;
 		this.exclusionTypes = exclusionTypes;
+		this.requiresTome = requiresTome;
 
 		this.effects = effects.stream().map(Supplier::get).collect(Collectors.toList());
 		this.effects.forEach(effect -> {
