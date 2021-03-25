@@ -48,13 +48,11 @@ public class PrayerSelectGUI extends Screen{
 
 		final Collection<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues();
 		final Iterator<Prayer> it = prayers.stream().sorted((p1, p2) -> IntComparators.NATURAL_COMPARATOR.compare(p1.getLevel(), p2.getLevel())).iterator();
+		final IPrayerUser user = IPrayerUser.getUser(this.minecraft.player);
 		while(it.hasNext()) {
 			final Prayer prayer  = it.next();
 			if(!prayer.isEnabled())
 				continue;
-			final IPrayerUser user = IPrayerUser.getUser(this.minecraft.player);
-			if(user.getPrayerLevel() < prayer.getLevel())
-				break;
 			final Button prayerButton = new PrayerButton(prayer, x, y, 16, 16);
 			this.addButton(prayerButton);
 			x += 16+spacing;
