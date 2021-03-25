@@ -23,6 +23,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
@@ -104,6 +105,14 @@ public class SoulOrbItem extends Item {
 	@Override
 	public boolean isFoil(final ItemStack stack) {
 		return this.hasAllKills(stack);
+	}
+
+	@Override
+	public Rarity getRarity(final ItemStack stack) {
+		if(this.hasAllKills(stack))
+			return Rarity.EPIC;
+		else
+			return super.getRarity(stack);
 	}
 
 	public boolean hasAllKills(final ItemStack stack) {

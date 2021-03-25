@@ -66,11 +66,11 @@ public interface IPrayerUser{
 	Collection<Prayer> getActivePrayers();
 
 	void deactivateAllPrayers();
-	
+
 	boolean unlockPrayer(Prayer prayer);
-	
+
 	boolean isUnlocked(Prayer prayer);
-	
+
 	Collection<Prayer> getUnlockedPrayers();
 
 	default void computeLevel() {
@@ -165,7 +165,7 @@ public interface IPrayerUser{
 			parent.putFloat(Storage.XP_KEY, instance.getXP());
 			final ListNBT unlocked = new ListNBT();
 			instance.getUnlockedPrayers().forEach(prayer -> unlocked.add(StringNBT.valueOf(prayer.getRegistryName().toString())));
-			parent.put(UNLOCKED_PRAYERS_KEY, unlocked);
+			parent.put(Storage.UNLOCKED_PRAYERS_KEY, unlocked);
 			final ListNBT enabled = new ListNBT();
 			instance.getActivePrayers().forEach(prayer -> enabled.add(StringNBT.valueOf(prayer.getRegistryName().toString())));
 			parent.put(Storage.ENABLED_PRAYERS_KEY, enabled);
@@ -180,7 +180,7 @@ public interface IPrayerUser{
 			instance.setCurrentPrayerPoints(parent.getFloat(Storage.CURRENT_POINTS_KEY));
 			instance.setXP(parent.getFloat(Storage.XP_KEY));
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
-			final ListNBT unlocked = parent.getList(UNLOCKED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
+			final ListNBT unlocked = parent.getList(Storage.UNLOCKED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			unlocked.forEach(stringNbt -> instance.unlockPrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));

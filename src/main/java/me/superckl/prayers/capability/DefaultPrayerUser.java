@@ -121,17 +121,17 @@ public class DefaultPrayerUser implements IPrayerUser{
 	}
 
 	@Override
-	public boolean unlockPrayer(Prayer prayer) {
+	public boolean unlockPrayer(final Prayer prayer) {
 		if(!prayer.isRequiresTome())
 			return false;
 		return this.unlockedPrayers.add(prayer.delegate);
 	}
 
 	@Override
-	public boolean isUnlocked(Prayer prayer) {
+	public boolean isUnlocked(final Prayer prayer) {
 		return this.unlockedPrayers.contains(prayer.delegate);
 	}
-	
+
 	@Override
 	public Collection<Prayer> getUnlockedPrayers() {
 		return this.unlockedPrayers.stream().map(IRegistryDelegate::get).collect(Collectors.toSet());
