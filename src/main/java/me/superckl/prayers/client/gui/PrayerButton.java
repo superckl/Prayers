@@ -38,7 +38,7 @@ public class PrayerButton extends ImageButton{
 		final IPrayerUser user = IPrayerUser.getUser(this.mc.player);
 		if(user.isPrayerActive(this.prayer.get()))
 			PrayerButton.drawOpenRect(matrixStack, this.x-2, this.y-2, 1, 20, 20);
-		if(!user.canActivatePrayer(prayer.get()))
+		if(!user.canActivatePrayer(this.prayer.get()))
 			RenderSystem.color3f(0.2F, 0.2F, 0.2F);
 		super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
 		RenderSystem.color3f(1, 1, 1);
@@ -56,9 +56,9 @@ public class PrayerButton extends ImageButton{
 	@Override
 	public void renderToolTip(final MatrixStack matrixStack, final int mouseX, final int mouseY) {
 		final IPrayerUser user = IPrayerUser.getUser(this.mc.player);
-		Prayer prayer = this.prayer.get();
+		final Prayer prayer = this.prayer.get();
 		if(!user.canActivatePrayer(prayer)) {
-			List<ITextComponent> tooltip = Lists.newArrayList();
+			final List<ITextComponent> tooltip = Lists.newArrayList();
 			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
 			tooltip.add(new StringTextComponent("This prayer eludes you...").withStyle(TextFormatting.GRAY));
 			if(prayer.isRequiresTome() && !user.isUnlocked(prayer))

@@ -28,7 +28,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 public interface IPrayerUser{
 
 	default boolean canActivatePrayer(final Prayer prayer) {
-		if(!prayer.isEnabled() || (prayer.isRequiresTome() && !this.isUnlocked(prayer)) || this.getPrayerLevel() < prayer.getLevel() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
+		if(!prayer.isEnabled() || prayer.isRequiresTome() && !this.isUnlocked(prayer) || this.getPrayerLevel() < prayer.getLevel() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
 			return false;
 		final Set<String> excludes = Sets.newHashSet();
 		this.getActivePrayers().forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));

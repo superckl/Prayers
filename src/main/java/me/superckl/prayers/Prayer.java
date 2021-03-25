@@ -34,7 +34,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 0.3F))
 			.exclusionTypes(Lists.newArrayList("enhance_melee", "enhance_range", "enhance_magic"))::build);
 	public static final RegistryObject<Prayer> POTENCY_2 = Prayer.REGISTER.register("potent", Prayer.builder().name("Potent").drain(5F).level(80)
-			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/potency.png"))
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/potency.png")).requiresTome(true)
 			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 0.5F))
 			.exclusionTypes(Lists.newArrayList("enhance_melee", "enhance_range", "enhance_magic"))::build);
 
