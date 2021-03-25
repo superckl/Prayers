@@ -9,7 +9,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.ints.IntComparators;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.capability.IPrayerUser;
 import me.superckl.prayers.client.input.KeyBindings;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -48,7 +47,6 @@ public class PrayerSelectGUI extends Screen{
 
 		final Collection<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues();
 		final Iterator<Prayer> it = prayers.stream().sorted((p1, p2) -> IntComparators.NATURAL_COMPARATOR.compare(p1.getLevel(), p2.getLevel())).iterator();
-		final IPrayerUser user = IPrayerUser.getUser(this.minecraft.player);
 		while(it.hasNext()) {
 			final Prayer prayer  = it.next();
 			if(!prayer.isEnabled())

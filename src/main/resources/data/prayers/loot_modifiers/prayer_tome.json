@@ -1,0 +1,29 @@
+{
+	"conditions": [
+		{
+			"condition": "minecraft:alternative",
+			"terms": [
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/stronghold_library"
+				},
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/village/village_temple"
+				},
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/jungle_temple"
+				},
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/buried_treasure"
+				}
+			]
+		},
+		{
+			"condition": "minecraft:random_chance",
+			"chance": 0.5
+		}
+	]
+}

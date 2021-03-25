@@ -20,6 +20,7 @@ import me.superckl.prayers.client.particle.PrayerParticle;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModEffects;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.init.ModLoot;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
@@ -93,6 +94,7 @@ public class Prayers
 		ModPotions.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		Prayer.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 		AltarItem.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+		ModLoot.REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){

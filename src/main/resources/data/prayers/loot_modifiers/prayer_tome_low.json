@@ -1,0 +1,33 @@
+{
+	"conditions": [
+		{
+			"condition": "minecraft:alternative",
+			"terms": [
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/stronghold_corridor"
+				},
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/stronghold_crossing"
+				},
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/simple_dungeon"
+				},
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/abandoned_mineshaft"
+				},
+				{
+					"condition": "forge:loot_table_id",
+					"loot_table_id": "minecraft:chests/desert_pyramid"
+				}
+			]
+		},
+		{
+			"condition": "minecraft:random_chance",
+			"chance": 0.1
+		}
+	]
+}
