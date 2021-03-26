@@ -3,7 +3,8 @@ package me.superckl.prayers.network.packet.user;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.capability.ILivingPrayerUser;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -24,8 +25,8 @@ public abstract class PrayerUserPacket {
 		supplier.get().setPacketHandled(true);
 	}
 
-	protected IPrayerUser getUser(final World world) {
-		return IPrayerUser.getUser(world.getEntity(this.entityID));
+	protected ILivingPrayerUser getUser(final World world) {
+		return ILivingPrayerUser.getUser((LivingEntity) world.getEntity(this.entityID));
 	}
 
 	@SuppressWarnings("unchecked")

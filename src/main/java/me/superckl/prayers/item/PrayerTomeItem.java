@@ -4,7 +4,7 @@ import java.util.List;
 
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.capability.ILivingPrayerUser;
 import me.superckl.prayers.init.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
@@ -40,10 +40,10 @@ public class PrayerTomeItem extends Item{
 		if(!prayerOpt.isPresent())
 			return ActionResult.pass(stack);
 		final Prayer prayer = prayerOpt.orElse(null);
-		final IPrayerUser user = IPrayerUser.getUser(player);
+		final ILivingPrayerUser user = ILivingPrayerUser.getUser(player);
 		if(user.getPrayerLevel() < prayer.getLevel())
 			return ActionResult.fail(stack);
-		if(IPrayerUser.getUser(player).unlockPrayer(prayerOpt.orElse(null))) {
+		if(ILivingPrayerUser.getUser(player).unlockPrayer(prayerOpt.orElse(null))) {
 			final ItemStack shrunk = stack.copy();
 			shrunk.shrink(1);
 			return ActionResult.consume(shrunk);
@@ -67,7 +67,7 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(Minecraft.getInstance().player != null && IPrayerUser.getUser(Minecraft.getInstance().player).getPrayerLevel() < prayer.getLevel()) {
+			if(Minecraft.getInstance().player != null && ILivingPrayerUser.getUser(Minecraft.getInstance().player).getPrayerLevel() < prayer.getLevel()) {
 				tooltip.add(new StringTextComponent("You cannot decipher the esoteric text...").withStyle(TextFormatting.GRAY));
 				tooltip.add(new StringTextComponent("Requires level "+prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
 			}else

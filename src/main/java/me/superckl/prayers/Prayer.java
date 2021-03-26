@@ -10,11 +10,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
-import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.capability.ILivingPrayerUser;
 import me.superckl.prayers.effects.DamageEffect;
 import me.superckl.prayers.effects.DamageEffect.DamageType;
 import me.superckl.prayers.effects.PrayerEffect;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -123,8 +123,8 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 				.setStyle(Style.EMPTY.withItalic(true))));
 	}
 
-	public boolean isActive(final Entity entity) {
-		return IPrayerUser.getUser(entity).isPrayerActive(this);
+	public boolean isActive(final LivingEntity entity) {
+		return ILivingPrayerUser.getUser(entity).isPrayerActive(this);
 	}
 
 	public static List<Prayer> defaults(){

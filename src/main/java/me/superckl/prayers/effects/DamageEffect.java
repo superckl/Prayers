@@ -2,6 +2,7 @@ package me.superckl.prayers.effects;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -53,9 +54,9 @@ public class DamageEffect extends PrayerEffect{
 		if(!apply)
 			return;
 		if(this.isIncoming)
-			apply = apply && this.getOwner().isActive(e.getEntity());
-		else if(s.getDirectEntity() != null)
-			apply = apply && this.getOwner().isActive(s.getDirectEntity());
+			apply = apply && this.getOwner().isActive(e.getEntityLiving());
+		else if(s.getDirectEntity() instanceof LivingEntity)
+			apply = apply && this.getOwner().isActive((LivingEntity) s.getDirectEntity());
 		if(!apply)
 			return;
 		if(this.isPercentage)

@@ -7,7 +7,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.capability.ILivingPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
@@ -31,7 +31,7 @@ public class CommandSet {
 		for(final Entity e:targets) {
 			if (!(e instanceof LivingEntity))
 				continue;
-			final IPrayerUser user = IPrayerUser.getUser(e);
+			final ILivingPrayerUser user = ILivingPrayerUser.getUser((LivingEntity) e);
 			user.setCurrentPrayerPoints(points);
 			pointsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
@@ -52,7 +52,7 @@ public class CommandSet {
 		for(final Entity e:targets) {
 			if (!(e instanceof LivingEntity))
 				continue;
-			final IPrayerUser user = IPrayerUser.getUser(e);
+			final ILivingPrayerUser user = ILivingPrayerUser.getUser((LivingEntity) e);
 			user.setPrayerLevel(level);
 			levelsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),

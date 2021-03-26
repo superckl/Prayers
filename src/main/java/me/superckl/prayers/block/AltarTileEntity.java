@@ -13,7 +13,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
-import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.capability.ILivingPrayerUser;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
@@ -233,7 +233,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	public float rechargeUser(final PlayerEntity player) {
 		if(this.level.isClientSide || !this.canRegen())
 			return 0;
-		final IPrayerUser user = IPrayerUser.getUser(player);
+		final ILivingPrayerUser user = ILivingPrayerUser.getUser(player);
 		final float current = user.getCurrentPrayerPoints();
 		final float max = user.getMaxPrayerPoints();
 		if(current < max) {
@@ -307,7 +307,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			if(player == null)
 				AltarsSavedData.get((ServerWorld) this.level).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
 			else {
-				IPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
+				ILivingPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
 				PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), PacketSyncPrayerUser.fromPlayer(player));
 			}
 			((ServerWorld)this.level).sendParticles(ParticleTypes.SMOKE, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);

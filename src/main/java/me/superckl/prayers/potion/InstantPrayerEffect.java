@@ -1,6 +1,6 @@
 package me.superckl.prayers.potion;
 
-import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.capability.ILivingPrayerUser;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.InstantEffect;
@@ -13,7 +13,7 @@ public class InstantPrayerEffect extends InstantEffect{
 
 	@Override
 	public void applyEffectTick(final LivingEntity entityLivingBaseIn, final int amplifier) {
-		IPrayerUser.getUser(entityLivingBaseIn).addPoints(75+50*amplifier);
+		ILivingPrayerUser.getUser(entityLivingBaseIn).addPoints(75+50*amplifier);
 	}
 
 }

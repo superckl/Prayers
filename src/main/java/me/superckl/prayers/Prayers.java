@@ -8,8 +8,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import me.superckl.prayers.capability.CapabilityEventHandler;
-import me.superckl.prayers.capability.DefaultPrayerUser;
-import me.superckl.prayers.capability.IPrayerUser;
+import me.superckl.prayers.capability.DefaultLivingPrayerUser;
+import me.superckl.prayers.capability.IInventoryPrayerProvider;
+import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.ITickablePrayerProvider;
+import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.client.AltarRenderer;
 import me.superckl.prayers.client.CraftingStandRenderer;
 import me.superckl.prayers.client.OfferingStandRenderer;
@@ -74,12 +77,14 @@ public class Prayers
 
 	public static final String MOD_ID = "prayers";
 
-	@CapabilityInject(IPrayerUser.class)
-	public static Capability<IPrayerUser> PRAYER_USER_CAPABILITY;
+	@CapabilityInject(ILivingPrayerUser.class)
+	public static Capability<ILivingPrayerUser> PRAYER_USER_CAPABILITY;
+	@CapabilityInject(ITickablePrayerProvider.class)
+	public static Capability<IInventoryPrayerProvider> INVENTORY_PRAYER_CAPABILITY;
 
 	public Prayers() {
 		LogHelper.setLogger(LogManager.getFormatterLogger(Prayers.MOD_ID));
-		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(this::commonSetup);
 		bus.addListener(this::clientSetup);
 		bus.addListener(this::initColors);
@@ -112,7 +117,8 @@ public class Prayers
 			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.PRAYER_RENEWAL::get, Items.REDSTONE, ModPotions.LONG_PRAYER_RENEWAL::get));
 
 		});
-		CapabilityManager.INSTANCE.register(IPrayerUser.class, new IPrayerUser.Storage(), DefaultPrayerUser::new);
+		CapabilityManager.INSTANCE.register(ILivingPrayerUser.class, new ILivingPrayerUser.Storage(), DefaultLivingPrayerUser::new);
+		CapabilityManager.INSTANCE.register(IInventoryPrayerProvider.class, new ITickablePrayerProvider.Storage<IInventoryPrayerProvider>(), TalismanPrayerProvider::new);
 		int pIndex = 0;
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketActivatePrayer.class,
 				PacketActivatePrayer::encode, PacketActivatePrayer::decode, PacketActivatePrayer::handle);

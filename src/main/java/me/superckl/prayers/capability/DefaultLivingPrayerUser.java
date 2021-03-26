@@ -10,7 +10,7 @@ import lombok.Getter;
 import me.superckl.prayers.Prayer;
 import net.minecraftforge.registries.IRegistryDelegate;
 
-public class DefaultPrayerUser implements IPrayerUser{
+public class DefaultLivingPrayerUser implements ILivingPrayerUser{
 
 	@Getter
 	private float currentPrayerPoints;
@@ -24,7 +24,7 @@ public class DefaultPrayerUser implements IPrayerUser{
 	private final Set<IRegistryDelegate<Prayer>> activePrayers = Sets.newIdentityHashSet();
 	private final Set<IRegistryDelegate<Prayer>> unlockedPrayers = Sets.newHashSet();
 
-	public DefaultPrayerUser() {
+	public DefaultLivingPrayerUser() {
 		this.prayerLevel = 1;
 		this.maxPointsBoost = 0;
 		this.maxPoints = this.computeMaxPoints();
