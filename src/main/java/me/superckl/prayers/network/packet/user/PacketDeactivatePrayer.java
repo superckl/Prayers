@@ -47,7 +47,7 @@ public class PacketDeactivatePrayer  extends PrayerUserPacket{
 					PrayersPacketHandler.INSTANCE.reply(PacketActivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;
 				}
-				ILivingPrayerUser.getUser(context.getSender()).deactivatePrayer(this.prayer);
+				ILivingPrayerUser.get(context.getSender()).deactivatePrayer(this.prayer);
 			});
 	}
 

@@ -26,7 +26,7 @@ public abstract class PrayerUserPacket {
 	}
 
 	protected ILivingPrayerUser getUser(final World world) {
-		return ILivingPrayerUser.getUser((LivingEntity) world.getEntity(this.entityID));
+		return ILivingPrayerUser.get((LivingEntity) world.getEntity(this.entityID));
 	}
 
 	@SuppressWarnings("unchecked")

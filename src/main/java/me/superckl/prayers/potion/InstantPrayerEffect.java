@@ -13,7 +13,7 @@ public class InstantPrayerEffect extends InstantEffect{
 
 	@Override
 	public void applyEffectTick(final LivingEntity entityLivingBaseIn, final int amplifier) {
-		ILivingPrayerUser.getUser(entityLivingBaseIn).addPoints(75+50*amplifier);
+		ILivingPrayerUser.get(entityLivingBaseIn).addPoints(75+50*amplifier);
 	}
 
 }

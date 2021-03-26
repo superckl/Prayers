@@ -124,7 +124,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	}
 
 	public boolean isActive(final LivingEntity entity) {
-		return ILivingPrayerUser.getUser(entity).isPrayerActive(this);
+		return ILivingPrayerUser.get(entity).isPrayerActive(this);
 	}
 
 	public static List<Prayer> defaults(){

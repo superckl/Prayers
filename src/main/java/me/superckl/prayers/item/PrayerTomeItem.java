@@ -40,10 +40,10 @@ public class PrayerTomeItem extends Item{
 		if(!prayerOpt.isPresent())
 			return ActionResult.pass(stack);
 		final Prayer prayer = prayerOpt.orElse(null);
-		final ILivingPrayerUser user = ILivingPrayerUser.getUser(player);
+		final ILivingPrayerUser user = ILivingPrayerUser.get(player);
 		if(user.getPrayerLevel() < prayer.getLevel())
 			return ActionResult.fail(stack);
-		if(ILivingPrayerUser.getUser(player).unlockPrayer(prayerOpt.orElse(null))) {
+		if(ILivingPrayerUser.get(player).unlockPrayer(prayerOpt.orElse(null))) {
 			final ItemStack shrunk = stack.copy();
 			shrunk.shrink(1);
 			return ActionResult.consume(shrunk);
@@ -67,7 +67,7 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(Minecraft.getInstance().player != null && ILivingPrayerUser.getUser(Minecraft.getInstance().player).getPrayerLevel() < prayer.getLevel()) {
+			if(Minecraft.getInstance().player != null && ILivingPrayerUser.get(Minecraft.getInstance().player).getPrayerLevel() < prayer.getLevel()) {
 				tooltip.add(new StringTextComponent("You cannot decipher the esoteric text...").withStyle(TextFormatting.GRAY));
 				tooltip.add(new StringTextComponent("Requires level "+prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
 			}else

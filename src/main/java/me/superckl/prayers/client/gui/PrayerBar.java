@@ -21,7 +21,7 @@ public class PrayerBar {
 	public final boolean inludeMax;
 
 	public void renderAt(final MatrixStack matrixStack, final int x, final int y) {
-		final ILivingPrayerUser user = ILivingPrayerUser.getUser(this.mc.player);
+		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
 
 		//Bar is 40x12, icon is 16x16
 		//Determine positioning of text and icon (defaults to bottom right)

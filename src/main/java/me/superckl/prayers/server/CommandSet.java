@@ -31,7 +31,7 @@ public class CommandSet {
 		for(final Entity e:targets) {
 			if (!(e instanceof LivingEntity))
 				continue;
-			final ILivingPrayerUser user = ILivingPrayerUser.getUser((LivingEntity) e);
+			final ILivingPrayerUser user = ILivingPrayerUser.get((LivingEntity) e);
 			user.setCurrentPrayerPoints(points);
 			pointsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
@@ -52,7 +52,7 @@ public class CommandSet {
 		for(final Entity e:targets) {
 			if (!(e instanceof LivingEntity))
 				continue;
-			final ILivingPrayerUser user = ILivingPrayerUser.getUser((LivingEntity) e);
+			final ILivingPrayerUser user = ILivingPrayerUser.get((LivingEntity) e);
 			user.setPrayerLevel(level);
 			levelsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),

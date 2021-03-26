@@ -36,7 +36,22 @@ public interface ITickablePrayerProvider<T> {
 
 	Collection<Prayer> getActivePrayers();
 
+	void deactivateAllPrayers();
+
 	void tick(T reference);
+
+	default void togglePrayer(final Prayer prayer) {
+		if (this.isPrayerActive(prayer))
+			this.deactivatePrayer(prayer);
+		else
+			this.activatePrayer(prayer);
+	}
+
+	default float addPoints(final float points) {
+		final float toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());
+		this.setCurrentPrayerPoints(this.getCurrentPrayerPoints()+toAdd);
+		return toAdd;
+	}
 
 	@RequiredArgsConstructor
 	public static class Provider<T extends ITickablePrayerProvider<?>> implements ICapabilitySerializable<INBT>{

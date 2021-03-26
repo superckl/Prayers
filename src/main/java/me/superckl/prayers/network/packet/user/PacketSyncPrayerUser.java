@@ -47,7 +47,7 @@ public class PacketSyncPrayerUser extends PrayerUserPacket{
 	}
 
 	public static PacketSyncPrayerUser fromPlayer(final PlayerEntity player){
-		return PacketSyncPrayerUser.builder().entityID(player.getId()).userNBT(Prayers.PRAYER_USER_CAPABILITY.writeNBT(ILivingPrayerUser.getUser(player), null)).build();
+		return PacketSyncPrayerUser.builder().entityID(player.getId()).userNBT(Prayers.PRAYER_USER_CAPABILITY.writeNBT(ILivingPrayerUser.get(player), null)).build();
 	}
 
 }

@@ -36,7 +36,6 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 
 	float getMaxPointsBoost();
 
-
 	int getPrayerLevel();
 
 	int setPrayerLevel(int level);
@@ -46,8 +45,6 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 	void setXP(float xp);
 
 	float getXP();
-
-	void deactivateAllPrayers();
 
 	boolean unlockPrayer(Prayer prayer);
 
@@ -72,13 +69,6 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 			return level >= 15 ? 37 + (level - 15) * 5 : 7 + level * 2;
 	}
 
-	default void togglePrayer(final Prayer prayer) {
-		if (this.isPrayerActive(prayer))
-			this.deactivatePrayer(prayer);
-		else
-			this.activatePrayer(prayer);
-	}
-
 	@Override
 	default void tick(final LivingEntity reference) {
 		final float drain = (float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum();
@@ -90,13 +80,7 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 		this.setCurrentPrayerPoints(newPoints);
 	}
 
-	default float addPoints(final float points) {
-		final float toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());
-		this.setCurrentPrayerPoints(this.getCurrentPrayerPoints()+toAdd);
-		return toAdd;
-	}
-
-	static  ILivingPrayerUser getUser(final LivingEntity entity) {
+	static ILivingPrayerUser get(final LivingEntity entity) {
 		return entity.getCapability(Prayers.PRAYER_USER_CAPABILITY)
 				.orElseThrow(() -> new IllegalStateException(String.format("Received entity %s with no prayer capability!", entity.toString())));
 	}

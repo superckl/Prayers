@@ -233,7 +233,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	public float rechargeUser(final PlayerEntity player) {
 		if(this.level.isClientSide || !this.canRegen())
 			return 0;
-		final ILivingPrayerUser user = ILivingPrayerUser.getUser(player);
+		final ILivingPrayerUser user = ILivingPrayerUser.get(player);
 		final float current = user.getCurrentPrayerPoints();
 		final float max = user.getMaxPrayerPoints();
 		if(current < max) {
@@ -307,7 +307,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			if(player == null)
 				AltarsSavedData.get((ServerWorld) this.level).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
 			else {
-				ILivingPrayerUser.getUser(player).giveXP(aItem.getSacrificeXP());
+				ILivingPrayerUser.get(player).giveXP(aItem.getSacrificeXP());
 				PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), PacketSyncPrayerUser.fromPlayer(player));
 			}
 			((ServerWorld)this.level).sendParticles(ParticleTypes.SMOKE, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);

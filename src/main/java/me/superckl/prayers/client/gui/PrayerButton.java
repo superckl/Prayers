@@ -35,7 +35,7 @@ public class PrayerButton extends ImageButton{
 	@SuppressWarnings("deprecation")
 	@Override
 	public void renderButton(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
-		final ILivingPrayerUser user = ILivingPrayerUser.getUser(this.mc.player);
+		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
 		if(user.isPrayerActive(this.prayer.get()))
 			PrayerButton.drawOpenRect(matrixStack, this.x-2, this.y-2, 1, 20, 20);
 		if(!user.canActivatePrayer(this.prayer.get()))
@@ -55,7 +55,7 @@ public class PrayerButton extends ImageButton{
 
 	@Override
 	public void renderToolTip(final MatrixStack matrixStack, final int mouseX, final int mouseY) {
-		final ILivingPrayerUser user = ILivingPrayerUser.getUser(this.mc.player);
+		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
 		final Prayer prayer = this.prayer.get();
 		if(!user.canActivatePrayer(prayer)) {
 			final List<ITextComponent> tooltip = Lists.newArrayList();
@@ -72,7 +72,7 @@ public class PrayerButton extends ImageButton{
 
 	@Override
 	public void onPress() {
-		final ILivingPrayerUser user = ILivingPrayerUser.getUser(this.mc.player);
+		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
 		if(user.isPrayerActive(this.prayer.get())) {
 			user.deactivatePrayer(this.prayer.get());
 			super.playDownSound(this.mc.getSoundManager());

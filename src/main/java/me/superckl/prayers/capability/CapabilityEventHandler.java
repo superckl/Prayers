@@ -1,5 +1,6 @@
 package me.superckl.prayers.capability;
 
+import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -8,7 +9,7 @@ import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -32,8 +33,9 @@ public class CapabilityEventHandler {
 	}
 
 	@SubscribeEvent
-	public void attachTalisman(final AttachCapabilitiesEvent<Item> e) {
-		if(e.getObject() == ModItems.TALISMAN.get()) {
+	public void attachTalisman(final AttachCapabilitiesEvent<ItemStack> e) {
+		if(e.getObject().getItem() == ModItems.TALISMAN.get()) {
+			LogHelper.info("attaching");
 			final ITickablePrayerProvider.Provider<IInventoryPrayerProvider> provider = new ITickablePrayerProvider.Provider<>(new TalismanPrayerProvider(), () -> Prayers.INVENTORY_PRAYER_CAPABILITY);
 			e.addCapability(new ResourceLocation(Prayers.MOD_ID, "inventory_prayer_provider"), provider);
 			e.addListener(provider::invalidate);
@@ -45,7 +47,7 @@ public class CapabilityEventHandler {
 	public void onPlayerLogin(final PlayerLoggedInEvent e) {
 		final AltarsSavedData data = AltarsSavedData.get((ServerWorld)e.getPlayer().level);
 		if(data.hasPendingXP(e.getPlayer().getUUID()))
-			ILivingPrayerUser.getUser(e.getPlayer()).giveXP(data.getAndRemoveXP(e.getPlayer().getUUID()));
+			ILivingPrayerUser.get(e.getPlayer()).giveXP(data.getAndRemoveXP(e.getPlayer().getUUID()));
 		PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(e::getPlayer),
 				PacketSyncPrayerUser.fromPlayer(e.getPlayer()));
 	}
@@ -54,14 +56,14 @@ public class CapabilityEventHandler {
 	@SubscribeEvent
 	public void onPlayerClone(final PlayerEvent.Clone e) {
 		e.getOriginal().getCapability(Prayers.PRAYER_USER_CAPABILITY).ifPresent(user -> {
-			final ILivingPrayerUser newUser =  ILivingPrayerUser.getUser(e.getPlayer());
+			final ILivingPrayerUser newUser =  ILivingPrayerUser.get(e.getPlayer());
 			Prayers.PRAYER_USER_CAPABILITY.readNBT(newUser, null, Prayers.PRAYER_USER_CAPABILITY.writeNBT(user, null));
 		});
 	}
 
 	@SubscribeEvent
 	public void onLivingTick(final LivingUpdateEvent e) {
-		ILivingPrayerUser.getUser(e.getEntityLiving()).tick(e.getEntityLiving());
+		ILivingPrayerUser.get(e.getEntityLiving()).tick(e.getEntityLiving());
 	}
 
 	//Updates clients of an entity's prayer data when they begin tracking
@@ -78,7 +80,7 @@ public class CapabilityEventHandler {
 	//Deactivates all prayers when an entity dies
 	@SubscribeEvent
 	public void onDeath(final LivingDeathEvent e) {
-		ILivingPrayerUser.getUser(e.getEntityLiving()).deactivateAllPrayers();
+		ILivingPrayerUser.get(e.getEntityLiving()).deactivateAllPrayers();
 	}
 
 }

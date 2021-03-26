@@ -13,7 +13,7 @@ public class PrayerRenewalEffect extends Effect{
 
 	@Override
 	public void applyEffectTick(final LivingEntity entityLivingBaseIn, final int amplifier) {
-		ILivingPrayerUser.getUser(entityLivingBaseIn).addPoints(1);
+		ILivingPrayerUser.get(entityLivingBaseIn).addPoints(1);
 	}
 
 	@Override

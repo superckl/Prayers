@@ -8,12 +8,11 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import me.superckl.prayers.Prayer;
+import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.registries.IRegistryDelegate;
 
-public class DefaultLivingPrayerUser implements ILivingPrayerUser{
+public class DefaultLivingPrayerUser extends SimplePrayerTracker<LivingEntity> implements ILivingPrayerUser{
 
-	@Getter
-	private float currentPrayerPoints;
 	@Getter
 	private int prayerLevel;
 	@Getter
@@ -21,34 +20,14 @@ public class DefaultLivingPrayerUser implements ILivingPrayerUser{
 	private float maxPoints;
 	private float xp;
 
-	private final Set<IRegistryDelegate<Prayer>> activePrayers = Sets.newIdentityHashSet();
 	private final Set<IRegistryDelegate<Prayer>> unlockedPrayers = Sets.newHashSet();
 
 	public DefaultLivingPrayerUser() {
+		super();
 		this.prayerLevel = 1;
 		this.maxPointsBoost = 0;
 		this.maxPoints = this.computeMaxPoints();
 		this.currentPrayerPoints = this.maxPoints;
-	}
-
-	@Override
-	public void activatePrayer(final Prayer prayer) {
-		this.activePrayers.add(prayer.delegate);
-	}
-
-	@Override
-	public void deactivatePrayer(final Prayer prayer) {
-		this.activePrayers.remove(prayer.delegate);
-	}
-
-	@Override
-	public void deactivateAllPrayers() {
-		this.activePrayers.clear();
-	}
-
-	@Override
-	public boolean isPrayerActive(final Prayer prayer) {
-		return this.activePrayers.contains(prayer.delegate);
 	}
 
 	@Override
@@ -76,15 +55,6 @@ public class DefaultLivingPrayerUser implements ILivingPrayerUser{
 	}
 
 	@Override
-	public float setCurrentPrayerPoints(final float currentPoints) {
-		if(currentPoints < 0)
-			this.currentPrayerPoints = 0;
-		else
-			this.currentPrayerPoints = currentPoints;
-		return this.currentPrayerPoints;
-	}
-
-	@Override
 	public int setPrayerLevel(final int level) {
 		if(level < 1)
 			this.prayerLevel = 1;
@@ -92,11 +62,6 @@ public class DefaultLivingPrayerUser implements ILivingPrayerUser{
 			this.prayerLevel = level;
 		this.maxPoints = this.computeMaxPoints();
 		return this.prayerLevel;
-	}
-
-	@Override
-	public Collection<Prayer> getActivePrayers() {
-		return this.activePrayers.stream().map(IRegistryDelegate::get).collect(Collectors.toSet());
 	}
 
 	protected float computeMaxPoints() {

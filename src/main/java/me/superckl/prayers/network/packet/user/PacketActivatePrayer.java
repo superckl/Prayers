@@ -47,7 +47,7 @@ public class PacketActivatePrayer extends PrayerUserPacket{
 					PrayersPacketHandler.INSTANCE.reply(PacketDeactivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;
 				}
-				final ILivingPrayerUser prayerUser = ILivingPrayerUser.getUser(context.getSender());
+				final ILivingPrayerUser prayerUser = ILivingPrayerUser.get(context.getSender());
 				if(!prayerUser.canActivatePrayer(this.prayer))
 					//Tell the player they cannot activate that prayer
 					PrayersPacketHandler.INSTANCE.reply(PacketDeactivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);

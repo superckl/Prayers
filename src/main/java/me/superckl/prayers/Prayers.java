@@ -18,6 +18,7 @@ import me.superckl.prayers.client.CraftingStandRenderer;
 import me.superckl.prayers.client.OfferingStandRenderer;
 import me.superckl.prayers.client.RenderTickHandler;
 import me.superckl.prayers.client.SoulOrbItemColor;
+import me.superckl.prayers.client.gui.GuiEventHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.client.particle.PrayerParticle;
 import me.superckl.prayers.init.ModBlocks;
@@ -79,7 +80,7 @@ public class Prayers
 
 	@CapabilityInject(ILivingPrayerUser.class)
 	public static Capability<ILivingPrayerUser> PRAYER_USER_CAPABILITY;
-	@CapabilityInject(ITickablePrayerProvider.class)
+	@CapabilityInject(IInventoryPrayerProvider.class)
 	public static Capability<IInventoryPrayerProvider> INVENTORY_PRAYER_CAPABILITY;
 
 	public Prayers() {
@@ -140,6 +141,7 @@ public class Prayers
 		event.enqueueWork(() -> {
 			MinecraftForge.EVENT_BUS.register(new RenderTickHandler());
 			MinecraftForge.EVENT_BUS.register(KeyBindings.class);
+			MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
 		});
 		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYER_GUI);
 		ModTiles.ALTARS.values().forEach(tileTypeObj -> ClientRegistry.bindTileEntityRenderer(tileTypeObj.get(), AltarRenderer::new));

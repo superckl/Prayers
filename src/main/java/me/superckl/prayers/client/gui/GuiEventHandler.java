@@ -10,10 +10,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class GuiEventListener {
+public class GuiEventHandler {
 
 	@SubscribeEvent
-	public static void onMouseClick(final GuiScreenEvent.MouseClickedEvent.Pre e) {
+	public void onMouseClick(final GuiScreenEvent.MouseClickedEvent.Pre e) {
 		if(e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && e.getGui() instanceof ContainerScreen<?> && !(e.getGui() instanceof CreativeScreen)) {
 			final ContainerScreen<?> containerS = (ContainerScreen<?>) e.getGui();
 			final Slot slot = containerS.getSlotUnderMouse();
