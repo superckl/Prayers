@@ -7,6 +7,7 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,7 +21,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -78,19 +78,18 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public Rarity getRarity(final ItemStack stack) {
 		if(this.getStoredPrayer(stack).isPresent())
-			return Rarity.RARE;
+			return Rarity.EPIC;
 		else return super.getRarity(stack);
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(Minecraft.getInstance().player != null && CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).getPrayerLevel() < prayer.getLevel()) {
-				tooltip.add(new StringTextComponent("You cannot decipher the esoteric text...").withStyle(TextFormatting.GRAY));
-				tooltip.add(new StringTextComponent("Requires level "+prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
+			if(level != null && CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).getPrayerLevel() < prayer.getLevel()) {
+				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.decipher")).withStyle(TextFormatting.GRAY));
+				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"), prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
 			}else
-				tooltip.add(new StringTextComponent("Use to unlock "+prayer.getName()).withStyle(TextFormatting.BLUE));
+				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.use_unlock"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 		});
 	}
 

@@ -6,8 +6,10 @@ import java.util.List;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,7 +21,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -78,16 +79,20 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 			final ITooltipFlag flag) {
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null) {
-			if(!prayer.isObfusctated(Minecraft.getInstance().player)) {
-				tooltip.add(new StringTextComponent("Bound to "+prayer.getName()).withStyle(TextFormatting.WHITE));
+			if(level == null || !prayer.isObfusctated(Minecraft.getInstance().player)) {
+				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.bound"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 				if(CapabilityHandler.getPrayerCapability(stack).isPrayerActive(prayer))
-					tooltip.add(new StringTextComponent("Active").withStyle(TextFormatting.GREEN));
+					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
 				else
-					tooltip.add(new StringTextComponent("Inactive").withStyle(TextFormatting.RED));
+					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("inactive")).withStyle(TextFormatting.RED));
 			}else
-				tooltip.add(new StringTextComponent("The bound prayer eludes you...").withStyle(TextFormatting.GRAY));
+				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.prayer_obfuscated")).withStyle(TextFormatting.GRAY));
 		}else
-			tooltip.add(new StringTextComponent("Use to bind to active prayer").withStyle(TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.use_bind")).withStyle(TextFormatting.GRAY));
+		if(level != null) {
+			final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(stack);
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.points"), (int) provider.getCurrentPrayerPoints(), (int) provider.getMaxPrayerPoints()).withStyle(TextFormatting.GRAY));
+		}
 	}
 
 	public boolean toggle(final ItemStack stack, final PlayerEntity player) {

@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.util.InputMappings;
@@ -33,6 +34,7 @@ import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -49,7 +51,7 @@ public class SoulOrbItem extends Item {
 			EntityType.EVOKER.getRegistryName(), EntityType.WITCH.getRegistryName(), EntityType.WITHER_SKELETON.getRegistryName(),
 			EntityType.STRAY.getRegistryName(), EntityType.SILVERFISH.getRegistryName());
 
-	private static Map<ResourceLocation, String> REQ_NAMES;
+	private static Map<ResourceLocation, IFormattableTextComponent> REQ_NAMES;
 
 	public SoulOrbItem() {
 		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP));
@@ -58,30 +60,23 @@ public class SoulOrbItem extends Item {
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		final Set<ResourceLocation> kills = this.getStoredKills(stack);
-		tooltip.add(new StringTextComponent(String.format("%d of %d souls", kills.size(), SoulOrbItem.REQ_MOBS.size())));
-		if(InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
+		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("soul_orb.souls"), kills.size(), SoulOrbItem.REQ_MOBS.size()));
+		if(level == null || InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
 			if(SoulOrbItem.REQ_NAMES == null) {
 				SoulOrbItem.REQ_NAMES = Maps.newHashMap();
-				SoulOrbItem.REQ_MOBS.forEach(rLoc -> SoulOrbItem.REQ_NAMES.put(rLoc, ForgeRegistries.ENTITIES.getValue(rLoc).getDescription().getString().trim()));
+				SoulOrbItem.REQ_MOBS.forEach(rLoc -> SoulOrbItem.REQ_NAMES.put(rLoc, ForgeRegistries.ENTITIES.getValue(rLoc).getDescription().copy()));
 			}
 			final Set<ResourceLocation> missing = Sets.difference(SoulOrbItem.REQ_MOBS, kills);
-			final Iterator<Entry<ResourceLocation, String>> it = SoulOrbItem.REQ_NAMES.entrySet().iterator();
+			final Iterator<Entry<ResourceLocation, IFormattableTextComponent>> it = SoulOrbItem.REQ_NAMES.entrySet().iterator();
 			while(it.hasNext()) {
-				final Entry<ResourceLocation, String> entry = it.next();
-				final String name1 = entry.getValue();
+				final Entry<ResourceLocation, IFormattableTextComponent> entry = it.next();
+				final IFormattableTextComponent name1 = entry.getValue();
 				final TextFormatting color1 = missing.contains(entry.getKey()) ? TextFormatting.RED:TextFormatting.GREEN;
-				final IFormattableTextComponent text = new StringTextComponent(name1).withStyle(color1);
-				/*if(it.hasNext()) {
-					entry = it.next();
-					final String name2 = entry.getValue();
-					final TextFormatting color2 = missing.contains(entry.getKey()) ? TextFormatting.RED:TextFormatting.GREEN;
-					final IFormattableTextComponent text2 = new StringTextComponent(String.format(FORMAT, name2)).withStyle(color2);
-					text = text.append(" ").append(text2);
-				}*/
+				final IFormattableTextComponent text = name1.withStyle(color1);
 				tooltip.add(text);
 			}
 		} else
-			tooltip.add(new StringTextComponent("Hold LSHIFT for more info...").withStyle(TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("hold_key"), new StringTextComponent("LSHIFT").withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 	}
 
 	@Override

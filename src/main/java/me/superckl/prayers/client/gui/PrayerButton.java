@@ -14,6 +14,7 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
@@ -25,6 +26,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.registries.IRegistryDelegate;
 
 public class PrayerButton extends ImageButton{
@@ -76,29 +78,29 @@ public class PrayerButton extends ImageButton{
 		final List<ITextComponent> tooltip = Lists.newArrayList();
 		switch(res) {
 		case NO_DISABLED:
-			tooltip.add(new StringTextComponent("Disabled").withStyle(TextFormatting.DARK_RED));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("disabled")).withStyle(TextFormatting.DARK_RED));
 			break;
 		case NO_EXLCUDE:
 			tooltip.addAll(this.prayer.get().getTooltipDescription());
-			tooltip.add(new StringTextComponent("Conflicting prayer active").withStyle(TextFormatting.RED));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.excluded")).withStyle(TextFormatting.RED));
 			break;
 		case NO_LEVEL:
 			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
-			tooltip.add(new StringTextComponent("This prayer eludes you...").withStyle(TextFormatting.GRAY));
-			tooltip.add(new StringTextComponent("Requires level "+prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.obfuscated")).withStyle(TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"),prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
 			break;
 		case NO_POINTS:
 			tooltip.addAll(this.prayer.get().getTooltipDescription());
-			tooltip.add(new StringTextComponent("Insufficient points").withStyle(TextFormatting.RED));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.no_points")).withStyle(TextFormatting.RED));
 			break;
 		case NO_TOME:
 			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
-			tooltip.add(new StringTextComponent("This prayer eludes you...").withStyle(TextFormatting.GRAY));
-			tooltip.add(new StringTextComponent("Requires tome to unlock").withStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.excluded")).withStyle(TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.tome")).withStyle(TextFormatting.DARK_GRAY));
 			break;
 		case NO_ITEM:
 			tooltip.addAll(this.prayer.get().getTooltipDescription());
-			tooltip.add(new StringTextComponent("Talisman active").withStyle(TextFormatting.GREEN));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.talisman")).withStyle(TextFormatting.GREEN));
 			break;
 		case YES:
 			tooltip.addAll(this.prayer.get().getTooltipDescription());
