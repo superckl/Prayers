@@ -3,8 +3,8 @@ package me.superckl.prayers.client.gui;
 import org.lwjgl.glfw.GLFW;
 
 import me.superckl.prayers.init.ModItems;
-import me.superckl.prayers.network.packet.PacketTalismanToggle;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.inventory.PacketTalismanToggle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;

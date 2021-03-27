@@ -2,8 +2,8 @@ package me.superckl.prayers.inventory;
 
 import java.util.List;
 
-import me.superckl.prayers.network.packet.PacketInventorySlotChanged;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.inventory.PacketInventorySlotChanged;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;

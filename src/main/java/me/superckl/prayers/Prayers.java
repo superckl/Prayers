@@ -32,10 +32,11 @@ import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.item.VesselItem;
-import me.superckl.prayers.network.packet.PacketInventorySlotChanged;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
-import me.superckl.prayers.network.packet.PacketTalismanToggle;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.inventory.PacketInventorySlotChanged;
+import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
+import me.superckl.prayers.network.packet.inventory.PacketTalismanToggle;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
@@ -133,6 +134,8 @@ public class Prayers {
 				PacketSetAltarItem::encode, PacketSetAltarItem::decode, PacketSetAltarItem::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketTalismanToggle.class,
 				PacketTalismanToggle::encode, PacketTalismanToggle::decode, PacketTalismanToggle::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetInventoryItemPoints.class,
+				PacketSetInventoryItemPoints::encode, PacketSetInventoryItemPoints::decode, PacketSetInventoryItemPoints::handle);
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {

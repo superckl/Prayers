@@ -1,4 +1,4 @@
-package me.superckl.prayers.network.packet;
+package me.superckl.prayers.network.packet.inventory;
 
 import java.util.function.Supplier;
 

@@ -3,29 +3,40 @@ package me.superckl.prayers.item;
 import java.util.Collection;
 import java.util.List;
 
+import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
@@ -44,9 +55,31 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 			this.deactivate(stack, player);
 			this.storePrayer(stack, prayer);
 
-			return ActionResult.consume(stack);
+			return ActionResult.sidedSuccess(stack, level.isClientSide);
 		}else
 			return ActionResult.fail(stack);
+	}
+
+	@SuppressWarnings("resource")
+	@Override
+	public ActionResultType useOn(final ItemUseContext context) {
+		if(context.getLevel().isClientSide)
+			return ActionResultType.sidedSuccess(true);
+		final TileEntity te = context.getLevel().getBlockEntity(context.getClickedPos());
+		if(te instanceof AltarTileEntity) {
+			final AltarTileEntity aTE = (AltarTileEntity) te;
+			if(aTE.canRegen()) {
+				final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(context.getItemInHand());
+				final float recharge = provider.getMaxPrayerPoints()-provider.getCurrentPrayerPoints();
+				final float actual = aTE.removePoints(recharge);
+				provider.addPoints(actual);
+				EquipmentSlotType type = context.getHand() == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND:EquipmentSlotType.OFFHAND;
+				PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) context.getPlayer()),
+						new PacketSetInventoryItemPoints(provider.getCurrentPrayerPoints(), type));
+			}
+			return ActionResultType.sidedSuccess(false);
+		}
+		return ActionResultType.PASS;
 	}
 
 	@Override
@@ -150,5 +183,5 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public TalismanPrayerProvider newProvider(final ItemStack stack) {
 		return new TalismanPrayerProvider(stack);
 	}
-	
+
 }
