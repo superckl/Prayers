@@ -6,9 +6,10 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayer;
-import me.superckl.prayers.Prayers;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -20,39 +21,49 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>{
+public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEntity>{
 
-	default boolean canActivatePrayer(final Prayer prayer) {
-		if(!prayer.isEnabled() || prayer.isRequiresTome() && !this.isUnlocked(prayer) || this.getPrayerLevel() < prayer.getLevel() || this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
-			return false;
-		final Set<String> excludes = Sets.newHashSet();
-		this.getActivePrayers().forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
-		return Collections.disjoint(prayer.getExclusionTypes(), excludes);
+	public PlayerPrayerUser(final PlayerEntity ref) {
+		super(ref);
 	}
 
-	float addMaxPointsBoost(float boost);
+	public Result canActivatePrayer(final Prayer prayer) {
+		if(!prayer.isEnabled())
+			return Result.NO_DISABLED;
+		if(prayer.isRequiresTome() && !this.isUnlocked(prayer))
+			return Result.NO_TOME;
+		if(this.getPrayerLevel() < prayer.getLevel())
+			return Result.NO_LEVEL;
+		if(this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
+			return Result.NO_POINTS;
+		final Set<String> excludes = Sets.newHashSet();
+		this.getActivePrayers().forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
+		return Collections.disjoint(prayer.getExclusionTypes(), excludes) ? Result.YES:Result.NO_EXLCUDE;
+	}
 
-	float setMaxPointsBoost(float boost);
+	public abstract float addMaxPointsBoost(float boost);
 
-	float getMaxPointsBoost();
+	public abstract float setMaxPointsBoost(float boost);
 
-	int getPrayerLevel();
+	public abstract float getMaxPointsBoost();
 
-	int setPrayerLevel(int level);
+	public abstract int getPrayerLevel();
 
-	int giveXP(float xp);
+	public abstract int setPrayerLevel(int level);
 
-	void setXP(float xp);
+	public abstract int giveXP(float xp);
 
-	float getXP();
+	public abstract void setXP(float xp);
 
-	boolean unlockPrayer(Prayer prayer);
+	public abstract float getXP();
 
-	boolean isUnlocked(Prayer prayer);
+	public abstract boolean unlockPrayer(Prayer prayer);
 
-	Collection<Prayer> getUnlockedPrayers();
+	public abstract boolean isUnlocked(Prayer prayer);
 
-	default void computeLevel() {
+	public abstract Collection<Prayer> getUnlockedPrayers();
+
+	public void computeLevel() {
 		float xp = this.getXP();
 		while(xp >= this.xpForLevel()) {
 			xp -= this.xpForLevel();
@@ -61,7 +72,7 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 		this.setXP(xp);
 	}
 
-	default int xpForLevel() {
+	public int xpForLevel() {
 		final int level = this.getPrayerLevel();
 		if (level >= 30)
 			return 112 + (level - 30) * 9;
@@ -69,23 +80,7 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 			return level >= 15 ? 37 + (level - 15) * 5 : 7 + level * 2;
 	}
 
-	@Override
-	default void tick(final LivingEntity reference) {
-		final float drain = (float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum();
-		float newPoints = this.getCurrentPrayerPoints()-drain/20F;
-		if (newPoints < 0) {
-			newPoints = 0;
-			this.deactivateAllPrayers();
-		}
-		this.setCurrentPrayerPoints(newPoints);
-	}
-
-	static ILivingPrayerUser get(final LivingEntity entity) {
-		return entity.getCapability(Prayers.PRAYER_USER_CAPABILITY)
-				.orElseThrow(() -> new IllegalStateException(String.format("Received entity %s with no prayer capability!", entity.toString())));
-	}
-
-	public static class Storage implements Capability.IStorage<ILivingPrayerUser>{
+	public static class Storage implements Capability.IStorage<PlayerPrayerUser>{
 
 		public static final String MAX_BOOST_KEY = "max_prayer_points_boost";
 		public static final String LEVEL_KEY = "prayer_level";
@@ -95,7 +90,7 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 		public static final String UNLOCKED_PRAYERS_KEY = "unlocked_prayers";
 
 		@Override
-		public CompoundNBT writeNBT(final Capability<ILivingPrayerUser> capability, final ILivingPrayerUser instance, final Direction side) {
+		public CompoundNBT writeNBT(final Capability<PlayerPrayerUser> capability, final PlayerPrayerUser instance, final Direction side) {
 			final CompoundNBT parent = new CompoundNBT();
 			parent.putInt(Storage.LEVEL_KEY, instance.getPrayerLevel());
 			parent.putFloat(Storage.MAX_BOOST_KEY, instance.getMaxPointsBoost());
@@ -111,7 +106,7 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 		}
 
 		@Override
-		public void readNBT(final Capability<ILivingPrayerUser> capability, final ILivingPrayerUser instance, final Direction side, final INBT nbt) {
+		public void readNBT(final Capability<PlayerPrayerUser> capability, final PlayerPrayerUser instance, final Direction side, final INBT nbt) {
 			final CompoundNBT parent = (CompoundNBT) nbt;
 			instance.setPrayerLevel(parent.getInt(Storage.LEVEL_KEY));
 			instance.setMaxPointsBoost(parent.getFloat(Storage.MAX_BOOST_KEY));
@@ -123,6 +118,21 @@ public interface ILivingPrayerUser extends ITickablePrayerProvider<LivingEntity>
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
 		}
+
+	}
+
+	@RequiredArgsConstructor
+	public enum Result{
+
+		YES(1F),
+		NO_DISABLED(0.1F),
+		NO_TOME(0.2F),
+		NO_LEVEL(0.2F),
+		NO_POINTS(0.5F),
+		NO_EXLCUDE(0.5F);
+
+		@Getter
+		private final float renderAlpha;
 
 	}
 

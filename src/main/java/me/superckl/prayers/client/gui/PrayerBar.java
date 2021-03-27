@@ -4,7 +4,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import lombok.AllArgsConstructor;
-import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.PlayerPrayerUser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.math.MathHelper;
@@ -21,7 +22,7 @@ public class PrayerBar {
 	public final boolean inludeMax;
 
 	public void renderAt(final MatrixStack matrixStack, final int x, final int y) {
-		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
 
 		//Bar is 40x12, icon is 16x16
 		//Determine positioning of text and icon (defaults to bottom right)

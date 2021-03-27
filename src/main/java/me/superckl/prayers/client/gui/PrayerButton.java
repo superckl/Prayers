@@ -7,7 +7,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import me.superckl.prayers.Prayer;
-import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.PlayerPrayerUser;
+import me.superckl.prayers.capability.PlayerPrayerUser.Result;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
@@ -35,11 +37,11 @@ public class PrayerButton extends ImageButton{
 	@SuppressWarnings("deprecation")
 	@Override
 	public void renderButton(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
-		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
 		if(user.isPrayerActive(this.prayer.get()))
 			PrayerButton.drawOpenRect(matrixStack, this.x-2, this.y-2, 1, 20, 20);
-		if(!user.canActivatePrayer(this.prayer.get()))
-			RenderSystem.color3f(0.2F, 0.2F, 0.2F);
+		final float alpha = user.isPrayerActive(this.prayer.get()) ? 1:user.canActivatePrayer(this.prayer.get()).getRenderAlpha();
+		RenderSystem.color3f(alpha, alpha, alpha);
 		super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
 		RenderSystem.color3f(1, 1, 1);
 	}
@@ -55,29 +57,47 @@ public class PrayerButton extends ImageButton{
 
 	@Override
 	public void renderToolTip(final MatrixStack matrixStack, final int mouseX, final int mouseY) {
-		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
 		final Prayer prayer = this.prayer.get();
-		if(!user.canActivatePrayer(prayer)) {
-			final List<ITextComponent> tooltip = Lists.newArrayList();
+		final Result res = user.isPrayerActive(prayer) ? Result.YES:user.canActivatePrayer(prayer);
+		final List<ITextComponent> tooltip = Lists.newArrayList();
+		switch(res) {
+		case NO_DISABLED:
+			tooltip.add(new StringTextComponent("Disabled").withStyle(TextFormatting.DARK_RED));
+			break;
+		case NO_EXLCUDE:
+			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			tooltip.add(new StringTextComponent("Conflicting prayer active").withStyle(TextFormatting.RED));
+			break;
+		case NO_LEVEL:
 			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
 			tooltip.add(new StringTextComponent("This prayer eludes you...").withStyle(TextFormatting.GRAY));
-			if(prayer.isRequiresTome() && !user.isUnlocked(prayer))
-				tooltip.add(new StringTextComponent("Requires tome to unlock").withStyle(TextFormatting.DARK_GRAY));
-			else if(user.getPrayerLevel() < prayer.getLevel())
-				tooltip.add(new StringTextComponent("Requires level "+prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
-			this.mc.screen.renderWrappedToolTip(matrixStack, tooltip, mouseX, mouseY, this.mc.font);
-		} else
-			this.mc.screen.renderWrappedToolTip(matrixStack, this.prayer.get().getTooltipDescription(), mouseX, mouseY, this.mc.font);
+			tooltip.add(new StringTextComponent("Requires level "+prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
+			break;
+		case NO_POINTS:
+			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			tooltip.add(new StringTextComponent("Insufficient points").withStyle(TextFormatting.RED));
+			break;
+		case NO_TOME:
+			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
+			tooltip.add(new StringTextComponent("This prayer eludes you...").withStyle(TextFormatting.GRAY));
+			tooltip.add(new StringTextComponent("Requires tome to unlock").withStyle(TextFormatting.DARK_GRAY));
+			break;
+		case YES:
+			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			break;
+		}
+		this.mc.screen.renderWrappedToolTip(matrixStack, tooltip, mouseX, mouseY, this.mc.font);
 	}
 
 	@Override
 	public void onPress() {
-		final ILivingPrayerUser user = ILivingPrayerUser.get(this.mc.player);
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
 		if(user.isPrayerActive(this.prayer.get())) {
 			user.deactivatePrayer(this.prayer.get());
 			super.playDownSound(this.mc.getSoundManager());
 			PrayersPacketHandler.INSTANCE.sendToServer(PacketDeactivatePrayer.builder().entityID(this.mc.player.getId()).prayer(this.prayer.get()).build());
-		}else if(!user.canActivatePrayer(this.prayer.get()))
+		}else if(user.canActivatePrayer(this.prayer.get()) != Result.YES)
 			this.mc.getSoundManager().play(SimpleSound.forUI(SoundEvents.SHIELD_BREAK, 1.0F));
 		else {
 			user.activatePrayer(this.prayer.get());

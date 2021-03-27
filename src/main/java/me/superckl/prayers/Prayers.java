@@ -7,12 +7,14 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import me.superckl.prayers.capability.CapabilityEventHandler;
+import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.DefaultLivingPrayerUser;
-import me.superckl.prayers.capability.IInventoryPrayerProvider;
-import me.superckl.prayers.capability.ILivingPrayerUser;
-import me.superckl.prayers.capability.ITickablePrayerProvider;
+import me.superckl.prayers.capability.DefaultPlayerPrayerUser;
+import me.superckl.prayers.capability.InventoryPrayerProvider;
+import me.superckl.prayers.capability.LivingPrayerUser;
+import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
+import me.superckl.prayers.capability.TickablePrayerProvider;
 import me.superckl.prayers.client.AltarRenderer;
 import me.superckl.prayers.client.CraftingStandRenderer;
 import me.superckl.prayers.client.OfferingStandRenderer;
@@ -55,8 +57,6 @@ import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -73,15 +73,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryBuilder;
 
 @Mod(Prayers.MOD_ID)
-public class Prayers
-{
+public class Prayers {
 
 	public static final String MOD_ID = "prayers";
-
-	@CapabilityInject(ILivingPrayerUser.class)
-	public static Capability<ILivingPrayerUser> PRAYER_USER_CAPABILITY;
-	@CapabilityInject(IInventoryPrayerProvider.class)
-	public static Capability<IInventoryPrayerProvider> INVENTORY_PRAYER_CAPABILITY;
 
 	public Prayers() {
 		LogHelper.setLogger(LogManager.getFormatterLogger(Prayers.MOD_ID));
@@ -108,7 +102,7 @@ public class Prayers
 	private void commonSetup(final FMLCommonSetupEvent event){
 		event.enqueueWork(() -> {
 			MinecraftForge.EVENT_BUS.register(this);
-			MinecraftForge.EVENT_BUS.register(new CapabilityEventHandler());
+			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
 			MinecraftForge.EVENT_BUS.register(AltarItem.class);
 			MinecraftForge.EVENT_BUS.register(SoulOrbItem.class);
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
@@ -118,8 +112,9 @@ public class Prayers
 			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.PRAYER_RENEWAL::get, Items.REDSTONE, ModPotions.LONG_PRAYER_RENEWAL::get));
 
 		});
-		CapabilityManager.INSTANCE.register(ILivingPrayerUser.class, new ILivingPrayerUser.Storage(), DefaultLivingPrayerUser::new);
-		CapabilityManager.INSTANCE.register(IInventoryPrayerProvider.class, new ITickablePrayerProvider.Storage<IInventoryPrayerProvider>(), TalismanPrayerProvider::new);
+		CapabilityManager.INSTANCE.register(PlayerPrayerUser.class, new PlayerPrayerUser.Storage(), () -> new DefaultPlayerPrayerUser(null));
+		CapabilityManager.INSTANCE.register(LivingPrayerUser.class, new TickablePrayerProvider.Storage<LivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));
+		CapabilityManager.INSTANCE.register(InventoryPrayerProvider.class, new TickablePrayerProvider.Storage<InventoryPrayerProvider>(), () -> new TalismanPrayerProvider(ItemStack.EMPTY));
 		int pIndex = 0;
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketActivatePrayer.class,
 				PacketActivatePrayer::encode, PacketActivatePrayer::decode, PacketActivatePrayer::handle);
@@ -165,7 +160,7 @@ public class Prayers
 				.then(Commands.literal("points").then(Commands.argument("targets", EntityArgument.entities())
 						.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleNumberEx)
 								.executes(CommandSet::prayerPoints)))).then(Commands.literal("level")
-										.then(Commands.argument("targets", EntityArgument.entities()).then(Commands.argument("level", IntegerArgumentType.integer(1))
+										.then(Commands.argument("targets", EntityArgument.players()).then(Commands.argument("level", IntegerArgumentType.integer(1))
 												.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))));
 
 		e.getDispatcher().register(root);

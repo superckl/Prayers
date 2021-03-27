@@ -7,7 +7,9 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.PlayerPrayerUser;
+import me.superckl.prayers.capability.TickablePrayerProvider;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
@@ -15,6 +17,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -31,7 +34,7 @@ public class CommandSet {
 		for(final Entity e:targets) {
 			if (!(e instanceof LivingEntity))
 				continue;
-			final ILivingPrayerUser user = ILivingPrayerUser.get((LivingEntity) e);
+			final TickablePrayerProvider<?> user = CapabilityHandler.getPrayerCapability((LivingEntity) e);
 			user.setCurrentPrayerPoints(points);
 			pointsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
@@ -42,17 +45,15 @@ public class CommandSet {
 	}
 
 	public static int prayerLevel(final CommandContext<CommandSource> context) throws CommandSyntaxException {
-		final Collection<? extends Entity> targets = EntityArgument.getOptionalEntities(context, "targets");
+		final Collection<ServerPlayerEntity> targets = EntityArgument.getOptionalPlayers(context, "targets");
 		if(targets.isEmpty()) {
 			context.getSource().sendSuccess(new StringTextComponent("No entities targeted."), true);
 			return 0;
 		}
 		final int level = IntegerArgumentType.getInteger(context, "level");
 		int levelsSet = 0;
-		for(final Entity e:targets) {
-			if (!(e instanceof LivingEntity))
-				continue;
-			final ILivingPrayerUser user = ILivingPrayerUser.get((LivingEntity) e);
+		for(final ServerPlayerEntity e:targets) {
+			final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(e);
 			user.setPrayerLevel(level);
 			levelsSet++;
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),

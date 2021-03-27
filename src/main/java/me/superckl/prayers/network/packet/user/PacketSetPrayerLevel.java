@@ -3,6 +3,7 @@ package me.superckl.prayers.network.packet.user;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
+import me.superckl.prayers.capability.PlayerPrayerUser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -30,7 +31,7 @@ public class PacketSetPrayerLevel extends PrayerUserPacket{
 		final Context context = supplier.get();
 		//Only the server should be sending this packet, and never on login
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT)
-			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().level).setPrayerLevel(this.level));
+			context.enqueueWork(() -> ((PlayerPrayerUser) this.getUser(Minecraft.getInstance().level)).setPrayerLevel(this.level));
 	}
 
 }

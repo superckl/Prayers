@@ -3,10 +3,10 @@ package me.superckl.prayers.network.packet.user;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.Prayers;
-import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.TickablePrayerProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.network.PacketBuffer;
@@ -42,12 +42,14 @@ public class PacketSyncPrayerUser extends PrayerUserPacket{
 		//Only the server should be sending these packets.
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
 			context.enqueueWork(() -> {
-				final ILivingPrayerUser prayerUser = this.getUser(Minecraft.getInstance().level);
-				Prayers.PRAYER_USER_CAPABILITY.readNBT(prayerUser, null, this.userNBT);});
+				final TickablePrayerProvider<? extends LivingEntity> prayerUser = this.getUser(Minecraft.getInstance().level);
+				CapabilityHandler.deserialize(prayerUser, this.userNBT);
+			});
 	}
 
-	public static PacketSyncPrayerUser fromPlayer(final PlayerEntity player){
-		return PacketSyncPrayerUser.builder().entityID(player.getId()).userNBT(Prayers.PRAYER_USER_CAPABILITY.writeNBT(ILivingPrayerUser.get(player), null)).build();
+	public static PacketSyncPrayerUser from(final LivingEntity entity) {
+		return PacketSyncPrayerUser.builder().entityID(entity.getId())
+				.userNBT(CapabilityHandler.serialize(CapabilityHandler.getPrayerCapability(entity))).build();
 	}
 
 }

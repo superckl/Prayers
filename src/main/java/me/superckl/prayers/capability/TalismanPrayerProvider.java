@@ -1,11 +1,12 @@
 package me.superckl.prayers.capability;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
-public class TalismanPrayerProvider extends SimplePrayerTracker<Pair<LivingEntity, ItemStack>> implements IInventoryPrayerProvider{
+public class TalismanPrayerProvider extends InventoryPrayerProvider{
+
+	public TalismanPrayerProvider(final ItemStack ref) {
+		super(ref);
+	}
 
 	@Override
 	public float getMaxPrayerPoints() {

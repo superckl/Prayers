@@ -1,9 +1,7 @@
 package me.superckl.prayers.item;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import lombok.Getter;
-import me.superckl.prayers.capability.IInventoryPrayerProvider;
+import me.superckl.prayers.capability.CapabilityHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -24,8 +22,7 @@ public class PrayerInventoryItem extends Item{
 	public void inventoryTick(final ItemStack stack, final World level, final Entity entity, final int slot, final boolean selected) {
 		if(!(entity instanceof LivingEntity))
 			return;
-		final IInventoryPrayerProvider cap = IInventoryPrayerProvider.get(stack);
-		cap.tick(Pair.of((LivingEntity) entity, stack));
+		CapabilityHandler.getPrayerCapability(stack).inventoryTick((LivingEntity) entity);
 	}
 
 	public void onPointsDepleted() {}

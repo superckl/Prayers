@@ -10,11 +10,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
-import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.effects.DamageEffect;
 import me.superckl.prayers.effects.DamageEffect.DamageType;
 import me.superckl.prayers.effects.PrayerEffect;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -124,7 +126,12 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	}
 
 	public boolean isActive(final LivingEntity entity) {
-		return ILivingPrayerUser.get(entity).isPrayerActive(this);
+		return CapabilityHandler.getPrayerCapability(entity).isPrayerActive(this);
+	}
+
+	public boolean isObfusctated(final PlayerEntity player) {
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
+		return this.requiresTome && !user.isUnlocked(this) || user.getPrayerLevel() < this.getLevel();
 	}
 
 	public static List<Prayer> defaults(){

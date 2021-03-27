@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.Prayer;
-import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
@@ -47,7 +47,7 @@ public class PacketDeactivatePrayer  extends PrayerUserPacket{
 					PrayersPacketHandler.INSTANCE.reply(PacketActivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;
 				}
-				ILivingPrayerUser.get(context.getSender()).deactivatePrayer(this.prayer);
+				CapabilityHandler.getPrayerCapability(context.getSender()).deactivatePrayer(this.prayer);
 			});
 	}
 

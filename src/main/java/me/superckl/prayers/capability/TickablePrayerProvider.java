@@ -1,10 +1,15 @@
 package me.superckl.prayers.capability;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.Sets;
+
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayer;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,42 +24,76 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IRegistryDelegate;
 
-public interface ITickablePrayerProvider<T> {
+public abstract class TickablePrayerProvider<T> {
 
-	void activatePrayer(Prayer prayer);
+	@Getter
+	protected float currentPrayerPoints;
+	private final Set<IRegistryDelegate<Prayer>> activePrayers = Sets.newIdentityHashSet();
+	protected final T ref;
 
-	void deactivatePrayer(Prayer prayer);
+	public TickablePrayerProvider(final T ref) {
+		this.ref = ref;
+		this.currentPrayerPoints = this.getMaxPrayerPoints();
+	}
 
-	boolean isPrayerActive(Prayer prayer);
+	public float setCurrentPrayerPoints(final float currentPoints) {
+		if(currentPoints < 0)
+			this.currentPrayerPoints = 0;
+		else
+			this.currentPrayerPoints = currentPoints;
+		return this.currentPrayerPoints;
+	}
 
-	float setCurrentPrayerPoints(float currentPoints);
+	public void activatePrayer(final Prayer prayer) {
+		if(!this.isPrayerActive(prayer))
+			this.activePrayers.add(prayer.delegate);
+	}
 
-	float getMaxPrayerPoints();
+	public void deactivatePrayer(final Prayer prayer) {
+		this.activePrayers.remove(prayer.delegate);
+	}
 
-	float getCurrentPrayerPoints();
+	public void deactivateAllPrayers() {
+		this.activePrayers.clear();
+	}
 
-	Collection<Prayer> getActivePrayers();
+	public boolean isPrayerActive(final Prayer prayer) {
+		return this.activePrayers.contains(prayer.delegate);
+	}
 
-	void deactivateAllPrayers();
+	public Collection<Prayer> getActivePrayers() {
+		return this.activePrayers.stream().map(IRegistryDelegate::get).collect(Collectors.toSet());
+	}
 
-	void tick(T reference);
+	public abstract float getMaxPrayerPoints();
 
-	default void togglePrayer(final Prayer prayer) {
+	public void tick() {
+		final float drain = (float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum();
+		float newPoints = this.getCurrentPrayerPoints()-drain/20F;
+		if (newPoints < 0) {
+			newPoints = 0;
+			this.deactivateAllPrayers();
+		}
+		this.setCurrentPrayerPoints(newPoints);
+	}
+
+	public void togglePrayer(final Prayer prayer) {
 		if (this.isPrayerActive(prayer))
 			this.deactivatePrayer(prayer);
 		else
 			this.activatePrayer(prayer);
 	}
 
-	default float addPoints(final float points) {
+	public float addPoints(final float points) {
 		final float toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());
 		this.setCurrentPrayerPoints(this.getCurrentPrayerPoints()+toAdd);
 		return toAdd;
 	}
 
 	@RequiredArgsConstructor
-	public static class Provider<T extends ITickablePrayerProvider<?>> implements ICapabilitySerializable<INBT>{
+	public static class Provider<T> implements ICapabilitySerializable<INBT>{
 
 		@Nonnull
 		private T instance;
@@ -85,7 +124,7 @@ public interface ITickablePrayerProvider<T> {
 
 	}
 
-	public static class Storage<T extends ITickablePrayerProvider<?>> implements Capability.IStorage<T>{
+	public static class Storage<T extends TickablePrayerProvider<?>> implements Capability.IStorage<T>{
 
 		public static final String CURRENT_POINTS_KEY = "current_prayer_points";
 		public static final String ENABLED_PRAYERS_KEY = "enabled_prayers";

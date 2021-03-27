@@ -1,6 +1,6 @@
 package me.superckl.prayers.potion;
 
-import me.superckl.prayers.capability.ILivingPrayerUser;
+import me.superckl.prayers.capability.CapabilityHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
@@ -13,7 +13,7 @@ public class PrayerRenewalEffect extends Effect{
 
 	@Override
 	public void applyEffectTick(final LivingEntity entityLivingBaseIn, final int amplifier) {
-		ILivingPrayerUser.get(entityLivingBaseIn).addPoints(1);
+		CapabilityHandler.getPrayerCapability(entityLivingBaseIn).addPoints(1);
 	}
 
 	@Override
