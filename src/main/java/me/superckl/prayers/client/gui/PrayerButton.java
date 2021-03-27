@@ -54,8 +54,8 @@ public class PrayerButton extends ImageButton{
 		RenderSystem.color3f(1, 1, 1);
 		if(res == Result.NO_ITEM) {
 			RenderSystem.pushMatrix();
-			RenderSystem.translatef(this.x+10, this.y+10, 0);
-			RenderSystem.scalef(0.4F, 0.4F, 1);
+			RenderSystem.translatef(this.x+8, this.y+9, 0);
+			RenderSystem.scalef(0.6F, 0.6F, 1);
 			this.itemRender.renderAndDecorateItem(this.talisman, 0, 0);
 			RenderSystem.popMatrix();
 		}
@@ -95,7 +95,7 @@ public class PrayerButton extends ImageButton{
 			break;
 		case NO_TOME:
 			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
-			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.excluded")).withStyle(TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.obfuscated")).withStyle(TextFormatting.GRAY));
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.tome")).withStyle(TextFormatting.DARK_GRAY));
 			break;
 		case NO_ITEM:

@@ -56,7 +56,7 @@ public class PrayerTomeItem extends Item{
 	public ITextComponent getName(final ItemStack stack) {
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null)
-			return new TranslationTextComponent(this.getDescriptionId(stack), prayer.getName());
+			return new TranslationTextComponent(this.getDescriptionId(stack), prayer.getName().getString());
 		else
 			return super.getName(stack);
 	}
