@@ -19,7 +19,7 @@ import me.superckl.prayers.client.AltarRenderer;
 import me.superckl.prayers.client.CraftingStandRenderer;
 import me.superckl.prayers.client.OfferingStandRenderer;
 import me.superckl.prayers.client.RenderTickHandler;
-import me.superckl.prayers.client.SoulOrbItemColor;
+import me.superckl.prayers.client.VesselItemColor;
 import me.superckl.prayers.client.gui.GuiEventHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.client.particle.PrayerParticle;
@@ -31,7 +31,7 @@ import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
-import me.superckl.prayers.item.SoulOrbItem;
+import me.superckl.prayers.item.VesselItem;
 import me.superckl.prayers.network.packet.PacketInventorySlotChanged;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
 import me.superckl.prayers.network.packet.PacketTalismanToggle;
@@ -105,7 +105,7 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(this);
 			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
 			MinecraftForge.EVENT_BUS.register(AltarItem.class);
-			MinecraftForge.EVENT_BUS.register(SoulOrbItem.class);
+			MinecraftForge.EVENT_BUS.register(VesselItem.class);
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
 					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
 			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.REDSTONE, ModPotions.PRAYER_RENEWAL::get));
@@ -148,7 +148,7 @@ public class Prayers {
 	}
 
 	private void initColors(final ColorHandlerEvent.Item e) {
-		e.getItemColors().register(new SoulOrbItemColor(), ModItems.SOUL_ORB::get);
+		e.getItemColors().register(new VesselItemColor(), ModItems.VESSEL::get);
 	}
 
 	private void createRegistry(final RegistryEvent.NewRegistry e) {

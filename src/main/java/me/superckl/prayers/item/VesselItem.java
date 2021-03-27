@@ -41,7 +41,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class SoulOrbItem extends Item {
+public class VesselItem extends Item {
 
 	public static final String KILL_LIST_NBT = "kills";
 	public static final Set<ResourceLocation> REQ_MOBS = ImmutableSet.of(EntityType.ZOMBIE.getRegistryName(), EntityType.SKELETON.getRegistryName(),
@@ -53,21 +53,21 @@ public class SoulOrbItem extends Item {
 
 	private static Map<ResourceLocation, IFormattableTextComponent> REQ_NAMES;
 
-	public SoulOrbItem() {
+	public VesselItem() {
 		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP));
 	}
 
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		final Set<ResourceLocation> kills = this.getStoredKills(stack);
-		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("soul_orb.souls"), kills.size(), SoulOrbItem.REQ_MOBS.size()));
+		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("soul_orb.souls"), kills.size(), VesselItem.REQ_MOBS.size()));
 		if(level == null || InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
-			if(SoulOrbItem.REQ_NAMES == null) {
-				SoulOrbItem.REQ_NAMES = Maps.newHashMap();
-				SoulOrbItem.REQ_MOBS.forEach(rLoc -> SoulOrbItem.REQ_NAMES.put(rLoc, ForgeRegistries.ENTITIES.getValue(rLoc).getDescription().copy()));
+			if(VesselItem.REQ_NAMES == null) {
+				VesselItem.REQ_NAMES = Maps.newHashMap();
+				VesselItem.REQ_MOBS.forEach(rLoc -> VesselItem.REQ_NAMES.put(rLoc, ForgeRegistries.ENTITIES.getValue(rLoc).getDescription().copy()));
 			}
-			final Set<ResourceLocation> missing = Sets.difference(SoulOrbItem.REQ_MOBS, kills);
-			final Iterator<Entry<ResourceLocation, IFormattableTextComponent>> it = SoulOrbItem.REQ_NAMES.entrySet().iterator();
+			final Set<ResourceLocation> missing = Sets.difference(VesselItem.REQ_MOBS, kills);
+			final Iterator<Entry<ResourceLocation, IFormattableTextComponent>> it = VesselItem.REQ_NAMES.entrySet().iterator();
 			while(it.hasNext()) {
 				final Entry<ResourceLocation, IFormattableTextComponent> entry = it.next();
 				final IFormattableTextComponent name1 = entry.getValue();
@@ -84,7 +84,7 @@ public class SoulOrbItem extends Item {
 		if(this.allowdedIn(group)) {
 			stacks.add(new ItemStack(this));
 			final ItemStack allKills = new ItemStack(this);
-			this.storeKills(SoulOrbItem.REQ_MOBS, allKills);
+			this.storeKills(VesselItem.REQ_MOBS, allKills);
 			stacks.add(allKills);
 		}
 	}
@@ -111,11 +111,11 @@ public class SoulOrbItem extends Item {
 	}
 
 	public boolean hasAllKills(final ItemStack stack) {
-		return this.getStoredKills(stack).size() == SoulOrbItem.REQ_MOBS.size();
+		return this.getStoredKills(stack).size() == VesselItem.REQ_MOBS.size();
 	}
 
 	public boolean onKill(final EntityType<?> type, final ItemStack stack) {
-		if(!SoulOrbItem.REQ_MOBS.contains(type.getRegistryName()))
+		if(!VesselItem.REQ_MOBS.contains(type.getRegistryName()))
 			return false;
 		final Set<ResourceLocation> kills = this.getStoredKills(stack);
 		if(kills.add(type.getRegistryName())) {
@@ -128,12 +128,12 @@ public class SoulOrbItem extends Item {
 	@SubscribeEvent
 	public static void onPlayerKillEntity(final LivingDeathEvent e) {
 		final EntityType<?> type = e.getEntityLiving().getType();
-		if(!SoulOrbItem.REQ_MOBS.contains(type.getRegistryName()))
+		if(!VesselItem.REQ_MOBS.contains(type.getRegistryName()))
 			return;
 		final Entity source = e.getSource().getDirectEntity();
 		if(source != null && source instanceof PlayerEntity) {
 			final PlayerEntity killer = (PlayerEntity) source;
-			final SoulOrbItem soulItem = ModItems.SOUL_ORB.get();
+			final VesselItem soulItem = ModItems.VESSEL.get();
 			for(final ItemStack stack:killer.inventory.items) {
 				if(stack.getItem() != soulItem)
 					continue;
@@ -145,7 +145,7 @@ public class SoulOrbItem extends Item {
 
 	public Set<ResourceLocation> getStoredKills(final ItemStack stack){
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
-		final ListNBT kills = nbt.getList(SoulOrbItem.KILL_LIST_NBT, Constants.NBT.TAG_STRING);
+		final ListNBT kills = nbt.getList(VesselItem.KILL_LIST_NBT, Constants.NBT.TAG_STRING);
 		final Set<ResourceLocation> rLocs = Sets.newHashSet();
 		kills.forEach(inbt -> rLocs.add(new ResourceLocation(inbt.getAsString())));
 		return rLocs;
@@ -155,7 +155,7 @@ public class SoulOrbItem extends Item {
 		final ListNBT list = new ListNBT();
 		kills.forEach(rLoc -> list.add(StringNBT.valueOf(rLoc.toString())));
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
-		nbt.put(SoulOrbItem.KILL_LIST_NBT, list);
+		nbt.put(VesselItem.KILL_LIST_NBT, list);
 	}
 
 }

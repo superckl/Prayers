@@ -3,19 +3,19 @@ package me.superckl.prayers.client;
 import java.awt.Color;
 
 import me.superckl.prayers.init.ModItems;
-import me.superckl.prayers.item.SoulOrbItem;
+import me.superckl.prayers.item.VesselItem;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 
-public class SoulOrbItemColor implements IItemColor{
+public class VesselItemColor implements IItemColor{
 
 	@Override
 	public int getColor(final ItemStack stack, final int layer) {
 		if(layer != 0)
 			return -1;
-		final int kills = ModItems.SOUL_ORB.get().getStoredKills(stack).size();
-		final float percentage = (float) kills/SoulOrbItem.REQ_MOBS.size();
+		final int kills = ModItems.VESSEL.get().getStoredKills(stack).size();
+		final float percentage = (float) kills/VesselItem.REQ_MOBS.size();
 
 		final int r0 = Color.LIGHT_GRAY.getRed();
 		final int b0 = Color.LIGHT_GRAY.getBlue();
