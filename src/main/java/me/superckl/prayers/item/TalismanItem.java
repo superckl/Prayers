@@ -73,7 +73,6 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		return id;
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip,
 			final ITooltipFlag flag) {
@@ -151,5 +150,5 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public TalismanPrayerProvider newProvider(final ItemStack stack) {
 		return new TalismanPrayerProvider(stack);
 	}
-
+	
 }
