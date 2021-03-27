@@ -1,7 +1,7 @@
 package me.superckl.prayers.capability;
 
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
 import me.superckl.prayers.world.AltarsSavedData;
@@ -48,8 +48,8 @@ public class CapabilityHandler {
 
 	@SubscribeEvent
 	public void attachTalisman(final AttachCapabilitiesEvent<ItemStack> e) {
-		if(e.getObject().getItem() == ModItems.TALISMAN.get()) {
-			final TickablePrayerProvider.Provider<?> provider = CapabilityHandler.makeProvider(new TalismanPrayerProvider(e.getObject()));
+		if(e.getObject().getItem() instanceof PrayerInventoryItem) {
+			final TickablePrayerProvider.Provider<?> provider = CapabilityHandler.makeProvider(((PrayerInventoryItem<?>) e.getObject().getItem()).newProvider(e.getObject()));
 			e.addCapability(new ResourceLocation(Prayers.MOD_ID, "inventory_prayer_provider"), provider);
 			e.addListener(provider::invalidate);
 		}
@@ -96,7 +96,7 @@ public class CapabilityHandler {
 
 	public static PlayerPrayerUser getPrayerCapability(final PlayerEntity ref) {
 		return ref.getCapability(CapabilityHandler.PLAYER_CAPABILITY).orElseThrow(() ->
-		new IllegalArgumentException("Passed player with no inventory prayer capability!"));
+		new IllegalArgumentException("Passed player with no inventory prayer capability! "+ref));
 	}
 
 	public static TickablePrayerProvider<? extends LivingEntity> getPrayerCapability(final LivingEntity ref) {
@@ -104,12 +104,12 @@ public class CapabilityHandler {
 			return CapabilityHandler.getPrayerCapability((PlayerEntity) ref);
 		else
 			return ref.getCapability(CapabilityHandler.LIVING_CAPABILITY).orElseThrow(() ->
-			new IllegalArgumentException("Passed player with no inventory prayer capability!"));
+			new IllegalArgumentException("Passed living entity with no prayer capability! "+ref));
 	}
 
 	public static InventoryPrayerProvider getPrayerCapability(final ItemStack ref) {
 		return ref.getCapability(CapabilityHandler.INVENTORY_CAPABILITY).orElseThrow(() ->
-		new IllegalArgumentException("Passed itemstack with no inventory prayer capability!"));
+		new IllegalArgumentException("Passed itemstack with no inventory prayer capability! "+ref));
 	}
 
 	public static <T extends PlayerPrayerUser> TickablePrayerProvider.Provider<PlayerPrayerUser> makeProvider(final T cap){

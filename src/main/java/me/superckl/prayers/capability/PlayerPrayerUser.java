@@ -2,14 +2,18 @@ package me.superckl.prayers.capability;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayer;
+import me.superckl.prayers.item.PrayerInventoryItem;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -36,8 +40,12 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 			return Result.NO_LEVEL;
 		if(this.getCurrentPrayerPoints() < prayer.getDrain()/20F)
 			return Result.NO_POINTS;
+		final Set<Prayer> activeItems = this.getActiveItems();
+		if(activeItems.contains(prayer))
+			return Result.NO_ITEM;
 		final Set<String> excludes = Sets.newHashSet();
 		this.getActivePrayers().forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
+		activeItems.forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
 		return Collections.disjoint(prayer.getExclusionTypes(), excludes) ? Result.YES:Result.NO_EXLCUDE;
 	}
 
@@ -78,6 +86,41 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 			return 112 + (level - 30) * 9;
 		else
 			return level >= 15 ? 37 + (level - 15) * 5 : 7 + level * 2;
+	}
+
+	@Override
+	public boolean isPrayerActive(final Prayer prayer) {
+		return this.isPrayerActive(prayer, true);
+	}
+
+	public boolean isPrayerActive(final Prayer prayer, final boolean checkItem) {
+		return super.isPrayerActive(prayer) || checkItem && this.hasActiveItem(prayer);
+	}
+
+	public boolean hasActiveItem(final Prayer prayer) {
+		final Stream<ItemStack> stream = Stream.concat(this.ref.inventory.items.stream(), this.ref.inventory.armor.stream());
+		final Iterator<ItemStack> it = Stream.concat(stream, this.ref.inventory.offhand.stream()).iterator();
+		while(it.hasNext()) {
+			final ItemStack stack = it.next();
+			if(stack.isEmpty() || !(stack.getItem() instanceof PrayerInventoryItem))
+				continue;
+			if(CapabilityHandler.getPrayerCapability(stack).isPrayerActive(prayer))
+				return true;
+		}
+		return false;
+	}
+
+	public Set<Prayer> getActiveItems(){
+		final Set<Prayer> active = Sets.newHashSet();
+		final Stream<ItemStack> stream = Stream.concat(this.ref.inventory.items.stream(), this.ref.inventory.armor.stream());
+		final Iterator<ItemStack> it = Stream.concat(stream, this.ref.inventory.offhand.stream()).iterator();
+		while(it.hasNext()) {
+			final ItemStack stack = it.next();
+			if(stack.isEmpty() || !(stack.getItem() instanceof PrayerInventoryItem))
+				continue;
+			active.addAll(CapabilityHandler.getPrayerCapability(stack).getActivePrayers());
+		}
+		return active;
 	}
 
 	public static class Storage implements Capability.IStorage<PlayerPrayerUser>{
@@ -129,6 +172,7 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 		NO_TOME(0.2F),
 		NO_LEVEL(0.2F),
 		NO_POINTS(0.5F),
+		NO_ITEM(0.5F),
 		NO_EXLCUDE(0.5F);
 
 		@Getter

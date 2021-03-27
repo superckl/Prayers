@@ -6,6 +6,7 @@ import java.util.List;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.init.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
@@ -25,7 +26,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class TalismanItem extends PrayerInventoryItem{
+public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	public static final String PRAYER_KEY = "prayer";
 
@@ -39,7 +40,7 @@ public class TalismanItem extends PrayerInventoryItem{
 		final ItemStack stack = player.getItemInHand(hand);
 		if(active.size() == 1) {
 			final Prayer prayer = active.iterator().next();
-			this.deactivate(stack);
+			this.deactivate(stack, player);
 			this.storePrayer(stack, prayer);
 
 			return ActionResult.consume(stack);
@@ -49,7 +50,7 @@ public class TalismanItem extends PrayerInventoryItem{
 
 	@Override
 	public boolean onDroppedByPlayer(final ItemStack item, final PlayerEntity player) {
-		this.deactivate(item);
+		this.deactivate(item, player);
 		return super.onDroppedByPlayer(item, player);
 	}
 
@@ -89,26 +90,24 @@ public class TalismanItem extends PrayerInventoryItem{
 			tooltip.add(new StringTextComponent("Use to bind to active prayer").withStyle(TextFormatting.GRAY));
 	}
 
-	@SuppressWarnings("resource")
-	public void toggle(final ItemStack stack) {
+	public boolean toggle(final ItemStack stack, final PlayerEntity player) {
+		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		if(prayer != null && !prayer.isObfusctated(player))
+			return CapabilityHandler.getPrayerCapability(stack).togglePrayer(prayer, player);
+		else
+			return false;
+	}
+
+	public void activate(final ItemStack stack, final PlayerEntity player) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(!prayer.isObfusctated(Minecraft.getInstance().player))
-				CapabilityHandler.getPrayerCapability(stack).togglePrayer(prayer);
+			if(!prayer.isObfusctated(player))
+				CapabilityHandler.getPrayerCapability(stack).activatePrayer(prayer, player);
 		});
 	}
 
-	@SuppressWarnings("resource")
-	public void activate(final ItemStack stack) {
+	public void deactivate(final ItemStack stack, final PlayerEntity player) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(!prayer.isObfusctated(Minecraft.getInstance().player))
-				CapabilityHandler.getPrayerCapability(stack).activatePrayer(prayer);
-		});
-	}
-
-	@SuppressWarnings("resource")
-	public void deactivate(final ItemStack stack) {
-		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(!prayer.isObfusctated(Minecraft.getInstance().player))
+			if(!prayer.isObfusctated(player))
 				CapabilityHandler.getPrayerCapability(stack).deactivatePrayer(prayer);
 		});
 	}
@@ -141,6 +140,11 @@ public class TalismanItem extends PrayerInventoryItem{
 	public void storePrayer(final ItemStack stack, final Prayer prayer) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		nbt.putString(TalismanItem.PRAYER_KEY, prayer.getRegistryName().toString());
+	}
+
+	@Override
+	public TalismanPrayerProvider newProvider(final ItemStack stack) {
+		return new TalismanPrayerProvider(stack);
 	}
 
 }

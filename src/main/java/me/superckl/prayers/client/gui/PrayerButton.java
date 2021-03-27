@@ -10,6 +10,7 @@ import me.superckl.prayers.Prayer;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.PlayerPrayerUser.Result;
+import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
@@ -18,6 +19,8 @@ import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.widget.button.ImageButton;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -28,6 +31,8 @@ public class PrayerButton extends ImageButton{
 
 	private final IRegistryDelegate<Prayer> prayer;
 	private final Minecraft mc = Minecraft.getInstance();
+	private final ItemRenderer itemRender = this.mc.getItemRenderer();
+	private final ItemStack talisman = new ItemStack(ModItems.TALISMAN::get);
 
 	public PrayerButton(final Prayer prayer, final int x, final int y, final int width, final int height) {
 		super(x, y, width, height, 0, 0, 0, prayer.getTexture(), 16, 16, button -> {});
@@ -38,12 +43,20 @@ public class PrayerButton extends ImageButton{
 	@Override
 	public void renderButton(final MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
-		if(user.isPrayerActive(this.prayer.get()))
+		if(user.isPrayerActive(this.prayer.get(), false))
 			PrayerButton.drawOpenRect(matrixStack, this.x-2, this.y-2, 1, 20, 20);
-		final float alpha = user.isPrayerActive(this.prayer.get()) ? 1:user.canActivatePrayer(this.prayer.get()).getRenderAlpha();
+		final Result res = user.canActivatePrayer(this.prayer.get());
+		final float alpha = user.isPrayerActive(this.prayer.get()) ? 1:res.getRenderAlpha();
 		RenderSystem.color3f(alpha, alpha, alpha);
 		super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
 		RenderSystem.color3f(1, 1, 1);
+		if(res == Result.NO_ITEM) {
+			RenderSystem.pushMatrix();
+			RenderSystem.translatef(this.x+10, this.y+10, 0);
+			RenderSystem.scalef(0.4F, 0.4F, 1);
+			this.itemRender.renderAndDecorateItem(this.talisman, 0, 0);
+			RenderSystem.popMatrix();
+		}
 	}
 
 	public static void drawOpenRect(final MatrixStack matrixStack, final int x, final int y, int thickness, final int width, final int height) {
@@ -59,7 +72,7 @@ public class PrayerButton extends ImageButton{
 	public void renderToolTip(final MatrixStack matrixStack, final int mouseX, final int mouseY) {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
 		final Prayer prayer = this.prayer.get();
-		final Result res = user.isPrayerActive(prayer) ? Result.YES:user.canActivatePrayer(prayer);
+		final Result res = user.isPrayerActive(prayer, false) ? Result.YES:user.canActivatePrayer(prayer);
 		final List<ITextComponent> tooltip = Lists.newArrayList();
 		switch(res) {
 		case NO_DISABLED:
@@ -83,6 +96,10 @@ public class PrayerButton extends ImageButton{
 			tooltip.add(new StringTextComponent("This prayer eludes you...").withStyle(TextFormatting.GRAY));
 			tooltip.add(new StringTextComponent("Requires tome to unlock").withStyle(TextFormatting.DARK_GRAY));
 			break;
+		case NO_ITEM:
+			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			tooltip.add(new StringTextComponent("Talisman active").withStyle(TextFormatting.GREEN));
+			break;
 		case YES:
 			tooltip.addAll(this.prayer.get().getTooltipDescription());
 			break;
@@ -93,7 +110,7 @@ public class PrayerButton extends ImageButton{
 	@Override
 	public void onPress() {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
-		if(user.isPrayerActive(this.prayer.get())) {
+		if(user.isPrayerActive(this.prayer.get(), false)) {
 			user.deactivatePrayer(this.prayer.get());
 			super.playDownSound(this.mc.getSoundManager());
 			PrayersPacketHandler.INSTANCE.sendToServer(PacketDeactivatePrayer.builder().entityID(this.mc.player.getId()).prayer(this.prayer.get()).build());

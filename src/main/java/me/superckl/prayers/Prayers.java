@@ -34,6 +34,7 @@ import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.item.SoulOrbItem;
 import me.superckl.prayers.network.packet.PacketInventorySlotChanged;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
+import me.superckl.prayers.network.packet.PacketTalismanToggle;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
@@ -130,6 +131,8 @@ public class Prayers {
 				PacketInventorySlotChanged::encode, PacketInventorySlotChanged::decode, PacketInventorySlotChanged::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetAltarItem.class,
 				PacketSetAltarItem::encode, PacketSetAltarItem::decode, PacketSetAltarItem::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketTalismanToggle.class,
+				PacketTalismanToggle::encode, PacketTalismanToggle::decode, PacketTalismanToggle::handle);
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {

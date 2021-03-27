@@ -2,13 +2,14 @@ package me.superckl.prayers.item;
 
 import lombok.Getter;
 import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.InventoryPrayerProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class PrayerInventoryItem extends Item{
+public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> extends Item{
 
 	@Getter
 	protected final boolean shouldDrainHolder;
@@ -26,5 +27,7 @@ public class PrayerInventoryItem extends Item{
 	}
 
 	public void onPointsDepleted() {}
+
+	public abstract T newProvider(ItemStack stack);
 
 }
