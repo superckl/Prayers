@@ -7,7 +7,6 @@ import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -51,13 +50,8 @@ public class PacketSetInventoryItemPoints {
 				final ItemStack stack;
 				if(this.isEquipment)
 					stack = Minecraft.getInstance().player.getItemBySlot(this.type);
-				else {
-					final Container container = Minecraft.getInstance().player.containerMenu;
-					if(container == null)
-						stack = Minecraft.getInstance().player.inventory.getItem(this.slot);
-					else
-						stack = container.getSlot(this.slot).getItem();
-				}
+				else
+					stack = Minecraft.getInstance().player.inventory.getItem(this.slot);
 				if(!stack.isEmpty() && stack.getItem() instanceof PrayerInventoryItem)
 					CapabilityHandler.getPrayerCapability(stack).setCurrentPrayerPoints(this.points);
 			});

@@ -109,7 +109,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 			final ITooltipFlag flag) {
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null) {
-			if(level == null || !prayer.isObfusctated(Minecraft.getInstance().player)) {
+			if(level == null || CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).canUseItemPrayer(prayer)) {
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.bound"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 				if(CapabilityHandler.getPrayerCapability(stack).isPrayerActive(prayer))
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
@@ -127,7 +127,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	public boolean toggle(final ItemStack stack, final PlayerEntity player) {
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
-		if(prayer != null && !prayer.isObfusctated(player))
+		if(prayer != null && CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
 			return CapabilityHandler.getPrayerCapability(stack).togglePrayer(prayer, player);
 		else
 			return false;
@@ -135,14 +135,14 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	public void activate(final ItemStack stack, final PlayerEntity player) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(!prayer.isObfusctated(player))
+			if(CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
 				CapabilityHandler.getPrayerCapability(stack).activatePrayer(prayer, player);
 		});
 	}
 
 	public void deactivate(final ItemStack stack, final PlayerEntity player) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(!prayer.isObfusctated(player))
+			if(CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
 				CapabilityHandler.getPrayerCapability(stack).deactivatePrayer(prayer);
 		});
 	}
@@ -158,7 +158,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	@Override
 	public boolean isFoil(final ItemStack stack) {
 		final LazyOptional<Prayer> opt = this.getStoredPrayer(stack);
-		if(opt.isPresent())
+		if(opt.isPresent() && (Minecraft.getInstance().player == null || CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).canUseItemPrayer(opt.orElse(null))))
 			return CapabilityHandler.getPrayerCapability(stack).isPrayerActive(opt.orElse(null));
 		else
 			return false;

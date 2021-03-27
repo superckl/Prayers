@@ -23,9 +23,9 @@ public class PacketTalismanToggle {
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_SERVER)
 			supplier.get().enqueueWork(() -> {
 				final ServerPlayerEntity player = supplier.get().getSender();
-				if(player == null || player.containerMenu == null)
+				if(player == null)
 					return;
-				final ItemStack stack = player.containerMenu.getSlot(this.slot).getItem();
+				final ItemStack stack = player.inventory.getItem(this.slot);
 				if(!stack.isEmpty() && stack.getItem() == ModItems.TALISMAN.get())
 					ModItems.TALISMAN.get().toggle(stack, player);
 			});

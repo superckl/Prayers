@@ -38,4 +38,8 @@ public class MathUtil {
 		return blocks.stream().map(pos -> new int[] {pos.getX(), pos.getY(), pos.getZ()}).collect(Collectors.toList());
 	}
 
+	public static boolean isIntDifferent(final float val1, final float val2) {
+		return (int) val1 != (int) val2;
+	}
+
 }

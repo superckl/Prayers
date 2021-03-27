@@ -34,10 +34,12 @@ import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.item.VesselItem;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.inventory.PacketDeactivateInventoryPrayer;
 import me.superckl.prayers.network.packet.inventory.PacketInventorySlotChanged;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.network.packet.inventory.PacketTalismanToggle;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
+import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
@@ -122,6 +124,8 @@ public class Prayers {
 				PacketActivatePrayer::encode, PacketActivatePrayer::decode, PacketActivatePrayer::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivatePrayer.class,
 				PacketDeactivatePrayer::encode, PacketDeactivatePrayer::decode, PacketDeactivatePrayer::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateAllPrayers.class,
+				PacketDeactivateAllPrayers::encode, PacketDeactivateAllPrayers::decode, PacketDeactivateAllPrayers::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetPrayerPoints.class,
 				PacketSetPrayerPoints::encode, PacketSetPrayerPoints::decode, PacketSetPrayerPoints::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSyncPrayerUser.class,
@@ -136,6 +140,8 @@ public class Prayers {
 				PacketTalismanToggle::encode, PacketTalismanToggle::decode, PacketTalismanToggle::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetInventoryItemPoints.class,
 				PacketSetInventoryItemPoints::encode, PacketSetInventoryItemPoints::decode, PacketSetInventoryItemPoints::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateInventoryPrayer.class,
+				PacketDeactivateInventoryPrayer::encode, PacketDeactivateInventoryPrayer::decode, PacketDeactivateInventoryPrayer::handle);
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {

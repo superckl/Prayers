@@ -3,11 +3,16 @@ package me.superckl.prayers.item;
 import lombok.Getter;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
+import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
+import me.superckl.prayers.util.MathUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> extends Item{
 
@@ -21,9 +26,14 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 
 	@Override
 	public void inventoryTick(final ItemStack stack, final World level, final Entity entity, final int slot, final boolean selected) {
-		if(!(entity instanceof LivingEntity))
+		if(level.isClientSide || !(entity instanceof PlayerEntity))
 			return;
-		CapabilityHandler.getPrayerCapability(stack).inventoryTick((LivingEntity) entity);
+		final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(stack);
+		final float old = provider.getCurrentPrayerPoints();
+		provider.inventoryTick((PlayerEntity) entity, slot);
+		final float newVal = provider.getCurrentPrayerPoints();
+		if(MathUtil.isIntDifferent(old, newVal))
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity), new PacketSetInventoryItemPoints(newVal, slot));
 	}
 
 	public void onPointsDepleted() {}

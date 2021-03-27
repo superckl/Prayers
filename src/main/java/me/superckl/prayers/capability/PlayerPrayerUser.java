@@ -12,7 +12,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.item.PrayerInventoryItem;
+import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
+import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
+import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
+import me.superckl.prayers.util.MathUtil;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -23,12 +29,20 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEntity>{
 
+	private final boolean autoSync;
+
 	public PlayerPrayerUser(final PlayerEntity ref) {
+		this(ref, true);
+	}
+
+	public PlayerPrayerUser(final PlayerEntity ref, final boolean autoSync) {
 		super(ref);
+		this.autoSync = autoSync;
 	}
 
 	public Result canActivatePrayer(final Prayer prayer) {
@@ -47,6 +61,32 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 		this.getActivePrayers().forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
 		activeItems.forEach(activePrayer -> excludes.addAll(activePrayer.getExclusionTypes()));
 		return Collections.disjoint(prayer.getExclusionTypes(), excludes) ? Result.YES:Result.NO_EXLCUDE;
+	}
+
+	@Override
+	public float setCurrentPrayerPoints(final float currentPoints) {
+		final float old = this.getCurrentPrayerPoints();
+		final float newVal = super.setCurrentPrayerPoints(currentPoints);
+		if(this.autoSync && !this.ref.level.isClientSide && ((ServerPlayerEntity)this.ref).connection != null && (newVal == 0 && old > 0 || old == 0 && newVal > 0  || MathUtil.isIntDifferent(old, newVal)))
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.ref),
+					PacketSetPrayerPoints.builder().entityID(this.ref.getId()).amount(newVal).build());
+		return newVal;
+	}
+
+	@Override
+	public void deactivateAllPrayers() {
+		super.deactivateAllPrayers();
+		if(this.autoSync && !this.ref.level.isClientSide)
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.ref),
+					PacketDeactivateAllPrayers.builder().entityID(this.ref.getId()).build());
+	}
+
+	@Override
+	public void deactivatePrayer(final Prayer prayer) {
+		super.deactivatePrayer(prayer);
+		if(this.autoSync && !this.ref.level.isClientSide)
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.ref),
+					PacketDeactivatePrayer.builder().entityID(this.ref.getId()).prayer(prayer).build());
 	}
 
 	public abstract float addMaxPointsBoost(float boost);
@@ -120,7 +160,12 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 				continue;
 			active.addAll(CapabilityHandler.getPrayerCapability(stack).getActivePrayers());
 		}
+		active.removeIf(prayer -> !this.canUseItemPrayer(prayer));
 		return active;
+	}
+
+	public boolean canUseItemPrayer(final Prayer prayer) {
+		return !prayer.isObfusctated(this.ref);
 	}
 
 	public static class Storage implements Capability.IStorage<PlayerPrayerUser>{

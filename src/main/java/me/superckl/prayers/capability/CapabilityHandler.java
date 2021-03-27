@@ -67,7 +67,7 @@ public class CapabilityHandler {
 
 	@SubscribeEvent
 	public void onLivingTick(final LivingUpdateEvent e) {
-		if(e.getEntityLiving().isAlive())
+		if(!e.getEntityLiving().level.isClientSide && e.getEntityLiving().isAlive())
 			CapabilityHandler.getPrayerCapability(e.getEntityLiving()).tick();
 	}
 
