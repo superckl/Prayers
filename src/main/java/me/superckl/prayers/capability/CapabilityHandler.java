@@ -67,7 +67,8 @@ public class CapabilityHandler {
 
 	@SubscribeEvent
 	public void onLivingTick(final LivingUpdateEvent e) {
-		CapabilityHandler.getPrayerCapability(e.getEntityLiving()).tick();
+		if(e.getEntityLiving().isAlive())
+			CapabilityHandler.getPrayerCapability(e.getEntityLiving()).tick();
 	}
 
 	//Deactivates all prayers when an entity dies
