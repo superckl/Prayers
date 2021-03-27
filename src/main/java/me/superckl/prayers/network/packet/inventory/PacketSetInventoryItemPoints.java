@@ -20,15 +20,15 @@ public class PacketSetInventoryItemPoints {
 	private final int slot;
 	private final boolean isEquipment;
 	private final EquipmentSlotType type;
-	
-	public PacketSetInventoryItemPoints(float points, int slot) {
+
+	public PacketSetInventoryItemPoints(final float points, final int slot) {
 		this.points = points;
 		this.slot = slot;
 		this.isEquipment = false;
 		this.type = null;
 	}
-	
-	public PacketSetInventoryItemPoints(float points, EquipmentSlotType type) {
+
+	public PacketSetInventoryItemPoints(final float points, final EquipmentSlotType type) {
 		this.points = points;
 		this.type = type;
 		this.isEquipment = true;
@@ -49,10 +49,10 @@ public class PacketSetInventoryItemPoints {
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
 				final ItemStack stack;
-				if(this.isEquipment) {
+				if(this.isEquipment)
 					stack = Minecraft.getInstance().player.getItemBySlot(this.type);
-				}else {
-					Container container = Minecraft.getInstance().player.containerMenu;
+				else {
+					final Container container = Minecraft.getInstance().player.containerMenu;
 					if(container == null)
 						stack = Minecraft.getInstance().player.inventory.getItem(this.slot);
 					else
@@ -72,5 +72,5 @@ public class PacketSetInventoryItemPoints {
 		else
 			return new PacketSetInventoryItemPoints(points, buffer.readInt());
 	}
-	
+
 }

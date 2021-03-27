@@ -18,10 +18,10 @@ public class GuiEventHandler {
 	@SuppressWarnings("resource")
 	@SubscribeEvent
 	public void onMouseClick(final GuiScreenEvent.MouseClickedEvent.Pre e) {
-		if(e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && e.getGui() instanceof ContainerScreen<?> && !(e.getGui() instanceof CreativeScreen)) {
+		if(e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && e.getGui() instanceof ContainerScreen<?>) {
 			final ContainerScreen<?> containerS = (ContainerScreen<?>) e.getGui();
 			final Slot slot = containerS.getSlotUnderMouse();
-			if(slot != null) {
+			if(slot != null && (!(e.getGui() instanceof CreativeScreen) || !((CreativeScreen)e.getGui()).isCreativeSlot(slot))) {
 				final ItemStack stack = containerS.getSlotUnderMouse().getItem();
 				if(!stack.isEmpty() && stack.getItem() == ModItems.TALISMAN.get()) {
 					if(ModItems.TALISMAN.get().toggle(stack, Minecraft.getInstance().player))

@@ -3,7 +3,6 @@ package me.superckl.prayers.item;
 import java.util.Collection;
 import java.util.List;
 
-import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarTileEntity;
@@ -33,7 +32,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -73,7 +71,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 				final float recharge = provider.getMaxPrayerPoints()-provider.getCurrentPrayerPoints();
 				final float actual = aTE.removePoints(recharge);
 				provider.addPoints(actual);
-				EquipmentSlotType type = context.getHand() == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND:EquipmentSlotType.OFFHAND;
+				final EquipmentSlotType type = context.getHand() == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND:EquipmentSlotType.OFFHAND;
 				PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) context.getPlayer()),
 						new PacketSetInventoryItemPoints(provider.getCurrentPrayerPoints(), type));
 			}
