@@ -3,6 +3,7 @@ package me.superckl.prayers.item;
 import java.util.Collection;
 import java.util.List;
 
+import me.superckl.prayers.ActivationCondition;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarTileEntity;
@@ -30,6 +31,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -40,6 +42,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	public static final String PRAYER_KEY = "prayer";
+	public static final String AUTO_KEY = "auto_activate";
 
 	public TalismanItem() {
 		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true);
@@ -96,7 +99,10 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
 		String id = super.getDescriptionId(stack);
+		if(this.canAutoActivate(stack))
+			id = id.concat("_auto");
 		@SuppressWarnings("resource")
+		final
 		PlayerEntity player = Minecraft.getInstance().player;
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null && player != null && player.isAlive() && !prayer.isObfusctated(player))
@@ -116,6 +122,12 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
 				else
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("inactive")).withStyle(TextFormatting.RED));
+				if(this.canAutoActivate(stack) && ActivationCondition.hasCondition(prayer)) {
+					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.auto_conditions")).withStyle(TextFormatting.BLUE));
+					final List<ActivationCondition> conditions = ActivationCondition.getConditions(prayer);
+					conditions.forEach(condition -> tooltip.add(new StringTextComponent("- ").append(condition.getDescription()).withStyle(TextFormatting.BLUE)));
+				}else
+					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.prayer_not_auto")).withStyle(TextFormatting.GRAY));
 				shouldToggle = true;
 			}else
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.prayer_obfuscated")).withStyle(TextFormatting.GRAY));
@@ -179,6 +191,19 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public void storePrayer(final ItemStack stack, final Prayer prayer) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		nbt.putString(TalismanItem.PRAYER_KEY, prayer.getRegistryName().toString());
+	}
+
+	public void setAutoActivate(final ItemStack stack) {
+		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
+		nbt.putBoolean(TalismanItem.AUTO_KEY, true);
+	}
+
+	public boolean canAutoActivate(final ItemStack stack) {
+		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
+		if(nbt.contains(TalismanItem.AUTO_KEY))
+			return nbt.getBoolean(TalismanItem.AUTO_KEY);
+		else
+			return false;
 	}
 
 	@Override

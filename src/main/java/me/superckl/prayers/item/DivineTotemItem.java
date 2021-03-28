@@ -19,8 +19,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class DivineTotemItem extends Item{
@@ -30,38 +29,38 @@ public class DivineTotemItem extends Item{
 	}
 
 	@Override
-	public boolean isFoil(ItemStack stack) {
+	public boolean isFoil(final ItemStack stack) {
 		return true;
 	}
-	
+
 	@Override
-	public Rarity getRarity(ItemStack stack) {
+	public Rarity getRarity(final ItemStack stack) {
 		return Rarity.EPIC;
 	}
-	
+
 	@Override
-	public void appendHoverText(ItemStack stack, World level, List<ITextComponent> tooltip,
-			ITooltipFlag flag) {
+	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip,
+			final ITooltipFlag flag) {
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("totem")).withStyle(TextFormatting.GRAY));
 	}
-	
+
 	@SubscribeEvent
-	public static void onPlayerHurt(LivingHurtEvent e) {
+	public static void onPlayerDamage(final LivingDamageEvent e) {
 		if(!(e.getEntityLiving() instanceof PlayerEntity) || e.getSource().isBypassInvul())
 			return;
-		PlayerEntity player = (PlayerEntity) e.getEntityLiving();
+		final PlayerEntity player = (PlayerEntity) e.getEntityLiving();
 		if(e.getAmount() >= player.getHealth()) {
-			int slot = player.inventory.findSlotMatchingItem(new ItemStack(ModItems.DIVINE_TOTEM::get));
+			final int slot = player.inventory.findSlotMatchingItem(new ItemStack(ModItems.DIVINE_TOTEM::get));
 			if(slot != -1) {
 				e.setCanceled(true);
 				player.inventory.removeItem(slot, 1);
-				
+
 				if (player instanceof ServerPlayerEntity) {
-		               ServerPlayerEntity serverplayerentity = (ServerPlayerEntity)player;
-		               serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
-		               CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, new ItemStack(Items.TOTEM_OF_UNDYING));
-		            }
-				
+					final ServerPlayerEntity serverplayerentity = (ServerPlayerEntity)player;
+					serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
+					CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, new ItemStack(Items.TOTEM_OF_UNDYING));
+				}
+
 				player.setHealth(player.getMaxHealth());
 				player.removeAllEffects();
 				player.addEffect(new EffectInstance(Effects.REGENERATION, 900, 1));
@@ -71,5 +70,5 @@ public class DivineTotemItem extends Item{
 			}
 		}
 	}
-	
+
 }

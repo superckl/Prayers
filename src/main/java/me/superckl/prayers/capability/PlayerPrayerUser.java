@@ -195,7 +195,7 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 
 		@Override
 		public void readNBT(final Capability<PlayerPrayerUser> capability, final PlayerPrayerUser instance, final Direction side, final INBT nbt) {
-			boolean autoSync = instance.autoSync;
+			final boolean autoSync = instance.autoSync;
 			instance.autoSync = false;
 			final CompoundNBT parent = (CompoundNBT) nbt;
 			instance.setPrayerLevel(parent.getInt(Storage.LEVEL_KEY));

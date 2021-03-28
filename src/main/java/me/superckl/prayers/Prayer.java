@@ -14,6 +14,7 @@ import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.effects.DamageEffect;
 import me.superckl.prayers.effects.DamageEffect.DamageType;
+import me.superckl.prayers.effects.FireProtEffect;
 import me.superckl.prayers.effects.PrayerEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -54,6 +55,8 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 			.effect(() -> new DamageEffect(DamageType.RANGE, true, true, -0.5F)).exclusionType("protect")::build);
 	public static final RegistryObject<Prayer> PROTECT_ITEM = Prayer.REGISTER.register("protect_item", Prayer.builder().drain(0.2F).level(25)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectitem.png"))::build);
+	public static final RegistryObject<Prayer> PROTECT_FIRE = Prayer.REGISTER.register("protect_fire", Prayer.builder().drain(2.5F).level(35)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectfire.png")).effect(FireProtEffect::new)::build);
 
 	public static final RegistryObject<Prayer> ENHANCE_MELEE_1 = Prayer.REGISTER.register("enhance_melee_1", Prayer.builder().drain(0.2F).level(4)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemelee1.png"))
@@ -148,22 +151,22 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 		return this.requiresTome && !user.isUnlocked(this) || user.getPrayerLevel() < this.getLevel();
 	}
 
-	public static List<Prayer> defaults(){
+	public static List<RegistryObject<? extends Prayer>> defaultObjects(){
 		return Lists.newArrayList(Prayer.POTENCY_1, Prayer.POTENCY_2,
 				Prayer.ENHANCE_MELEE_1, Prayer.ENHANCE_MELEE_2, Prayer.ENHANCE_MELEE_3,
 				Prayer.ENHANCE_MAGIC_1, Prayer.ENHANCE_MAGIC_2, Prayer.ENHANCE_MAGIC_3,
 				Prayer.ENHANCE_RANGE_1, Prayer.ENHANCE_RANGE_2, Prayer.ENHANCE_RANGE_3,
 				Prayer.ENHANCE_DEFENCE_1, Prayer.ENHANCE_DEFENCE_2, Prayer.ENHANCE_DEFENCE_3,
-				Prayer.PROTECT_MAGIC, Prayer.PROTECT_MELEE, Prayer.PROTECT_RANGE).stream().map(RegistryObject::get).collect(Collectors.toList());
+				Prayer.PROTECT_MAGIC, Prayer.PROTECT_MELEE, Prayer.PROTECT_RANGE, Prayer.PROTECT_ITEM,
+				Prayer.PROTECT_FIRE);
+	}
+
+	public static List<Prayer> defaults(){
+		return Prayer.defaultObjects().stream().map(RegistryObject::get).collect(Collectors.toList());
 	}
 
 	public static List<ResourceLocation> defaultLocations(){
-		return Lists.newArrayList(Prayer.POTENCY_1, Prayer.POTENCY_2,
-				Prayer.ENHANCE_MELEE_1, Prayer.ENHANCE_MELEE_2, Prayer.ENHANCE_MELEE_3,
-				Prayer.ENHANCE_MAGIC_1, Prayer.ENHANCE_MAGIC_2, Prayer.ENHANCE_MAGIC_3,
-				Prayer.ENHANCE_RANGE_1, Prayer.ENHANCE_RANGE_2, Prayer.ENHANCE_RANGE_3,
-				Prayer.ENHANCE_DEFENCE_1, Prayer.ENHANCE_DEFENCE_2, Prayer.ENHANCE_DEFENCE_3,
-				Prayer.PROTECT_MAGIC, Prayer.PROTECT_MELEE, Prayer.PROTECT_RANGE).stream().map(RegistryObject::getId).collect(Collectors.toList());
+		return Prayer.defaultObjects().stream().map(RegistryObject::getId).collect(Collectors.toList());
 	}
 
 }

@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.google.common.collect.Lists;
+
 import lombok.Getter;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -23,11 +25,11 @@ public class Config {
 	private Config(final ForgeConfigSpec.Builder builder) {
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
 		final String[] comment = new String[prayerLocs.size()+1];
-		comment[0] = "List of prayer resource locations to enable. Defaults are ";
+		comment[0] = "List of prayer resource locations to disable. Defaults prayers are ";
 		for(int i = 0; i < prayerLocs.size(); i++)
 			comment[i + 1] = prayerLocs.get(i);
 		builder.comment(comment);
-		this.prayers = builder.define("Prayers", prayerLocs);
+		this.prayers = builder.define("Prayers", Lists.newArrayList());
 	}
 
 	public static ForgeConfigSpec setup() {
@@ -44,10 +46,9 @@ public class Config {
 	}
 
 	private void applyConfig() {
-		final List<String> enabled = this.prayers.get();
+		final List<String> disabled = this.prayers.get();
 		GameRegistry.findRegistry(Prayer.class).getValues().forEach(prayer ->
-		prayer.setEnabled(enabled.contains(prayer.getRegistryName().toString()))
-				);
+		prayer.setEnabled(!disabled.contains(prayer.getRegistryName().toString())));
 	}
 
 }

@@ -13,7 +13,9 @@
   "item.prayers.prayer_tome": "Ancient Tome",
   "item.prayers.prayer_tome_prayer": "Ancient Tome (%s)",
   "item.prayers.talisman": "Talisman",
+  "item.prayers.talisman_auto": "Automatic Talisman",
   "item.prayers.talisman_prayer": "Talisman (%s)",
+  "item.prayers.talisman_auto_prayer": "Automatic Talisman (%s)",
   "item.prayers.divine_totem": "Divine Totem of Undying",
   "itemGroup.prayers": "Prayers",
   "effect.prayers.instant_prayer": "Instant Prayer",
@@ -29,6 +31,8 @@
   "text.prayers.talisman.prayer_obfuscated": "The bound prayer eludes you...",
   "text.prayers.talisman.bound": "Bound to %s",
   "text.prayers.talisman.points": "Stored points: %d/%d",
+  "text.prayers.talisman.prayer_not_auto": "Bound prayer cannot auto-activate",
+  "text.prayers.talisman.auto_conditions": "Activates when:",
   "text.prayers.soul_orb.souls": "%d of %d souls",
   "text.prayers.ancient_tome.decipher": "You cannot decipher the esoteric text...",
   "text.prayers.ancient_tome.use_unlock": "Use to unlock %s",
@@ -52,6 +56,7 @@
   "prayer.prayers.protect_range": "Protect Range",
   "prayer.prayers.protect_magic": "Protect Magic",
   "prayer.prayers.protect_item": "Protect Item",
+  "prayer.prayers.protect_fire": "Protect Fire",
   "prayer.prayers.enhance_melee_1": "Might",
   "prayer.prayers.enhance_melee_2": "Strength",
   "prayer.prayers.enhance_melee_3": "Vigor",
@@ -65,5 +70,6 @@
   "prayer.prayers.enhance_defence_2": "Durable",
   "prayer.prayers.enhance_defence_3": "Robust",
   "key.prayers.toggle_talisman": "Toggle Talismans",
-  "key.prayers.open_gui": "Open Prayer GUI"
+  "key.prayers.open_gui": "Open Prayer GUI",
+  "activate_condition.prayers.fire_prot": "Taking fire damage"
 }

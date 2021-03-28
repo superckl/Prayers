@@ -85,9 +85,9 @@ public class CapabilityHandler {
 			CapabilityHandler.PLAYER_CAPABILITY.readNBT(newUser, null, CapabilityHandler.PLAYER_CAPABILITY.writeNBT(user, null));
 		});
 	}
-	
+
 	@SubscribeEvent
-	public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent e) {
+	public void onPlayerRespawn(final PlayerEvent.PlayerRespawnEvent e) {
 		CapabilityHandler.getPrayerCapability(e.getPlayer()).setCurrentPrayerPoints(0);
 		if(e.getPlayer() instanceof ServerPlayerEntity)
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) e.getPlayer()),
