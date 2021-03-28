@@ -64,8 +64,10 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
 		String id = super.getDescriptionId(stack);
+		@SuppressWarnings("resource")
+		PlayerEntity player = Minecraft.getInstance().player;
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
-		if(prayer != null && Minecraft.getInstance().player != null && CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).getPrayerLevel() >= prayer.getLevel())
+		if(prayer != null && player != null && player.isAlive() && CapabilityHandler.getPrayerCapability(player).getPrayerLevel() >= prayer.getLevel())
 			id = id.concat("_prayer");
 		return id;
 	}

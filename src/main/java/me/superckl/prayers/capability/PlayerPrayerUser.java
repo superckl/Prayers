@@ -34,7 +34,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEntity>{
 
-	private final boolean autoSync;
+	protected boolean autoSync;
 
 	public PlayerPrayerUser(final PlayerEntity ref) {
 		this(ref, true);
@@ -195,6 +195,8 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 
 		@Override
 		public void readNBT(final Capability<PlayerPrayerUser> capability, final PlayerPrayerUser instance, final Direction side, final INBT nbt) {
+			boolean autoSync = instance.autoSync;
+			instance.autoSync = false;
 			final CompoundNBT parent = (CompoundNBT) nbt;
 			instance.setPrayerLevel(parent.getInt(Storage.LEVEL_KEY));
 			instance.setMaxPointsBoost(parent.getFloat(Storage.MAX_BOOST_KEY));
@@ -205,6 +207,7 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 			unlocked.forEach(stringNbt -> instance.unlockPrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
+			instance.autoSync = autoSync;
 		}
 
 	}

@@ -85,6 +85,14 @@ public class CapabilityHandler {
 			CapabilityHandler.PLAYER_CAPABILITY.readNBT(newUser, null, CapabilityHandler.PLAYER_CAPABILITY.writeNBT(user, null));
 		});
 	}
+	
+	@SubscribeEvent
+	public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent e) {
+		CapabilityHandler.getPrayerCapability(e.getPlayer()).setCurrentPrayerPoints(0);
+		if(e.getPlayer() instanceof ServerPlayerEntity)
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) e.getPlayer()),
+					PacketSyncPrayerUser.from(e.getPlayer()));
+	}
 
 	//Updates clients of an entity's prayer data when they begin tracking
 	@SubscribeEvent
@@ -97,7 +105,7 @@ public class CapabilityHandler {
 
 	public static PlayerPrayerUser getPrayerCapability(final PlayerEntity ref) {
 		return ref.getCapability(CapabilityHandler.PLAYER_CAPABILITY).orElseThrow(() ->
-		new IllegalArgumentException("Passed player with no inventory prayer capability! "+ref));
+		new IllegalArgumentException("Passed player with prayer capability! "+ref));
 	}
 
 	public static TickablePrayerProvider<? extends LivingEntity> getPrayerCapability(final LivingEntity ref) {

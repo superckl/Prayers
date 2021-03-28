@@ -85,12 +85,6 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	}
 
 	@Override
-	public boolean onDroppedByPlayer(final ItemStack item, final PlayerEntity player) {
-		this.deactivate(item, player);
-		return super.onDroppedByPlayer(item, player);
-	}
-
-	@Override
 	public ITextComponent getName(final ItemStack stack) {
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null)
@@ -102,8 +96,10 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
 		String id = super.getDescriptionId(stack);
+		@SuppressWarnings("resource")
+		PlayerEntity player = Minecraft.getInstance().player;
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
-		if(prayer != null && !prayer.isObfusctated(Minecraft.getInstance().player))
+		if(prayer != null && player != null && player.isAlive() && !prayer.isObfusctated(player))
 			id = id.concat("_prayer");
 		return id;
 	}
@@ -166,7 +162,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	@Override
 	public boolean isFoil(final ItemStack stack) {
 		final LazyOptional<Prayer> opt = this.getStoredPrayer(stack);
-		if(opt.isPresent() && (Minecraft.getInstance().player == null || CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).canUseItemPrayer(opt.orElse(null))))
+		if(opt.isPresent())
 			return CapabilityHandler.getPrayerCapability(stack).isPrayerActive(opt.orElse(null));
 		else
 			return false;

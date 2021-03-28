@@ -22,6 +22,8 @@ public class PrayerBar {
 	public final boolean inludeMax;
 
 	public void renderAt(final MatrixStack matrixStack, final int x, final int y) {
+		if(!this.mc.player.isAlive())
+			return;
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
 
 		//Bar is 40x12, icon is 16x16

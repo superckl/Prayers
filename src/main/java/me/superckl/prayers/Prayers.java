@@ -31,6 +31,7 @@ import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
+import me.superckl.prayers.item.DivineTotemItem;
 import me.superckl.prayers.item.VesselItem;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -109,6 +110,7 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
 			MinecraftForge.EVENT_BUS.register(AltarItem.class);
 			MinecraftForge.EVENT_BUS.register(VesselItem.class);
+			MinecraftForge.EVENT_BUS.register(DivineTotemItem.class);
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
 					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
 			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.REDSTONE, ModPotions.PRAYER_RENEWAL::get));

@@ -4,6 +4,7 @@ import java.util.EnumMap;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
+import me.superckl.prayers.item.DivineTotemItem;
 import me.superckl.prayers.item.PrayerTomeItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.item.VesselItem;
@@ -43,6 +44,7 @@ public class ModItems {
 	public static final RegistryObject<VesselItem> VESSEL = ModItems.REGISTER.register("vessel", VesselItem::new);
 	public static final RegistryObject<PrayerTomeItem> PRAYER_TOME = ModItems.REGISTER.register("prayer_tome", PrayerTomeItem::new);
 	public static final RegistryObject<TalismanItem> TALISMAN = ModItems.REGISTER.register("talisman", TalismanItem::new);
+	public static final RegistryObject<DivineTotemItem> DIVINE_TOTEM = ModItems.REGISTER.register("divine_totem", DivineTotemItem::new);
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())
