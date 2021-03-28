@@ -108,13 +108,15 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip,
 			final ITooltipFlag flag) {
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		boolean shouldToggle = false;
 		if(prayer != null) {
 			if(level == null || CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).canUseItemPrayer(prayer)) {
-				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.bound"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
+				//tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.bound"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 				if(CapabilityHandler.getPrayerCapability(stack).isPrayerActive(prayer))
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
 				else
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("inactive")).withStyle(TextFormatting.RED));
+				shouldToggle = true;
 			}else
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.prayer_obfuscated")).withStyle(TextFormatting.GRAY));
 		}else
@@ -123,6 +125,8 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 			final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(stack);
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.points"), (int) provider.getCurrentPrayerPoints(), (int) provider.getMaxPrayerPoints()).withStyle(TextFormatting.GRAY));
 		}
+		if(shouldToggle)
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("click_toggle")).withStyle(TextFormatting.DARK_GRAY));
 	}
 
 	public boolean toggle(final ItemStack stack, final PlayerEntity player) {
