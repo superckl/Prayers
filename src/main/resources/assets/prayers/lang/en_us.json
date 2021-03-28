@@ -43,6 +43,7 @@
   "text.prayers.inactive": "Inactive",
   "text.prayers.disabled": "Disabled",
   "text.prayers.hold_key": "Hold %s for more info...",
+  "text.prayers.click_toggle": "Right click to toggle",
   "prayer.prayers.effective": "Effective",
   "prayer.prayers.potent": "Potent",
   "prayer.prayers.protect_melee": "Protect Melee",
@@ -60,5 +61,7 @@
   "prayer.prayers.enhance_range_3": "Hawk Eye",
   "prayer.prayers.enhance_defence_1": "Tough",
   "prayer.prayers.enhance_defence_2": "Durable",
-  "prayer.prayers.enhance_defence_3": "Robust"
+  "prayer.prayers.enhance_defence_3": "Robust",
+  "key.prayers.toggle_talisman": "Toggle Talismans",
+  "key.prayers.open_gui": "Open Prayer GUI"
 }

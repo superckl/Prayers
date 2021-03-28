@@ -151,6 +151,7 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
 		});
 		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYER_GUI);
+		ClientRegistry.registerKeyBinding(KeyBindings.TOGGLE_TALISMANS);
 		ModTiles.ALTARS.values().forEach(tileTypeObj -> ClientRegistry.bindTileEntityRenderer(tileTypeObj.get(), AltarRenderer::new));
 		ClientRegistry.bindTileEntityRenderer(ModTiles.OFFERING_STAND.get(), OfferingStandRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(ModTiles.CRAFTING_STAND.get(), CraftingStandRenderer::new);
