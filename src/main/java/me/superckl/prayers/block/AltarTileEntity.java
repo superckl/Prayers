@@ -42,6 +42,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.server.ServerWorld;
@@ -103,7 +104,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			final List<AltarTileEntity> tiles = AltarTileEntity.toAltars(connected, this.level);
 			if(numConnected <= this.altarType.getMaxConnected()) {
 				final float points = (float) (tiles.stream().mapToDouble(te -> te.currentPoints).sum()/numConnected);
-				final float maxPoints = this.altarType.getMaxPoints()*numConnected; //TODO diminishing returns
+				final float maxPoints = this.altarType.getMaxPoints()*MathHelper.sqrt(numConnected);
 				tiles.forEach(tile -> {
 					tile.validMultiblock = true;
 					tile.connected = connected;

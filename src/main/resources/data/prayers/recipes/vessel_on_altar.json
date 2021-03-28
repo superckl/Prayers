@@ -1,19 +1,22 @@
 {
   "type": "prayers:altar_crafting",
   "group": "blessing",
-  "points": 1000,
+  "points": 2000,
   "ingredients": [
     {
-      "item": "minecraft:polished_diorite"
+      "item": "minecraft:glass"
     },
     {
-      "item": "prayers:gold_leaf"
+      "item": "prayers:blessed_water"
+    },
+    {
+      "item": "prayers:blessed_water"
     },
     {
       "item": "prayers:blessed_water"
     }
   ],
   "result": {
-    "item": "prayers:sacred_marble"
+    "item": "prayers:vessel"
   }
 }

@@ -46,9 +46,9 @@ public class AltarBlock extends FourWayShapedBlock{
 	@RequiredArgsConstructor
 	@Getter
 	public enum AltarTypes{
-		SANDSTONE(100, 1F/48000F, 2/20F, 2),
-		GILDED_SANDSTONE(1000, 1F/24000F, 4/20F, 4),
-		MARBLE(100000, 1F/24000F, 10/20F, 5);
+		SANDSTONE(100, 1F/72000F, 2/20F, 2),
+		GILDED_SANDSTONE(1000, 1F/48000F, 10/20F, 4),
+		MARBLE(100000, 1F/24000F, 100/20F, 5);
 
 		private final float maxPoints;
 		private final float rechargeRate;
