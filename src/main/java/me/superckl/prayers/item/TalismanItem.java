@@ -28,6 +28,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -48,11 +49,14 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public ActionResult<ItemStack> use(final World level, final PlayerEntity player, final Hand hand) {
 		final Collection<Prayer> active = CapabilityHandler.getPrayerCapability(player).getActivePrayers();
 		final ItemStack stack = player.getItemInHand(hand);
+		final Prayer stored = this.getStoredPrayer(stack).orElse(null);
 		if(active.size() == 1) {
 			final Prayer prayer = active.iterator().next();
+			if(prayer == stored)
+				return ActionResult.pass(stack);
 			this.deactivate(stack, player);
 			this.storePrayer(stack, prayer);
-
+			level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, player.getSoundSource(), 0.25F, 0.75F);
 			return ActionResult.sidedSuccess(stack, level.isClientSide);
 		}else
 			return ActionResult.fail(stack);
