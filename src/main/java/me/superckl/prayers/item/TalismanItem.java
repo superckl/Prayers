@@ -134,7 +134,15 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		}else
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.use_bind")).withStyle(TextFormatting.GRAY));
 		if(level != null) {
-			final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(stack);
+			InventoryPrayerProvider provider;
+			try {
+				provider = CapabilityHandler.getPrayerCapability(stack);
+			} catch (final IllegalArgumentException e) {
+				// Since the search tree is populated before capabilities are registered, it is possible that an
+				// ItemStack will not have the capability. Try again after copying it. If it errors after copying,
+				// something is actually wrong.
+				provider = CapabilityHandler.getPrayerCapability(stack.copy());
+			}
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.points"), (int) provider.getCurrentPrayerPoints(), (int) provider.getMaxPrayerPoints()).withStyle(TextFormatting.GRAY));
 		}
 		if(shouldToggle)
