@@ -199,6 +199,7 @@ public class RenderEventHandler {
 		final Iterator<Prayer> it = prayers.iterator();
 		final float[][] spacings = RenderEventHandler.overheadSpacing[prayers.size()-1];
 		final float[] offsets = RenderEventHandler.overheadOffset[prayers.size()-1];
+		final float bbSize = (float) entity.getBoundingBox().getSize();
 		//Setup correct render state (taken from ParticleManager)
 		RenderSystem.enableAlphaTest();
 		RenderSystem.defaultAlphaFunc();
@@ -218,10 +219,10 @@ public class RenderEventHandler {
 				vertex.add(spacing[0], spacing[1], 0);
 				//Transform to world coordinates
 				vertex.transform(camera.rotation());
-				//Scale to appropriate size
-				vertex.mul(RenderEventHandler.prayerScale);
+				//Scale to appropriate size, considering general size of entity
+				vertex.mul(RenderEventHandler.prayerScale*bbSize);
 				//Move to above entity (we're in world coordinates now)
-				vertex.add(0, entity.getEyeHeight()+offset, 0);
+				vertex.add(0, entity.getBbHeight()+offset+RenderEventHandler.prayerScale*(bbSize-1), 0);
 				final Vector4f toTransform = new Vector4f(vertex);
 				//Transform by current matrix pose
 				toTransform.transform(matrix.last().pose());
