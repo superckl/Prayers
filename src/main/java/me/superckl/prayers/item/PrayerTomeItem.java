@@ -111,12 +111,13 @@ public class PrayerTomeItem extends Item{
 
 	@Override
 	public void fillItemCategory(final ItemGroup tab, final NonNullList<ItemStack> stacks) {
-		for(final Prayer prayer:GameRegistry.findRegistry(Prayer.class).getValues())
-			if(prayer.isRequiresTome()) {
-				final ItemStack stack = new ItemStack(this);
-				this.storePrayer(stack, prayer);
-				stacks.add(stack);
-			}
+		if(this.allowdedIn(tab))
+			for(final Prayer prayer:GameRegistry.findRegistry(Prayer.class).getValues())
+				if(prayer.isRequiresTome()) {
+					final ItemStack stack = new ItemStack(this);
+					this.storePrayer(stack, prayer);
+					stacks.add(stack);
+				}
 	}
 
 }

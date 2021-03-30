@@ -30,8 +30,6 @@ archivesBaseName = artifact_basename
 minecraft {
     mappings channel: project.mappings, version: project.mappings_version
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
     runs {
         client {
             workingDirectory project.file('run')

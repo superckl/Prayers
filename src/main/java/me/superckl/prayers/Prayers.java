@@ -23,6 +23,7 @@ import me.superckl.prayers.client.VesselItemColor;
 import me.superckl.prayers.client.gui.GuiEventHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.client.particle.PrayerParticle;
+import me.superckl.prayers.entity.ai.EntityEventHandler;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModEffects;
 import me.superckl.prayers.init.ModItems;
@@ -105,9 +106,11 @@ public class Prayers {
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
+
 		event.enqueueWork(() -> {
 			MinecraftForge.EVENT_BUS.register(this);
 			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
+			MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 			MinecraftForge.EVENT_BUS.register(AltarItem.class);
 			MinecraftForge.EVENT_BUS.register(VesselItem.class);
 			MinecraftForge.EVENT_BUS.register(DivineTotemItem.class);

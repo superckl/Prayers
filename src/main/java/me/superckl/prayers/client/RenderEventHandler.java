@@ -183,8 +183,8 @@ public class RenderEventHandler {
 		this.renderOverheadPrayers((T) e.getEntity(), e.getRenderer().getDispatcher().camera, e.getMatrixStack(), e.getLight(), e.getPartialRenderTick());
 	}
 
-	private static float[][] overheadOffset = new float[][] {{0.5F}};
-	private static float[][][] overheadSpacing = new float[][][] {{{0, 0}}};
+	private static float[][] overheadOffset = new float[][] {{0.5F}, {0.5F, 0.5F}};
+	private static float[][][] overheadSpacing = new float[][][] {{{0, 0}}, {{1.1F, 0}, {-1.1F, 0}}};
 	private static float prayerScale = 0.15F;
 
 	@SuppressWarnings("deprecation")
@@ -210,7 +210,9 @@ public class RenderEventHandler {
 		RenderSystem.activeTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0);
 		while(it.hasNext()) {
 			final float[] spacing = spacings[i];
-			final float offset = offsets[i++];
+			float offset = offsets[i++];
+			if(entity.hasCustomName())
+				offset += 0.5F;
 			final Vector3f[] vertices = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
 			for (final Vector3f vertex:vertices) {
 				//Setup correct orientation

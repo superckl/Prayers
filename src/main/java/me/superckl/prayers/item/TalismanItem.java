@@ -10,12 +10,16 @@ import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
+import me.superckl.prayers.entity.ai.WitherUsePrayersGoal;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -30,11 +34,13 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -43,6 +49,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	public static final String PRAYER_KEY = "prayer";
 	public static final String AUTO_KEY = "auto_activate";
+	public static final String TALISMAN_KEY = "talisman";
 
 	public TalismanItem() {
 		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true);
@@ -68,10 +75,10 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	@SuppressWarnings("resource")
 	@Override
 	public ActionResultType useOn(final ItemUseContext context) {
-		if(context.getLevel().isClientSide)
-			return ActionResultType.sidedSuccess(true);
 		final TileEntity te = context.getLevel().getBlockEntity(context.getClickedPos());
 		if(te instanceof AltarTileEntity) {
+			if(context.getLevel().isClientSide)
+				return ActionResultType.sidedSuccess(true);
 			final AltarTileEntity aTE = (AltarTileEntity) te;
 			if(aTE.canRegen()) {
 				final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(context.getItemInHand());
@@ -83,6 +90,25 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 						new PacketSetInventoryItemPoints(provider.getCurrentPrayerPoints(), type));
 			}
 			return ActionResultType.sidedSuccess(false);
+		}
+		return ActionResultType.PASS;
+	}
+
+	@Override
+	public ActionResultType interactLivingEntity(final ItemStack stack, final PlayerEntity player,
+			final LivingEntity entity, final Hand hand) {
+		if(entity instanceof WitherEntity && !this.canAutoActivate(stack) && this.storeTalisman(entity, stack)) {
+			if(!player.level.isClientSide) {
+				final WitherUsePrayersGoal goal = new WitherUsePrayersGoal((WitherEntity) entity);
+				this.getStoredPrayer(stack).ifPresent(goal::addPrayer);
+				((WitherEntity)entity).goalSelector.addGoal(0, goal);
+				CapabilityHandler.getPrayerCapability(entity).setShouldDrain(false);
+				ITextComponent name = entity.hasCustomName() ? entity.getCustomName():entity.getName();
+				entity.setCustomName(new TranslationTextComponent(Util.makeDescriptionId("entity", new ResourceLocation(Prayers.MOD_ID, "boss_enlightened")), name));
+			}
+			if(!player.isCreative())
+				player.getItemInHand(hand).shrink(1);
+			return ActionResultType.sidedSuccess(player.level.isClientSide);
 		}
 		return ActionResultType.PASS;
 	}
@@ -102,8 +128,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		if(this.canAutoActivate(stack))
 			id = id.concat("_auto");
 		@SuppressWarnings("resource")
-		final
-		PlayerEntity player = Minecraft.getInstance().player;
+		final PlayerEntity player = Minecraft.getInstance().player;
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null && player != null && player.isAlive() && !prayer.isObfusctated(player))
 			id = id.concat("_prayer");
@@ -122,11 +147,12 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
 				else
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("inactive")).withStyle(TextFormatting.RED));
-				if(this.canAutoActivate(stack) && ActivationCondition.hasCondition(prayer)) {
+				final boolean auto = this.canAutoActivate(stack);
+				if(auto && ActivationCondition.hasCondition(prayer)) {
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.auto_conditions")).withStyle(TextFormatting.BLUE));
 					final List<ActivationCondition> conditions = ActivationCondition.getConditions(prayer);
 					conditions.forEach(condition -> tooltip.add(new StringTextComponent("- ").append(condition.getDescription()).withStyle(TextFormatting.BLUE)));
-				}else
+				}else if(auto)
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.prayer_not_auto")).withStyle(TextFormatting.GRAY));
 				shouldToggle = true;
 			}else
@@ -211,6 +237,18 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		if(nbt.contains(TalismanItem.AUTO_KEY))
 			return nbt.getBoolean(TalismanItem.AUTO_KEY);
 		else
+			return false;
+	}
+
+	public boolean storeTalisman(final Entity entity, final ItemStack stack) {
+		final CompoundNBT perData = entity.getPersistentData();
+		if(!perData.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND))
+			perData.put(Prayers.MOD_ID, new CompoundNBT());
+		final CompoundNBT prayersData = perData.getCompound(Prayers.MOD_ID);
+		if(!prayersData.contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND)) {
+			prayersData.put(TalismanItem.TALISMAN_KEY, stack.serializeNBT());
+			return true;
+		}else
 			return false;
 	}
 

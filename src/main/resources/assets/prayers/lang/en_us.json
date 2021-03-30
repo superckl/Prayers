@@ -69,6 +69,7 @@
   "prayer.prayers.enhance_defence_1": "Tough",
   "prayer.prayers.enhance_defence_2": "Durable",
   "prayer.prayers.enhance_defence_3": "Robust",
+  "entity.prayers.boss_enlightened": "Enlightened %s",
   "key.prayers.toggle_talisman": "Toggle Talismans",
   "key.prayers.open_gui": "Open Prayer GUI",
   "activate_condition.prayers.fire_prot": "Taking fire damage"
