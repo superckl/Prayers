@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import me.superckl.prayers.Prayer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -30,7 +31,10 @@ public abstract class TickablePrayerProvider<T> {
 
 	@Getter
 	protected float currentPrayerPoints;
-	private final Set<IRegistryDelegate<Prayer>> activePrayers = Sets.newIdentityHashSet();
+	private final Set<IRegistryDelegate<Prayer>> activePrayers = Sets.newHashSet();
+	@Getter
+	@Setter
+	protected boolean shouldDrain = true;
 	protected final T ref;
 
 	public TickablePrayerProvider(final T ref) {
@@ -70,6 +74,8 @@ public abstract class TickablePrayerProvider<T> {
 	public abstract float getMaxPrayerPoints();
 
 	public void tick() {
+		if(!this.shouldDrain)
+			return;
 		final float drain = (float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum();
 		float newPoints = this.getCurrentPrayerPoints()-drain/20F;
 		if (newPoints < 0) {
@@ -128,11 +134,13 @@ public abstract class TickablePrayerProvider<T> {
 
 		public static final String CURRENT_POINTS_KEY = "current_prayer_points";
 		public static final String ENABLED_PRAYERS_KEY = "enabled_prayers";
+		public static final String SHOULD_DRAIN_KEY = "should_drain";
 
 		@Override
 		public CompoundNBT writeNBT(final Capability<T> capability, final T instance, final Direction side) {
 			final CompoundNBT parent = new CompoundNBT();
 			parent.putFloat(Storage.CURRENT_POINTS_KEY, instance.getCurrentPrayerPoints());
+			parent.putBoolean(Storage.SHOULD_DRAIN_KEY, instance.shouldDrain);
 			final ListNBT enabled = new ListNBT();
 			instance.getActivePrayers().forEach(prayer -> enabled.add(StringNBT.valueOf(prayer.getRegistryName().toString())));
 			parent.put(Storage.ENABLED_PRAYERS_KEY, enabled);
@@ -141,8 +149,10 @@ public abstract class TickablePrayerProvider<T> {
 
 		@Override
 		public void readNBT(final Capability<T> capability, final T instance, final Direction side, final INBT nbt) {
+			instance.deactivateAllPrayers();
 			final CompoundNBT parent = (CompoundNBT) nbt;
 			instance.setCurrentPrayerPoints(parent.getFloat(Storage.CURRENT_POINTS_KEY));
+			instance.setShouldDrain(parent.getBoolean(Storage.SHOULD_DRAIN_KEY));
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
