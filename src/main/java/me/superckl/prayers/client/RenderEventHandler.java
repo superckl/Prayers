@@ -1,30 +1,41 @@
 package me.superckl.prayers.client;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
+import me.superckl.prayers.Prayer;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.block.CraftingStandBlock;
 import me.superckl.prayers.block.CraftingStandTileEntity;
 import me.superckl.prayers.block.OfferingStandBlock;
 import me.superckl.prayers.block.OfferingStandTileEntity;
+import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.client.gui.PrayerBar;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.Atlases;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -36,16 +47,20 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.math.vector.Vector4f;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class RenderTickHandler {
+public class RenderEventHandler {
 
 	private final PrayerBar widget = new PrayerBar(true, false);
 	private final Minecraft mc = Minecraft.getInstance();
@@ -120,7 +135,7 @@ public class RenderTickHandler {
 			e.setCanceled(true);
 			final Vector3d proj = e.getInfo().getPosition();
 			final VoxelShape connected = AltarBlock.connectAltars(renderBlock, this.mc.level, pos);
-			RenderTickHandler.drawShape(e.getMatrix(), e.getBuffers().getBuffer(RenderType.lines()), connected,
+			RenderEventHandler.drawShape(e.getMatrix(), e.getBuffers().getBuffer(RenderType.lines()), connected,
 					pos.getX()-proj.x, pos.getY()-proj.y, pos.getZ()-proj.z, 0, 0, 0, 0.4F);
 		}
 	}
@@ -154,6 +169,74 @@ public class RenderTickHandler {
 					buffer.endBatch();
 				}
 			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onRenderPlayer(final RenderPlayerEvent e) {
+		this.renderOverheadPrayers((ClientPlayerEntity) e.getPlayer(), e.getRenderer().getDispatcher().camera, e.getMatrixStack(), e.getLight(), e.getPartialRenderTick());
+	}
+
+	@SuppressWarnings("unchecked")
+	@SubscribeEvent
+	public <T extends LivingEntity> void onRenderLiving(final RenderLivingEvent<T,?> e) {
+		this.renderOverheadPrayers((T) e.getEntity(), e.getRenderer().getDispatcher().camera, e.getMatrixStack(), e.getLight(), e.getPartialRenderTick());
+	}
+
+	private static float[][] overheadOffset = new float[][] {{0.5F}};
+	private static float[][][] overheadSpacing = new float[][][] {{{0, 0}}};
+	private static float prayerScale = 0.15F;
+
+	@SuppressWarnings("deprecation")
+	public <T extends LivingEntity> void renderOverheadPrayers(final T entity, final ActiveRenderInfo camera, final MatrixStack matrix, final int light, final float partialTicks) {
+		final Collection<Prayer> prayers = CapabilityHandler.getPrayerCapability(entity).getActivePrayers();
+		prayers.removeIf(prayer -> !prayer.isOverhead());
+		if(prayers.isEmpty())
+			return;
+		else if(prayers.size() > RenderEventHandler.overheadOffset.length)
+			throw new IllegalStateException("Unknown layout for number of overhead prayers! "+prayers.size());
+		int i = 0;
+		final Iterator<Prayer> it = prayers.iterator();
+		final float[][] spacings = RenderEventHandler.overheadSpacing[prayers.size()-1];
+		final float[] offsets = RenderEventHandler.overheadOffset[prayers.size()-1];
+		//Setup correct render state (taken from ParticleManager)
+		RenderSystem.enableAlphaTest();
+		RenderSystem.defaultAlphaFunc();
+		RenderSystem.enableDepthTest();
+		RenderSystem.enableFog();
+		RenderSystem.activeTexture(org.lwjgl.opengl.GL13.GL_TEXTURE2);
+		RenderSystem.enableTexture();
+		RenderSystem.activeTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0);
+		while(it.hasNext()) {
+			final float[] spacing = spacings[i];
+			final float offset = offsets[i++];
+			final Vector3f[] vertices = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+			for (final Vector3f vertex:vertices) {
+				//Setup correct orientation
+				vertex.transform(Vector3f.ZP.rotationDegrees(180F));
+				//Apply spacing relative to other prayers
+				vertex.add(spacing[0], spacing[1], 0);
+				//Transform to world coordinates
+				vertex.transform(camera.rotation());
+				//Scale to appropriate size
+				vertex.mul(RenderEventHandler.prayerScale);
+				//Move to above entity (we're in world coordinates now)
+				vertex.add(0, entity.getEyeHeight()+offset, 0);
+				final Vector4f toTransform = new Vector4f(vertex);
+				//Transform by current matrix pose
+				toTransform.transform(matrix.last().pose());
+				vertex.set(toTransform.x(), toTransform.y(), toTransform.z());
+
+			}
+			final BufferBuilder builder = Tessellator.getInstance().getBuilder();
+			builder.begin(7, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);
+			this.mc.getTextureManager().bind(it.next().getTexture());
+			//The ordering of these calls is very important, it must match that defined in the vertex format
+			builder.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z()).color(1F, 1F, 1F, 1F).uv(0, 0).uv2(light).endVertex();
+			builder.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z()).color(1F, 1F, 1F, 1F).uv(0, 1).uv2(light).endVertex();
+			builder.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z()).color(1F, 1F, 1F, 1F).uv(1, 1).uv2(light).endVertex();
+			builder.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z()).color(1F, 1F, 1F, 1F).uv(1, 0).uv2(light).endVertex();
+			Tessellator.getInstance().end();
 		}
 	}
 

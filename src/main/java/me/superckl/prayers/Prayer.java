@@ -45,13 +45,13 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 			.exclusionTypes(Lists.newArrayList("enhance_melee", "enhance_range", "enhance_magic"))::build);
 
 	public static final RegistryObject<Prayer> PROTECT_MELEE = Prayer.REGISTER.register("protect_melee", Prayer.builder().drain(2.5F).level(43)
-			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectmelee.png"))
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectmelee.png")).overhead(true)
 			.effect(() -> new DamageEffect(DamageType.MELEE, true, true, -0.5F)).exclusionType("protect")::build);
 	public static final RegistryObject<Prayer> PROTECT_MAGIC = Prayer.REGISTER.register("protect_magic", Prayer.builder().drain(2.5F).level(37)
-			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectmagic.png"))
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectmagic.png")).overhead(true)
 			.effect(() -> new DamageEffect(DamageType.MAGIC, true, true, -0.5F)).exclusionType("protect")::build);
 	public static final RegistryObject<Prayer> PROTECT_RANGE = Prayer.REGISTER.register("protect_range", Prayer.builder().drain(2.5F).level(40)
-			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectrange.png"))
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectrange.png")).overhead(true)
 			.effect(() -> new DamageEffect(DamageType.RANGE, true, true, -0.5F)).exclusionType("protect")::build);
 	public static final RegistryObject<Prayer> PROTECT_ITEM = Prayer.REGISTER.register("protect_item", Prayer.builder().drain(0.2F).level(25)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectitem.png"))::build);
@@ -103,6 +103,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	private final List<PrayerEffect> effects;
 	private final List<String> exclusionTypes;
 	private final boolean requiresTome;
+	private final boolean overhead;
 	private final ResourceLocation texture;
 	private List<ITextComponent> tooltipDescription;
 	private IFormattableTextComponent name;
@@ -112,12 +113,13 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	//We require a supplier for effects so that a new instance can be created every time the prayer is built.
 	@Builder
 	private Prayer(final float drain, final int level, @Singular final List<Supplier<PrayerEffect>> effects, @Singular final List<String> exclusionTypes,
-			final boolean requiresTome, final ResourceLocation texture) {
+			final boolean requiresTome, final boolean overhead, final ResourceLocation texture) {
 		this.drain = drain;
 		this.level = level;
 		this.texture = texture;
 		this.exclusionTypes = exclusionTypes;
 		this.requiresTome = requiresTome;
+		this.overhead = overhead;
 
 		this.effects = effects.stream().map(Supplier::get).collect(Collectors.toList());
 		this.effects.forEach(effect -> {

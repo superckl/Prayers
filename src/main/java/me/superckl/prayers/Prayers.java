@@ -18,7 +18,7 @@ import me.superckl.prayers.capability.TickablePrayerProvider;
 import me.superckl.prayers.client.AltarRenderer;
 import me.superckl.prayers.client.CraftingStandRenderer;
 import me.superckl.prayers.client.OfferingStandRenderer;
-import me.superckl.prayers.client.RenderTickHandler;
+import me.superckl.prayers.client.RenderEventHandler;
 import me.superckl.prayers.client.VesselItemColor;
 import me.superckl.prayers.client.gui.GuiEventHandler;
 import me.superckl.prayers.client.input.KeyBindings;
@@ -149,7 +149,7 @@ public class Prayers {
 
 	private void clientSetup(final FMLClientSetupEvent event) {
 		event.enqueueWork(() -> {
-			MinecraftForge.EVENT_BUS.register(new RenderTickHandler());
+			MinecraftForge.EVENT_BUS.register(new RenderEventHandler());
 			MinecraftForge.EVENT_BUS.register(KeyBindings.class);
 			MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
 		});
