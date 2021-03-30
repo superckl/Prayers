@@ -54,9 +54,9 @@ public class DamageEffect extends PrayerEffect{
 		if(!apply)
 			return;
 		if(this.isIncoming)
-			apply = apply && this.getOwner().isActive(e.getEntityLiving());
-		else if(s.getDirectEntity() instanceof LivingEntity)
-			apply = apply && this.getOwner().isActive((LivingEntity) s.getDirectEntity());
+			apply = this.getOwner().isActive(e.getEntityLiving());
+		else if(s.getEntity() instanceof LivingEntity)
+			apply = this.getOwner().isActive((LivingEntity) s.getEntity());
 		if(!apply)
 			return;
 		if(this.isPercentage)
