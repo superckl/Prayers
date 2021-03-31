@@ -76,14 +76,13 @@ public class DamageEffect extends PrayerEffect{
 		public static DamageType getType(final DamageSource source) {
 			if(source.isMagic())
 				return DamageType.MAGIC;
-			else if(source.isProjectile())
+			if(source.isProjectile())
 				return DamageType.RANGE;
-			else if(source.isFire())
+			if(source.isFire())
 				return DamageType.FIRE;
-			else if(source instanceof EntityDamageSource && !source.isExplosion())
+			if(source instanceof EntityDamageSource && !source.isExplosion())
 				return DamageType.MELEE;
-			else
-				return DamageType.NONE;
+			return DamageType.NONE;
 		}
 
 		public boolean matches(final DamageSource source) {

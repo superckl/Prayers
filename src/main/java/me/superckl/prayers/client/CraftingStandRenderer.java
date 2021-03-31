@@ -24,13 +24,14 @@ public class CraftingStandRenderer extends TileEntityRenderer<CraftingStandTileE
 			ItemStack stack = tileEntityIn.getItem(i);
 			final Direction dir = CraftingStandTileEntity.slotToDir.get(i);
 			float alpha = 1;
-			if(stack.isEmpty())
+			if(stack.isEmpty()) {
 				if(dir != Direction.UP)
 					continue;
-				else if(tileEntityIn.isCrafting()) {
+				if(tileEntityIn.isCrafting()) {
 					alpha = tileEntityIn.getCraftingProgress();
 					stack = tileEntityIn.getActiveRecipe().getResultItem();
 				}
+			}
 			if(dir != Direction.UP && tileEntityIn.isCrafting() && tileEntityIn.willCraftingConsume(i))
 				alpha = 1-tileEntityIn.getCraftingProgress();
 			matrixStackIn.pushPose();

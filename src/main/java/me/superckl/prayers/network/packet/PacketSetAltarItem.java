@@ -32,10 +32,8 @@ public class PacketSetAltarItem {
 		final ItemStack stack = buffer.readItem();
 		if(stack.isEmpty())
 			return new PacketSetAltarItem(pos, stack, null);
-		else {
-			final Direction dir = buffer.readEnum(Direction.class);
-			return new PacketSetAltarItem(pos, stack, dir);
-		}
+		final Direction dir = buffer.readEnum(Direction.class);
+		return new PacketSetAltarItem(pos, stack, dir);
 	}
 
 	@SuppressWarnings("resource")

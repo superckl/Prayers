@@ -21,8 +21,7 @@ public class PrayerRenewalEffect extends Effect{
 		final int time = 30 >> amplifier;
 		if(time > 0)
 			return duration % time == 0;
-		else
-			return true;
+		return true;
 	}
 
 }

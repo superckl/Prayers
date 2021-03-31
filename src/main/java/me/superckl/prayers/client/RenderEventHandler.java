@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -183,8 +185,7 @@ public class RenderEventHandler {
 		this.renderOverheadPrayers((T) e.getEntity(), e.getRenderer().getDispatcher().camera, e.getMatrixStack(), e.getLight(), e.getPartialRenderTick());
 	}
 
-	private static float[][] overheadOffset = new float[][] {{0.5F}, {0.5F, 0.5F}};
-	private static float[][][] overheadSpacing = new float[][][] {{{0, 0}}, {{1.1F, 0}, {-1.1F, 0}}};
+	private static float overheadOffset = 0.5F;
 	private static float prayerScale = 0.15F;
 
 	@SuppressWarnings("deprecation")
@@ -193,12 +194,9 @@ public class RenderEventHandler {
 		prayers.removeIf(prayer -> !prayer.isOverhead());
 		if(prayers.isEmpty())
 			return;
-		else if(prayers.size() > RenderEventHandler.overheadOffset.length)
-			throw new IllegalStateException("Unknown layout for number of overhead prayers! "+prayers.size());
 		int i = 0;
 		final Iterator<Prayer> it = prayers.iterator();
-		final float[][] spacings = RenderEventHandler.overheadSpacing[prayers.size()-1];
-		final float[] offsets = RenderEventHandler.overheadOffset[prayers.size()-1];
+		final float[][] spacings = this.buildSpacings(prayers.size());
 		final float bbSize = (float) entity.getBoundingBox().getSize();
 		//Setup correct render state (taken from ParticleManager)
 		RenderSystem.enableAlphaTest();
@@ -209,8 +207,8 @@ public class RenderEventHandler {
 		RenderSystem.enableTexture();
 		RenderSystem.activeTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0);
 		while(it.hasNext()) {
-			final float[] spacing = spacings[i];
-			float offset = offsets[i++];
+			final float[] spacing = spacings[i++];
+			float offset = RenderEventHandler.overheadOffset;
 			if(entity.hasCustomName())
 				offset += 0.5F;
 			final Vector3f[] vertices = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
@@ -241,6 +239,29 @@ public class RenderEventHandler {
 			builder.vertex(vertices[3].x(), vertices[3].y(), vertices[3].z()).color(1F, 1F, 1F, 1F).uv(1, 0).uv2(light).endVertex();
 			Tessellator.getInstance().end();
 		}
+	}
+
+	private static float overheadSpacing = 0.25F;
+	private static float[][][] spacingCache = new float[][][] {};
+
+	private float[][] buildSpacings(final int prayers){
+		if(RenderEventHandler.spacingCache.length < prayers) {
+			if (prayers - 1 > 0)
+				this.buildSpacings(prayers - 1);
+			final float[][] spacings = new float[prayers][2];
+			int i = 0;
+			int j = 0;
+			while(i < prayers) {
+				if(prayers - i >= 2) {
+					spacings[i++] = new float[] {-1-RenderEventHandler.overheadSpacing/2, 2.2F*j};
+					spacings[i++] = new float[] {1+RenderEventHandler.overheadSpacing/2, 2.2F*j};
+				} else
+					spacings[i++] = new float[] {0,2.2F*j};
+				j++;
+			}
+			RenderEventHandler.spacingCache = ArrayUtils.add(RenderEventHandler.spacingCache, spacings);
+		}
+		return RenderEventHandler.spacingCache[prayers - 1];
 	}
 
 	public static void drawShape(final MatrixStack matrixStackIn, final IVertexBuilder bufferIn, final VoxelShape shapeIn, final double x, final double y, final double z, final float red, final float green, final float blue, final float alpha) {

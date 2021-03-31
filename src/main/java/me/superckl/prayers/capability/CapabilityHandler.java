@@ -111,9 +111,8 @@ public class CapabilityHandler {
 	public static TickablePrayerProvider<? extends LivingEntity> getPrayerCapability(final LivingEntity ref) {
 		if(ref instanceof PlayerEntity)
 			return CapabilityHandler.getPrayerCapability((PlayerEntity) ref);
-		else
-			return ref.getCapability(CapabilityHandler.LIVING_CAPABILITY).orElseThrow(() ->
-			new IllegalArgumentException("Passed living entity with no prayer capability! "+ref));
+		return ref.getCapability(CapabilityHandler.LIVING_CAPABILITY).orElseThrow(() ->
+		new IllegalArgumentException("Passed living entity with no prayer capability! "+ref));
 	}
 
 	public static InventoryPrayerProvider getPrayerCapability(final ItemStack ref) {
@@ -136,12 +135,11 @@ public class CapabilityHandler {
 	public static INBT serialize(final TickablePrayerProvider<?> cap) {
 		if(cap instanceof PlayerPrayerUser)
 			return CapabilityHandler.PLAYER_CAPABILITY.writeNBT((PlayerPrayerUser) cap, null);
-		else if(cap instanceof LivingPrayerUser)
+		if(cap instanceof LivingPrayerUser)
 			return CapabilityHandler.LIVING_CAPABILITY.writeNBT((LivingPrayerUser) cap, null);
-		else if(cap instanceof InventoryPrayerProvider)
+		if(cap instanceof InventoryPrayerProvider)
 			return CapabilityHandler.INVENTORY_CAPABILITY.writeNBT((InventoryPrayerProvider) cap, null);
-		else
-			throw new IllegalArgumentException("Unknown capability type! "+cap);
+		throw new IllegalArgumentException("Unknown capability type! "+cap);
 	}
 
 	public static void deserialize(final TickablePrayerProvider<?> cap, final INBT nbt) {

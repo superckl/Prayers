@@ -49,8 +49,7 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 		final Direction dir = CraftingStandBlock.directionFromVec(dirVec, tolerance/16);
 		if(state.is(this) && state.getValue(CraftingStandBlock.propertyFromDirection(dir)))
 			return state;
-		else
-			return state.setValue(CraftingStandBlock.propertyFromDirection(dir), true);
+		return state.setValue(CraftingStandBlock.propertyFromDirection(dir), true);
 	}
 
 	@Override
@@ -102,17 +101,15 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	public static Direction directionFromVec(final Vector3d dirVec, final float tolerance) {
 		if(Math.abs(dirVec.x) <= tolerance && Math.abs(dirVec.z) <= tolerance)
 			return Direction.UP;
-		else
-			return Direction.getNearest(dirVec.x, 0, dirVec.z);
+		return Direction.getNearest(dirVec.x, 0, dirVec.z);
 	}
 
 	public static Property<Boolean> propertyFromDirection(final Direction dir){
 		if(dir == Direction.UP)
 			return CraftingStandBlock.CENTER;
-		else if(dir == Direction.DOWN)
+		if(dir == Direction.DOWN)
 			throw new IllegalArgumentException("Down is not a valid direction!");
-		else
-			return FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir);
+		return FourWayShapedBlock.FACING_TO_PROPERTY_MAP.get(dir);
 	}
 
 	@Override

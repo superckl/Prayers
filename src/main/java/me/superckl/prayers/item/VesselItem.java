@@ -106,8 +106,7 @@ public class VesselItem extends Item {
 	public Rarity getRarity(final ItemStack stack) {
 		if(this.hasAllKills(stack))
 			return Rarity.EPIC;
-		else
-			return super.getRarity(stack);
+		return super.getRarity(stack);
 	}
 
 	public boolean hasAllKills(final ItemStack stack) {
@@ -121,8 +120,8 @@ public class VesselItem extends Item {
 		if(kills.add(type.getRegistryName())) {
 			this.storeKills(kills, stack);
 			return true;
-		}else
-			return false;
+		}
+		return false;
 	}
 
 	@SubscribeEvent
@@ -131,7 +130,7 @@ public class VesselItem extends Item {
 		if(!VesselItem.REQ_MOBS.contains(type.getRegistryName()))
 			return;
 		final Entity source = e.getSource().getDirectEntity();
-		if(source != null && source instanceof PlayerEntity) {
+		if(source instanceof PlayerEntity) {
 			final PlayerEntity killer = (PlayerEntity) source;
 			final VesselItem soulItem = ModItems.VESSEL.get();
 			for(final ItemStack stack:killer.inventory.items) {

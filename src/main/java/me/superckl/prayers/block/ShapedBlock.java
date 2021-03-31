@@ -60,8 +60,7 @@ public abstract class ShapedBlock extends Block implements IWaterLoggable{
 	public boolean canPlaceLiquid(final IBlockReader worldIn, final BlockPos pos, final BlockState state, final Fluid fluidIn) {
 		if(this.waterLoggable)
 			return IWaterLoggable.super.canPlaceLiquid(worldIn, pos, state, fluidIn);
-		else
-			return false;
+		return false;
 	}
 
 	@Override
@@ -70,8 +69,7 @@ public abstract class ShapedBlock extends Block implements IWaterLoggable{
 		final BlockState state =  super.getStateForPlacement(context);
 		if(this.waterLoggable)
 			return state.setValue(ShapedBlock.WATERLOGGED, fluidState.getType() == Fluids.WATER);
-		else
-			return state.setValue(ShapedBlock.WATERLOGGED, false);
+		return state.setValue(ShapedBlock.WATERLOGGED, false);
 	}
 
 

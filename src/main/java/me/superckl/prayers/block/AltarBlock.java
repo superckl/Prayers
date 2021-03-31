@@ -93,14 +93,15 @@ public class AltarBlock extends FourWayShapedBlock{
 	public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
 		final AltarTileEntity altar = (AltarTileEntity) worldIn.getBlockEntity(pos);
-		if(!player.isCrouching())
+		if(!player.isCrouching()) {
 			if(worldIn.isClientSide)
 				return ActionResultType.SUCCESS;
-			else if (altar.setOwner(player.getUUID(), true))
+			if (altar.setOwner(player.getUUID(), true))
 				return ActionResultType.CONSUME;
-			else if(player.getItemInHand(handIn).isEmpty())
+			if(player.getItemInHand(handIn).isEmpty())
 				if(altar.rechargeUser(player) > 0)
 					return ActionResultType.CONSUME;
+		}
 		return altar.onActivateBy(player, handIn);
 	}
 

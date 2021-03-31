@@ -60,16 +60,15 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final Collection<Prayer> active = CapabilityHandler.getPrayerCapability(player).getActivePrayers();
 		final ItemStack stack = player.getItemInHand(hand);
 		final Prayer stored = this.getStoredPrayer(stack).orElse(null);
-		if(active.size() == 1) {
-			final Prayer prayer = active.iterator().next();
-			if(prayer == stored)
-				return ActionResult.pass(stack);
-			this.deactivate(stack, player);
-			this.storePrayer(stack, prayer);
-			level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, player.getSoundSource(), 0.25F, 0.75F);
-			return ActionResult.sidedSuccess(stack, level.isClientSide);
-		}else
+		if(active.size() != 1)
 			return ActionResult.fail(stack);
+		final Prayer prayer = active.iterator().next();
+		if(prayer == stored)
+			return ActionResult.pass(stack);
+		this.deactivate(stack, player);
+		this.storePrayer(stack, prayer);
+		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, player.getSoundSource(), 0.25F, 0.75F);
+		return ActionResult.sidedSuccess(stack, level.isClientSide);
 	}
 
 	@SuppressWarnings("resource")
@@ -103,7 +102,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 				this.getStoredPrayer(stack).ifPresent(goal::addPrayer);
 				((WitherEntity)entity).goalSelector.addGoal(0, goal);
 				CapabilityHandler.getPrayerCapability(entity).setShouldDrain(false);
-				ITextComponent name = entity.hasCustomName() ? entity.getCustomName():entity.getName();
+				final ITextComponent name = entity.hasCustomName() ? entity.getCustomName():entity.getName();
 				entity.setCustomName(new TranslationTextComponent(Util.makeDescriptionId("entity", new ResourceLocation(Prayers.MOD_ID, "boss_enlightened")), name));
 			}
 			if(!player.isCreative())
@@ -118,8 +117,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null)
 			return new TranslationTextComponent(this.getDescriptionId(stack), prayer.getName());
-		else
-			return super.getName(stack);
+		return super.getName(stack);
 	}
 
 	@Override
@@ -179,8 +177,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null && CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
 			return CapabilityHandler.getPrayerCapability(stack).togglePrayer(prayer, player);
-		else
-			return false;
+		return false;
 	}
 
 	public void activate(final ItemStack stack, final PlayerEntity player) {
@@ -201,8 +198,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public Rarity getRarity(final ItemStack stack) {
 		if(this.isFoil(stack))
 			return Rarity.RARE;
-		else
-			return super.getRarity(stack);
+		return super.getRarity(stack);
 	}
 
 	@Override
@@ -210,16 +206,14 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final LazyOptional<Prayer> opt = this.getStoredPrayer(stack);
 		if(opt.isPresent())
 			return CapabilityHandler.getPrayerCapability(stack).isPrayerActive(opt.orElse(null));
-		else
-			return false;
+		return false;
 	}
 
 	public LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(TalismanItem.PRAYER_KEY))
 			return LazyOptional.of(() -> GameRegistry.findRegistry(Prayer.class).getValue(new ResourceLocation(nbt.getString(TalismanItem.PRAYER_KEY))));
-		else
-			return LazyOptional.empty();
+		return LazyOptional.empty();
 	}
 
 	public void storePrayer(final ItemStack stack, final Prayer prayer) {
@@ -236,8 +230,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(TalismanItem.AUTO_KEY))
 			return nbt.getBoolean(TalismanItem.AUTO_KEY);
-		else
-			return false;
+		return false;
 	}
 
 	public boolean storeTalisman(final Entity entity, final ItemStack stack) {
@@ -248,8 +241,8 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		if(!prayersData.contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND)) {
 			prayersData.put(TalismanItem.TALISMAN_KEY, stack.serializeNBT());
 			return true;
-		}else
-			return false;
+		}
+		return false;
 	}
 
 	@Override

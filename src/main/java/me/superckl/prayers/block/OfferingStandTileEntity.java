@@ -74,11 +74,11 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	protected LazyOptional<AltarTileEntity> findValidAltar() {
 		final TileEntity below = this.level.getBlockEntity(this.worldPosition.below());
-		if(below != null && below instanceof AltarTileEntity) {
+		if(below instanceof AltarTileEntity) {
 			final AltarTileEntity altar = (AltarTileEntity) below;
 			return altar.canRegen() ? LazyOptional.of(() -> altar):LazyOptional.empty();
-		}else
-			return LazyOptional.empty();
+		}
+		return LazyOptional.empty();
 	}
 
 	@Override

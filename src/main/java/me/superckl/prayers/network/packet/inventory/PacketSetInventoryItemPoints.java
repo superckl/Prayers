@@ -63,8 +63,7 @@ public class PacketSetInventoryItemPoints {
 		final boolean isEquip = buffer.readBoolean();
 		if(isEquip)
 			return new PacketSetInventoryItemPoints(points, buffer.readEnum(EquipmentSlotType.class));
-		else
-			return new PacketSetInventoryItemPoints(points, buffer.readInt());
+		return new PacketSetInventoryItemPoints(points, buffer.readInt());
 	}
 
 }

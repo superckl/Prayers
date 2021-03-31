@@ -180,11 +180,11 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	protected LazyOptional<AltarTileEntity> findValidAltar() {
 		final TileEntity below = this.level.getBlockEntity(this.worldPosition.below());
-		if(below != null && below instanceof AltarTileEntity) {
+		if(below instanceof AltarTileEntity) {
 			final AltarTileEntity altar = (AltarTileEntity) below;
 			return altar.canRegen() ? LazyOptional.of(() -> altar):LazyOptional.empty();
-		}else
-			return LazyOptional.empty();
+		}
+		return LazyOptional.empty();
 	}
 
 	public void updateRecipe(final boolean clearPoints){
@@ -229,8 +229,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	public int[] getSlotsForFace(final Direction side) {
 		if(CraftingStandTileEntity.dirToSlot.containsKey(side) && this.hasStand(side))
 			return new int[] {CraftingStandTileEntity.dirToSlot.getInt(side)};
-		else
-			return new int[0];
+		return new int[0];
 	}
 
 	public boolean hasOutputSlot() {

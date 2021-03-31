@@ -45,11 +45,9 @@ public class PrayerTomeItem extends Item{
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
 		if(user.getPrayerLevel() < prayer.getLevel() || !user.unlockPrayer(prayerOpt.orElse(null)))
 			return ActionResult.fail(stack);
-		else {
-			final ItemStack shrunk = stack.copy();
-			shrunk.shrink(1);
-			return ActionResult.consume(shrunk);
-		}
+		final ItemStack shrunk = stack.copy();
+		shrunk.shrink(1);
+		return ActionResult.consume(shrunk);
 	}
 
 	@Override
@@ -57,8 +55,7 @@ public class PrayerTomeItem extends Item{
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null)
 			return new TranslationTextComponent(this.getDescriptionId(stack), prayer.getName().getString());
-		else
-			return super.getName(stack);
+		return super.getName(stack);
 	}
 
 	@Override
@@ -82,7 +79,7 @@ public class PrayerTomeItem extends Item{
 	public Rarity getRarity(final ItemStack stack) {
 		if(this.getStoredPrayer(stack).isPresent())
 			return Rarity.EPIC;
-		else return super.getRarity(stack);
+		return super.getRarity(stack);
 	}
 
 	@Override
@@ -100,8 +97,7 @@ public class PrayerTomeItem extends Item{
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(PrayerTomeItem.PRAYER_KEY))
 			return LazyOptional.of(() -> GameRegistry.findRegistry(Prayer.class).getValue(new ResourceLocation(nbt.getString(PrayerTomeItem.PRAYER_KEY))));
-		else
-			return LazyOptional.empty();
+		return LazyOptional.empty();
 	}
 
 	public void storePrayer(final ItemStack stack, final Prayer prayer) {

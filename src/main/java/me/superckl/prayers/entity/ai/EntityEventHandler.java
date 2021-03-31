@@ -64,19 +64,17 @@ public class EntityEventHandler {
 			CompoundNBT nbt = entity.getPersistentData();
 			if(nbt.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND)) {
 				nbt = nbt.getCompound(Prayers.MOD_ID);
-				if(nbt.contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND)) {
-					if(entity.getRandom().nextFloat() < .15) {
-						Vector3d pos = this.randomPointIn(entity.getBoundingBox(), entity.getRandom());
-						((ServerWorld)entity.level).sendParticles(ModParticles.ALTAR_ACTIVE.get(), pos.x, pos.y, pos.z, 0, 0, 0, 0, 0);
-					}
+				if(nbt.contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND) && entity.getRandom().nextFloat() < .15) {
+					final Vector3d pos = this.randomPointIn(entity.getBoundingBox(), entity.getRandom());
+					((ServerWorld)entity.level).sendParticles(ModParticles.ALTAR_ACTIVE.get(), pos.x, pos.y, pos.z, 0, 0, 0, 0, 0);
 				}
 			}
 		}
 	}
-	
-	private Vector3d randomPointIn(AxisAlignedBB bb, Random random) {
+
+	private Vector3d randomPointIn(final AxisAlignedBB bb, final Random random) {
 		return bb.getCenter().add(bb.getXsize()*(random.nextDouble()-1D/2D),
 				bb.getYsize()*(random.nextDouble()-1D/2D), bb.getZsize()*(random.nextDouble()-1D/2D));
 	}
-	
+
 }

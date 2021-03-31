@@ -33,19 +33,17 @@ public class HolyWaterRecipe extends AltarCraftingRecipe{
 		int slot = -1;
 		final ItemStack waterBottle = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER);
 		for (int i = 0; i < inventory.size(); i++)
-			if(ItemStack.isSame(inventory.get(i), waterBottle) && ItemStack.tagMatches(inventory.get(i), waterBottle))
-				if(slot == -1)
-					slot = i;
-				else
+			if(ItemStack.isSame(inventory.get(i), waterBottle) && ItemStack.tagMatches(inventory.get(i), waterBottle)) {
+				if(slot != -1)
 					return null;
+				slot = i;
+			}
 		if(slot == -1)
 			return null;
-		else {
-			final int[] mapping = new int[] {0,1,2,3};
-			mapping[0] = slot;
-			mapping[slot] = 0;
-			return mapping;
-		}
+		final int[] mapping = new int[] {0,1,2,3};
+		mapping[0] = slot;
+		mapping[slot] = 0;
+		return mapping;
 	}
 
 	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<HolyWaterRecipe>{
