@@ -19,6 +19,7 @@ import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.effects.DamageEffect;
 import me.superckl.prayers.effects.DamageEffect.DamageType;
 import me.superckl.prayers.effects.FireProtEffect;
+import me.superckl.prayers.effects.FlightEffect;
 import me.superckl.prayers.effects.PoisonProtEffect;
 import me.superckl.prayers.effects.PrayerEffect;
 import me.superckl.prayers.effects.TemptAnimalEffect;
@@ -107,6 +108,9 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 
 	public static final RegistryObject<Prayer> ARK = Prayer.REGISTER.register("ark", Prayer.builder().drain(1F).level(15)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/ark.png")).effect(TemptAnimalEffect::new)::build);
+	public static final RegistryObject<Prayer> FLIGHT = Prayer.REGISTER.register("flight", Prayer.builder().drain(10F).level(99)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/flight.png")).onActivate(PrayerActivationEffects::onActivateFlight)
+			.onDeactivate(PrayerActivationEffects::onDeactivateFlight).effect(FlightEffect::new).requiresTome(true)::build);
 
 	private final float drain;
 	private final int level;
