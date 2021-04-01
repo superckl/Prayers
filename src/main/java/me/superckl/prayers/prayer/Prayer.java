@@ -162,7 +162,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public List<ITextComponent> getTooltipDescription(){
 		if(this.tooltipDescription == null) {
 			this.tooltipDescription = Lists.newArrayList(this.getName());
-			this.effects.forEach(effect -> this.tooltipDescription.add(effect.getDescription().copy().setStyle(Style.EMPTY.withItalic(true))));
+			this.effects.forEach(effect -> this.tooltipDescription.add(effect.getDescription().setStyle(Style.EMPTY.withItalic(true))));
 		}
 		return this.tooltipDescription;
 	}

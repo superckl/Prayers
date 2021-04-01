@@ -3,7 +3,7 @@ package me.superckl.prayers.effects;
 import me.superckl.prayers.Prayers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -23,7 +23,7 @@ public class FireProtEffect extends PrayerEffect{
 	}
 
 	@Override
-	public ITextComponent getDescription() {
+	public IFormattableTextComponent getDescription() {
 		return new TranslationTextComponent(Util.makeDescriptionId("prayer_effect", new ResourceLocation(Prayers.MOD_ID, "fire_prot")));
 	}
 

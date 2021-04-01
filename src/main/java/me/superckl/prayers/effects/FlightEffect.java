@@ -3,7 +3,7 @@ package me.superckl.prayers.effects;
 import me.superckl.prayers.Prayers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class FlightEffect extends PrayerEffect{
@@ -14,7 +14,7 @@ public class FlightEffect extends PrayerEffect{
 	}
 
 	@Override
-	public ITextComponent getDescription() {
+	public IFormattableTextComponent getDescription() {
 		return new TranslationTextComponent(Util.makeDescriptionId("prayer_effect", new ResourceLocation(Prayers.MOD_ID, "flight")));
 	}
 

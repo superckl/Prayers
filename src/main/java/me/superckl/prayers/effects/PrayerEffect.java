@@ -2,7 +2,7 @@ package me.superckl.prayers.effects;
 
 import lombok.Getter;
 import me.superckl.prayers.prayer.Prayer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.IFormattableTextComponent;
 
 public abstract class PrayerEffect{
 
@@ -17,6 +17,6 @@ public abstract class PrayerEffect{
 
 	public abstract boolean hasListener();
 
-	public abstract ITextComponent getDescription();
+	public abstract IFormattableTextComponent getDescription();
 
 }

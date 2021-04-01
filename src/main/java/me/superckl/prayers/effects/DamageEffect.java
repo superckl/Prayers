@@ -1,25 +1,32 @@
 package me.superckl.prayers.effects;
 
+import java.text.DecimalFormat;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.Prayers;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 @RequiredArgsConstructor
 public class DamageEffect extends PrayerEffect{
 
+	private static final DecimalFormat FORMAT = new DecimalFormat("0.#");
 	private final DamageType type;
 	private final boolean isIncoming;
 	@Getter
 	private final boolean isPercentage;
 	private final float amount;
 
-	private String description;
+	private ITextComponent description;
 
 	@Override
 	public boolean hasListener() {
@@ -27,24 +34,17 @@ public class DamageEffect extends PrayerEffect{
 	}
 
 	@Override
-	public ITextComponent getDescription() {
+	public IFormattableTextComponent getDescription() {
 		if(this.description == null) {
-			final StringBuilder builder = new StringBuilder(this.type.getName()).append(" Damage ");
-			if(this.isIncoming)
-				builder.append("In ");
-			else
-				builder.append("Out ");
+			char modifier;
 			if(this.amount < 0)
-				builder.append('-');
+				modifier = '-';
 			else
-				builder.append('+');
-			if(this.isPercentage)
-				builder.append(Math.round(Math.abs(this.amount)*100)).append('%');
-			else
-				builder.append(String.format("%.2f", Math.abs(this.amount)));
-			this.description = builder.toString();
+				modifier = '+';
+			this.description = new TranslationTextComponent(this.type.buildId(this.isIncoming),
+					new StringBuilder().append(modifier).append(DamageEffect.FORMAT.format(Math.abs(this.amount)*100)).toString());
 		}
-		return new StringTextComponent(this.description);
+		return this.description.copy();
 	}
 
 	@SubscribeEvent
@@ -70,10 +70,10 @@ public class DamageEffect extends PrayerEffect{
 	@RequiredArgsConstructor
 	public enum DamageType{
 
-		ALL("All"), MELEE("Melee"), MAGIC("Magic"), RANGE("Range"), FIRE("Fire"), NONE("None");
+		ALL("all"), MELEE("melee"), MAGIC("magic"), RANGE("range"), FIRE("fire"), NONE("none");
 
 		@Getter
-		private final String name;
+		private final String key;
 
 		public static DamageType getType(final DamageSource source) {
 			if(source.isMagic())
@@ -89,6 +89,15 @@ public class DamageEffect extends PrayerEffect{
 
 		public boolean matches(final DamageSource source) {
 			return this == DamageType.ALL || this == DamageType.getType(source);
+		}
+
+		public String buildId(final boolean damageIn) {
+			final StringBuilder builder = new StringBuilder(this.getKey()).append("_damage");
+			if(damageIn)
+				builder.append("_in");
+			else
+				builder.append("_out");
+			return Util.makeDescriptionId("prayer_effect", new ResourceLocation(Prayers.MOD_ID, builder.toString()));
 		}
 
 	}
