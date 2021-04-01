@@ -56,6 +56,7 @@
   "prayer.prayers.protect_range": "Protect Range",
   "prayer.prayers.protect_magic": "Protect Magic",
   "prayer.prayers.protect_item": "Protect Item",
+  "prayer.prayers.protect_poison": "Protect Poison",
   "prayer.prayers.protect_fire": "Protect Fire",
   "prayer.prayers.enhance_melee_1": "Might",
   "prayer.prayers.enhance_melee_2": "Strength",
@@ -69,8 +70,11 @@
   "prayer.prayers.enhance_defence_1": "Tough",
   "prayer.prayers.enhance_defence_2": "Durable",
   "prayer.prayers.enhance_defence_3": "Robust",
+  "prayer_effect.prayers.fire_prot": "Fire immunity",
+  "prayer_effect.prayers.poison_prot": "Immunity to poisoning",
   "entity.prayers.boss_enlightened": "Enlightened %s",
   "key.prayers.toggle_talisman": "Toggle Talismans",
   "key.prayers.open_gui": "Open Prayer GUI",
-  "activate_condition.prayers.fire_prot": "Taking fire damage"
+  "activate_condition.prayers.fire_prot": "Taking fire damage",
+  "activate_condition.prayers.poison_prot": "Poisoned"
 }

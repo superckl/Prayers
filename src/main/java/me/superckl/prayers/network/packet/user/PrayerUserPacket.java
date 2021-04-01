@@ -3,11 +3,13 @@ package me.superckl.prayers.network.packet.user;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.TickablePrayerProvider;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 @SuperBuilder
@@ -28,6 +30,16 @@ public abstract class PrayerUserPacket {
 
 	protected TickablePrayerProvider<? extends LivingEntity> getUser(final World world) {
 		return CapabilityHandler.getPrayerCapability((LivingEntity) world.getEntity(this.entityID));
+	}
+
+	protected TickablePrayerProvider<? extends LivingEntity> getUser(final NetworkEvent.Context context) {
+		return this.getUser(this.getLevel(context));
+	}
+
+	protected World getLevel(final NetworkEvent.Context context) {
+		if(context.getDirection().getReceptionSide() == LogicalSide.SERVER)
+			return context.getSender().level;
+		return ClientHelper.getClientLevel();
 	}
 
 	@SuppressWarnings("unchecked")

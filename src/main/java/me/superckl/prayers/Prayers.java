@@ -15,14 +15,6 @@ import me.superckl.prayers.capability.LivingPrayerUser;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.capability.TickablePrayerProvider;
-import me.superckl.prayers.client.AltarRenderer;
-import me.superckl.prayers.client.CraftingStandRenderer;
-import me.superckl.prayers.client.OfferingStandRenderer;
-import me.superckl.prayers.client.RenderEventHandler;
-import me.superckl.prayers.client.VesselItemColor;
-import me.superckl.prayers.client.gui.GuiEventHandler;
-import me.superckl.prayers.client.input.KeyBindings;
-import me.superckl.prayers.client.particle.PrayerParticle;
 import me.superckl.prayers.entity.ai.EntityEventHandler;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModEffects;
@@ -32,14 +24,13 @@ import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
-import me.superckl.prayers.item.DivineTotemItem;
-import me.superckl.prayers.item.VesselItem;
+import me.superckl.prayers.item.ItemEvents;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketDeactivateInventoryPrayer;
 import me.superckl.prayers.network.packet.inventory.PacketInventorySlotChanged;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
-import me.superckl.prayers.network.packet.inventory.PacketTalismanToggle;
+import me.superckl.prayers.network.packet.inventory.PacketTalismanState;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
@@ -49,7 +40,6 @@ import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
 import me.superckl.prayers.potion.PotionTransformRecipe;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
@@ -59,8 +49,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -68,11 +57,10 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -87,10 +75,8 @@ public class Prayers {
 		LogHelper.setLogger(LogManager.getFormatterLogger(Prayers.MOD_ID));
 		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(this::commonSetup);
-		bus.addListener(this::clientSetup);
-		bus.addListener(this::initColors);
 		bus.addListener(this::createRegistry);
-		bus.addListener(this::registerParticleFactory);
+		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientEvents::register);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
 
 		ModBlocks.REGISTER.register(bus);
@@ -106,15 +92,18 @@ public class Prayers {
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
-
 		event.enqueueWork(() -> {
+			LogHelper.info("registering");
 			MinecraftForge.EVENT_BUS.register(this);
+			LogHelper.info(1);
 			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
+			LogHelper.info(2);
 			MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
-			MinecraftForge.EVENT_BUS.register(AltarItem.class);
-			MinecraftForge.EVENT_BUS.register(VesselItem.class);
-			MinecraftForge.EVENT_BUS.register(DivineTotemItem.class);
+			LogHelper.info(3);
+			MinecraftForge.EVENT_BUS.register(new ItemEvents());
+			LogHelper.info(4);
 			ActivationCondition.registerConditions();
+			LogHelper.info("registered");
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
 					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
 			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.REDSTONE, ModPotions.PRAYER_RENEWAL::get));
@@ -142,29 +131,12 @@ public class Prayers {
 				PacketInventorySlotChanged::encode, PacketInventorySlotChanged::decode, PacketInventorySlotChanged::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetAltarItem.class,
 				PacketSetAltarItem::encode, PacketSetAltarItem::decode, PacketSetAltarItem::handle);
-		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketTalismanToggle.class,
-				PacketTalismanToggle::encode, PacketTalismanToggle::decode, PacketTalismanToggle::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketTalismanState.class,
+				PacketTalismanState::encode, PacketTalismanState::decode, PacketTalismanState::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetInventoryItemPoints.class,
 				PacketSetInventoryItemPoints::encode, PacketSetInventoryItemPoints::decode, PacketSetInventoryItemPoints::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateInventoryPrayer.class,
 				PacketDeactivateInventoryPrayer::encode, PacketDeactivateInventoryPrayer::decode, PacketDeactivateInventoryPrayer::handle);
-	}
-
-	private void clientSetup(final FMLClientSetupEvent event) {
-		event.enqueueWork(() -> {
-			MinecraftForge.EVENT_BUS.register(new RenderEventHandler());
-			MinecraftForge.EVENT_BUS.register(KeyBindings.class);
-			MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
-		});
-		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYER_GUI);
-		ClientRegistry.registerKeyBinding(KeyBindings.TOGGLE_TALISMANS);
-		ModTiles.ALTARS.values().forEach(tileTypeObj -> ClientRegistry.bindTileEntityRenderer(tileTypeObj.get(), AltarRenderer::new));
-		ClientRegistry.bindTileEntityRenderer(ModTiles.OFFERING_STAND.get(), OfferingStandRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(ModTiles.CRAFTING_STAND.get(), CraftingStandRenderer::new);
-	}
-
-	private void initColors(final ColorHandlerEvent.Item e) {
-		e.getItemColors().register(new VesselItemColor(), ModItems.VESSEL::get);
 	}
 
 	private void createRegistry(final RegistryEvent.NewRegistry e) {
@@ -188,12 +160,6 @@ public class Prayers {
 	//Called to ensure the overworld saved data is the one we use
 	public void onServerStarting(final FMLServerStartingEvent e) {
 		AltarsSavedData.get(e.getServer().getLevel(World.OVERWORLD));
-	}
-
-	@SuppressWarnings("resource")
-	public void registerParticleFactory(final ParticleFactoryRegisterEvent e) {
-		Minecraft.getInstance().particleEngine.register(ModParticles.ALTAR_ACTIVE.get(), PrayerParticle.Factory::new);
-		Minecraft.getInstance().particleEngine.register(ModParticles.ITEM_SACRIFICE.get(), PrayerParticle.Factory::new);
 	}
 
 }

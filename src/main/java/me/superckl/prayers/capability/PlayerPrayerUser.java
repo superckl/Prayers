@@ -68,25 +68,31 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 		final float old = this.getCurrentPrayerPoints();
 		final float newVal = super.setCurrentPrayerPoints(currentPoints);
 		if(this.autoSync && !this.ref.level.isClientSide && ((ServerPlayerEntity)this.ref).connection != null && (newVal == 0 && old > 0 || old == 0 && newVal > 0  || MathUtil.isIntDifferent(old, newVal)))
-			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.ref),
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this.ref),
 					PacketSetPrayerPoints.builder().entityID(this.ref.getId()).amount(newVal).build());
 		return newVal;
 	}
 
 	@Override
-	public void deactivateAllPrayers() {
-		super.deactivateAllPrayers();
-		if(this.autoSync && !this.ref.level.isClientSide)
-			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.ref),
+	public boolean deactivateAllPrayers() {
+		final boolean changed = super.deactivateAllPrayers();
+		if(changed && this.autoSync && !this.ref.level.isClientSide) {
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this.ref),
 					PacketDeactivateAllPrayers.builder().entityID(this.ref.getId()).build());
+			return true;
+		}
+		return changed;
 	}
 
 	@Override
-	public void deactivatePrayer(final Prayer prayer) {
-		super.deactivatePrayer(prayer);
-		if(this.autoSync && !this.ref.level.isClientSide)
-			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.ref),
+	public boolean deactivatePrayer(final Prayer prayer) {
+		final boolean changed = super.deactivatePrayer(prayer);
+		if(changed && this.autoSync && !this.ref.level.isClientSide) {
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this.ref),
 					PacketDeactivatePrayer.builder().entityID(this.ref.getId()).prayer(prayer).build());
+			return true;
+		}
+		return changed;
 	}
 
 	public abstract float addMaxPointsBoost(float boost);

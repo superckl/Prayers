@@ -64,18 +64,15 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 
 	public boolean activatePrayer(final Prayer prayer, final PlayerEntity player) {
 		if(this.canActivatePrayer(player, prayer)) {
-			super.activatePrayer(prayer);
 			CapabilityHandler.getPrayerCapability(player).deactivatePrayer(prayer);
-			return true;
+			return super.activatePrayer(prayer);
 		}
 		return false;
 	}
 
 	public boolean togglePrayer(final Prayer prayer, final PlayerEntity player) {
-		if (this.isPrayerActive(prayer)) {
-			this.deactivatePrayer(prayer);
-			return true;
-		}
+		if (this.isPrayerActive(prayer))
+			return this.deactivatePrayer(prayer);
 		return this.activatePrayer(prayer, player);
 	}
 

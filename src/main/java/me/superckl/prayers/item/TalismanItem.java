@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import me.superckl.prayers.ActivationCondition;
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarTileEntity;
@@ -15,7 +16,6 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.util.LangUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -40,8 +40,10 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -65,7 +67,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final Prayer prayer = active.iterator().next();
 		if(prayer == stored)
 			return ActionResult.pass(stack);
-		this.deactivate(stack, player);
+		this.applyState(stack, player, State.DEACTIVATE);
 		this.storePrayer(stack, prayer);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, player.getSoundSource(), 0.25F, 0.75F);
 		return ActionResult.sidedSuccess(stack, level.isClientSide);
@@ -122,16 +124,12 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
-		String id = super.getDescriptionId(stack);
-		if(this.canAutoActivate(stack))
-			id = id.concat("_auto");
-		@SuppressWarnings("resource")
-		final PlayerEntity player = Minecraft.getInstance().player;
+		final String id = this.canAutoActivate(stack) ? super.getDescriptionId(stack).concat("_auto"):super.getDescriptionId(stack);
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
-		if(prayer != null && player != null && player.isAlive() && !prayer.isObfusctated(player))
-			id = id.concat("_prayer");
-		return id;
+		final String newId = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> new ClientIdHelper(id, prayer)::modifyId);
+		return newId == null ? id:newId;
 	}
+
 
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip,
@@ -139,7 +137,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		boolean shouldToggle = false;
 		if(prayer != null) {
-			if(level == null || CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).canUseItemPrayer(prayer)) {
+			if(level == null || CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).canUseItemPrayer(prayer)) {
 				//tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.bound"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 				if(CapabilityHandler.getPrayerCapability(stack).isPrayerActive(prayer))
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
@@ -173,25 +171,18 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("click_toggle")).withStyle(TextFormatting.DARK_GRAY));
 	}
 
-	public boolean toggle(final ItemStack stack, final PlayerEntity player) {
+	public boolean applyState(final ItemStack stack, final PlayerEntity player, final State state) {
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
 		if(prayer != null && CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
-			return CapabilityHandler.getPrayerCapability(stack).togglePrayer(prayer, player);
+			switch(state) {
+			case ACTIVATE:
+				return CapabilityHandler.getPrayerCapability(stack).activatePrayer(prayer, player);
+			case DEACTIVATE:
+				return CapabilityHandler.getPrayerCapability(stack).deactivatePrayer(prayer);
+			case TOGGLE:
+				return CapabilityHandler.getPrayerCapability(stack).togglePrayer(prayer, player);
+			}
 		return false;
-	}
-
-	public void activate(final ItemStack stack, final PlayerEntity player) {
-		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
-				CapabilityHandler.getPrayerCapability(stack).activatePrayer(prayer, player);
-		});
-	}
-
-	public void deactivate(final ItemStack stack, final PlayerEntity player) {
-		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
-				CapabilityHandler.getPrayerCapability(stack).deactivatePrayer(prayer);
-		});
 	}
 
 	@Override
@@ -246,8 +237,34 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	}
 
 	@Override
+	public CompoundNBT getShareTag(final ItemStack stack) {
+		// TODO Auto-generated method stub
+		return super.getShareTag(stack);
+	}
+
+	@Override
 	public TalismanPrayerProvider newProvider(final ItemStack stack) {
 		return new TalismanPrayerProvider(stack);
+	}
+
+	public enum State {
+
+		TOGGLE,
+		ACTIVATE,
+		DEACTIVATE;
+
+		public State opposite() {
+			switch(this) {
+			case ACTIVATE:
+				return DEACTIVATE;
+			case DEACTIVATE:
+				return ACTIVATE;
+			case TOGGLE:
+				return TOGGLE;
+			}
+			throw new IllegalArgumentException("Cannot compute opposite of unknown state!");
+		}
+
 	}
 
 }

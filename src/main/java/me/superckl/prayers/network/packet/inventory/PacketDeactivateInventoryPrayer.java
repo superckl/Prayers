@@ -22,6 +22,7 @@ public class PacketDeactivateInventoryPrayer {
 
 	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
+		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
 				final ItemStack stack = Minecraft.getInstance().player.inventory.getItem(this.slot);

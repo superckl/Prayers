@@ -7,8 +7,9 @@ import org.lwjgl.glfw.GLFW;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.client.gui.PrayerSelectGUI;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
-import me.superckl.prayers.network.packet.inventory.PacketTalismanToggle;
+import me.superckl.prayers.network.packet.inventory.PacketTalismanState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
@@ -33,8 +34,9 @@ public class KeyBindings {
 			for(int i = 0; i < stacks.size(); i++) {
 				final ItemStack stack = stacks.get(i);
 				if(!stack.isEmpty() && stack.getItem() == ModItems.TALISMAN.get())
-					if(ModItems.TALISMAN.get().toggle(stack, KeyBindings.mc.player))
-						PrayersPacketHandler.INSTANCE.sendToServer(new PacketTalismanToggle(i));
+					if(ModItems.TALISMAN.get().applyState(stack, KeyBindings.mc.player, TalismanItem.State.TOGGLE))
+						PrayersPacketHandler.INSTANCE.sendToServer(PacketTalismanState.builder().entityID(KeyBindings.mc.player.getId())
+								.slot(i).state(TalismanItem.State.TOGGLE).build());
 			}
 		}
 	}

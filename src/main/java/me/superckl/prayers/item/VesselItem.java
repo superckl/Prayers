@@ -18,9 +18,7 @@ import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -37,8 +35,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class VesselItem extends Item {
@@ -122,24 +118,6 @@ public class VesselItem extends Item {
 			return true;
 		}
 		return false;
-	}
-
-	@SubscribeEvent
-	public static void onPlayerKillEntity(final LivingDeathEvent e) {
-		final EntityType<?> type = e.getEntityLiving().getType();
-		if(!VesselItem.REQ_MOBS.contains(type.getRegistryName()))
-			return;
-		final Entity source = e.getSource().getDirectEntity();
-		if(source instanceof PlayerEntity) {
-			final PlayerEntity killer = (PlayerEntity) source;
-			final VesselItem soulItem = ModItems.VESSEL.get();
-			for(final ItemStack stack:killer.inventory.items) {
-				if(stack.getItem() != soulItem)
-					continue;
-				if(soulItem.onKill(type, stack))
-					break;
-			}
-		}
 	}
 
 	public Set<ResourceLocation> getStoredKills(final ItemStack stack){

@@ -50,17 +50,22 @@ public abstract class TickablePrayerProvider<T> {
 		return this.currentPrayerPoints;
 	}
 
-	public void activatePrayer(final Prayer prayer) {
+	public boolean activatePrayer(final Prayer prayer) {
 		if(!this.isPrayerActive(prayer))
-			this.activePrayers.add(prayer.delegate);
+			return this.activePrayers.add(prayer.delegate);
+		return false;
 	}
 
-	public void deactivatePrayer(final Prayer prayer) {
-		this.activePrayers.remove(prayer.delegate);
+	public boolean deactivatePrayer(final Prayer prayer) {
+		return this.activePrayers.remove(prayer.delegate);
 	}
 
-	public void deactivateAllPrayers() {
-		this.activePrayers.clear();
+	public boolean deactivateAllPrayers() {
+		if(!this.activePrayers.isEmpty()) {
+			this.activePrayers.clear();
+			return true;
+		}
+		return false;
 	}
 
 	public boolean isPrayerActive(final Prayer prayer) {
@@ -85,11 +90,10 @@ public abstract class TickablePrayerProvider<T> {
 		this.setCurrentPrayerPoints(newPoints);
 	}
 
-	public void togglePrayer(final Prayer prayer) {
+	public boolean togglePrayer(final Prayer prayer) {
 		if (this.isPrayerActive(prayer))
-			this.deactivatePrayer(prayer);
-		else
-			this.activatePrayer(prayer);
+			return this.deactivatePrayer(prayer);
+		return this.activatePrayer(prayer);
 	}
 
 	public float addPoints(final float points) {

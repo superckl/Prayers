@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.TickablePrayerProvider;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -35,14 +34,13 @@ public class PacketSyncPrayerUser extends PrayerUserPacket{
 	}
 
 	@Override
-	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		super.handle(supplier);
 		final Context context = supplier.get();
 		//Only the server should be sending these packets.
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
 			context.enqueueWork(() -> {
-				final TickablePrayerProvider<? extends LivingEntity> prayerUser = this.getUser(Minecraft.getInstance().level);
+				final TickablePrayerProvider<? extends LivingEntity> prayerUser = this.getUser(context);
 				CapabilityHandler.deserialize(prayerUser, this.userNBT);
 			});
 	}

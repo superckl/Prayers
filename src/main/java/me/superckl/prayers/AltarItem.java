@@ -8,10 +8,6 @@ import lombok.Getter;
 import me.superckl.prayers.init.ModItems;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -53,16 +49,6 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 			if(altarItem.get().matcher.test(stack))
 				return altarItem.get();
 		return null;
-	}
-
-	@SubscribeEvent
-	public static void fillTooltip(final ItemTooltipEvent e) {
-		final AltarItem aItem = AltarItem.find(e.getItemStack());
-		if(aItem == null)
-			return;
-		e.getToolTip().add(new StringTextComponent("Altar offering:").withStyle(TextFormatting.BLUE));
-		e.getToolTip().add(new StringTextComponent(String.format("- %.1f point(s)", aItem.getOfferPoints())).withStyle(TextFormatting.BLUE));
-		e.getToolTip().add(new StringTextComponent(String.format("- %.1f xp", aItem.getSacrificeXP())).withStyle(TextFormatting.BLUE));
 	}
 
 }

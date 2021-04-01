@@ -33,6 +33,7 @@ public class PacketInventorySlotChanged {
 
 	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
+		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
 				if(!Minecraft.getInstance().level.isAreaLoaded(this.pos, 0))

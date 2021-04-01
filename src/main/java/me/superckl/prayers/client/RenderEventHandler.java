@@ -227,7 +227,6 @@ public class RenderEventHandler {
 				//Transform by current matrix pose
 				toTransform.transform(matrix.last().pose());
 				vertex.set(toTransform.x(), toTransform.y(), toTransform.z());
-
 			}
 			final BufferBuilder builder = Tessellator.getInstance().getBuilder();
 			builder.begin(7, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);

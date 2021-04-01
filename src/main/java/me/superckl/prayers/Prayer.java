@@ -15,6 +15,7 @@ import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.effects.DamageEffect;
 import me.superckl.prayers.effects.DamageEffect.DamageType;
 import me.superckl.prayers.effects.FireProtEffect;
+import me.superckl.prayers.effects.PoisonProtEffect;
 import me.superckl.prayers.effects.PrayerEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +23,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
@@ -55,6 +55,8 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 			.effect(() -> new DamageEffect(DamageType.RANGE, true, true, -0.5F)).exclusionType("protect")::build);
 	public static final RegistryObject<Prayer> PROTECT_ITEM = Prayer.REGISTER.register("protect_item", Prayer.builder().drain(0.2F).level(25)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectitem.png"))::build);
+	public static final RegistryObject<Prayer> PROTECT_POISON = Prayer.REGISTER.register("protect_poison", Prayer.builder().drain(1F).level(20)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectpoison.png")).effect(PoisonProtEffect::new)::build);
 	public static final RegistryObject<Prayer> PROTECT_FIRE = Prayer.REGISTER.register("protect_fire", Prayer.builder().drain(2.5F).level(35)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectfire.png")).effect(FireProtEffect::new)::build);
 
@@ -138,8 +140,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public List<ITextComponent> getTooltipDescription(){
 		if(this.tooltipDescription == null) {
 			this.tooltipDescription = Lists.newArrayList(this.getName());
-			this.effects.forEach(effect -> this.tooltipDescription.add(new StringTextComponent(effect.getDescription())
-					.setStyle(Style.EMPTY.withItalic(true))));
+			this.effects.forEach(effect -> this.tooltipDescription.add(effect.getDescription().copy().setStyle(Style.EMPTY.withItalic(true))));
 		}
 		return this.tooltipDescription;
 	}

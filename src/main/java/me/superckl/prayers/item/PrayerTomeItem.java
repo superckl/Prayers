@@ -2,13 +2,13 @@ package me.superckl.prayers.item;
 
 import java.util.List;
 
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.util.LangUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -24,7 +24,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class PrayerTomeItem extends Item{
@@ -60,14 +62,10 @@ public class PrayerTomeItem extends Item{
 
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
-		String id = super.getDescriptionId(stack);
-		@SuppressWarnings("resource")
-		final
-		PlayerEntity player = Minecraft.getInstance().player;
+		final String id = super.getDescriptionId(stack);
 		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
-		if(prayer != null && player != null && player.isAlive() && CapabilityHandler.getPrayerCapability(player).getPrayerLevel() >= prayer.getLevel())
-			id = id.concat("_prayer");
-		return id;
+		final String newId = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> new ClientIdHelper(id, prayer)::modifyId);
+		return newId == null ? id:newId;
 	}
 
 	@Override
@@ -85,7 +83,7 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		this.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(level != null && CapabilityHandler.getPrayerCapability(Minecraft.getInstance().player).getPrayerLevel() < prayer.getLevel()) {
+			if(level != null && CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).getPrayerLevel() < prayer.getLevel()) {
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.decipher")).withStyle(TextFormatting.GRAY));
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"), prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
 			}else

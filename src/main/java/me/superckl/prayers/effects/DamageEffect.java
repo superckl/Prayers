@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -25,7 +27,7 @@ public class DamageEffect extends PrayerEffect{
 	}
 
 	@Override
-	public String getDescription() {
+	public ITextComponent getDescription() {
 		if(this.description == null) {
 			final StringBuilder builder = new StringBuilder(this.type.getName()).append(" Damage ");
 			if(this.isIncoming)
@@ -42,7 +44,7 @@ public class DamageEffect extends PrayerEffect{
 				builder.append(String.format("%.2f", Math.abs(this.amount)));
 			this.description = builder.toString();
 		}
-		return this.description;
+		return new StringTextComponent(this.description);
 	}
 
 	@SubscribeEvent

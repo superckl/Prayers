@@ -6,7 +6,6 @@ import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.Prayer;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -38,16 +37,16 @@ public class PacketDeactivatePrayer  extends PrayerUserPacket{
 		super.handle(supplier);
 		final Context context = supplier.get();
 		if(context.getDirection() == NetworkDirection.PLAY_TO_CLIENT || context.getDirection() == NetworkDirection.LOGIN_TO_CLIENT)
-			context.enqueueWork(() -> this.getUser(Minecraft.getInstance().level).deactivatePrayer(this.prayer));
+			context.enqueueWork(() -> this.getUser(context).deactivatePrayer(this.prayer));
 		else
 			context.enqueueWork(() -> {
-				//Check the client is not attempting to deactivate a prayer an another entity
+				//Since this is from a client, defensively check this can actually be done
 				if (this.entityID != context.getSender().getId()) {
 					//Tell the client they can't deactivate that prayer
 					PrayersPacketHandler.INSTANCE.reply(PacketActivatePrayer.builder().entityID(this.entityID).prayer(this.prayer).build(), context);
 					return;
 				}
-				CapabilityHandler.getPrayerCapability(context.getSender()).deactivatePrayer(this.prayer);
+				CapabilityHandler.getPrayerCapability(context.getSender()).deactivatePrayer(this.prayer); //This should automatically sync to all tracking clients
 			});
 	}
 
