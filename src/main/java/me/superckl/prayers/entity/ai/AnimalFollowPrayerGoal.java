@@ -35,8 +35,7 @@ public class AnimalFollowPrayerGoal extends Goal{
 		this.player = this.mob.level.getNearestPlayer(AnimalFollowPrayerGoal.TEMP_TARGETING, this.mob);
 		if (this.player == null)
 			return false;
-		else
-			return CapabilityHandler.getPrayerCapability(this.player).isPrayerActive(Prayer.ARK.get());
+		return CapabilityHandler.getPrayerCapability(this.player).isPrayerActive(Prayer.ARK.get());
 	}
 
 	@Override
