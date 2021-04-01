@@ -20,7 +20,7 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 
 	public boolean canActivatePrayer(final PlayerEntity player, final Prayer prayer) {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
-		return prayer.isEnabled() && (user.isPrayerActive(prayer, false) || user.canUseItemPrayer(prayer)) &&
+		return prayer.isEnabled() && user.canUseItemPrayer(prayer) && !user.hasActiveItem(prayer) &&
 				(this.getCurrentPrayerPoints() >= prayer.getDrain()/20F || ((PrayerInventoryItem<?>) this.ref.getItem()).isShouldDrainHolder() && user.getCurrentPrayerPoints() >= prayer.getDrain()/20F);
 	}
 
