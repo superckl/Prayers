@@ -21,6 +21,7 @@ import me.superckl.prayers.effects.DamageEffect.DamageType;
 import me.superckl.prayers.effects.FireProtEffect;
 import me.superckl.prayers.effects.PoisonProtEffect;
 import me.superckl.prayers.effects.PrayerEffect;
+import me.superckl.prayers.effects.TemptAnimalEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
@@ -103,6 +104,9 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public static final RegistryObject<Prayer> ENHANCE_DEFENCE_3 = Prayer.REGISTER.register("enhance_defence_3", Prayer.builder().drain(2F).level(28)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancedefence3.png"))
 			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.25F)).exclusionType("enhance_defence")::build);
+
+	public static final RegistryObject<Prayer> ARK = Prayer.REGISTER.register("ark", Prayer.builder().drain(1F).level(15)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/ark.png")).effect(TemptAnimalEffect::new)::build);
 
 	private final float drain;
 	private final int level;
