@@ -200,6 +200,20 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		return false;
 	}
 
+	@Override
+	public boolean shouldCauseReequipAnimation(final ItemStack oldStack, final ItemStack newStack, final boolean slotChanged) {
+		final boolean notEqual = super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
+		if(notEqual && !slotChanged && ItemStack.isSame(oldStack, newStack)) {
+			final CompoundNBT tag1 = oldStack.getTag().copy();
+			tag1.remove(PrayerInventoryItem.CAPABILITY_KEY);
+			final CompoundNBT tag2 = newStack.getTag().copy();
+			tag2.remove(PrayerInventoryItem.CAPABILITY_KEY);
+			if(tag1 == null && tag2 == null || tag1 != null && tag1.equals(tag2))
+				return !CapabilityHandler.getPrayerCapability(oldStack).samePrayersActive(CapabilityHandler.getPrayerCapability(newStack));
+		}
+		return notEqual;
+	}
+
 	public LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(TalismanItem.PRAYER_KEY))

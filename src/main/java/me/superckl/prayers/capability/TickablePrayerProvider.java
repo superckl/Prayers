@@ -102,6 +102,12 @@ public abstract class TickablePrayerProvider<T> {
 		return toAdd;
 	}
 
+	public boolean samePrayersActive(final TickablePrayerProvider<?> other) {
+		final Collection<Prayer> prayers1 = this.getActivePrayers();
+		final Collection<Prayer> prayers2 = other.getActivePrayers();
+		return prayers1.size() == prayers2.size() && prayers1.containsAll(prayers2);
+	}
+
 	@RequiredArgsConstructor
 	public static class Provider<T> implements ICapabilitySerializable<INBT>{
 

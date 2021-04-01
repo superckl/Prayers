@@ -3,7 +3,6 @@ package me.superckl.prayers.network.packet.inventory;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.TalismanItem.State;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -39,7 +38,6 @@ public class PacketTalismanState extends PrayerUserPacket{
 				if(!stack.isEmpty() && stack.getItem() == ModItems.TALISMAN.get()) {
 					//Since this is from a client, defensively check this can actually be done
 					final boolean changed = ModItems.TALISMAN.get().applyState(stack, player, this.state);
-					LogHelper.info(changed);
 					if(changed && supplier.get().getDirection() == NetworkDirection.PLAY_TO_SERVER)
 						//Notify tracking clients that this player has updated their prayers
 						PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> player), this);
