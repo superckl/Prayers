@@ -3,9 +3,9 @@ package me.superckl.prayers.network.packet.user;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.Prayer;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;

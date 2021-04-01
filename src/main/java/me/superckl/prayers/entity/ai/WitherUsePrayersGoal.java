@@ -4,12 +4,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import me.superckl.prayers.Prayer;
 import me.superckl.prayers.capability.CapabilityHandler;
-import me.superckl.prayers.capability.TickablePrayerProvider;
+import me.superckl.prayers.capability.LivingPrayerUser;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
-import net.minecraft.entity.LivingEntity;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -17,7 +16,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 public class WitherUsePrayersGoal extends Goal{
 
 	private final WitherEntity entity;
-	private final TickablePrayerProvider<? extends LivingEntity> provider;
+	private final LivingPrayerUser<?> provider;
 	private final List<Prayer> first_stage;
 	private final List<Prayer> second_stage;
 	private boolean wasPowered;

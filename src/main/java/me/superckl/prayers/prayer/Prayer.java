@@ -1,15 +1,19 @@
-package me.superckl.prayers;
+package me.superckl.prayers.prayer;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.Singular;
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.effects.DamageEffect;
@@ -103,6 +107,10 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	private final float drain;
 	private final int level;
 	private final List<PrayerEffect> effects;
+	@Getter(AccessLevel.PRIVATE)
+	private final Consumer<LivingEntity> onActivate;
+	@Getter(AccessLevel.PRIVATE)
+	private final Consumer<LivingEntity> onDeactivate;
 	private final List<String> exclusionTypes;
 	private final boolean requiresTome;
 	private final boolean overhead;
@@ -115,20 +123,26 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	//We require a supplier for effects so that a new instance can be created every time the prayer is built.
 	@Builder
 	private Prayer(final float drain, final int level, @Singular final List<Supplier<PrayerEffect>> effects, @Singular final List<String> exclusionTypes,
-			final boolean requiresTome, final boolean overhead, final ResourceLocation texture) {
+			Consumer<LivingEntity> onActivate, Consumer<LivingEntity> onDeactivate, final boolean requiresTome, final boolean overhead, @NonNull final ResourceLocation texture) {
 		this.drain = drain;
 		this.level = level;
 		this.texture = texture;
 		this.exclusionTypes = exclusionTypes;
 		this.requiresTome = requiresTome;
 		this.overhead = overhead;
+		if(onActivate == null)
+			onActivate = entity -> {};
+			if(onDeactivate == null)
+				onDeactivate = entity -> {};
+				this.onActivate = onActivate;
+				this.onDeactivate = onDeactivate;
 
-		this.effects = effects.stream().map(Supplier::get).collect(Collectors.toList());
-		this.effects.forEach(effect -> {
-			effect.setOwner(this);
-			if(effect.hasListener())
-				MinecraftForge.EVENT_BUS.register(effect);
-		});
+				this.effects = effects.stream().map(Supplier::get).collect(Collectors.toList());
+				this.effects.forEach(effect -> {
+					effect.setOwner(this);
+					if(effect.hasListener())
+						MinecraftForge.EVENT_BUS.register(effect);
+				});
 	}
 
 	public IFormattableTextComponent getName() {
@@ -152,6 +166,14 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public boolean isObfusctated(final PlayerEntity player) {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
 		return this.requiresTome && !user.isUnlocked(this) || user.getPrayerLevel() < this.getLevel();
+	}
+
+	public void onActivate(final LivingEntity e) {
+		this.onActivate.accept(e);
+	}
+
+	public void onDeactivate(final LivingEntity e) {
+		this.onDeactivate.accept(e);
 	}
 
 	public static List<RegistryObject<? extends Prayer>> defaultObjects(){

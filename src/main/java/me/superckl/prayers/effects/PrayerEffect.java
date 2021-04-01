@@ -1,7 +1,7 @@
 package me.superckl.prayers.effects;
 
 import lombok.Getter;
-import me.superckl.prayers.Prayer;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.util.text.ITextComponent;
 
 public abstract class PrayerEffect{

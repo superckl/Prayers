@@ -11,7 +11,6 @@ import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.DefaultLivingPrayerUser;
 import me.superckl.prayers.capability.DefaultPlayerPrayerUser;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
-import me.superckl.prayers.capability.LivingPrayerUser;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.capability.TickablePrayerProvider;
@@ -38,6 +37,8 @@ import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
 import me.superckl.prayers.potion.PotionTransformRecipe;
+import me.superckl.prayers.prayer.ActivationCondition;
+import me.superckl.prayers.prayer.Prayer;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.command.CommandSource;
@@ -93,17 +94,11 @@ public class Prayers {
 
 	private void commonSetup(final FMLCommonSetupEvent event){
 		event.enqueueWork(() -> {
-			LogHelper.info("registering");
 			MinecraftForge.EVENT_BUS.register(this);
-			LogHelper.info(1);
 			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
-			LogHelper.info(2);
 			MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
-			LogHelper.info(3);
 			MinecraftForge.EVENT_BUS.register(new ItemEvents());
-			LogHelper.info(4);
 			ActivationCondition.registerConditions();
-			LogHelper.info("registered");
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
 					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
 			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.REDSTONE, ModPotions.PRAYER_RENEWAL::get));
@@ -112,7 +107,7 @@ public class Prayers {
 
 		});
 		CapabilityManager.INSTANCE.register(PlayerPrayerUser.class, new PlayerPrayerUser.Storage(), () -> new DefaultPlayerPrayerUser(null));
-		CapabilityManager.INSTANCE.register(LivingPrayerUser.class, new TickablePrayerProvider.Storage<LivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));
+		CapabilityManager.INSTANCE.register(DefaultLivingPrayerUser.class, new TickablePrayerProvider.Storage<DefaultLivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));
 		CapabilityManager.INSTANCE.register(InventoryPrayerProvider.class, new TickablePrayerProvider.Storage<InventoryPrayerProvider>(), () -> new TalismanPrayerProvider(ItemStack.EMPTY));
 		int pIndex = 0;
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketActivatePrayer.class,

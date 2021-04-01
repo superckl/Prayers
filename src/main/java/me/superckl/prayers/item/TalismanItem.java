@@ -3,9 +3,7 @@ package me.superckl.prayers.item;
 import java.util.Collection;
 import java.util.List;
 
-import me.superckl.prayers.ActivationCondition;
 import me.superckl.prayers.ClientHelper;
-import me.superckl.prayers.Prayer;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
@@ -15,6 +13,8 @@ import me.superckl.prayers.entity.ai.WitherUsePrayersGoal;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
+import me.superckl.prayers.prayer.ActivationCondition;
+import me.superckl.prayers.prayer.Prayer;
 import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -178,7 +178,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 			case ACTIVATE:
 				return CapabilityHandler.getPrayerCapability(stack).activatePrayer(prayer, player);
 			case DEACTIVATE:
-				return CapabilityHandler.getPrayerCapability(stack).deactivatePrayer(prayer);
+				return CapabilityHandler.getPrayerCapability(stack).deactivatePrayer(prayer, player);
 			case TOGGLE:
 				return CapabilityHandler.getPrayerCapability(stack).togglePrayer(prayer, player);
 			}

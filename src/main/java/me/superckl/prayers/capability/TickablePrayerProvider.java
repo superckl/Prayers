@@ -12,7 +12,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import me.superckl.prayers.Prayer;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -35,10 +35,8 @@ public abstract class TickablePrayerProvider<T> {
 	@Getter
 	@Setter
 	protected boolean shouldDrain = true;
-	protected final T ref;
 
-	public TickablePrayerProvider(final T ref) {
-		this.ref = ref;
+	public TickablePrayerProvider() {
 		this.currentPrayerPoints = this.getMaxPrayerPoints();
 	}
 
@@ -50,17 +48,21 @@ public abstract class TickablePrayerProvider<T> {
 		return this.currentPrayerPoints;
 	}
 
-	public boolean activatePrayer(final Prayer prayer) {
+	//These methods are all protected because they do not
+	//call onActivate or onDeactivate. They must be exposed by
+	//subclasses that properly inform the prayers of activation
+	//and deactivation
+	protected boolean activatePrayer(final Prayer prayer) {
 		if(!this.isPrayerActive(prayer))
 			return this.activePrayers.add(prayer.delegate);
 		return false;
 	}
 
-	public boolean deactivatePrayer(final Prayer prayer) {
+	protected boolean deactivatePrayer(final Prayer prayer) {
 		return this.activePrayers.remove(prayer.delegate);
 	}
 
-	public boolean deactivateAllPrayers() {
+	protected boolean deactivateAllPrayers() {
 		if(!this.activePrayers.isEmpty()) {
 			this.activePrayers.clear();
 			return true;
@@ -88,12 +90,6 @@ public abstract class TickablePrayerProvider<T> {
 			this.deactivateAllPrayers();
 		}
 		this.setCurrentPrayerPoints(newPoints);
-	}
-
-	public boolean togglePrayer(final Prayer prayer) {
-		if (this.isPrayerActive(prayer))
-			return this.deactivatePrayer(prayer);
-		return this.activatePrayer(prayer);
 	}
 
 	public float addPoints(final float points) {

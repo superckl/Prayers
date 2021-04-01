@@ -27,8 +27,8 @@ public class CapabilityHandler {
 
 	@CapabilityInject(PlayerPrayerUser.class)
 	private static Capability<PlayerPrayerUser> PLAYER_CAPABILITY;
-	@CapabilityInject(LivingPrayerUser.class)
-	private static Capability<LivingPrayerUser> LIVING_CAPABILITY;
+	@CapabilityInject(DefaultLivingPrayerUser.class)
+	private static Capability<DefaultLivingPrayerUser> LIVING_CAPABILITY;
 	@CapabilityInject(InventoryPrayerProvider.class)
 	private static Capability<InventoryPrayerProvider> INVENTORY_CAPABILITY;
 
@@ -108,7 +108,7 @@ public class CapabilityHandler {
 		new IllegalArgumentException("Passed player with prayer capability! "+ref));
 	}
 
-	public static TickablePrayerProvider<? extends LivingEntity> getPrayerCapability(final LivingEntity ref) {
+	public static LivingPrayerUser<?> getPrayerCapability(final LivingEntity ref) {
 		if(ref instanceof PlayerEntity)
 			return CapabilityHandler.getPrayerCapability((PlayerEntity) ref);
 		return ref.getCapability(CapabilityHandler.LIVING_CAPABILITY).orElseThrow(() ->
@@ -124,7 +124,7 @@ public class CapabilityHandler {
 		return new TickablePrayerProvider.Provider<>(cap, () -> CapabilityHandler.PLAYER_CAPABILITY);
 	}
 
-	public static <T extends LivingPrayerUser> TickablePrayerProvider.Provider<LivingPrayerUser> makeProvider(final T cap){
+	public static <T extends DefaultLivingPrayerUser> TickablePrayerProvider.Provider<DefaultLivingPrayerUser> makeProvider(final T cap){
 		return new TickablePrayerProvider.Provider<>(cap, () -> CapabilityHandler.LIVING_CAPABILITY);
 	}
 
@@ -136,7 +136,7 @@ public class CapabilityHandler {
 		if(cap instanceof PlayerPrayerUser)
 			return CapabilityHandler.PLAYER_CAPABILITY.writeNBT((PlayerPrayerUser) cap, null);
 		if(cap instanceof LivingPrayerUser)
-			return CapabilityHandler.LIVING_CAPABILITY.writeNBT((LivingPrayerUser) cap, null);
+			return CapabilityHandler.LIVING_CAPABILITY.writeNBT((DefaultLivingPrayerUser) cap, null);
 		if(cap instanceof InventoryPrayerProvider)
 			return CapabilityHandler.INVENTORY_CAPABILITY.writeNBT((InventoryPrayerProvider) cap, null);
 		throw new IllegalArgumentException("Unknown capability type! "+cap);
@@ -146,7 +146,7 @@ public class CapabilityHandler {
 		if(cap instanceof PlayerPrayerUser)
 			CapabilityHandler.PLAYER_CAPABILITY.readNBT((PlayerPrayerUser) cap, null, nbt);
 		else if(cap instanceof LivingPrayerUser)
-			CapabilityHandler.LIVING_CAPABILITY.readNBT((LivingPrayerUser) cap, null, nbt);
+			CapabilityHandler.LIVING_CAPABILITY.readNBT((DefaultLivingPrayerUser) cap, null, nbt);
 		else if(cap instanceof InventoryPrayerProvider)
 			CapabilityHandler.INVENTORY_CAPABILITY.readNBT((InventoryPrayerProvider) cap, null, nbt);
 		else

@@ -11,7 +11,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
-import me.superckl.prayers.Prayer;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.block.CraftingStandBlock;
@@ -22,6 +21,7 @@ import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.client.gui.PrayerBar;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;

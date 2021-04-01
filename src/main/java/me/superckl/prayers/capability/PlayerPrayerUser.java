@@ -10,12 +10,12 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.Prayer;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
+import me.superckl.prayers.prayer.Prayer;
 import me.superckl.prayers.util.MathUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -32,7 +32,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEntity>{
+public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 
 	protected boolean autoSync;
 
@@ -87,11 +87,9 @@ public abstract class PlayerPrayerUser extends TickablePrayerProvider<PlayerEnti
 	@Override
 	public boolean deactivatePrayer(final Prayer prayer) {
 		final boolean changed = super.deactivatePrayer(prayer);
-		if(changed && this.autoSync && !this.ref.level.isClientSide) {
+		if(changed && this.autoSync && !this.ref.level.isClientSide)
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this.ref),
 					PacketDeactivatePrayer.builder().entityID(this.ref.getId()).prayer(prayer).build());
-			return true;
-		}
 		return changed;
 	}
 

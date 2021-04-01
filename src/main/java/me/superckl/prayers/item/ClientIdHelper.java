@@ -2,8 +2,8 @@ package me.superckl.prayers.item;
 
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.ClientHelper;
-import me.superckl.prayers.Prayer;
 import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.entity.player.PlayerEntity;
 
 @RequiredArgsConstructor

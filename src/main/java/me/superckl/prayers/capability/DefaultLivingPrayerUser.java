@@ -2,7 +2,7 @@ package me.superckl.prayers.capability;
 
 import net.minecraft.entity.LivingEntity;
 
-public class DefaultLivingPrayerUser extends LivingPrayerUser{
+public class DefaultLivingPrayerUser extends LivingPrayerUser<LivingEntity>{
 
 	private final float maxPoints;
 

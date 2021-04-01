@@ -8,8 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import me.superckl.prayers.Prayer;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.conditions.ILootCondition;

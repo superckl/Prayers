@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
-import me.superckl.prayers.Prayer;
+import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.registries.IRegistryDelegate;
 

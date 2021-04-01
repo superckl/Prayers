@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
-import me.superckl.prayers.capability.TickablePrayerProvider;
+import me.superckl.prayers.capability.LivingPrayerUser;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
@@ -28,11 +28,11 @@ public abstract class PrayerUserPacket {
 		supplier.get().setPacketHandled(true);
 	}
 
-	protected TickablePrayerProvider<? extends LivingEntity> getUser(final World world) {
+	protected LivingPrayerUser<?> getUser(final World world) {
 		return CapabilityHandler.getPrayerCapability((LivingEntity) world.getEntity(this.entityID));
 	}
 
-	protected TickablePrayerProvider<? extends LivingEntity> getUser(final NetworkEvent.Context context) {
+	protected LivingPrayerUser<?> getUser(final NetworkEvent.Context context) {
 		return this.getUser(this.getLevel(context));
 	}
 
