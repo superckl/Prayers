@@ -7,6 +7,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 public class MathUtil {
@@ -40,6 +41,10 @@ public class MathUtil {
 
 	public static boolean isIntDifferent(final float val1, final float val2) {
 		return (int) val1 != (int) val2;
+	}
+
+	public static AxisAlignedBB withSquareRadius(final BlockPos center, final int radius) {
+		return new AxisAlignedBB(center.offset(-radius, -radius, -radius), center.offset(radius, radius, radius));
 	}
 
 }

@@ -12,6 +12,8 @@ import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -22,6 +24,10 @@ public class Config {
 	private static Config instance;
 	@Getter
 	private final ConfigValue<List<String>> prayers;
+	@Getter
+	private final IntValue fertilityRange;
+	@Getter
+	private final DoubleValue fertilityChance;
 
 	private Config(final ForgeConfigSpec.Builder builder) {
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
@@ -31,6 +37,12 @@ public class Config {
 			comment[i + 1] = prayerLocs.get(i);
 		builder.comment(comment);
 		this.prayers = builder.define("Prayers", Lists.newArrayList());
+		builder.comment("Radius, in blocks, of the decree of fertility. (default 9)");
+		this.fertilityRange = builder.defineInRange("Decree of Fertility Range", 9, 0, Integer.MAX_VALUE);
+		builder.comment("This controls how often the decree of fertility will apply bonemeal to crops within its radius. (default .0003125)",
+				"A random value (0,1) is checked against this value every tick; .0003125 means on average every 160 seconds.",
+				"This might sound like a lot, but a 9x9 farm has ~80 blocks, so one crop bonemeals every 2 seconds.");
+		this.fertilityChance = builder.defineInRange("Decree of Fertility Chance", .0003125, 0, 1);
 	}
 
 	public static ForgeConfigSpec setup() {

@@ -24,6 +24,7 @@ import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.item.ItemEvents;
+import me.superckl.prayers.item.decree.ItemFrameTickManager;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketDeactivateInventoryPrayer;
@@ -98,6 +99,7 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
 			MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 			MinecraftForge.EVENT_BUS.register(new ItemEvents());
+			MinecraftForge.EVENT_BUS.register(ItemFrameTickManager.INSTANCE);
 			ActivationCondition.registerConditions();
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
 					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
