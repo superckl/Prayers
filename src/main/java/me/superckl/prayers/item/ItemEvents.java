@@ -1,13 +1,17 @@
 package me.superckl.prayers.item;
 
+import java.lang.reflect.Method;
+
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.decree.DecreeData;
 import me.superckl.prayers.item.decree.DecreeItem;
 import me.superckl.prayers.item.decree.InfertilityDecreeData;
 import me.superckl.prayers.item.decree.ItemFrameTickManager;
+import me.superckl.prayers.item.decree.SanctuaryDecreeData;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -16,17 +20,20 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.world.BlockEvent.CropGrowEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class ItemEvents {
+
+	private Method shouldDespawnInPeaceful;
 
 	@SubscribeEvent
 	public void onPlayerKillEntity(final LivingDeathEvent e) {
@@ -74,37 +81,74 @@ public class ItemEvents {
 	}
 
 	@SubscribeEvent
-	public void onBreed(BabyEntitySpawnEvent e) {
+	public void onMobSpawn(final LivingSpawnEvent.CheckSpawn e) {
+		try {
+			if(this.shouldDespawnInPeaceful == null) {
+				this.shouldDespawnInPeaceful = ObfuscationReflectionHelper.findMethod(MobEntity.class, "func_225511_J_");
+				this.shouldDespawnInPeaceful.setAccessible(true);
+			}
+			if(e.getEntityLiving() instanceof MobEntity && this.isSanctuary(e.getEntityLiving().blockPosition()) && (Boolean) this.shouldDespawnInPeaceful.invoke(e.getEntityLiving()))
+				e.setResult(Result.DENY);
+		} catch (final Exception e1) {
+			throw new IllegalStateException("Failed to access despawn check method of mob entity!", e1);
+		}
+	}
+
+	@SubscribeEvent
+	public void onSpecialSpawn(final LivingSpawnEvent.SpecialSpawn e) {
+		try {
+			if(this.shouldDespawnInPeaceful == null) {
+				this.shouldDespawnInPeaceful = ObfuscationReflectionHelper.findMethod(MobEntity.class, "func_225511_J_");
+				this.shouldDespawnInPeaceful.setAccessible(true);
+			}
+			if(e.getEntityLiving() instanceof MobEntity && this.isSanctuary(e.getEntityLiving().blockPosition()) && (Boolean) this.shouldDespawnInPeaceful.invoke(e.getEntityLiving()))
+				e.setCanceled(true);
+		} catch (final Exception e1) {
+			throw new IllegalStateException("Failed to access despawn check method of mob entity!", e1);
+		}
+	}
+
+	@SubscribeEvent
+	public void onBreed(final BabyEntitySpawnEvent e) {
 		if(this.isInfertile(e.getParentA().blockPosition(), e.getParentB().blockPosition()))
 			e.setCanceled(true);
 	}
-	
+
 	@SubscribeEvent
-	public void onBonemeal(BonemealEvent e) {
+	public void onBonemeal(final BonemealEvent e) {
 		if(this.isInfertile(e.getPos()))
 			e.setCanceled(true);
 	}
-	
+
 	@SubscribeEvent
-	public void onCropGrow(CropGrowEvent.Pre e) {
+	public void onCropGrow(final CropGrowEvent.Pre e) {
 		if(this.isInfertile(e.getPos()))
 			e.setResult(Result.DENY);
 	}
-	
-	public void onSaplingGrow(SaplingGrowTreeEvent e) {
+
+	public void onSaplingGrow(final SaplingGrowTreeEvent e) {
 		if(this.isInfertile(e.getPos()))
 			e.setResult(Result.DENY);
 	}
-	
-	private boolean isInfertile(BlockPos... positions) {
-		for(DecreeData data:ItemFrameTickManager.INSTANCE.getDataForType(DecreeItem.Type.INFERTILITY)) {
-			InfertilityDecreeData iData = (InfertilityDecreeData) data;
-			for(BlockPos pos:positions)
-				if(iData.isAffected(pos)) {
+
+	private boolean isSanctuary(final BlockPos... positions) {
+		for(final DecreeData data:ItemFrameTickManager.INSTANCE.getDataForType(DecreeItem.Type.SANCTUARY)) {
+			final SanctuaryDecreeData iData = (SanctuaryDecreeData) data;
+			for(final BlockPos pos:positions)
+				if(iData.isAffected(pos))
 					return true;
-				}
 		}
 		return false;
 	}
-	
+
+	private boolean isInfertile(final BlockPos... positions) {
+		for(final DecreeData data:ItemFrameTickManager.INSTANCE.getDataForType(DecreeItem.Type.INFERTILITY)) {
+			final InfertilityDecreeData iData = (InfertilityDecreeData) data;
+			for(final BlockPos pos:positions)
+				if(iData.isAffected(pos))
+					return true;
+		}
+		return false;
+	}
+
 }

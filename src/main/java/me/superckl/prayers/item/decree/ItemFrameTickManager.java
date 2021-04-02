@@ -50,9 +50,9 @@ public class ItemFrameTickManager{
 		}
 	}
 
-	public List<DecreeData> getDataForType(DecreeItem.Type type){
+	public List<DecreeData> getDataForType(final DecreeItem.Type type){
 		this.purge();
-		List<DecreeData> data = Lists.newArrayList();
+		final List<DecreeData> data = Lists.newArrayList();
 		final Iterator<Entry<WeakReference<ItemFrameEntity>, DecreeData>> it = this.frames.entrySet().iterator();
 		while(it.hasNext()) {
 			final Entry<WeakReference<ItemFrameEntity>, DecreeData> entry = it.next();
@@ -61,12 +61,12 @@ public class ItemFrameTickManager{
 		}
 		return data;
 	}
-	
+
 	private boolean isValid(final ItemFrameEntity entity) {
 		return entity != null && entity.isAlive() && entity.isAddedToWorld() && entity.level != null && entity.level.isLoaded(entity.getPos()) && !entity.getItem().isEmpty()
 				&& entity.getItem().getItem() instanceof DecreeItem;
 	}
-	
+
 	//Helper method to ensure integrity of the stored data when needed
 	private void purge() {
 		final Iterator<Entry<WeakReference<ItemFrameEntity>, DecreeData>> it = this.frames.entrySet().iterator();

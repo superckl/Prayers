@@ -8,14 +8,14 @@ import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public class InfertilityDecreeData extends DecreeData{
+public class SanctuaryDecreeData extends DecreeData{
 
-	public InfertilityDecreeData(final WeakReference<ItemFrameEntity> ref) {
+	public SanctuaryDecreeData(final WeakReference<ItemFrameEntity> ref) {
 		super(ref);
 	}
 
 	public boolean isAffected(final BlockPos pos) {
-		return this.ref.get().getRotation() == 0 && pos.distSqr(this.ref.get().getPos()) <= MathHelper.square(Config.getInstance().getDecreeRanges().get(Type.INFERTILITY).get());
+		return this.ref.get().getRotation() == 0 && pos.distSqr(this.ref.get().getPos()) <= MathHelper.square(Config.getInstance().getDecreeRanges().get(Type.SANCTUARY).get());
 	}
 
 }

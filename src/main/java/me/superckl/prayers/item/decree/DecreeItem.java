@@ -30,16 +30,16 @@ public class DecreeItem extends Item{
 	}
 
 	@Override
-	public Rarity getRarity(ItemStack p_77613_1_) {
+	public Rarity getRarity(final ItemStack p_77613_1_) {
 		return Rarity.EPIC;
 	}
-	
+
 	@Override
-	public void appendHoverText(ItemStack stack, World level, List<ITextComponent> tooltip, ITooltipFlag flag) {
+	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("decree."+this.type.name().toLowerCase())).withStyle(TextFormatting.GRAY));
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("decree.radius"), Config.getInstance().getDecreeRanges().get(this.type).get()).withStyle(TextFormatting.GRAY));
 	}
-	
+
 	@Override
 	public boolean isFoil(final ItemStack stack) {
 		return stack.isFramed() && ((ItemFrameEntity)stack.getEntityRepresentation()).getRotation() == 0;
@@ -49,7 +49,7 @@ public class DecreeItem extends Item{
 	public enum Type{
 
 		FERTILITY(FertilityDecreeData::new),
-		SANCTUARY(DecreeData::new),
+		SANCTUARY(SanctuaryDecreeData::new),
 		INFERTILITY(InfertilityDecreeData::new);
 
 		@Getter

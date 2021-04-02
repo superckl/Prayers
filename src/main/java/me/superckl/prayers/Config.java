@@ -43,7 +43,7 @@ public class Config {
 			comment[i + 1] = prayerLocs.get(i);
 		builder.comment(comment);
 		this.prayers = builder.define("Prayers", Lists.newArrayList());
-		
+
 		builder.comment("Radius, in blocks, of the decree of fertility. (default 9)");
 		this.decreeRanges.put(Type.FERTILITY, builder.defineInRange("Decree.Decree of Fertility Range", 9, 0, Integer.MAX_VALUE));
 		builder.comment("This controls how often the decree of fertility will apply bonemeal to crops within its radius. (default .0003125)",
@@ -54,10 +54,10 @@ public class Config {
 				"A random value (0,1) is checked against this value every tick; .0003125 means on average every 160 seconds.",
 				"This might sound like a lot, but with 10 animals one will get fed every 16 seconds.");
 		this.fertilityAnimalChance = builder.defineInRange("Decree.Decree of Fertility Animal Chance", .0003125, 0, 1);
-		
+
 		builder.comment("Radius, in blocks, of the decree of infertility. (default 9)");
 		this.decreeRanges.put(Type.INFERTILITY, builder.defineInRange("Decree.Decree of Infertility Range", 9, 0, Integer.MAX_VALUE));
-		
+
 		builder.comment("Radius, in blocks, of the decree of sanctuary. (default 30)");
 		this.decreeRanges.put(Type.SANCTUARY, builder.defineInRange("Decree.Decree of Sanctuary Range", 30, 0, Integer.MAX_VALUE));
 	}

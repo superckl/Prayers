@@ -55,7 +55,7 @@
   "text.prayers.click_toggle": "Right click to toggle",
   "text.prayers.decree.radius": "Radius: %d",
   "text.prayers.decree.fertility": "Hydrates farmland, grows plants, and feeds animals",
-  "text.prayers.decree.infertility": "Prevents crop growth and animal breeding",
+  "text.prayers.decree.infertility": "Prevents plant growth and animal breeding",
   "text.prayers.decree.sanctuary": "Prevents hostile mob spawns",
   "prayer.prayers.effective": "Effective",
   "prayer.prayers.potent": "Potent",
