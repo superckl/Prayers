@@ -82,9 +82,9 @@ public class ItemFrameTickManager{
 					if(data != null)
 						data.onRemove();
 					it.remove();
-					continue;
 				}
-				entry.getValue().tick();
+				if(entity.getRotation() == 0)
+					entry.getValue().tick();
 			}
 		}
 	}

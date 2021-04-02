@@ -22,7 +22,7 @@ public class DecreeItem extends Item{
 
 	@Override
 	public boolean isFoil(final ItemStack stack) {
-		return stack.isFramed();
+		return stack.isFramed() && ((ItemFrameEntity)stack.getEntityRepresentation()).getRotation() == 0;
 	}
 
 	@RequiredArgsConstructor

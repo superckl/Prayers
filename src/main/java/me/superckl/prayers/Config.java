@@ -27,7 +27,9 @@ public class Config {
 	@Getter
 	private final IntValue fertilityRange;
 	@Getter
-	private final DoubleValue fertilityChance;
+	private final DoubleValue fertilityCropChance;
+	@Getter
+	private final DoubleValue fertilityAnimalChance;
 
 	private Config(final ForgeConfigSpec.Builder builder) {
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
@@ -42,7 +44,11 @@ public class Config {
 		builder.comment("This controls how often the decree of fertility will apply bonemeal to crops within its radius. (default .0003125)",
 				"A random value (0,1) is checked against this value every tick; .0003125 means on average every 160 seconds.",
 				"This might sound like a lot, but a 9x9 farm has ~80 blocks, so one crop bonemeals every 2 seconds.");
-		this.fertilityChance = builder.defineInRange("Decree of Fertility Chance", .0003125, 0, 1);
+		this.fertilityCropChance = builder.defineInRange("Decree of Fertility Crop Chance", .0003125, 0, 1);
+		builder.comment("This controls how often the decree of fertility will apply food to animals. (default .0003125)",
+				"A random value (0,1) is checked against this value every tick; .0003125 means on average every 160 seconds.",
+				"This might sound like a lot, but with 10 animals one will get fed every 16 seconds.");
+		this.fertilityAnimalChance = builder.defineInRange("Decree of Fertility Animal Chance", .0003125, 0, 1);
 	}
 
 	public static ForgeConfigSpec setup() {
