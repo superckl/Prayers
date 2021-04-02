@@ -3,8 +3,11 @@ package me.superckl.prayers.item.decree;
 import java.lang.ref.WeakReference;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.google.common.collect.Lists;
 
 import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
@@ -47,9 +50,36 @@ public class ItemFrameTickManager{
 		}
 	}
 
+	public List<DecreeData> getDataForType(DecreeItem.Type type){
+		this.purge();
+		List<DecreeData> data = Lists.newArrayList();
+		final Iterator<Entry<WeakReference<ItemFrameEntity>, DecreeData>> it = this.frames.entrySet().iterator();
+		while(it.hasNext()) {
+			final Entry<WeakReference<ItemFrameEntity>, DecreeData> entry = it.next();
+			if(((DecreeItem)entry.getKey().get().getItem().getItem()).getType() == type)
+				data.add(entry.getValue());
+		}
+		return data;
+	}
+	
 	private boolean isValid(final ItemFrameEntity entity) {
 		return entity != null && entity.isAlive() && entity.isAddedToWorld() && entity.level != null && entity.level.isLoaded(entity.getPos()) && !entity.getItem().isEmpty()
 				&& entity.getItem().getItem() instanceof DecreeItem;
+	}
+	
+	//Helper method to ensure integrity of the stored data when needed
+	private void purge() {
+		final Iterator<Entry<WeakReference<ItemFrameEntity>, DecreeData>> it = this.frames.entrySet().iterator();
+		while(it.hasNext()) {
+			final Entry<WeakReference<ItemFrameEntity>, DecreeData> entry = it.next();
+			if(!this.isValid(entry.getKey().get())) {
+				final DecreeData data = entry.getValue();
+				if(data != null)
+					data.onRemove();
+				it.remove();
+				break;
+			}
+		}
 	}
 
 	@SubscribeEvent
@@ -72,18 +102,11 @@ public class ItemFrameTickManager{
 	@SubscribeEvent
 	public void onWorldTick(final WorldTickEvent e) {
 		if(e.phase == Phase.END && e.side == LogicalSide.SERVER) {
+			this.purge();
 			final Iterator<Entry<WeakReference<ItemFrameEntity>, DecreeData>> it = this.frames.entrySet().iterator();
 			while(it.hasNext()) {
 				final Entry<WeakReference<ItemFrameEntity>, DecreeData> entry = it.next();
-				final ItemFrameEntity entity = entry.getKey().get();
-				if(!this.isValid(entity)) {
-					//This reference has expired or is no longer relevant
-					final DecreeData data = entry.getValue();
-					if(data != null)
-						data.onRemove();
-					it.remove();
-				}
-				if(entity.getRotation() == 0)
+				if(entry.getKey().get().getRotation() == 0)
 					entry.getValue().tick();
 			}
 		}

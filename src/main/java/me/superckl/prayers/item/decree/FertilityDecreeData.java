@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import me.superckl.prayers.Config;
 import me.superckl.prayers.init.ModParticles;
+import me.superckl.prayers.item.decree.DecreeItem.Type;
 import me.superckl.prayers.util.MathUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IGrowable;
@@ -24,6 +25,7 @@ import net.minecraftforge.common.util.Constants;
 public class FertilityDecreeData extends DecreeData{
 
 	private static final ResourceLocation CROP_TAG = new ResourceLocation("minecraft", "crops");
+	private static final ResourceLocation SAPLING_TAG = new ResourceLocation("minecraft", "saplings");
 
 	private AABBTicket farmlandTicket;
 	private final AxisAlignedBB bb;
@@ -31,7 +33,7 @@ public class FertilityDecreeData extends DecreeData{
 
 	public FertilityDecreeData(final WeakReference<ItemFrameEntity> ref) {
 		super(ref);
-		this.bb = MathUtil.withSquareRadius(this.ref.get().getPos(), Config.getInstance().getFertilityRange().get());
+		this.bb = MathUtil.withSquareRadius(this.ref.get().getPos(), Config.getInstance().getDecreeRanges().get(Type.FERTILITY).get());
 	}
 
 	@Override
@@ -55,7 +57,8 @@ public class FertilityDecreeData extends DecreeData{
 			final Stream<BlockPos> positions = BlockPos.betweenClosedStream(this.bb);
 			positions.forEach(pos -> {
 				final BlockState state = entity.level.getBlockState(pos);
-				if(state.getBlock() instanceof IGrowable && state.getBlock().getTags().contains(FertilityDecreeData.CROP_TAG)) {
+				if(state.getBlock() instanceof IGrowable && state.getBlock().getTags().contains(FertilityDecreeData.CROP_TAG) ||
+						state.getBlock().getTags().contains(FertilityDecreeData.SAPLING_TAG)) {
 					final IGrowable growable = (IGrowable)state.getBlock();
 					if(growable.isValidBonemealTarget(entity.level, pos, state, entity.level.isClientSide) &&
 							this.rand.nextFloat() < cropChance && growable.isBonemealSuccess(entity.level, this.rand, pos, state)) {
