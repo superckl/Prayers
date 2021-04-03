@@ -2,7 +2,7 @@ package me.superckl.prayers.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import me.superckl.prayers.block.AltarTileEntity;
+import me.superckl.prayers.block.entity.AltarTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;

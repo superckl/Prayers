@@ -1,5 +1,6 @@
 package me.superckl.prayers.block;
 
+import me.superckl.prayers.block.entity.OfferingStandTileEntity;
 import me.superckl.prayers.init.ModTiles;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -23,6 +24,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 public class OfferingStandBlock extends ShapedBlock{
 
@@ -35,7 +37,7 @@ public class OfferingStandBlock extends ShapedBlock{
 
 	@Override
 	public BlockState getStateForPlacement(final BlockItemUseContext context) {
-		return super.getStateForPlacement(context).setValue(OfferingStandBlock.FACING, context.getNearestLookingDirection().getOpposite());
+		return super.getStateForPlacement(context).setValue(OfferingStandBlock.FACING, context.getHorizontalDirection().getOpposite());
 	}
 
 	@Override
@@ -60,7 +62,7 @@ public class OfferingStandBlock extends ShapedBlock{
 	public void onRemove(final BlockState state, final World worldIn, final BlockPos pos, final BlockState newState, final boolean isMoving) {
 		if(!state.is(newState.getBlock())) {
 			final OfferingStandTileEntity offering_stand = (OfferingStandTileEntity) worldIn.getBlockEntity(pos);
-			InventoryHelper.dropContents(worldIn, pos, offering_stand);
+			InventoryHelper.dropContents(worldIn, pos, new RecipeWrapper(offering_stand.getInternalItemHandler()));
 			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
 	}

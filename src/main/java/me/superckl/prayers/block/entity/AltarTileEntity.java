@@ -1,4 +1,4 @@
-package me.superckl.prayers.block;
+package me.superckl.prayers.block.entity;
 
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
+import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;

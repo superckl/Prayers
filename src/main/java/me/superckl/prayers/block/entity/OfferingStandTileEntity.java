@@ -1,11 +1,10 @@
-package me.superckl.prayers.block;
+package me.superckl.prayers.block.entity;
 
 import java.util.Random;
 
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
 import me.superckl.prayers.init.ModTiles;
-import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -19,6 +18,8 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
 
 @Getter
 public class OfferingStandTileEntity extends InteractableInventoryTileEntity implements ITickableTileEntity{
@@ -31,21 +32,24 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	private int itemTicks;
 	private int reqTicks;
+	private AltarItem currentItem;
+
+	private final ItemStackHandler itemHandler = new OfferingStandItemHandler();
 
 	public OfferingStandTileEntity() {
-		super(ModTiles.OFFERING_STAND.get(), 1);
+		super(ModTiles.OFFERING_STAND.get());
 	}
 
 	@Override
 	public void tick() {
-		if(this.level.isClientSide || this.getItem(0).isEmpty())
+		if(this.level.isClientSide || this.itemHandler.getStackInSlot(0).isEmpty())
 			return;
 		this.findValidAltar().ifPresent(altar -> {
 			if(++this.itemTicks >= this.reqTicks) {
-				final AltarItem aItem = AltarItem.find(this.getItem(0));
+				final AltarItem aItem = AltarItem.find(this.itemHandler.getStackInSlot(0));
 				if(aItem.getOfferPoints() <= altar.getMaxPoints()-altar.getCurrentPoints() || altar.getCurrentPoints() == 0) {
 					altar.addPoints(aItem.getOfferPoints());
-					this.removeItem(0, 1);
+					this.itemHandler.extractItem(0, 1, false);
 					this.itemTicks = 0;
 					((ServerWorld)this.level).sendParticles(ParticleTypes.SMOKE, this.worldPosition.getX()+0.5, this.worldPosition.getY()+7F/16F, this.worldPosition.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
 					((ServerWorld)this.level).playSound(null, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, SoundEvents.FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.01F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
@@ -55,21 +59,18 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	}
 
 	public ActionResultType onActivateBy(final PlayerEntity player, final Hand hand) {
-		return this.onInteract(player, hand, 0);
+		return this.onInteract(player, hand, this.itemHandler, 0);
 	}
 
 	@Override
-	public void onSlotChange(final int slot, final boolean itemChanged) {
-		if(itemChanged) {
+	public void onSlotChange(final int slot) {
+		final AltarItem aItem = AltarItem.find(this.itemHandler.getStackInSlot(0));
+		if(aItem != this.currentItem){
 			this.itemTicks = 0;
-			this.reqTicks = this.getItem(0).isEmpty() ? 0:AltarItem.find(this.getItem(0)).getOfferTicks();
+			this.reqTicks = this.itemHandler.getStackInSlot(0).isEmpty() ? 0:AltarItem.find(this.itemHandler.getStackInSlot(0)).getOfferTicks();
+			this.currentItem = aItem;
 		}
-		super.onSlotChange(slot, itemChanged);
-	}
-
-	@Override
-	public boolean canPlaceItem(final int index, final ItemStack stack) {
-		return AltarItem.find(stack) != null;
+		super.onSlotChange(slot);
 	}
 
 	protected LazyOptional<AltarTileEntity> findValidAltar() {
@@ -84,8 +85,8 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	@Override
 	public CompoundNBT save(final CompoundNBT compound) {
 		final CompoundNBT offer_data = new CompoundNBT();
-		this.writeInventory(offer_data);
-		if(!this.getItem(0).isEmpty())
+		offer_data.put(InteractableInventoryTileEntity.INV_KEY, this.itemHandler.serializeNBT());
+		if(!this.itemHandler.getStackInSlot(0).isEmpty())
 			offer_data.putInt(OfferingStandTileEntity.ITEM_PROGRESS_KEY, this.itemTicks);
 		compound.put(OfferingStandTileEntity.OFFERING_STAND_KEY, offer_data);
 		return super.save(compound);
@@ -93,13 +94,13 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	@Override
 	public void load(final BlockState state, final CompoundNBT nbt) {
-		final CompoundNBT offer_data = nbt.getCompound(OfferingStandTileEntity.OFFERING_STAND_KEY);
-		this.readInventory(offer_data);
-		if(!this.getItem(0).isEmpty()) {
-			this.itemTicks = offer_data.getInt(OfferingStandTileEntity.ITEM_PROGRESS_KEY);
-			this.reqTicks = AltarItem.find(this.getItem(0)).getOfferTicks();
-		}
 		super.load(state, nbt);
+		final CompoundNBT offer_data = nbt.getCompound(OfferingStandTileEntity.OFFERING_STAND_KEY);
+		this.itemHandler.deserializeNBT(offer_data.getCompound(InteractableInventoryTileEntity.INV_KEY));
+		if(!this.itemHandler.getStackInSlot(0).isEmpty()) {
+			this.itemTicks = offer_data.getInt(OfferingStandTileEntity.ITEM_PROGRESS_KEY);
+			this.reqTicks = AltarItem.find(this.itemHandler.getStackInSlot(0)).getOfferTicks();
+		}
 	}
 
 	@Override
@@ -110,6 +111,29 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 	@Override
 	public void handleUpdateTag(final BlockState state, final CompoundNBT tag) {
 		this.load(state, tag);
+	}
+
+	@Override
+	public IItemHandlerModifiable getInternalItemHandler() {
+		return this.itemHandler;
+	}
+
+	public class OfferingStandItemHandler extends ItemStackHandler{
+
+		public OfferingStandItemHandler() {
+			super(1);
+		}
+
+		@Override
+		public boolean isItemValid(final int slot, final ItemStack stack) {
+			return AltarItem.find(stack) != null;
+		}
+
+		@Override
+		protected void onContentsChanged(final int slot) {
+			OfferingStandTileEntity.this.onSlotChange(slot);
+		}
+
 	}
 
 }

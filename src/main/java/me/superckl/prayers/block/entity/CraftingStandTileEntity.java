@@ -1,7 +1,9 @@
-package me.superckl.prayers.block;
+package me.superckl.prayers.block.entity;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -11,14 +13,14 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import lombok.Getter;
+import me.superckl.prayers.block.CraftingStandBlock;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
-import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
+import me.superckl.prayers.inventory.SlotMappedItemHandlerWrapper;
 import me.superckl.prayers.recipe.AbstractAltarCraftingRecipe;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -38,17 +40,19 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
 
-public class CraftingStandTileEntity extends InteractableInventoryTileEntity implements ISidedInventory, ITickableTileEntity{
+public class CraftingStandTileEntity extends InteractableInventoryTileEntity implements ITickableTileEntity{
 
 	public static final String CRAFTING_STAND_KEY = "crafting_stand";
 
-	public static final Reference2IntMap<Direction> dirToSlot = Util.make(new Reference2IntArrayMap<Direction>(5), map -> {
+	public static final Reference2IntMap<Direction> dirToSlot = Util.make(new Reference2IntArrayMap<>(5), map -> {
 		Direction.Plane.HORIZONTAL.forEach(dir -> map.put(dir, dir.get2DDataValue()));
 		map.put(Direction.UP, 4);
 	});
 
-	public static final Int2ReferenceMap<Direction> slotToDir = Util.make(new Int2ReferenceArrayMap<Direction>(5), map -> {
+	public static final Int2ReferenceMap<Direction> slotToDir = Util.make(new Int2ReferenceArrayMap<>(5), map -> {
 		CraftingStandTileEntity.dirToSlot.keySet().forEach(dir -> map.put(CraftingStandTileEntity.dirToSlot.getInt(dir), dir));
 	});
 
@@ -61,15 +65,21 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	private int lastPercentage;
 	private boolean inventoryChanged = true;
 
+	private final ItemStackHandler itemHandler = new StandItemHandler();
+
+	private final Map<Direction, IItemHandlerModifiable> mappedHandlers = Util.make(new EnumMap<>(Direction.class), map -> {
+		CraftingStandTileEntity.dirToSlot.keySet().forEach(dir -> map.put(dir, new SlotMappedItemHandlerWrapper(this.itemHandler, CraftingStandTileEntity.dirToSlot.getInt(dir))));
+	});
+
 	public CraftingStandTileEntity() {
-		super(ModTiles.CRAFTING_STAND.get(), 5);
+		super(ModTiles.CRAFTING_STAND.get());
 	}
 
 	public ActionResultType onActivate(final PlayerEntity player, final Hand hand, final Direction dir) {
 		if(player instanceof ServerPlayerEntity)
 			this.syncToClientLight((ServerPlayerEntity) player);
 		final int slot = CraftingStandTileEntity.dirToSlot.getInt(dir);
-		return this.onInteract(player, hand, slot);
+		return this.onInteract(player, hand, this.itemHandler, slot);
 	}
 
 	@Override
@@ -112,7 +122,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			this.consumedPoints += transferred;
 
 			for(final Direction dir:Direction.Plane.HORIZONTAL) {
-				if(this.getItem(CraftingStandTileEntity.dirToSlot.getInt(dir)).isEmpty() || this.rand.nextFloat() >= 0.05F)
+				if(this.itemHandler.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(dir)).isEmpty() || this.rand.nextFloat() >= 0.05F)
 					continue;
 				final Vector3d centerPos = new Vector3d(this.worldPosition.getX()+0.5, this.worldPosition.getY()+3D/16, this.worldPosition.getZ()+0.5);
 				final Vector3d itemPos = centerPos.add(5.5/16*dir.getStepX(), 0, 5.5/16*dir.getStepZ())
@@ -134,10 +144,10 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	protected void finishCrafting() {
 		for(int i = 0; i < this.recipeMapping.length; i++)
-			this.removeItem(i, this.activeRecipe.getIngredientCounts()[this.recipeMapping[i]]);
-		final ItemStack output = this.getItem(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP));
+			this.itemHandler.extractItem(i, this.activeRecipe.getIngredientCounts()[this.recipeMapping[i]], false);
+		final ItemStack output = this.itemHandler.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP));
 		if(output.isEmpty())
-			this.setItem(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP), this.activeRecipe.getResultItem().copy());
+			this.itemHandler.setStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP), this.activeRecipe.getResultItem().copy());
 		else
 			output.grow(this.activeRecipe.getResultItem().getCount());
 		this.setChanged();
@@ -149,7 +159,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	protected boolean canRecipeOutput(final AbstractAltarCraftingRecipe recipe) {
 		if(!this.hasOutputSlot())
 			return false;
-		final ItemStack output = this.getItem(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP));
+		final ItemStack output = this.itemHandler.getStackInSlot(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP));
 		return output.isEmpty() || ItemStack.isSame(output, recipe.getResultItem()) && ItemStack.tagMatches(output, recipe.getResultItem()) && output.getCount()+recipe.getResultItem().getCount() < output.getMaxStackSize();
 	}
 
@@ -166,16 +176,16 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	public boolean willCraftingConsume(final int slot) {
 		if(!this.isCrafting())
 			return false;
-		final ItemStack stack = this.getItem(slot);
+		final ItemStack stack = this.itemHandler.getStackInSlot(slot);
 		if(stack.isEmpty())
 			return false;
 		return stack.getCount() <= this.getActiveRecipe().getIngredientCounts()[this.recipeMapping[slot]];
 	}
 
 	@Override
-	public void onSlotChange(final int slot, final boolean itemChanged) {
+	public void onSlotChange(final int slot) {
 		this.inventoryChanged = true;
-		super.onSlotChange(slot, itemChanged);
+		super.onSlotChange(slot);
 	}
 
 	protected LazyOptional<AltarTileEntity> findValidAltar() {
@@ -189,7 +199,9 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	public void updateRecipe(final boolean clearPoints){
 		final List<AbstractAltarCraftingRecipe> recipes = this.level.getRecipeManager().getAllRecipesFor(AbstractAltarCraftingRecipe.TYPE);
-		final List<ItemStack> inventory = this.items.subList(0, 4);
+		final List<ItemStack> inventory = new ArrayList<>(4);
+		for(int i = 0; i < 4; i++)
+			inventory.add(i, this.itemHandler.getStackInSlot(i).copy());
 		Pair<AbstractAltarCraftingRecipe, int[]> pair = null;
 		for(final AbstractAltarCraftingRecipe recipe:recipes) {
 			final int[] mapping = recipe.findMapping(inventory);
@@ -203,7 +215,7 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			final int[] mapping = pair.getValue();
 			boolean enoughItem = true;
 			for (int i = 0; i < mapping.length; i++)
-				if(this.getItem(i).getCount() < recipe.getIngredientCounts()[mapping[i]]) {
+				if(this.itemHandler.getStackInSlot(i).getCount() < recipe.getIngredientCounts()[mapping[i]]) {
 					enoughItem = false;
 					break;
 				}
@@ -220,18 +232,6 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			this.clearRecipe(clearPoints);
 	}
 
-	@Override
-	public boolean canPlaceItem(final int index, final ItemStack stack) {
-		return CraftingStandTileEntity.slotToDir.get(index) != Direction.UP;
-	}
-
-	@Override
-	public int[] getSlotsForFace(final Direction side) {
-		if(CraftingStandTileEntity.dirToSlot.containsKey(side) && this.hasStand(side))
-			return new int[] {CraftingStandTileEntity.dirToSlot.getInt(side)};
-		return new int[0];
-	}
-
 	public boolean hasOutputSlot() {
 		return this.hasStand(Direction.UP);
 	}
@@ -242,31 +242,20 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	}
 
 	@Override
-	public boolean canPlaceItemThroughFace(final int index, final ItemStack itemStackIn, final Direction direction) {
-		return direction != Direction.UP && Arrays.stream(this.getSlotsForFace(direction)).anyMatch(slot -> slot == index) && this.canPlaceItem(index, itemStackIn);
-	}
-
-	@Override
-	public boolean canTakeItemThroughFace(final int index, final ItemStack stack, final Direction direction) {
-		return Arrays.stream(this.getSlotsForFace(direction)).anyMatch(slot -> slot == index);
-	}
-
-	@Override
 	public CompoundNBT save(final CompoundNBT compound) {
 		final CompoundNBT craft_data = new CompoundNBT();
-		super.writeInventory(craft_data);
 		craft_data.putFloat("points", this.consumedPoints);
+		craft_data.put(InteractableInventoryTileEntity.INV_KEY, this.itemHandler.serializeNBT());
 		compound.put(CraftingStandTileEntity.CRAFTING_STAND_KEY, craft_data);
-
 		return super.save(compound);
 	}
 
 	@Override
 	public void load(final BlockState state, final CompoundNBT nbt) {
-		final CompoundNBT craft_data = nbt.getCompound(CraftingStandTileEntity.CRAFTING_STAND_KEY);
-		this.readInventory(craft_data);
-		this.consumedPoints = craft_data.getFloat("points");
 		super.load(state, nbt);
+		final CompoundNBT craft_data = nbt.getCompound(CraftingStandTileEntity.CRAFTING_STAND_KEY);
+		this.consumedPoints = craft_data.getFloat("points");
+		this.itemHandler.deserializeNBT(craft_data.getCompound(InteractableInventoryTileEntity.INV_KEY));
 	}
 
 	public void syncToClientLight(final ServerPlayerEntity player) {
@@ -292,8 +281,10 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			return null;
 		final CompoundNBT nbt = new CompoundNBT();
 		nbt.putFloat("points", this.consumedPoints);
-		if(this.activeRecipe != null)
+		if(this.activeRecipe != null) {
 			nbt.putString("recipe", this.activeRecipe.getId().toString());
+			nbt.putIntArray("mapping", this.recipeMapping);
+		}
 		return new SUpdateTileEntityPacket(this.worldPosition, -1, nbt);
 	}
 
@@ -304,8 +295,39 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 		this.updateRecipe(true);
 		final CompoundNBT nbt = pkt.getTag();
 		this.consumedPoints = nbt.getFloat("points");
-		if(nbt.contains("recipe"))
+		if(nbt.contains("recipe")) {
 			this.activeRecipe = (AbstractAltarCraftingRecipe) this.level.getRecipeManager().byKey(new ResourceLocation(nbt.getString("recipe"))).get();
+			this.recipeMapping = nbt.getIntArray("mapping");
+		}
+	}
+
+	@Override
+	public IItemHandlerModifiable getItemHandlerForSide(final Direction side) {
+		return this.mappedHandlers.get(side);
+	}
+
+	@Override
+	public IItemHandlerModifiable getInternalItemHandler() {
+		return this.itemHandler;
+	}
+
+	public class StandItemHandler extends ItemStackHandler{
+
+		public StandItemHandler() {
+			super(5);
+		}
+
+		@Override
+		public boolean isItemValid(final int slot, final ItemStack stack) {
+			final Direction dir = CraftingStandTileEntity.slotToDir.get(slot);
+			return dir != Direction.UP && CraftingStandTileEntity.this.hasStand(dir);
+		}
+
+		@Override
+		protected void onContentsChanged(final int slot) {
+			CraftingStandTileEntity.this.onSlotChange(slot);
+		}
+
 	}
 
 }

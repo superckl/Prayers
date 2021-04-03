@@ -3,7 +3,7 @@ package me.superckl.prayers.network.packet.inventory;
 import java.util.function.Supplier;
 
 import lombok.Getter;
-import me.superckl.prayers.inventory.InteractableInventoryTileEntity;
+import me.superckl.prayers.block.entity.InteractableInventoryTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -42,7 +42,7 @@ public class PacketInventorySlotChanged {
 				if(!(te instanceof InteractableInventoryTileEntity))
 					return;
 				final InteractableInventoryTileEntity iTE = (InteractableInventoryTileEntity) te;
-				iTE.setItem(this.slot, this.stack);
+				iTE.getInternalItemHandler().setStackInSlot(this.slot, this.stack);
 			});
 		supplier.get().setPacketHandled(true);
 	}

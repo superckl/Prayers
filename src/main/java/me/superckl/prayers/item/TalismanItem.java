@@ -5,7 +5,7 @@ import java.util.List;
 
 import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.block.AltarTileEntity;
+import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.TalismanPrayerProvider;

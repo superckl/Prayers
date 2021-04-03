@@ -4,9 +4,9 @@ import java.util.EnumMap;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
-import me.superckl.prayers.block.AltarTileEntity;
-import me.superckl.prayers.block.CraftingStandTileEntity;
-import me.superckl.prayers.block.OfferingStandTileEntity;
+import me.superckl.prayers.block.entity.AltarTileEntity;
+import me.superckl.prayers.block.entity.CraftingStandTileEntity;
+import me.superckl.prayers.block.entity.OfferingStandTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;

@@ -2,8 +2,7 @@ package me.superckl.prayers.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import me.superckl.prayers.block.CraftingStandTileEntity;
-import net.minecraft.client.renderer.Atlases;
+import me.superckl.prayers.block.entity.CraftingStandTileEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -21,7 +20,7 @@ public class CraftingStandRenderer extends TileEntityRenderer<CraftingStandTileE
 	public void render(final CraftingStandTileEntity tileEntityIn, final float partialTicks, final MatrixStack matrixStackIn,
 			final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
 		for (final int i:CraftingStandTileEntity.slotToDir.keySet()) {
-			ItemStack stack = tileEntityIn.getItem(i);
+			ItemStack stack = tileEntityIn.getItemHandlerForSide(CraftingStandTileEntity.slotToDir.get(i)).getStackInSlot(0);
 			final Direction dir = CraftingStandTileEntity.slotToDir.get(i);
 			float alpha = 1;
 			if(stack.isEmpty()) {
@@ -38,7 +37,7 @@ public class CraftingStandRenderer extends TileEntityRenderer<CraftingStandTileE
 			final Vector3f offset = new Vector3f(0.5F+dir.getStepX()*5.5F/16F, 2F/16F, 0.5F+dir.getStepZ()*5.5F/16F);
 			matrixStackIn.translate(offset.x(), offset.y(), offset.z());
 			matrixStackIn.scale(0.3F, 0.3F, 0.3F);
-			RenderHelper.renderFloatingItemStack(matrixStackIn, new RenderHelper.AlphaMultipliedVertexBuffer(bufferIn, Atlases.translucentItemSheet(), alpha),
+			RenderHelper.renderFloatingItemStack(matrixStackIn, new RenderHelper.AlphaMultipliedVertexBuffer(bufferIn, null, alpha),
 					partialTicks, combinedLightIn, combinedOverlayIn, stack);
 			matrixStackIn.popPose();
 		}

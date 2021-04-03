@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;

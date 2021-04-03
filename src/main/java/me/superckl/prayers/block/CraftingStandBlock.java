@@ -1,5 +1,6 @@
 package me.superckl.prayers.block;
 
+import me.superckl.prayers.block.entity.CraftingStandTileEntity;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -28,6 +29,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 public class CraftingStandBlock extends FourWayShapedBlock{
 
@@ -87,13 +89,13 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 			final NonNullList<ItemStack> stacks = NonNullList.create();
 			Direction.Plane.HORIZONTAL.forEach(dir -> {
 				if(state.getValue(CraftingStandBlock.propertyFromDirection(dir)) && !newState.getValue(CraftingStandBlock.propertyFromDirection(dir)))
-					stacks.add(crafting_stand.removeItemNoUpdate(CraftingStandTileEntity.dirToSlot.getInt(dir)));
+					stacks.add(crafting_stand.getItemHandlerForSide(dir).extractItem(0, Integer.MAX_VALUE, false));
 			});
 			if(state.getValue(CraftingStandBlock.CENTER) && !newState.getValue(CraftingStandBlock.CENTER))
-				stacks.add(crafting_stand.removeItemNoUpdate(CraftingStandTileEntity.dirToSlot.getInt(Direction.UP)));
+				stacks.add(crafting_stand.getItemHandlerForSide(Direction.UP).extractItem(0, Integer.MAX_VALUE, false));
 			InventoryHelper.dropContents(worldIn, pos, stacks);
 		}else {
-			InventoryHelper.dropContents(worldIn, pos, crafting_stand);
+			InventoryHelper.dropContents(worldIn, pos, new RecipeWrapper(crafting_stand.getInternalItemHandler()));
 			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
 	}
@@ -129,7 +131,7 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 		final Vector3d hitVec = hit.getLocation();
 		final Vector3d dirVec = hitVec.subtract(Math.floor(hitVec.x)+0.5, hitVec.y, Math.floor(hitVec.z)+0.5);
 		final Direction dir = CraftingStandBlock.directionFromVec(dirVec, 1.5F/16);
-		if(player.isCrouching() && player.getItemInHand(handIn).isEmpty() && craftingStand.getItem(CraftingStandTileEntity.dirToSlot.getInt(dir)).isEmpty()) {
+		if(player.isCrouching() && player.getItemInHand(handIn).isEmpty() && craftingStand.getItemHandlerForSide(dir).getStackInSlot(0).isEmpty()) {
 			BlockState newState = state.setValue(CraftingStandBlock.propertyFromDirection(dir), false);
 			if(!newState.getValue(CraftingStandBlock.CENTER) && !FourWayShapedBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(newState::getValue))
 				newState = newState.getValue(ShapedBlock.WATERLOGGED) ? Blocks.WATER.defaultBlockState():Blocks.AIR.defaultBlockState();
@@ -137,6 +139,7 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 			final ItemStack toDrop = new ItemStack(this::asItem);
 			if(!player.addItem(toDrop))
 				InventoryHelper.dropContents(worldIn, pos, NonNullList.of(ItemStack.EMPTY, toDrop));
+			return ActionResultType.sidedSuccess(worldIn.isClientSide);
 		}
 		return craftingStand.onActivate(player, handIn, dir);
 	}

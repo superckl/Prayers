@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -25,6 +26,7 @@ public class RenderHelper {
 	public static void renderFloatingItemStack(final MatrixStack matrixStackIn, final IRenderTypeBuffer bufferIn,
 			final float partialTicks, final int combinedLightIn, final int combinedOverlayIn, final ItemStack itemstack) {
 		final float f1 = MathHelper.sin((RenderHelper.mc.level.getGameTime() + partialTicks) / 10.0F) * 0.1F + 0.1F;
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0.0D, f1 + 0.25F * .1, 0.0D);
 		final float itemRotation = (RenderHelper.mc.level.getGameTime() + partialTicks) / 20.0F;
 		matrixStackIn.mulPose(Vector3f.YP.rotation(itemRotation));
@@ -46,10 +48,11 @@ public class RenderHelper {
 				matrixStackIn.translate(f12, f14, 0.0D);
 			}
 
-			RenderHelper.itemRenderer.renderStatic(itemstack, ItemCameraTransforms.TransformType.GROUND, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
+			RenderHelper.itemRenderer.renderStatic(itemstack, ItemCameraTransforms.TransformType.GROUND, combinedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn);
 			matrixStackIn.popPose();
 			matrixStackIn.translate(0.0, 0.0, 0.09375F);
 		}
+		matrixStackIn.popPose();
 	}
 
 	public static int getModelCount(final ItemStack stack) {

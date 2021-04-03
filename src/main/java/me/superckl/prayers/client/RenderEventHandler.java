@@ -12,11 +12,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import me.superckl.prayers.block.AltarBlock;
-import me.superckl.prayers.block.AltarTileEntity;
 import me.superckl.prayers.block.CraftingStandBlock;
-import me.superckl.prayers.block.CraftingStandTileEntity;
 import me.superckl.prayers.block.OfferingStandBlock;
-import me.superckl.prayers.block.OfferingStandTileEntity;
+import me.superckl.prayers.block.entity.AltarTileEntity;
+import me.superckl.prayers.block.entity.CraftingStandTileEntity;
+import me.superckl.prayers.block.entity.OfferingStandTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.client.gui.PrayerBar;
 import me.superckl.prayers.init.ModBlocks;
@@ -99,14 +99,14 @@ public class RenderEventHandler {
 				ItemStack toRender = ItemStack.EMPTY;
 				if(hitBlock instanceof OfferingStandBlock) {
 					final OfferingStandTileEntity offeringStand = (OfferingStandTileEntity) this.mc.level.getBlockEntity(hit);
-					toRender = offeringStand.getItem(0);
+					toRender = offeringStand.getInternalItemHandler().getStackInSlot(0);
 				}else if(hitBlock instanceof CraftingStandBlock) {
 					final Vector3d hitVec = this.mc.hitResult.getLocation();
 					final Vector3d dirVec = hitVec.subtract(Math.floor(hitVec.x)+0.5, hitVec.y, Math.floor(hitVec.z)+0.5);
 					final Direction dir = CraftingStandBlock.directionFromVec(dirVec, 1.5F/16);
 
 					final CraftingStandTileEntity te = (CraftingStandTileEntity) this.mc.level.getBlockEntity(hit);
-					toRender = te.getItem(CraftingStandTileEntity.dirToSlot.getInt(dir));
+					toRender = te.getItemHandlerForSide(dir).getStackInSlot(0);
 					if(te.isCrafting()) {
 						final int height = this.mc.getWindow().getGuiScaledHeight();
 						final int width = this.mc.getWindow().getGuiScaledWidth();

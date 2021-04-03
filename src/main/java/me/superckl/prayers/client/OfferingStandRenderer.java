@@ -2,7 +2,7 @@ package me.superckl.prayers.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import me.superckl.prayers.block.OfferingStandTileEntity;
+import me.superckl.prayers.block.entity.OfferingStandTileEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -17,13 +17,13 @@ public class OfferingStandRenderer extends TileEntityRenderer<OfferingStandTileE
 	@Override
 	public void render(final OfferingStandTileEntity tileEntityIn, final float partialTicks, final MatrixStack matrixStackIn,
 			final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
-		if(tileEntityIn.getItem(0).isEmpty())
+		if(tileEntityIn.getInternalItemHandler().getStackInSlot(0).isEmpty())
 			return;
 		matrixStackIn.pushPose();
 		final Vector3f renderLoc = new Vector3f(0.5F, 7/16F, 0.5F);
 		matrixStackIn.translate(renderLoc.x(), renderLoc.y(), renderLoc.z());
 		matrixStackIn.scale(0.4F, 0.4F, 0.4F);
-		RenderHelper.renderFloatingItemStack(matrixStackIn, bufferIn, partialTicks, combinedLightIn, combinedOverlayIn, tileEntityIn.getItem(0));
+		RenderHelper.renderFloatingItemStack(matrixStackIn, bufferIn, partialTicks, combinedLightIn, combinedOverlayIn, tileEntityIn.getInternalItemHandler().getStackInSlot(0));
 		matrixStackIn.popPose();
 	}
 
