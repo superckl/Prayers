@@ -60,6 +60,9 @@ public class Config {
 
 		builder.comment("Radius, in blocks, of the decree of sanctuary. (default 30)");
 		this.decreeRanges.put(Type.SANCTUARY, builder.defineInRange("Decree.Decree of Sanctuary Range", 30, 0, Integer.MAX_VALUE));
+
+		builder.comment("Radius, in chunks, of the decree of persistence. (default 2)");
+		this.decreeRanges.put(Type.PERSISTENCE, builder.defineInRange("Decree.Decree of Persistence Range", 2, 0, Integer.MAX_VALUE));
 	}
 
 	public static ForgeConfigSpec setup() {

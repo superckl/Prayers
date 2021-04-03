@@ -42,7 +42,7 @@ public class DecreeItem extends Item{
 
 	@Override
 	public boolean isFoil(final ItemStack stack) {
-		return stack.isFramed() && ((ItemFrameEntity)stack.getEntityRepresentation()).getRotation() == 0;
+		return stack.isFramed() && ItemFrameTickManager.INSTANCE.hasActiveDecree((ItemFrameEntity)stack.getEntityRepresentation(), true);
 	}
 
 	@RequiredArgsConstructor
@@ -50,6 +50,7 @@ public class DecreeItem extends Item{
 
 		FERTILITY(FertilityDecreeData::new),
 		SANCTUARY(SanctuaryDecreeData::new),
+		PERSISTENCE(PersistenceDecreeData::new),
 		INFERTILITY(InfertilityDecreeData::new);
 
 		@Getter

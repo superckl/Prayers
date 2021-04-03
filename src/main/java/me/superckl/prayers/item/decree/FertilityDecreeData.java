@@ -37,7 +37,7 @@ public class FertilityDecreeData extends DecreeData{
 	}
 
 	@Override
-	public void setup() {
+	public void onSetup() {
 		this.farmlandTicket = FarmlandWaterManager.addAABBTicket(this.ref.get().level, this.bb);
 	}
 
