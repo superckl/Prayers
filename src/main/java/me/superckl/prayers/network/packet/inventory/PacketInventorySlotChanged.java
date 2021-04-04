@@ -3,8 +3,8 @@ package me.superckl.prayers.network.packet.inventory;
 import java.util.function.Supplier;
 
 import lombok.Getter;
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.entity.InteractableInventoryTileEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -31,14 +31,13 @@ public class PacketInventorySlotChanged {
 		buffer.writeItem(this.stack);
 	}
 
-	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				if(!Minecraft.getInstance().level.isAreaLoaded(this.pos, 0))
+				if(!ClientHelper.getClientLevel().isAreaLoaded(this.pos, 0))
 					return;
-				final TileEntity te = Minecraft.getInstance().level.getBlockEntity(this.pos);
+				final TileEntity te = ClientHelper.getClientLevel().getBlockEntity(this.pos);
 				if(!(te instanceof InteractableInventoryTileEntity))
 					return;
 				final InteractableInventoryTileEntity iTE = (InteractableInventoryTileEntity) te;

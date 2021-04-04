@@ -20,7 +20,6 @@ public class PacketDeactivateAllPrayers  extends PrayerUserPacket{
 		return PrayerUserPacket.decode(PacketDeactivateAllPrayers.builder(), buffer).build();
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		super.handle(supplier);

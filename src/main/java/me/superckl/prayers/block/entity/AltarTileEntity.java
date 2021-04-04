@@ -19,6 +19,7 @@ import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
+import me.superckl.prayers.network.packet.PacketSetAltarItemTicks;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
@@ -234,6 +235,11 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		return false;
 	}
 
+	public void setItemTicks(final int ticks) {
+		if(this.level.isClientSide)
+			this.itemTicks = ticks;
+	}
+
 	public float rechargeUser(final PlayerEntity player) {
 		if(this.level.isClientSide || !this.canRegen())
 			return 0;
@@ -318,6 +324,9 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			((ServerWorld)this.level).playSound(null, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, SoundEvents.FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.02F, 1.2F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
 			this.clearItem();
 		}
+		//Unfortunately, this has to be done every tick for smooth rendering
+		//However, it's only synced when there is an item being sacrificed
+		this.syncTicks();
 		this.setChanged();
 	}
 
@@ -398,6 +407,14 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		//We don't sync the item owner because the client doesn't care about it. All particles and xp logic are done server-side
 		PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> this.level.getChunkAt(this.worldPosition)),
 				new PacketSetAltarItem(this.worldPosition, this.altarItem, this.itemDirection));
+	}
+
+	protected void syncTicks() {
+		if(this.level.isClientSide)
+			return;
+		//Sync item ticks to all tracking clients for rendering item shrinking
+		PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> this.level.getChunkAt(this.worldPosition)),
+				new PacketSetAltarItemTicks(this.worldPosition, this.itemTicks));
 	}
 
 	public boolean isTopClear(final boolean requireAir) {
