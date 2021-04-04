@@ -13,7 +13,7 @@ public class DamageSupplier implements Supplier<AttributeModifier>{
 
 	@Override
 	public AttributeModifier get() {
-		return new AttributeModifier(DamageSupplier.ID, "Boon of Damage", Config.getInstance().getBoonValues().get(ItemBoon.ATTACK_DAMAGE).get(), Operation.MULTIPLY_TOTAL);
+		return new AttributeModifier(DamageSupplier.ID, ItemBoon.ATTACK_DAMAGE.getName().getString(), Config.getInstance().getBoonValues().get(ItemBoon.ATTACK_DAMAGE).get(), Operation.MULTIPLY_TOTAL);
 	}
 
 }

@@ -1,6 +1,9 @@
 package me.superckl.prayers.init;
 
 import java.util.EnumMap;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
@@ -33,12 +36,16 @@ public class ModItems {
 
 	public static final EnumMap<DecreeItem.Type, RegistryObject<DecreeItem>> DECREES = new EnumMap<>(DecreeItem.Type.class);
 
+	public static final List<RegistryObject<Item>> relics = Lists.newArrayList();
+
 	public static final RegistryObject<BlockItem> OFFERING_STAND = ModItems.REGISTER.register("offering_stand",
 			() -> new BlockItem(ModBlocks.OFFERING_STAND.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<BlockItem> CRAFTING_STAND = ModItems.REGISTER.register("crafting_stand",
 			() -> new BlockItem(ModBlocks.CRAFTING_STAND.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<BlockItem> SACRED_MARBLE = ModItems.REGISTER.register("sacred_marble",
 			() -> new BlockItem(ModBlocks.SACRED_MARBLE.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
+	public static final RegistryObject<BlockItem> ORNATE_REDSTONE = ModItems.REGISTER.register("ornate_redstone",
+			() -> new BlockItem(ModBlocks.ORNATE_REDSTONE.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> GOLD_LEAF = ModItems.REGISTER.register("gold_leaf",
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> GILDED_BONE = ModItems.REGISTER.register("gilded_bone",
@@ -58,6 +65,9 @@ public class ModItems {
 		for(final DecreeItem.Type type : DecreeItem.Type.values())
 			ModItems.DECREES.put(type, ModItems.REGISTER.register(type.name().toLowerCase()+"_decree",
 					() -> new DecreeItem(type)));
+
+		for(int i = 0; i < 4; i++)
+			ModItems.relics.add(ModItems.REGISTER.register("relic_"+i, () -> new Item(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP))));
 	}
 
 }

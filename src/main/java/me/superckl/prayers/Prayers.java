@@ -94,6 +94,8 @@ public class Prayers {
 		Prayer.REGISTER.register(bus);
 		AltarItem.REGISTER.register(bus);
 		ModLoot.REGISTER.register(bus);
+
+		ModLoot.registerConditions();
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){

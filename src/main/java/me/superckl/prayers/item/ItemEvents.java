@@ -1,13 +1,13 @@
 package me.superckl.prayers.item;
 
-import java.lang.reflect.Method;
-
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.decree.DecreeData;
 import me.superckl.prayers.item.decree.DecreeItem;
 import me.superckl.prayers.item.decree.InfertilityDecreeData;
 import me.superckl.prayers.item.decree.ItemFrameTickManager;
 import me.superckl.prayers.item.decree.SanctuaryDecreeData;
+import me.superckl.prayers.util.ReflectionCache;
+import me.superckl.prayers.util.ReflectionCache.Methods;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -29,11 +29,8 @@ import net.minecraftforge.event.world.BlockEvent.CropGrowEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class ItemEvents {
-
-	private Method shouldDespawnInPeaceful;
 
 	@SubscribeEvent
 	public void onPlayerKillEntity(final LivingDeathEvent e) {
@@ -83,11 +80,8 @@ public class ItemEvents {
 	@SubscribeEvent
 	public void onMobSpawn(final LivingSpawnEvent.CheckSpawn e) {
 		try {
-			if(this.shouldDespawnInPeaceful == null) {
-				this.shouldDespawnInPeaceful = ObfuscationReflectionHelper.findMethod(MobEntity.class, "func_225511_J_");
-				this.shouldDespawnInPeaceful.setAccessible(true);
-			}
-			if(e.getEntityLiving() instanceof MobEntity && this.isSanctuary(e.getEntityLiving().blockPosition()) && (Boolean) this.shouldDespawnInPeaceful.invoke(e.getEntityLiving()))
+			if(e.getEntityLiving() instanceof MobEntity && this.isSanctuary(e.getEntityLiving().blockPosition()) &&
+					(Boolean) ReflectionCache.INSTANCE.get(Methods.MOB_ENTITY__SHOULD_DESPAWN_IN_PEACEFUL).invoke(e.getEntityLiving()))
 				e.setResult(Result.DENY);
 		} catch (final Exception e1) {
 			throw new IllegalStateException("Failed to access despawn check method of mob entity!", e1);
@@ -97,11 +91,8 @@ public class ItemEvents {
 	@SubscribeEvent
 	public void onSpecialSpawn(final LivingSpawnEvent.SpecialSpawn e) {
 		try {
-			if(this.shouldDespawnInPeaceful == null) {
-				this.shouldDespawnInPeaceful = ObfuscationReflectionHelper.findMethod(MobEntity.class, "func_225511_J_");
-				this.shouldDespawnInPeaceful.setAccessible(true);
-			}
-			if(e.getEntityLiving() instanceof MobEntity && this.isSanctuary(e.getEntityLiving().blockPosition()) && (Boolean) this.shouldDespawnInPeaceful.invoke(e.getEntityLiving()))
+			if(e.getEntityLiving() instanceof MobEntity && this.isSanctuary(e.getEntityLiving().blockPosition()) &&
+					(Boolean) ReflectionCache.INSTANCE.get(Methods.MOB_ENTITY__SHOULD_DESPAWN_IN_PEACEFUL).invoke(e.getEntityLiving()))
 				e.setCanceled(true);
 		} catch (final Exception e1) {
 			throw new IllegalStateException("Failed to access despawn check method of mob entity!", e1);

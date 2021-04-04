@@ -5,6 +5,7 @@
   "block.prayers.crafting_stand": "Crafting Stand",
   "block.prayers.offering_stand": "Offering Stand",
   "block.prayers.sacred_marble": "Sacred Marble",
+  "block.prayers.ornate_redstone": "Ornate Redstone",
   "item.prayers.gold_leaf": "Gold Leaf",
   "item.prayers.gilded_bone": "Gilded Bone",
   "item.prayers.blessed_water": "Blessed Water",
@@ -21,6 +22,10 @@
   "item.prayers.sanctuary_decree": "Decree of Sanctuary",
   "item.prayers.infertility_decree": "Decree of Infertility",
   "item.prayers.persistence_decree": "Decree of Persistence",
+  "item.prayers.relic_0": "Relic 0",
+  "item.prayers.relic_1": "Relic 1",
+  "item.prayers.relic_2": "Relic 2",
+  "item.prayers.relic_3": "Relic 3",
   "itemGroup.prayers": "Prayers",
   "effect.prayers.instant_prayer": "Instant Prayer",
   "effect.prayers.prayer_regen": "Prayer Renewal",
@@ -103,5 +108,6 @@
   "key.prayers.open_gui": "Open Prayer GUI",
   "activate_condition.prayers.fire_prot": "Taking fire damage",
   "activate_condition.prayers.poison_prot": "Poisoned",
-  "boon.prayers.attack_damage": "Boon of Strength"
+  "boon.prayers.attack_damage": "Boon of Strength",
+  "boon.prayers.curios": "Boon of Curios"
 }

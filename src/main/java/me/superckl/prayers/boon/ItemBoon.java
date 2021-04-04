@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import lombok.Getter;
-import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.Prayers;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -24,10 +23,12 @@ import net.minecraftforge.common.util.Constants;
 @Getter
 public enum ItemBoon {
 
-	ATTACK_DAMAGE(() -> Attributes.ATTACK_DAMAGE, new DamageSupplier(), EquipmentSlotType.MAINHAND, EquipmentSlotType.OFFHAND);
+	ATTACK_DAMAGE(() -> Attributes.ATTACK_DAMAGE, new DamageSupplier(), EquipmentSlotType.MAINHAND, EquipmentSlotType.OFFHAND),
+	CURIOS(null, null);
 
 	public static final String BOON_KEY = "boons";
 
+	private final boolean hasModifier;
 	private final Supplier<Attribute> attributeSupplier;
 	private final Supplier<AttributeModifier> modifierSupplier;
 	private final EquipmentSlotType[] types;
@@ -35,6 +36,7 @@ public enum ItemBoon {
 
 	ItemBoon(final Supplier<Attribute> attributeSupplier, final Supplier<AttributeModifier> supplier,
 			final EquipmentSlotType... equipmentSlotTypes) {
+		this.hasModifier = attributeSupplier != null;
 		this.attributeSupplier = attributeSupplier;
 		this.modifierSupplier = supplier;
 		this.types = equipmentSlotTypes;
@@ -49,14 +51,11 @@ public enum ItemBoon {
 	public void addTo(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		ListNBT boons;
-		LogHelper.info("applying");
-		if(!nbt.contains(ItemBoon.BOON_KEY, Constants.NBT.TAG_LIST)) {
+		if(!nbt.contains(ItemBoon.BOON_KEY, Constants.NBT.TAG_LIST))
 			boons = new ListNBT();
-			LogHelper.info("creating");
-		}else
+		else
 			boons = nbt.getList(ItemBoon.BOON_KEY, Constants.NBT.TAG_STRING);
 		if(!this.contains(boons)) {
-			LogHelper.info("adding");
 			boons.add(StringNBT.valueOf(this.name()));
 			nbt.put(ItemBoon.BOON_KEY, boons);
 		}
