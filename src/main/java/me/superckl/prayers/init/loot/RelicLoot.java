@@ -20,7 +20,7 @@ public class RelicLoot extends LootModifier{
 
 	@Override
 	protected List<ItemStack> doApply(final List<ItemStack> generatedLoot, final LootContext context) {
-		generatedLoot.add(new ItemStack(ModItems.relics.get(context.getRandom().nextInt(ModItems.relics.size()))::get));
+		generatedLoot.add(new ItemStack(ModItems.RELICS.get(context.getRandom().nextInt(ModItems.RELICS.size()))::get));
 		return generatedLoot;
 	}
 

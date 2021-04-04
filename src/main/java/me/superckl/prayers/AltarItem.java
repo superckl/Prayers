@@ -8,10 +8,10 @@ import lombok.Getter;
 import me.superckl.prayers.init.ModItems;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.ObjectHolder;
 
 @Builder
 @Getter
@@ -19,12 +19,19 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 
 	public static DeferredRegister<AltarItem> REGISTER = DeferredRegister.create(AltarItem.class, Prayers.MOD_ID);
 
-	@ObjectHolder("minecraft:bone")
-	public static Item ITEM_BONE = null;
 	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(0.5F).sacrificeTicks(30)
-			.offerPoints(1).offerTicks(40).matcher(stack -> ItemStack.isSame(stack, new ItemStack(AltarItem.ITEM_BONE)))::build);
+			.offerPoints(1).offerTicks(40).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.BONE)))::build);
+
 	public static RegistryObject<AltarItem> GILDED_BONE = AltarItem.REGISTER.register("gilded_bone", AltarItem.builder().sacrificeXP(10).sacrificeTicks(50)
 			.offerPoints(70).offerTicks(100).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONE::get)))::build);
+
+	public static RegistryObject<AltarItem> RELIC = AltarItem.REGISTER.register("relic", AltarItem.builder().sacrificeXP(300).sacrificeTicks(200)
+			.offerPoints(0).offerTicks(0).matcher(stack -> {
+				for(final RegistryObject<Item> items:ModItems.RELICS)
+					if(items.get() == stack.getItem())
+						return true;
+				return false;
+			})::build);
 
 	@Default
 	private final float offerPoints = 0;

@@ -36,7 +36,7 @@ public class ModItems {
 
 	public static final EnumMap<DecreeItem.Type, RegistryObject<DecreeItem>> DECREES = new EnumMap<>(DecreeItem.Type.class);
 
-	public static final List<RegistryObject<Item>> relics = Lists.newArrayList();
+	public static final List<RegistryObject<Item>> RELICS = Lists.newArrayList();
 
 	public static final RegistryObject<BlockItem> OFFERING_STAND = ModItems.REGISTER.register("offering_stand",
 			() -> new BlockItem(ModBlocks.OFFERING_STAND.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
@@ -67,7 +67,7 @@ public class ModItems {
 					() -> new DecreeItem(type)));
 
 		for(int i = 0; i < 4; i++)
-			ModItems.relics.add(ModItems.REGISTER.register("relic_"+i, () -> new Item(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP))));
+			ModItems.RELICS.add(ModItems.REGISTER.register("relic_"+i, () -> new Item(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP))));
 	}
 
 }

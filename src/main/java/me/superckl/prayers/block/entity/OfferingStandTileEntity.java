@@ -126,7 +126,8 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 
 		@Override
 		public boolean isItemValid(final int slot, final ItemStack stack) {
-			return AltarItem.find(stack) != null;
+			final AltarItem aItem = AltarItem.find(stack);
+			return aItem != null && aItem.canOffer();
 		}
 
 		@Override

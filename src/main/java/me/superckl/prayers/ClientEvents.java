@@ -65,11 +65,13 @@ public class ClientEvents {
 	public static void fillTooltip(final ItemTooltipEvent e) {
 		//Altar item text
 		final AltarItem aItem = AltarItem.find(e.getItemStack());
-		if(aItem != null) {
+		if(aItem != null && (aItem.canOffer() || aItem.canSacrifice())) {
 			final String addS = aItem.getOfferPoints() != 1 ? "s":"";
 			e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering")).withStyle(TextFormatting.BLUE));
-			e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering.points"), aItem.getOfferPoints(), addS).withStyle(TextFormatting.BLUE));
-			e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering.xp"), aItem.getSacrificeXP()).withStyle(TextFormatting.BLUE));
+			if(aItem.canOffer())
+				e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering.points"), aItem.getOfferPoints(), addS).withStyle(TextFormatting.BLUE));
+			if(aItem.canSacrifice())
+				e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering.xp"), aItem.getSacrificeXP()).withStyle(TextFormatting.BLUE));
 		}
 
 		//Boon text
