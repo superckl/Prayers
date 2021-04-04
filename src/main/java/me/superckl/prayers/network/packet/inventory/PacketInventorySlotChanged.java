@@ -27,7 +27,7 @@ public class PacketInventorySlotChanged {
 
 	public void encode(final PacketBuffer buffer) {
 		buffer.writeBlockPos(this.pos);
-		buffer.writeInt(this.slot);
+		buffer.writeVarInt(this.slot);
 		buffer.writeItem(this.stack);
 	}
 
@@ -49,7 +49,7 @@ public class PacketInventorySlotChanged {
 
 	public static PacketInventorySlotChanged decode(final PacketBuffer buffer) {
 		final BlockPos pos = buffer.readBlockPos();
-		final int slot = buffer.readInt();
+		final int slot = buffer.readVarInt();
 		return new PacketInventorySlotChanged(pos, slot, buffer.readItem());
 	}
 

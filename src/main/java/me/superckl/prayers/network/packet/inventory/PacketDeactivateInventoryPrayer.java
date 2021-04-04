@@ -17,10 +17,9 @@ public class PacketDeactivateInventoryPrayer {
 	private final int slot;
 
 	public void encode(final PacketBuffer buffer) {
-		buffer.writeInt(this.slot);
+		buffer.writeVarInt(this.slot);
 	}
 
-	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
@@ -33,7 +32,7 @@ public class PacketDeactivateInventoryPrayer {
 	}
 
 	public static PacketDeactivateInventoryPrayer decode(final PacketBuffer buffer) {
-		final int slot = buffer.readInt();
+		final int slot = buffer.readVarInt();
 		return new PacketDeactivateInventoryPrayer(slot);
 	}
 

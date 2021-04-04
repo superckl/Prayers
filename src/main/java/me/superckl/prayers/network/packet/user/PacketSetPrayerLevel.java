@@ -17,11 +17,11 @@ public class PacketSetPrayerLevel extends PrayerUserPacket{
 	@Override
 	public void encode(final PacketBuffer buffer) {
 		super.encode(buffer);
-		buffer.writeInt(this.level);
+		buffer.writeVarInt(this.level);
 	}
 
 	public static PacketSetPrayerLevel decode(final PacketBuffer buffer) {
-		return PrayerUserPacket.decode(PacketSetPrayerLevel.builder(), buffer).level(buffer.readInt()).build();
+		return PrayerUserPacket.decode(PacketSetPrayerLevel.builder(), buffer).level(buffer.readVarInt()).build();
 	}
 
 	@Override

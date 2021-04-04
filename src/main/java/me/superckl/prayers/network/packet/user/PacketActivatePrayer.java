@@ -9,8 +9,6 @@ import me.superckl.prayers.capability.PlayerPrayerUser.Result;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
@@ -22,15 +20,12 @@ public class PacketActivatePrayer extends PrayerUserPacket{
 
 	@Override
 	public void encode(final PacketBuffer buffer) {
-		buffer.writeUtf(this.prayer.getRegistryName().toString());
+		buffer.writeRegistryId(this.prayer);
 		super.encode(buffer);
 	}
 
 	public static PacketActivatePrayer decode(final PacketBuffer buffer) {
-		final ResourceLocation loc = new ResourceLocation(buffer.readUtf(PrayerUserPacket.BUFFER_STRING_LENGTH));
-		final Prayer prayer = GameRegistry.findRegistry(Prayer.class).getValue(loc);
-		if (prayer == null)
-			throw new IllegalArgumentException(String.format("Invalid prayer location %s!", loc.toString()));
+		final Prayer prayer = buffer.readRegistryIdSafe(Prayer.class);
 		return PrayerUserPacket.decode(PacketActivatePrayer.builder(), buffer).prayer(prayer).build();
 	}
 

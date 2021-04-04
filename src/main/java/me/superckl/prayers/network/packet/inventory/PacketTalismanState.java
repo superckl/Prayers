@@ -24,7 +24,7 @@ public class PacketTalismanState extends PrayerUserPacket{
 	@Override
 	public void encode(final PacketBuffer buffer) {
 		super.encode(buffer);
-		buffer.writeInt(this.slot);
+		buffer.writeVarInt(this.slot);
 		buffer.writeEnum(this.state);
 	}
 
@@ -52,7 +52,7 @@ public class PacketTalismanState extends PrayerUserPacket{
 	}
 
 	public static PacketTalismanState decode(final PacketBuffer buffer) {
-		return PrayerUserPacket.decode(PacketTalismanState.builder(), buffer).slot(buffer.readInt())
+		return PrayerUserPacket.decode(PacketTalismanState.builder(), buffer).slot(buffer.readVarInt())
 				.state(buffer.readEnum(State.class)).build();
 	}
 
