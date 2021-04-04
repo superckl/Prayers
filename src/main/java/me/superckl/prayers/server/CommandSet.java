@@ -41,7 +41,7 @@ public class CommandSet {
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
 					PacketSetPrayerPoints.builder().entityID(e.getId()).amount(points).build());
 		}
-		context.getSource().sendSuccess(new TranslationTextComponent(LangUtil.buildTextLoc("command.entities"), targets.size(), pointsSet), true);
+		context.getSource().sendSuccess(new TranslationTextComponent(LangUtil.buildTextLoc("command.level.entities"), targets.size(), pointsSet), true);
 		return pointsSet;
 	}
 
@@ -58,7 +58,7 @@ public class CommandSet {
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
 					PacketSetPrayerLevel.builder().entityID(e.getId()).level(level).build());
 		}
-		context.getSource().sendSuccess(new TranslationTextComponent(LangUtil.buildTextLoc("command.players"), targets.size()), true);
+		context.getSource().sendSuccess(new TranslationTextComponent(LangUtil.buildTextLoc("command.level.players"), targets.size()), true);
 		return targets.size();
 	}
 

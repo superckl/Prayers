@@ -30,6 +30,9 @@
   "item.minecraft.potion.effect.prayer_regen": "Prayer Renewal Potion",
   "item.minecraft.splash_potion.effect.prayer_regen": "Splash Prayer Renewal Potion",
   "item.minecraft.lingering_potion.effect.prayer_regen": "Lingering Prayer Renewal Potion",
+  "text.prayers.offering": "Altar Offering:",
+  "text.prayers.offering.points": "- %.1f point%s",
+  "text.prayers.offering.xp": "- %.1f xp",
   "text.prayers.totem": "Prevents death when in inventory",
   "text.prayers.talisman.use_bind": "Use to bind to active prayer",
   "text.prayers.talisman.prayer_obfuscated": "The bound prayer eludes you...",
@@ -47,8 +50,9 @@
   "text.prayers.prayer.tome": "Requires tome to unlock",
   "text.prayers.prayer.talisman": "Talisman active",
   "text.prayers.command.no_entities": "No entities targeted.",
-  "text.prayers.command.entities": "Targeted %d entities, set points for %d living entities.",
-  "text.prayers.command.players": "Set level for %d players.",
+  "text.prayers.command.level.entities": "Targeted %d entities, set points for %d living entities.",
+  "text.prayers.command.level.players": "Set level for %d players.",
+  "text.prayers.command.boon.entities": "Applied %s to %d items.",
   "text.prayers.active": "Active",
   "text.prayers.inactive": "Inactive",
   "text.prayers.disabled": "Disabled",
@@ -59,6 +63,7 @@
   "text.prayers.decree.infertility": "Prevents plant growth and animal breeding",
   "text.prayers.decree.sanctuary": "Prevents hostile mob spawns",
   "text.prayers.decree.persistence": "Keeps nearby chunks loaded",
+  "argument.boon.not_exist": "Boon does not exist",
   "prayer.prayers.effective": "Effective",
   "prayer.prayers.potent": "Potent",
   "prayer.prayers.protect_melee": "Protect Melee",
@@ -97,5 +102,6 @@
   "key.prayers.toggle_talisman": "Toggle Talismans",
   "key.prayers.open_gui": "Open Prayer GUI",
   "activate_condition.prayers.fire_prot": "Taking fire damage",
-  "activate_condition.prayers.poison_prot": "Poisoned"
+  "activate_condition.prayers.poison_prot": "Poisoned",
+  "boon.prayers.attack_damage": "Boon of Strength"
 }

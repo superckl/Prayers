@@ -1,5 +1,8 @@
 package me.superckl.prayers;
 
+import java.util.EnumSet;
+
+import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.client.AltarRenderer;
 import me.superckl.prayers.client.CraftingStandRenderer;
 import me.superckl.prayers.client.OfferingStandRenderer;
@@ -11,9 +14,10 @@ import me.superckl.prayers.client.particle.PrayerParticle;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -59,12 +63,18 @@ public class ClientEvents {
 
 	@SubscribeEvent
 	public static void fillTooltip(final ItemTooltipEvent e) {
+		//Altar item text
 		final AltarItem aItem = AltarItem.find(e.getItemStack());
-		if(aItem == null)
-			return;
-		e.getToolTip().add(new StringTextComponent("Altar offering:").withStyle(TextFormatting.BLUE));
-		e.getToolTip().add(new StringTextComponent(String.format("- %.1f point(s)", aItem.getOfferPoints())).withStyle(TextFormatting.BLUE));
-		e.getToolTip().add(new StringTextComponent(String.format("- %.1f xp", aItem.getSacrificeXP())).withStyle(TextFormatting.BLUE));
+		if(aItem != null) {
+			final String addS = aItem.getOfferPoints() != 1 ? "s":"";
+			e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering")).withStyle(TextFormatting.BLUE));
+			e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering.points"), aItem.getOfferPoints(), addS).withStyle(TextFormatting.BLUE));
+			e.getToolTip().add(new TranslationTextComponent(LangUtil.buildTextLoc("offering.xp"), aItem.getSacrificeXP()).withStyle(TextFormatting.BLUE));
+		}
+
+		//Boon text
+		final EnumSet<ItemBoon> boons = ItemBoon.getBoons(e.getItemStack());
+		boons.forEach(boon -> e.getToolTip().add(boon.getName().withStyle(TextFormatting.LIGHT_PURPLE)));
 	}
 
 }

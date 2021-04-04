@@ -13,7 +13,7 @@ public class FireProtEffect extends PrayerEffect{
 
 	@SubscribeEvent(priority =  EventPriority.HIGH)
 	public void onLivingHurt(final LivingAttackEvent e) {
-		if(e.getSource().isFire() && this.getOwner().isActive(e.getEntityLiving()))
+		if(e.getEntityLiving().isAlive() && e.getSource().isFire() && this.getOwner().isActive(e.getEntityLiving()))
 			e.setCanceled(true);
 	}
 

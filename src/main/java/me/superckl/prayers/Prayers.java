@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
+import me.superckl.prayers.boon.BoonEventHandler;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.DefaultLivingPrayerUser;
 import me.superckl.prayers.capability.DefaultPlayerPrayerUser;
@@ -40,6 +41,8 @@ import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
 import me.superckl.prayers.potion.PotionTransformRecipe;
 import me.superckl.prayers.prayer.ActivationCondition;
 import me.superckl.prayers.prayer.Prayer;
+import me.superckl.prayers.server.BoonArgument;
+import me.superckl.prayers.server.CommandBoon;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.command.CommandSource;
@@ -99,6 +102,7 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
 			MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 			MinecraftForge.EVENT_BUS.register(new ItemEvents());
+			MinecraftForge.EVENT_BUS.register(new BoonEventHandler());
 			MinecraftForge.EVENT_BUS.register(ItemFrameTickManager.INSTANCE);
 			ActivationCondition.registerConditions();
 			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
@@ -149,7 +153,9 @@ public class Prayers {
 						.then(Commands.argument("amount", FloatArgumentType.floatArg(0)).suggests(simpleNumberEx)
 								.executes(CommandSet::prayerPoints)))).then(Commands.literal("level")
 										.then(Commands.argument("targets", EntityArgument.players()).then(Commands.argument("level", IntegerArgumentType.integer(1))
-												.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))));
+												.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))))
+				.then(Commands.literal("boon").then(Commands.argument("targets", EntityArgument.entities())
+						.then(Commands.argument("boon", new BoonArgument()).executes(CommandBoon::applyBoon))));
 
 		e.getDispatcher().register(root);
 	}

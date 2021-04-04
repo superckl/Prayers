@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
+import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.item.decree.DecreeItem;
 import me.superckl.prayers.item.decree.DecreeItem.Type;
 import me.superckl.prayers.prayer.Prayer;
@@ -22,18 +23,16 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+@Getter
 public class Config {
 
 	@Getter
 	private static Config instance;
-	@Getter
 	private final ConfigValue<List<String>> prayers;
-	@Getter
 	private final Map<DecreeItem.Type, IntValue> decreeRanges = new EnumMap<>(DecreeItem.Type.class);
-	@Getter
 	private final DoubleValue fertilityCropChance;
-	@Getter
 	private final DoubleValue fertilityAnimalChance;
+	private final Map<ItemBoon, DoubleValue> boonValues = new EnumMap<>(ItemBoon.class);
 
 	private Config(final ForgeConfigSpec.Builder builder) {
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
@@ -63,6 +62,10 @@ public class Config {
 
 		builder.comment("Radius, in chunks, of the decree of persistence. (default 2)");
 		this.decreeRanges.put(Type.PERSISTENCE, builder.defineInRange("Decree.Decree of Persistence Range", 2, 0, Integer.MAX_VALUE));
+
+		builder.comment("Boon of Damage percentage bonus (default 0.5 (+50%))");
+		this.boonValues.put(ItemBoon.ATTACK_DAMAGE, builder.defineInRange("Boon.Boon of Damage", 0.5, 0, Float.MAX_VALUE));
+
 	}
 
 	public static ForgeConfigSpec setup() {
