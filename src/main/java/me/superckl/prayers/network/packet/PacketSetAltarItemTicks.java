@@ -29,9 +29,9 @@ public class PacketSetAltarItemTicks {
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				if(!ClientHelper.getClientLevel().isAreaLoaded(this.pos, 0))
+				if(!ClientHelper.getLevel().isAreaLoaded(this.pos, 0))
 					return;
-				final TileEntity te = ClientHelper.getClientLevel().getBlockEntity(this.pos);
+				final TileEntity te = ClientHelper.getLevel().getBlockEntity(this.pos);
 				if(!(te instanceof AltarTileEntity))
 					return;
 				final AltarTileEntity aTE = (AltarTileEntity) te;

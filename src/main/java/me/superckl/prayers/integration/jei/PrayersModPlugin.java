@@ -29,7 +29,7 @@ public class PrayersModPlugin implements IModPlugin{
 	
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		registration.addRecipes(ClientHelper.getClientLevel().getRecipeManager().getAllRecipesFor(AbstractAltarCraftingRecipe.TYPE), AltarCraftingRecipeCategory.UID);
+		registration.addRecipes(ClientHelper.getLevel().getRecipeManager().getAllRecipesFor(AbstractAltarCraftingRecipe.TYPE), AltarCraftingRecipeCategory.UID);
 	}
 	
 	@Override

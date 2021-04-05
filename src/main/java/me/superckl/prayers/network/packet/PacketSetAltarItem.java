@@ -3,8 +3,8 @@ package me.superckl.prayers.network.packet;
 import java.util.function.Supplier;
 
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.entity.AltarTileEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -36,13 +36,12 @@ public class PacketSetAltarItem {
 		return new PacketSetAltarItem(pos, stack, dir);
 	}
 
-	@SuppressWarnings("resource")
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				if(!Minecraft.getInstance().level.isAreaLoaded(this.pos, 0))
+				if(!ClientHelper.getLevel().isAreaLoaded(this.pos, 0))
 					return;
-				final TileEntity te = Minecraft.getInstance().level.getBlockEntity(this.pos);
+				final TileEntity te = ClientHelper.getLevel().getBlockEntity(this.pos);
 				if(!(te instanceof AltarTileEntity))
 					return;
 				final AltarTileEntity aTE = (AltarTileEntity) te;

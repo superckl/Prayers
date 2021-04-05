@@ -15,7 +15,6 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.LangUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -55,10 +54,9 @@ public class ClientEvents {
 		ClientRegistry.bindTileEntityRenderer(ModTiles.CRAFTING_STAND.get(), CraftingStandRenderer::new);
 	}
 
-	@SuppressWarnings("resource")
 	private static void registerParticleFactory(final ParticleFactoryRegisterEvent e) {
-		Minecraft.getInstance().particleEngine.register(ModParticles.ALTAR_ACTIVE.get(), PrayerParticle.Factory::new);
-		Minecraft.getInstance().particleEngine.register(ModParticles.ITEM_SACRIFICE.get(), PrayerParticle.Factory::new);
+		ClientHelper.getParticleEnginge().register(ModParticles.ALTAR_ACTIVE.get(), PrayerParticle.Factory::new);
+		ClientHelper.getParticleEnginge().register(ModParticles.ITEM_SACRIFICE.get(), PrayerParticle.Factory::new);
 	}
 
 	@SubscribeEvent

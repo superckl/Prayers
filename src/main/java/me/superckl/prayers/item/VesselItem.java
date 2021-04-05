@@ -12,10 +12,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.util.LangUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.EntityType;
@@ -57,7 +57,7 @@ public class VesselItem extends Item {
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		final Set<ResourceLocation> kills = this.getStoredKills(stack);
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("soul_orb.souls"), kills.size(), VesselItem.REQ_MOBS.size()));
-		if(level == null || InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
+		if(level == null || InputMappings.isKeyDown(ClientHelper.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
 			if(VesselItem.REQ_NAMES == null) {
 				VesselItem.REQ_NAMES = Maps.newHashMap();
 				VesselItem.REQ_MOBS.forEach(rLoc -> VesselItem.REQ_NAMES.put(rLoc, ForgeRegistries.ENTITIES.getValue(rLoc).getDescription().copy()));

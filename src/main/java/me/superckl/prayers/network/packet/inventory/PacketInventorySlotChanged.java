@@ -35,9 +35,9 @@ public class PacketInventorySlotChanged {
 		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				if(!ClientHelper.getClientLevel().isAreaLoaded(this.pos, 0))
+				if(!ClientHelper.getLevel().isAreaLoaded(this.pos, 0))
 					return;
-				final TileEntity te = ClientHelper.getClientLevel().getBlockEntity(this.pos);
+				final TileEntity te = ClientHelper.getLevel().getBlockEntity(this.pos);
 				if(!(te instanceof InteractableInventoryTileEntity))
 					return;
 				final InteractableInventoryTileEntity iTE = (InteractableInventoryTileEntity) te;

@@ -4,9 +4,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import lombok.AllArgsConstructor;
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
@@ -14,17 +14,15 @@ import net.minecraft.util.text.TextFormatting;
 @AllArgsConstructor
 public class PrayerBar {
 
-	private final Minecraft mc = Minecraft.getInstance();
-
 	public static final int HEIGHT = 16;
 
 	public final boolean leftJustified;
 	public final boolean inludeMax;
 
 	public void renderAt(final MatrixStack matrixStack, final int x, final int y) {
-		if(!this.mc.player.isAlive())
+		if(!ClientHelper.getPlayer().isAlive())
 			return;
-		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(this.mc.player);
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer());
 
 		//Bar is 40x12, icon is 16x16
 		//Determine positioning of text and icon (defaults to bottom right)
@@ -41,10 +39,10 @@ public class PrayerBar {
 		if(this.inludeMax)
 			builder.append('/').append(MathHelper.ceil(user.getMaxPrayerPoints()));
 		final String points = builder.toString();
-		final int width = 16+3+40+4+this.mc.font.width(points);
+		final int width = 16+3+40+4+ClientHelper.getFontRenderer().width(points);
 		final int startX = this.leftJustified ? x : x-width;
 		//We have to add (or subtract) 1 here to creates gaps of the desired size
-		final float textOffset = 8+1-(this.mc.font.lineHeight/2F-1); //Half of the texture height because font renderer takes in y for middle of text
+		final float textOffset = 8+1-(ClientHelper.getFontRenderer().lineHeight/2F-1); //Half of the texture height because font renderer takes in y for middle of text
 		//This is 2+1 to create a gap of size 2
 		final int barOffset = 3;
 
@@ -52,7 +50,7 @@ public class PrayerBar {
 		final int barWidth = Math.round(prayerPercentage*40);
 
 		//Bind texture and render text and icon
-		this.mc.textureManager.bind(PrayerSelectGUI.PRAYER_GUI_TEXTURE);
+		ClientHelper.getTextureManager().bind(PrayerSelectGUI.PRAYER_GUI_TEXTURE);
 		RenderSystem.enableBlend();
 		AbstractGui.blit(matrixStack, startX, y, 0, 140, 16, 16, 256, 256);
 		//Render the last two extra columns of the on with semi-transparency?
@@ -60,7 +58,7 @@ public class PrayerBar {
 		AbstractGui.blit(matrixStack, startX+16+3, y+barOffset, 0, 116+12, barWidth, 12, 256, 256);
 		RenderSystem.disableBlend();
 		RenderSystem.defaultBlendFunc();
-		this.mc.font.draw(matrixStack, points, startX+16+3+40+4, y+textOffset, color.getColor());
+		ClientHelper.getFontRenderer().draw(matrixStack, points, startX+16+3+40+4, y+textOffset, color.getColor());
 	}
 
 }

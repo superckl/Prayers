@@ -39,7 +39,7 @@ public abstract class PrayerUserPacket {
 	protected World getLevel(final NetworkEvent.Context context) {
 		if(context.getDirection().getReceptionSide() == LogicalSide.SERVER)
 			return context.getSender().level;
-		return ClientHelper.getClientLevel();
+		return ClientHelper.getLevel();
 	}
 
 	@SuppressWarnings("unchecked")

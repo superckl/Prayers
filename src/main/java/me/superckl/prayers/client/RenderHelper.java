@@ -6,9 +6,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.Minecraft;
+import me.superckl.prayers.ClientHelper;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -19,16 +18,14 @@ import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderHelper {
 
-	private final static Minecraft mc = Minecraft.getInstance();
-	private final static ItemRenderer itemRenderer = RenderHelper.mc.getItemRenderer();
 	private static final Random random = new Random();
 
 	public static void renderFloatingItemStack(final MatrixStack matrixStackIn, final IRenderTypeBuffer bufferIn,
 			final float partialTicks, final int combinedLightIn, final int combinedOverlayIn, final ItemStack itemstack) {
-		final float f1 = MathHelper.sin((RenderHelper.mc.level.getGameTime() + partialTicks) / 10.0F) * 0.1F + 0.1F;
+		final float f1 = MathHelper.sin((ClientHelper.getLevel().getGameTime() + partialTicks) / 10.0F) * 0.1F + 0.1F;
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(0.0D, f1 + 0.25F * .1, 0.0D);
-		final float itemRotation = (RenderHelper.mc.level.getGameTime() + partialTicks) / 20.0F;
+		final float itemRotation = (ClientHelper.getLevel().getGameTime() + partialTicks) / 20.0F;
 		matrixStackIn.mulPose(Vector3f.YP.rotation(itemRotation));
 
 		final int j = RenderHelper.getModelCount(itemstack);
@@ -48,7 +45,7 @@ public class RenderHelper {
 				matrixStackIn.translate(f12, f14, 0.0D);
 			}
 
-			RenderHelper.itemRenderer.renderStatic(itemstack, ItemCameraTransforms.TransformType.GROUND, combinedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn);
+			ClientHelper.getItemRenderer().renderStatic(itemstack, ItemCameraTransforms.TransformType.GROUND, combinedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn);
 			matrixStackIn.popPose();
 			matrixStackIn.translate(0.0, 0.0, 0.09375F);
 		}

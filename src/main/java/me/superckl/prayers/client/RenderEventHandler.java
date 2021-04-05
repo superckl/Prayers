@@ -11,6 +11,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
+import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.CraftingStandBlock;
 import me.superckl.prayers.block.OfferingStandBlock;
@@ -24,14 +25,12 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -65,8 +64,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class RenderEventHandler {
 
 	private final PrayerBar widget = new PrayerBar(true, false);
-	private final Minecraft mc = Minecraft.getInstance();
-	private final ItemRenderer itemRender = this.mc.getItemRenderer();
 
 	//This event renders the player's prayer points
 	@SubscribeEvent
@@ -77,53 +74,53 @@ public class RenderEventHandler {
 			final int startY = height - 21 + (20 - PrayerBar.HEIGHT)/2;
 			this.widget.renderAt(e.getMatrixStack(), 8, startY);
 		}
-		if(this.mc.player.isCrouching() && this.mc.hitResult.getType() == RayTraceResult.Type.BLOCK) {
-			final BlockPos hit = ((BlockRayTraceResult) this.mc.hitResult).getBlockPos();
-			final Block hitBlock = this.mc.level.getBlockState(hit).getBlock();
+		if(ClientHelper.getPlayer().isCrouching() && ClientHelper.getRayTrace().getType() == RayTraceResult.Type.BLOCK) {
+			final BlockPos hit = ((BlockRayTraceResult) ClientHelper.getRayTrace()).getBlockPos();
+			final Block hitBlock = ClientHelper.getLevel().getBlockState(hit).getBlock();
 
 			if(hitBlock instanceof AltarBlock) {
-				final AltarTileEntity altar = (AltarTileEntity) this.mc.level.getBlockEntity(hit);
+				final AltarTileEntity altar = (AltarTileEntity) ClientHelper.getLevel().getBlockEntity(hit);
 				final double current = altar.getCurrentPoints();
 				final double max = altar.getMaxPoints();
 				final List<String> toWrite = Lists.newArrayList();
 				toWrite.add("Valid: "+altar.isValidMultiblock());
 				toWrite.add("Owner: "+(altar.getOwner() == null ? "None":UsernameCache.getLastKnownUsername(altar.getOwner())));
 				toWrite.add("Points: "+String.format("%.2f/%.2f", current, max));
-				final int height = this.mc.getWindow().getGuiScaledHeight();
-				final int width = this.mc.getWindow().getGuiScaledWidth();
+				final int height = ClientHelper.getWindow().getGuiScaledHeight();
+				final int width = ClientHelper.getWindow().getGuiScaledWidth();
 				for (int i = 0; i < toWrite.size(); i++)
-					this.mc.font.draw(e.getMatrixStack(), toWrite.get(i),
-							width/2-this.mc.font.width(toWrite.get(i))/2,
-							height/2+5*(i+1)+this.mc.font.lineHeight*i, TextFormatting.WHITE.getColor());
+					ClientHelper.getFontRenderer().draw(e.getMatrixStack(), toWrite.get(i),
+							width/2-ClientHelper.getFontRenderer().width(toWrite.get(i))/2,
+							height/2+5*(i+1)+ClientHelper.getFontRenderer().lineHeight*i, TextFormatting.WHITE.getColor());
 			}else{
 				ItemStack toRender = ItemStack.EMPTY;
 				if(hitBlock instanceof OfferingStandBlock) {
-					final OfferingStandTileEntity offeringStand = (OfferingStandTileEntity) this.mc.level.getBlockEntity(hit);
+					final OfferingStandTileEntity offeringStand = (OfferingStandTileEntity) ClientHelper.getLevel().getBlockEntity(hit);
 					toRender = offeringStand.getInternalItemHandler().getStackInSlot(0);
 				}else if(hitBlock instanceof CraftingStandBlock) {
-					final Vector3d hitVec = this.mc.hitResult.getLocation();
+					final Vector3d hitVec = ClientHelper.getRayTrace().getLocation();
 					final Vector3d dirVec = hitVec.subtract(Math.floor(hitVec.x)+0.5, hitVec.y, Math.floor(hitVec.z)+0.5);
 					final Direction dir = CraftingStandBlock.directionFromVec(dirVec, 1.5F/16);
 
-					final CraftingStandTileEntity te = (CraftingStandTileEntity) this.mc.level.getBlockEntity(hit);
+					final CraftingStandTileEntity te = (CraftingStandTileEntity) ClientHelper.getLevel().getBlockEntity(hit);
 					toRender = te.getItemHandlerForSide(dir).getStackInSlot(0);
 					if(te.isCrafting()) {
-						final int height = this.mc.getWindow().getGuiScaledHeight();
-						final int width = this.mc.getWindow().getGuiScaledWidth();
+						final int height = ClientHelper.getWindow().getGuiScaledHeight();
+						final int width = ClientHelper.getWindow().getGuiScaledWidth();
 						final String progress = String.format("Progress: %2.0f", 100*te.getCraftingProgress()).concat("%");
 						final int offset = toRender.isEmpty() ? 5: 24;
-						this.mc.font.draw(e.getMatrixStack(), progress, width/2-this.mc.font.width(progress)/2,
+						ClientHelper.getFontRenderer().draw(e.getMatrixStack(), progress, width/2-ClientHelper.getFontRenderer().width(progress)/2,
 								height/2+offset, TextFormatting.WHITE.getColor());
 					}
 				}
 				if(!toRender.isEmpty()) {
 					FontRenderer font = toRender.getItem().getFontRenderer(toRender);
 					if(font == null)
-						font = this.mc.font;
-					final int height = this.mc.getWindow().getGuiScaledHeight();
-					final int width = this.mc.getWindow().getGuiScaledWidth();
-					this.itemRender.renderAndDecorateItem(toRender, width/2-8, height/2+4);
-					this.itemRender.renderGuiItemDecorations(font, toRender, width/2-8, height/2+4, null);
+						font = ClientHelper.getFontRenderer();
+					final int height = ClientHelper.getWindow().getGuiScaledHeight();
+					final int width = ClientHelper.getWindow().getGuiScaledWidth();
+					ClientHelper.getItemRenderer().renderAndDecorateItem(toRender, width/2-8, height/2+4);
+					ClientHelper.getItemRenderer().renderGuiItemDecorations(font, toRender, width/2-8, height/2+4, null);
 				}
 			}
 		}
@@ -132,11 +129,11 @@ public class RenderEventHandler {
 	@SubscribeEvent
 	public void onDrawBlockHighlight(final DrawHighlightEvent.HighlightBlock e) {
 		final BlockPos pos = e.getTarget().getBlockPos();
-		final BlockState renderBlock = this.mc.level.getBlockState(pos);
+		final BlockState renderBlock = ClientHelper.getLevel().getBlockState(pos);
 		if(renderBlock.getBlock() instanceof AltarBlock) {
 			e.setCanceled(true);
 			final Vector3d proj = e.getInfo().getPosition();
-			final VoxelShape connected = AltarBlock.connectAltars(renderBlock, this.mc.level, pos);
+			final VoxelShape connected = AltarBlock.connectAltars(renderBlock, ClientHelper.getLevel(), pos);
 			RenderEventHandler.drawShape(e.getMatrix(), e.getBuffers().getBuffer(RenderType.lines()), connected,
 					pos.getX()-proj.x, pos.getY()-proj.y, pos.getZ()-proj.z, 0, 0, 0, 0.4F);
 		}
@@ -144,19 +141,19 @@ public class RenderEventHandler {
 
 	@SubscribeEvent
 	public void onWorldRenderFinish(final RenderWorldLastEvent e) {
-		if(this.mc.player.isCrouching() && this.mc.hitResult.getType() == Type.BLOCK &&
-				(this.mc.player.getMainHandItem().getItem() == ModItems.CRAFTING_STAND.get() || this.mc.player.getOffhandItem().getItem() == ModItems.CRAFTING_STAND.get())) {
-			final BlockRayTraceResult raytrace = (BlockRayTraceResult)this.mc.hitResult;
+		if(ClientHelper.getPlayer().isCrouching() && ClientHelper.getRayTrace().getType() == Type.BLOCK &&
+				(ClientHelper.getPlayer().getMainHandItem().getItem() == ModItems.CRAFTING_STAND.get() || ClientHelper.getPlayer().getOffhandItem().getItem() == ModItems.CRAFTING_STAND.get())) {
+			final BlockRayTraceResult raytrace = (BlockRayTraceResult)ClientHelper.getRayTrace();
 			Hand hand;
-			if(this.mc.player.getMainHandItem().getItem() == ModItems.CRAFTING_STAND.get())
+			if(ClientHelper.getPlayer().getMainHandItem().getItem() == ModItems.CRAFTING_STAND.get())
 				hand = Hand.MAIN_HAND;
 			else
 				hand = Hand.OFF_HAND;
-			final BlockItemUseContext context = new BlockItemUseContext(this.mc.player, hand, this.mc.player.getItemInHand(hand), raytrace);
+			final BlockItemUseContext context = new BlockItemUseContext(ClientHelper.getPlayer(), hand, ClientHelper.getPlayer().getItemInHand(hand), raytrace);
 			if(context.canPlace()) {
 				final BlockPos renderPos = context.getClickedPos();
-				final Vector3d proj = this.mc.gameRenderer.getMainCamera().getPosition();
-				final BlockState oldState = this.mc.level.getBlockState(renderPos);
+				final Vector3d proj = ClientHelper.getGameRenderer().getMainCamera().getPosition();
+				final BlockState oldState = ClientHelper.getLevel().getBlockState(renderPos);
 				BlockState newState = ModBlocks.CRAFTING_STAND.get().getStateForPlacement(context);
 				if(oldState != newState) {
 					if(oldState.is(ModBlocks.CRAFTING_STAND.get()))
@@ -164,9 +161,9 @@ public class RenderEventHandler {
 					final MatrixStack matrix = e.getMatrixStack();
 					matrix.pushPose();
 					matrix.translate(renderPos.getX()-proj.x, renderPos.getY()-proj.y, renderPos.getZ()-proj.z);
-					final IRenderTypeBuffer.Impl buffer = this.mc.renderBuffers().bufferSource();
-					this.mc.getBlockRenderer().renderBlock(newState, matrix, new RenderHelper.AlphaMultipliedVertexBuffer(buffer, Atlases.translucentCullBlockSheet(), 0.4F),
-							WorldRenderer.getLightColor(this.mc.level, renderPos), OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
+					final IRenderTypeBuffer.Impl buffer = ClientHelper.getBufferSource();
+					ClientHelper.getBlockRenderer().renderBlock(newState, matrix, new RenderHelper.AlphaMultipliedVertexBuffer(buffer, Atlases.translucentCullBlockSheet(), 0.4F),
+							WorldRenderer.getLightColor(ClientHelper.getLevel(), renderPos), OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
 					matrix.popPose();
 					buffer.endBatch();
 				}
@@ -230,7 +227,7 @@ public class RenderEventHandler {
 			}
 			final BufferBuilder builder = Tessellator.getInstance().getBuilder();
 			builder.begin(7, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);
-			this.mc.getTextureManager().bind(it.next().getTexture());
+			ClientHelper.getTextureManager().bind(it.next().getTexture());
 			//The ordering of these calls is very important, it must match that defined in the vertex format
 			builder.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z()).color(1F, 1F, 1F, 1F).uv(0, 0).uv2(light).endVertex();
 			builder.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z()).color(1F, 1F, 1F, 1F).uv(0, 1).uv2(light).endVertex();

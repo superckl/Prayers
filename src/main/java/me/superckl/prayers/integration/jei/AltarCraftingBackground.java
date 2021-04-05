@@ -6,7 +6,6 @@ import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.init.ModBlocks;
 import mezz.jei.api.gui.drawable.IDrawable;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
@@ -49,7 +48,7 @@ public class AltarCraftingBackground implements IDrawable{
 		matrixStack.translate(scale/2, scale/2, 0.0F);
 		matrixStack.scale(1.0F, -1.0F, 1.0F);
 		matrixStack.scale(scale, scale, scale);
-		IBakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+		IBakedModel model = ClientHelper.getBlockRenderer().getBlockModel(state);
 		ForgeHooksClient.handleCameraTransforms(matrixStack, model, TransformType.GUI, false);
 	}
 	
