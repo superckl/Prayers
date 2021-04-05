@@ -1,6 +1,7 @@
 package me.superckl.prayers;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
@@ -23,6 +24,10 @@ public class ClientHelper {
 	
 	public static float getPartialTicks() {
 		return mc.getFrameTime();
+	}
+	
+	public static BlockRendererDispatcher getBlockRenderer() {
+		return mc.getBlockRenderer();
 	}
 	
 }

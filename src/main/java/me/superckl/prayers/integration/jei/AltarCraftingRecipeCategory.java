@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
-import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.init.ModItems;
@@ -16,6 +16,7 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.ITickTimer;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated.StartDirection;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
@@ -23,13 +24,26 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-@RequiredArgsConstructor
 public class AltarCraftingRecipeCategory implements IRecipeCategory<AbstractAltarCraftingRecipe>{
 
-	public static final ResourceLocation UID = new ResourceLocation(Prayers.MOD_ID, "altar_crafting");;
+	public static final ResourceLocation UID = new ResourceLocation(Prayers.MOD_ID, "altar_crafting");
+	public static final ResourceLocation ARROWS = new ResourceLocation(Prayers.MOD_ID, "textures/gui/arrow_widgets.png");
 	private final IGuiHelper guiHelper;
+	private final ITickTimer inputTimer;
+	private final ITickTimer outputTimer;
+	private final IDrawable arrowBackground;
+	private final IDrawable animArrow;
+	
+	public AltarCraftingRecipeCategory(IGuiHelper helper) {
+		this.guiHelper = helper;
+		inputTimer = guiHelper.createTickTimer(200, 16, true);
+		outputTimer = guiHelper.createTickTimer(200, 16, false);
+		this.arrowBackground = helper.drawableBuilder(ARROWS, 0, 0, 7, 16).setTextureSize(14, 16).build();
+		this.animArrow = helper.drawableBuilder(ARROWS, 7, 0, 7, 16).setTextureSize(14, 16).buildAnimated(inputTimer, StartDirection.TOP);
+	}
 	
 	@Override
 	public ResourceLocation getUid() {
@@ -50,7 +64,7 @@ public class AltarCraftingRecipeCategory implements IRecipeCategory<AbstractAlta
 	public IDrawable getBackground() {
 		return new AltarCraftingBackground();
 	}
-
+	
 	@Override
 	public IDrawable getIcon() {
 		return this.guiHelper.createDrawableIngredient(new ItemStack(ModItems.ALTARS.get(AltarTypes.GILDED_SANDSTONE)::get));
@@ -69,8 +83,6 @@ public class AltarCraftingRecipeCategory implements IRecipeCategory<AbstractAlta
 		int startY = 6;
 		int num = (int) ingredients.getInputs(VanillaTypes.ITEM).stream().filter(list -> !list.isEmpty() && (list.size() > 1 || !list.get(0).isEmpty())).count();
 		int[] offsets = this.getSlotOffsets(num);
-		ITickTimer inputTimer = guiHelper.createTickTimer(200, 200, true);
-		ITickTimer outputTimer = guiHelper.createTickTimer(200, 200, false);
 		Iterator<Direction> dirs = Direction.Plane.HORIZONTAL.iterator();
 		for(int i = 0; i < num; i++) {
 			recipeLayout.getItemStacks().init(i, true, new CraftingStandItemRenderer(guiHelper, inputTimer, dirs.next(), startX+offsets[i]+1, startY+1),
@@ -90,6 +102,23 @@ public class AltarCraftingRecipeCategory implements IRecipeCategory<AbstractAlta
 			offsets[i] = 9*(2*i-numSlots);
 		}
 		return offsets;
+	}
+	
+	@Override
+	public List<ITextComponent> getTooltipStrings(AbstractAltarCraftingRecipe recipe, double mouseX, double mouseY) {
+		int startX = 40;
+		int startY = 6;
+		if(mouseX >= startX-3 && mouseX < startX+7 && mouseY >= startY+21 && mouseY < startY+37)
+			return Lists.newArrayList(new TranslationTextComponent(LangUtil.buildTextLoc("points"), (int) recipe.getPoints()));
+		return IRecipeCategory.super.getTooltipStrings(recipe, mouseX, mouseY);
+	}
+	
+	@Override
+	public void draw(AbstractAltarCraftingRecipe recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
+		int startX = 40;
+		int startY = 6;
+		this.arrowBackground.draw(matrixStack, startX-3, startY+21);
+		this.animArrow.draw(matrixStack, startX-3, startY+21);
 	}
 	
 }

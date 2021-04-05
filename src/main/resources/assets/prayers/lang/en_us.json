@@ -58,6 +58,7 @@
   "text.prayers.command.level.entities": "Targeted %d entities, set points for %d living entities.",
   "text.prayers.command.level.players": "Set level for %d players.",
   "text.prayers.command.boon.entities": "Applied %s to %d items.",
+  "text.prayers.points": "%d points",
   "text.prayers.active": "Active",
   "text.prayers.inactive": "Inactive",
   "text.prayers.disabled": "Disabled",
