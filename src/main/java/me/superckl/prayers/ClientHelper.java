@@ -1,6 +1,7 @@
 package me.superckl.prayers;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
@@ -16,4 +17,12 @@ public class ClientHelper {
 		return ClientHelper.mc.player;
 	}
 
+	public static IRenderTypeBuffer.Impl getBufferSource(){
+		return mc.renderBuffers().bufferSource();
+	}
+	
+	public static float getPartialTicks() {
+		return mc.getFrameTime();
+	}
+	
 }
