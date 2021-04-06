@@ -25,7 +25,6 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.Atlases;
@@ -173,7 +172,7 @@ public class RenderEventHandler {
 
 	@SubscribeEvent
 	public void onRenderPlayer(final RenderPlayerEvent e) {
-		this.renderOverheadPrayers((ClientPlayerEntity) e.getPlayer(), e.getRenderer().getDispatcher().camera, e.getMatrixStack(), e.getLight(), e.getPartialRenderTick());
+		this.renderOverheadPrayers(e.getPlayer(), e.getRenderer().getDispatcher().camera, e.getMatrixStack(), e.getLight(), e.getPartialRenderTick());
 	}
 
 	@SuppressWarnings("unchecked")

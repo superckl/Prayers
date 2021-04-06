@@ -3,17 +3,21 @@ package me.superckl.prayers.client;
 import java.util.Random;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.ClientHelper;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderHelper {
@@ -64,6 +68,89 @@ public class RenderHelper {
 			i = 2;
 
 		return i;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void renderEntityInInventory(final int x, final int y, final int scale, final MatrixStack matrixstack, final float mouseVecX, final float mouseVecY, final LivingEntity entity) {
+		final float f = (float)Math.atan(mouseVecX / 40.0F);
+		final float f1 = (float)Math.atan(mouseVecY / 40.0F);
+		matrixstack.pushPose();
+		matrixstack.translate(x, y, 1050.0F);
+		matrixstack.scale(1.0F, 1.0F, -1.0F);
+		matrixstack.translate(0.0D, 0.0D, 1000.0D);
+		matrixstack.scale(scale, scale, scale);
+		final Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
+		final Quaternion quaternion1 = Vector3f.XP.rotationDegrees(f1 * 20.0F);
+		quaternion.mul(quaternion1);
+		matrixstack.mulPose(quaternion);
+		final float yBodyRot0 = entity.yBodyRot;
+		final float yRot0 = entity.yRot;
+		final float xRot0 = entity.xRot;
+		final float yHeadRot00 = entity.yHeadRotO;
+		final float yHeadRot0 = entity.yHeadRot;
+		entity.yBodyRot = 180.0F + f * 20.0F;
+		entity.yRot = 180.0F + f * 40.0F;
+		entity.xRot = -f1 * 20.0F;
+		entity.yHeadRot = entity.yRot;
+		entity.yHeadRotO = entity.yRot;
+		final EntityRendererManager entityrenderermanager = ClientHelper.getEntityRenderer();
+		quaternion1.conj();
+		entityrenderermanager.overrideCameraOrientation(quaternion1);
+		entityrenderermanager.setRenderShadow(false);
+		final IRenderTypeBuffer.Impl buffer = ClientHelper.getBufferSource();
+		RenderSystem.runAsFancy(() -> {
+			entityrenderermanager.render(entity, 0, 0, 0, 0, 1, matrixstack, buffer, 15728880);
+		});
+		buffer.endBatch();
+		entityrenderermanager.setRenderShadow(true);
+		entity.yBodyRot = yBodyRot0;
+		entity.yRot = yRot0;
+		entity.xRot = xRot0;
+		entity.yHeadRotO = yHeadRot00;
+		entity.yHeadRot = yHeadRot0;
+		matrixstack.popPose();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void renderEntityInInventory(final int x, final int y, final int scale, final float partialTicks, final MatrixStack matrixstack, final float rot, final LivingEntity entity) {
+		matrixstack.pushPose();
+		matrixstack.translate(x, y, 1050.0F);
+		matrixstack.scale(1.0F, 1.0F, -1.0F);
+		matrixstack.translate(0.0D, 0.0D, 1000.0D);
+		matrixstack.scale(scale, scale, scale);
+		final Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
+		final Quaternion quaternion1 = Vector3f.XP.rotationDegrees(0);
+		quaternion.mul(quaternion1);
+		matrixstack.mulPose(quaternion);
+		//		final float yBodyRot0 = entity.yBodyRot;
+		//		final float yRot0 = entity.yRot;
+		//		final float xRot0 = entity.xRot;
+		//		final float yHeadRot00 = entity.yHeadRotO;
+		//		final float yHeadRot0 = entity.yHeadRot;
+		entity.yBodyRot = 180.0F+rot;
+		entity.yBodyRotO = entity.yBodyRot;
+		entity.yRot = 180.0F+rot;
+		entity.yRotO = entity.yRot;
+		entity.xRot = 0;
+		entity.xRotO = entity.xRot;
+		entity.yHeadRot = entity.yRot;
+		entity.yHeadRotO = entity.yRot;
+		final EntityRendererManager entityrenderermanager = ClientHelper.getEntityRenderer();
+		quaternion1.conj();
+		entityrenderermanager.overrideCameraOrientation(quaternion1);
+		entityrenderermanager.setRenderShadow(false);
+		final IRenderTypeBuffer.Impl buffer = ClientHelper.getBufferSource();
+		RenderSystem.runAsFancy(() -> {
+			entityrenderermanager.render(entity, 0, 0, 0, 0, partialTicks, matrixstack, buffer, 15728880);
+		});
+		buffer.endBatch();
+		entityrenderermanager.setRenderShadow(true);
+		//		entity.yBodyRot = yBodyRot0;
+		//		entity.yRot = yRot0;
+		//		entity.xRot = xRot0;
+		//		entity.yHeadRotO = yHeadRot00;
+		//		entity.yHeadRot = yHeadRot0;
+		matrixstack.popPose();
 	}
 
 	@RequiredArgsConstructor

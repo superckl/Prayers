@@ -1,4 +1,4 @@
-package me.superckl.prayers.integration.jei;
+package me.superckl.prayers.integration.jei.altar;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 

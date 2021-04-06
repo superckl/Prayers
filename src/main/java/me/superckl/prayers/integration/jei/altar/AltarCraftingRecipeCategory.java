@@ -1,4 +1,4 @@
-package me.superckl.prayers.integration.jei;
+package me.superckl.prayers.integration.jei.altar;
 
 import java.util.Iterator;
 import java.util.List;
@@ -41,8 +41,8 @@ public class AltarCraftingRecipeCategory implements IRecipeCategory<AbstractAlta
 		this.guiHelper = helper;
 		this.inputTimer = this.guiHelper.createTickTimer(200, 16, true);
 		this.outputTimer = this.guiHelper.createTickTimer(200, 16, false);
-		this.arrowBackground = helper.drawableBuilder(AltarCraftingRecipeCategory.ARROWS, 0, 0, 7, 16).setTextureSize(14, 16).build();
-		this.animArrow = helper.drawableBuilder(AltarCraftingRecipeCategory.ARROWS, 7, 0, 7, 16).setTextureSize(14, 16).buildAnimated(this.inputTimer, StartDirection.TOP);
+		this.arrowBackground = helper.drawableBuilder(AltarCraftingRecipeCategory.ARROWS, 0, 0, 7, 16).setTextureSize(36, 16).build();
+		this.animArrow = helper.drawableBuilder(AltarCraftingRecipeCategory.ARROWS, 7, 0, 7, 16).setTextureSize(36, 16).buildAnimated(this.inputTimer, StartDirection.TOP);
 	}
 
 	@Override

@@ -136,14 +136,13 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 			final ITooltipFlag flag) {
 		final Prayer prayer = TalismanItem.getStoredPrayer(stack).orElse(null);
 		boolean shouldToggle = false;
+		final boolean auto = TalismanItem.canAutoActivate(stack);
 		if(prayer != null) {
 			if(level == null || CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).canUseItemPrayer(prayer)) {
-				//tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.bound"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 				if(CapabilityHandler.getPrayerCapability(stack).isPrayerActive(prayer))
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
 				else
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("inactive")).withStyle(TextFormatting.RED));
-				final boolean auto = TalismanItem.canAutoActivate(stack);
 				if(auto && ActivationCondition.hasCondition(prayer)) {
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.auto_conditions")).withStyle(TextFormatting.BLUE));
 					final List<ActivationCondition> conditions = ActivationCondition.getConditions(prayer);
@@ -153,8 +152,11 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 				shouldToggle = true;
 			}else
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.prayer_obfuscated")).withStyle(TextFormatting.GRAY));
-		}else
+		}else {
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.use_bind")).withStyle(TextFormatting.GRAY));
+			if(auto)
+				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.auto_no_prayer")).withStyle(TextFormatting.BLUE));
+		}
 		if(level != null) {
 			InventoryPrayerProvider provider;
 			try {

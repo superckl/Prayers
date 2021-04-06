@@ -1,4 +1,4 @@
-package me.superckl.prayers.integration.jei;
+package me.superckl.prayers.integration.jei.altar;
 
 import java.util.List;
 

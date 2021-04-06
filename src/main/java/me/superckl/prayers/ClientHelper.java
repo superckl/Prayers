@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.RayTraceResult;
@@ -18,6 +19,10 @@ import net.minecraft.world.World;
 public class ClientHelper {
 
 	private static Minecraft mc = Minecraft.getInstance();
+
+	public static Minecraft getMinecraft() {
+		return ClientHelper.mc;
+	}
 
 	public static World getLevel() {
 		return ClientHelper.mc.level;
@@ -45,6 +50,10 @@ public class ClientHelper {
 
 	public static ItemRenderer getItemRenderer() {
 		return ClientHelper.mc.getItemRenderer();
+	}
+
+	public static EntityRendererManager getEntityRenderer() {
+		return ClientHelper.mc.getEntityRenderDispatcher();
 	}
 
 	public static RayTraceResult getRayTrace() {
@@ -77,6 +86,14 @@ public class ClientHelper {
 
 	public static SoundHandler getSoundManager() {
 		return ClientHelper.mc.getSoundManager();
+	}
+
+	public static int getMouseX() {
+		return (int) (ClientHelper.mc.mouseHandler.xpos() * ClientHelper.getWindow().getGuiScaledWidth() / ClientHelper.getWindow().getScreenWidth());
+	}
+
+	public static int getMouseY() {
+		return (int) (ClientHelper.mc.mouseHandler.ypos() * ClientHelper.getWindow().getGuiScaledWidth() / ClientHelper.getWindow().getScreenWidth());
 	}
 
 }
