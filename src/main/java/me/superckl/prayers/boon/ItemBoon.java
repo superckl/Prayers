@@ -24,6 +24,7 @@ import net.minecraftforge.common.util.Constants;
 public enum ItemBoon {
 
 	ATTACK_DAMAGE(() -> Attributes.ATTACK_DAMAGE, new DamageSupplier(), EquipmentSlotType.MAINHAND, EquipmentSlotType.OFFHAND),
+	ARMOR(() -> Attributes.ARMOR, new ArmorSupplier(), EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD),
 	CURIOS(null, null);
 
 	public static final String BOON_KEY = "boons";
@@ -44,8 +45,12 @@ public enum ItemBoon {
 
 	public IFormattableTextComponent getName() {
 		if(this.name == null)
-			this.name = new TranslationTextComponent(Util.makeDescriptionId("boon", new ResourceLocation(Prayers.MOD_ID, this.name().toLowerCase())));
+			this.name = new TranslationTextComponent(this.getNameId());
 		return this.name;
+	}
+	
+	public String getNameId() {
+		return Util.makeDescriptionId("boon", new ResourceLocation(Prayers.MOD_ID, this.name().toLowerCase()));
 	}
 
 	public void addTo(final ItemStack stack) {

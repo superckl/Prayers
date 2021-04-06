@@ -16,6 +16,7 @@ import me.superckl.prayers.item.decree.DecreeItem.Type;
 import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
@@ -33,6 +34,7 @@ public class Config {
 	private final DoubleValue fertilityCropChance;
 	private final DoubleValue fertilityAnimalChance;
 	private final Map<ItemBoon, DoubleValue> boonValues = new EnumMap<>(ItemBoon.class);
+	private final BooleanValue preventWitherCheese;
 
 	private Config(final ForgeConfigSpec.Builder builder) {
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
@@ -65,7 +67,12 @@ public class Config {
 
 		builder.comment("Boon of Damage percentage bonus (default 0.5 (+50%))");
 		this.boonValues.put(ItemBoon.ATTACK_DAMAGE, builder.defineInRange("Boon.Boon of Damage", 0.5, 0, Float.MAX_VALUE));
-
+		
+		builder.comment("Boon of Armor percentage bonus (default 0.5 (+50%))");
+		this.boonValues.put(ItemBoon.ARMOR, builder.defineInRange("Boon.Boon of Armor", 0.5, 0, Float.MAX_VALUE));
+		
+		builder.comment("If true, Prayers will attempt to prevent 'cheesing' of upgraded withers by cancelling any damage from fake players (e.g., grinders)");
+		this.preventWitherCheese = builder.define("Prevent Wither Cheese", true);
 	}
 
 	public static ForgeConfigSpec setup() {

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.item.RelicItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -27,8 +28,8 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 
 	public static RegistryObject<AltarItem> RELIC = AltarItem.REGISTER.register("relic", AltarItem.builder().sacrificeXP(300).sacrificeTicks(200)
 			.offerPoints(0).offerTicks(0).matcher(stack -> {
-				for(final RegistryObject<Item> items:ModItems.RELICS)
-					if(items.get() == stack.getItem())
+				for(final RegistryObject<Item> items:ModItems.RELICS.values())
+					if(items.get() == stack.getItem() && !RelicItem.isCharged(stack))
 						return true;
 				return false;
 			})::build);

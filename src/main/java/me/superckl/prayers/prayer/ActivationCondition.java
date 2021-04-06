@@ -59,8 +59,8 @@ public abstract class ActivationCondition {
 		for(int i = 0; i < player.inventory.items.size(); i++) {
 			final ItemStack stack = player.inventory.items.get(i);
 			final TalismanItem item = ModItems.TALISMAN.get();
-			if(!stack.isEmpty() && stack.getItem() == item && item.canAutoActivate(stack)) {
-				final Prayer stored = item.getStoredPrayer(stack).orElse(null);
+			if(!stack.isEmpty() && stack.getItem() == item && TalismanItem.canAutoActivate(stack)) {
+				final Prayer stored = TalismanItem.getStoredPrayer(stack).orElse(null);
 				if(stored == prayer && item.applyState(stack, player, TalismanItem.State.ACTIVATE)) {
 					PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
 							PacketTalismanState.builder().entityID(player.getId()).slot(i).state(TalismanItem.State.ACTIVATE).build());

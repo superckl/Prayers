@@ -1,9 +1,12 @@
 package me.superckl.prayers.init.loot;
 
+import java.util.EnumSet;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
 
+import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.init.ModItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
@@ -20,7 +23,10 @@ public class RelicLoot extends LootModifier{
 
 	@Override
 	protected List<ItemStack> doApply(final List<ItemStack> generatedLoot, final LootContext context) {
-		generatedLoot.add(new ItemStack(ModItems.RELICS.get(context.getRandom().nextInt(ModItems.RELICS.size()))::get));
+		EnumSet<ItemBoon> set = EnumSet.allOf(ItemBoon.class);
+		set.remove(ItemBoon.CURIOS);
+		ItemBoon boon = Lists.newArrayList(set).get(context.getRandom().nextInt(set.size()));
+		generatedLoot.add(new ItemStack(ModItems.RELICS.get(boon)::get));
 		return generatedLoot;
 	}
 

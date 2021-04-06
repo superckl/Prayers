@@ -22,10 +22,10 @@
   "item.prayers.sanctuary_decree": "Decree of Sanctuary",
   "item.prayers.infertility_decree": "Decree of Infertility",
   "item.prayers.persistence_decree": "Decree of Persistence",
-  "item.prayers.relic_0": "Relic 0",
-  "item.prayers.relic_1": "Relic 1",
-  "item.prayers.relic_2": "Relic 2",
-  "item.prayers.relic_3": "Relic 3",
+  "item.prayers.relic_attack_damage": "Relic of Strength",
+  "item.prayers.relic_attack_damage_charged": "Hallowed Relic of Strength",
+  "item.prayers.relic_armor": "Relic of Defence",
+  "item.prayers.relic_armor_charged": "Hallowed Relic of Defence",
   "itemGroup.prayers": "Prayers",
   "effect.prayers.instant_prayer": "Instant Prayer",
   "effect.prayers.prayer_regen": "Prayer Renewal",
@@ -54,6 +54,7 @@
   "text.prayers.prayer.no_points": "Insufficient points",
   "text.prayers.prayer.tome": "Requires tome to unlock",
   "text.prayers.prayer.talisman": "Talisman active",
+  "text.prayers.relic.apply": "Craft with item to apply boon",
   "text.prayers.command.no_entities": "No entities targeted.",
   "text.prayers.command.level.entities": "Targeted %d entities, set points for %d living entities.",
   "text.prayers.command.level.players": "Set level for %d players.",
@@ -111,5 +112,8 @@
   "activate_condition.prayers.fire_prot": "Taking fire damage",
   "activate_condition.prayers.poison_prot": "Poisoned",
   "boon.prayers.attack_damage": "Boon of Strength",
-  "boon.prayers.curios": "Boon of Curios"
+  "boon.prayers.armor": "Boon of Defence",
+  "boon.prayers.curios": "Boon of Curios",
+  "boon.prayers.attack_damage_wither": "%s of Strength",
+  "boon.prayers.armor_wither": "%s of Defence"
 }

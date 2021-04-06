@@ -61,14 +61,14 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public ActionResult<ItemStack> use(final World level, final PlayerEntity player, final Hand hand) {
 		final Collection<Prayer> active = CapabilityHandler.getPrayerCapability(player).getActivePrayers();
 		final ItemStack stack = player.getItemInHand(hand);
-		final Prayer stored = this.getStoredPrayer(stack).orElse(null);
+		final Prayer stored = TalismanItem.getStoredPrayer(stack).orElse(null);
 		if(active.size() != 1)
 			return ActionResult.fail(stack);
 		final Prayer prayer = active.iterator().next();
 		if(prayer == stored)
 			return ActionResult.pass(stack);
 		this.applyState(stack, player, State.DEACTIVATE);
-		this.storePrayer(stack, prayer);
+		TalismanItem.storePrayer(stack, prayer);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, player.getSoundSource(), 0.25F, 0.75F);
 		return ActionResult.sidedSuccess(stack, level.isClientSide);
 	}
@@ -98,10 +98,10 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	@Override
 	public ActionResultType interactLivingEntity(final ItemStack stack, final PlayerEntity player,
 			final LivingEntity entity, final Hand hand) {
-		if(entity instanceof WitherEntity && !this.canAutoActivate(stack) && this.storeTalisman(entity, stack)) {
+		if(entity instanceof WitherEntity && !TalismanItem.canAutoActivate(stack) && TalismanItem.storeTalisman(entity, stack)) {
 			if(!player.level.isClientSide) {
 				final WitherUsePrayersGoal goal = new WitherUsePrayersGoal((WitherEntity) entity);
-				this.getStoredPrayer(stack).ifPresent(goal::addPrayer);
+				TalismanItem.getStoredPrayer(stack).ifPresent(goal::addPrayer);
 				((WitherEntity)entity).goalSelector.addGoal(0, goal);
 				CapabilityHandler.getPrayerCapability(entity).setShouldDrain(false);
 				final ITextComponent name = entity.hasCustomName() ? entity.getCustomName():entity.getName();
@@ -116,7 +116,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	@Override
 	public ITextComponent getName(final ItemStack stack) {
-		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		final Prayer prayer = TalismanItem.getStoredPrayer(stack).orElse(null);
 		if(prayer != null)
 			return new TranslationTextComponent(this.getDescriptionId(stack), prayer.getName());
 		return super.getName(stack);
@@ -124,8 +124,8 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
-		final String id = this.canAutoActivate(stack) ? super.getDescriptionId(stack).concat("_auto"):super.getDescriptionId(stack);
-		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		final String id = TalismanItem.canAutoActivate(stack) ? super.getDescriptionId(stack).concat("_auto"):super.getDescriptionId(stack);
+		final Prayer prayer = TalismanItem.getStoredPrayer(stack).orElse(null);
 		final String newId = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> new ClientIdHelper(id, prayer)::modifyId);
 		return newId == null ? id:newId;
 	}
@@ -134,7 +134,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip,
 			final ITooltipFlag flag) {
-		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		final Prayer prayer = TalismanItem.getStoredPrayer(stack).orElse(null);
 		boolean shouldToggle = false;
 		if(prayer != null) {
 			if(level == null || CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).canUseItemPrayer(prayer)) {
@@ -143,7 +143,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("active")).withStyle(TextFormatting.GREEN));
 				else
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("inactive")).withStyle(TextFormatting.RED));
-				final boolean auto = this.canAutoActivate(stack);
+				final boolean auto = TalismanItem.canAutoActivate(stack);
 				if(auto && ActivationCondition.hasCondition(prayer)) {
 					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.auto_conditions")).withStyle(TextFormatting.BLUE));
 					final List<ActivationCondition> conditions = ActivationCondition.getConditions(prayer);
@@ -172,7 +172,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	}
 
 	public boolean applyState(final ItemStack stack, final PlayerEntity player, final State state) {
-		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		final Prayer prayer = TalismanItem.getStoredPrayer(stack).orElse(null);
 		if(prayer != null && CapabilityHandler.getPrayerCapability(player).canUseItemPrayer(prayer))
 			switch(state) {
 			case ACTIVATE:
@@ -194,7 +194,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
 	@Override
 	public boolean isFoil(final ItemStack stack) {
-		final LazyOptional<Prayer> opt = this.getStoredPrayer(stack);
+		final LazyOptional<Prayer> opt = TalismanItem.getStoredPrayer(stack);
 		if(opt.isPresent())
 			return CapabilityHandler.getPrayerCapability(stack).isPrayerActive(opt.orElse(null));
 		return false;
@@ -214,31 +214,31 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		return notEqual;
 	}
 
-	public LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
+	public static LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(TalismanItem.PRAYER_KEY))
 			return LazyOptional.of(() -> GameRegistry.findRegistry(Prayer.class).getValue(new ResourceLocation(nbt.getString(TalismanItem.PRAYER_KEY))));
 		return LazyOptional.empty();
 	}
 
-	public void storePrayer(final ItemStack stack, final Prayer prayer) {
+	public static void storePrayer(final ItemStack stack, final Prayer prayer) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		nbt.putString(TalismanItem.PRAYER_KEY, prayer.getRegistryName().toString());
 	}
 
-	public void setAutoActivate(final ItemStack stack) {
+	public static void setAutoActivate(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		nbt.putBoolean(TalismanItem.AUTO_KEY, true);
 	}
 
-	public boolean canAutoActivate(final ItemStack stack) {
+	public static boolean canAutoActivate(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(TalismanItem.AUTO_KEY))
 			return nbt.getBoolean(TalismanItem.AUTO_KEY);
 		return false;
 	}
 
-	public boolean storeTalisman(final Entity entity, final ItemStack stack) {
+	public static boolean storeTalisman(final Entity entity, final ItemStack stack) {
 		final CompoundNBT perData = entity.getPersistentData();
 		if(!perData.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND))
 			perData.put(Prayers.MOD_ID, new CompoundNBT());
@@ -249,11 +249,11 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		}
 		return false;
 	}
-
-	@Override
-	public CompoundNBT getShareTag(final ItemStack stack) {
-		// TODO Auto-generated method stub
-		return super.getShareTag(stack);
+	
+	public static boolean hasStoredTalisman(final Entity entity) {
+		final CompoundNBT perData = entity.getPersistentData();
+		return perData.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND) && 
+				perData.getCompound(Prayers.MOD_ID).contains(TALISMAN_KEY, Constants.NBT.TAG_COMPOUND);
 	}
 
 	@Override

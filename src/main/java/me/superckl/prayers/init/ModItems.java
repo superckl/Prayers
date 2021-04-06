@@ -1,14 +1,14 @@
 package me.superckl.prayers.init;
 
 import java.util.EnumMap;
-import java.util.List;
-
-import com.google.common.collect.Lists;
+import java.util.Map;
 
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
+import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.item.DivineTotemItem;
 import me.superckl.prayers.item.PrayerTomeItem;
+import me.superckl.prayers.item.RelicItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.item.VesselItem;
 import me.superckl.prayers.item.decree.DecreeItem;
@@ -36,7 +36,7 @@ public class ModItems {
 
 	public static final EnumMap<DecreeItem.Type, RegistryObject<DecreeItem>> DECREES = new EnumMap<>(DecreeItem.Type.class);
 
-	public static final List<RegistryObject<Item>> RELICS = Lists.newArrayList();
+	public static final Map<ItemBoon, RegistryObject<Item>> RELICS = new EnumMap<>(ItemBoon.class);
 
 	public static final RegistryObject<BlockItem> OFFERING_STAND = ModItems.REGISTER.register("offering_stand",
 			() -> new BlockItem(ModBlocks.OFFERING_STAND.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
@@ -66,8 +66,10 @@ public class ModItems {
 			ModItems.DECREES.put(type, ModItems.REGISTER.register(type.name().toLowerCase()+"_decree",
 					() -> new DecreeItem(type)));
 
-		for(int i = 0; i < 4; i++)
-			ModItems.RELICS.add(ModItems.REGISTER.register("relic_"+i, () -> new Item(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP))));
+		for(ItemBoon boon:ItemBoon.values())
+			if(boon != ItemBoon.CURIOS)
+				ModItems.RELICS.put(boon, ModItems.REGISTER.register("relic_"+boon.name().toLowerCase(),
+					() -> new RelicItem(boon)));
 	}
 
 }

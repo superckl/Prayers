@@ -9,7 +9,6 @@ import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.item.TalismanItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.WitherEntity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -17,7 +16,6 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -32,26 +30,10 @@ public class EntityEventHandler {
 				if(nbt.contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND)) {
 					final ItemStack talisman = ItemStack.of(nbt.getCompound(TalismanItem.TALISMAN_KEY));
 					final WitherUsePrayersGoal goal = new WitherUsePrayersGoal((WitherEntity) e.getEntity());
-					ModItems.TALISMAN.get().getStoredPrayer(talisman).ifPresent(goal::addPrayer);
+					ModItems.TALISMAN.get();
+					TalismanItem.getStoredPrayer(talisman).ifPresent(goal::addPrayer);
 					((WitherEntity)e.getEntity()).goalSelector.addGoal(0, goal);
 					CapabilityHandler.getPrayerCapability((LivingEntity) e.getEntity()).setShouldDrain(false);
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public void onEntityDrops(final LivingDropsEvent e) {
-		final LivingEntity entity = e.getEntityLiving();
-		if(entity instanceof WitherEntity) {
-			CompoundNBT nbt = entity.getPersistentData();
-			if(nbt.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND)) {
-				nbt = nbt.getCompound(Prayers.MOD_ID);
-				if(nbt.contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND)) {
-					final ItemStack talisman = ItemStack.of(nbt.getCompound(TalismanItem.TALISMAN_KEY));
-					ModItems.TALISMAN.get().setAutoActivate(talisman);
-					final ItemEntity item = new ItemEntity(entity.level, entity.getX(), entity.getY(), entity.getZ(), talisman);
-					e.getDrops().add(item);
 				}
 			}
 		}

@@ -1,5 +1,8 @@
 package me.superckl.prayers.item;
 
+import me.superckl.prayers.Config;
+import me.superckl.prayers.Prayers;
+import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.decree.DecreeData;
 import me.superckl.prayers.item.decree.DecreeItem;
@@ -11,23 +14,35 @@ import me.superckl.prayers.util.ReflectionCache.Methods;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.projectile.WitherSkullEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.world.BlockEvent.CropGrowEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ItemEvents {
@@ -51,9 +66,32 @@ public class ItemEvents {
 	}
 
 	@SubscribeEvent
+	public void onEntityDrops(final LivingDropsEvent e) {
+		final LivingEntity entity = e.getEntityLiving();
+		if(entity instanceof WitherEntity) {
+			CompoundNBT nbt = entity.getPersistentData();
+			if(nbt.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND)) {
+				nbt = nbt.getCompound(Prayers.MOD_ID);
+				if(nbt.contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND)) {
+					final ItemStack talisman = ItemStack.of(nbt.getCompound(TalismanItem.TALISMAN_KEY));
+					TalismanItem.setAutoActivate(talisman);
+					final ItemEntity item = new ItemEntity(entity.level, entity.getX(), entity.getY(), entity.getZ(), talisman);
+					e.getDrops().add(item);
+				}
+				if(nbt.contains(RelicItem.BOON_KEY, Constants.NBT.TAG_STRING)) {
+					final ItemBoon boon = ItemBoon.valueOf(nbt.getString(RelicItem.BOON_KEY));
+					ItemStack relic = new ItemStack(ModItems.RELICS.get(boon)::get);
+					RelicItem.setCharged(relic);
+					final ItemEntity item = new ItemEntity(entity.level, entity.getX(), entity.getY(), entity.getZ(), relic);
+					e.getDrops().add(item);
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void onPlayerDamage(final LivingDamageEvent e) {
-		if(!(e.getEntityLiving() instanceof PlayerEntity) || e.getSource().isBypassInvul())
-			return;
+		if((e.getEntityLiving() instanceof PlayerEntity) && !e.getSource().isBypassInvul()) {
 		final PlayerEntity player = (PlayerEntity) e.getEntityLiving();
 		if(e.getAmount() >= player.getHealth()) {
 			final int slot = player.inventory.findSlotMatchingItem(new ItemStack(ModItems.DIVINE_TOTEM::get));
@@ -75,6 +113,39 @@ public class ItemEvents {
 				player.level.broadcastEntityEvent(player, (byte)35);
 			}
 		}
+		}
+	}
+	
+	//We have to add boon damage manually since wither skulls don't check for damage modifiers on their source
+	@SubscribeEvent
+	public void onLivingHurt(LivingHurtEvent e) {
+		if(e.getSource().getDirectEntity() instanceof WitherSkullEntity && e.getSource().getEntity() instanceof WitherEntity) {
+			RelicItem.getBoon(e.getSource().getEntity()).ifPresent(boon -> {
+				if(boon == ItemBoon.ATTACK_DAMAGE) {
+					AttributeModifier mod = boon.getModifierSupplier().get();
+					switch(mod.getOperation()) {
+					case ADDITION:
+						e.setAmount((float) (e.getAmount()+mod.getAmount()));
+						break;
+					case MULTIPLY_BASE:
+					case MULTIPLY_TOTAL:
+						e.setAmount((float) (e.getAmount()*mod.getAmount()));
+						break;
+					default:
+						break;
+					}
+				}
+			});
+		}
+	}
+	
+	//Cancel any damage from fake players to upgraded withers to prevent cheesing
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onLivingAttack(LivingAttackEvent e) {
+		if(Config.getInstance().getPreventWitherCheese().get() && e.getEntity() instanceof WitherEntity && 
+				e.getSource().getEntity() instanceof FakePlayer &&
+					(TalismanItem.hasStoredTalisman(e.getEntity()) || RelicItem.getBoon(e.getEntity()).isPresent()))
+				e.setCanceled(true);
 	}
 
 	@SubscribeEvent
