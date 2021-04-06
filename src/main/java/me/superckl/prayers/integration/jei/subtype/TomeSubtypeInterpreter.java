@@ -13,7 +13,7 @@ public class TomeSubtypeInterpreter implements ISubtypeInterpreter{
 		final LazyOptional<Prayer> prayer = PrayerTomeItem.getStoredPrayer(itemStack);
 		if(prayer.isPresent())
 			return prayer.orElse(null).getRegistryName().getPath();
-		return null;
+		return ISubtypeInterpreter.NONE;
 	}
 
 }

@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import me.superckl.prayers.ClientHelper;
+import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.client.RenderHelper;
 import me.superckl.prayers.integration.jei.altar.AltarCraftingRecipeCategory;
@@ -15,8 +16,10 @@ import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.ITickTimer;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.helpers.IStackHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.plugins.vanilla.ingredients.item.ItemStackHelper;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.item.ItemStack;
@@ -32,14 +35,16 @@ public class WitherUpgradeRecipeCategory implements IRecipeCategory<WitherUpgrad
 	public static final ResourceLocation UID = new ResourceLocation(Prayers.MOD_ID, "wither_upgrade");
 
 	private final IGuiHelper guiHelper;
+	private final IStackHelper stackHelper;
 	private final WitherEntity wither;
 	private final FakeClientPlayer player;
 	private final IDrawable arrow;
 	private final ITickTimer timer;
 	private int lastValue = -1;
 
-	public WitherUpgradeRecipeCategory(final IGuiHelper helper) {
+	public WitherUpgradeRecipeCategory(final IGuiHelper helper, IStackHelper stackHelper) {
 		this.guiHelper = helper;
+		this.stackHelper = stackHelper;
 		this.wither = new FakeWitherEntity(ClientHelper.getLevel());
 		this.player = new FakeClientPlayer((ClientWorld) ClientHelper.getLevel(), ClientHelper.getPlayer().getGameProfile());
 		this.arrow = helper.drawableBuilder(AltarCraftingRecipeCategory.ARROWS, 14, 0, 22, 15).setTextureSize(36, 16).build();
@@ -71,11 +76,13 @@ public class WitherUpgradeRecipeCategory implements IRecipeCategory<WitherUpgrad
 	public IDrawable getIcon() {
 		return new WitherDrawable(4, false);
 	}
-
+	
 	@Override
 	public void setIngredients(final WitherUpgradeRecipe recipe, final IIngredients ingredients) {
 		ingredients.setInput(VanillaTypes.ITEM, recipe.getInput());
 		ingredients.setOutput(VanillaTypes.ITEM, recipe.getOutput());
+		LogHelper.info(this.stackHelper.getUniqueIdentifierForStack(recipe.getInput(), null));
+		LogHelper.info(this.stackHelper.getUniqueIdentifierForStack(recipe.getOutput(), null));
 	}
 
 	@Override

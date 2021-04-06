@@ -24,11 +24,12 @@ import net.minecraftforge.common.util.Constants;
 @Getter
 public enum ItemBoon {
 
-	ATTACK_DAMAGE(() -> Attributes.ATTACK_DAMAGE, new DamageSupplier(), ItemStackPredicates.IS_WEAPON,
+	ATTACK_DAMAGE(() -> Attributes.ATTACK_DAMAGE, new DamageSupplier(), ItemStackPredicates.IS_WEAPON, false,
 			EquipmentSlotType.MAINHAND, EquipmentSlotType.OFFHAND),
-	ARMOR(() -> Attributes.ARMOR, new ArmorSupplier(), ItemStackPredicates.IS_ARMOR,
+	ARMOR(() -> Attributes.ARMOR, new ArmorSupplier(), ItemStackPredicates.IS_ARMOR, false,
 			EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD),
-	CURIOS(null, null, null);
+	PRAYER_DRAIN(null, null, ItemStackPredicates.IS_ARMOR, true),
+	CURIOS(null, null, ItemStackPredicates.IS_WEAPON, true);
 
 	public static final String BOON_KEY = "boons";
 
@@ -37,15 +38,18 @@ public enum ItemBoon {
 	private final Supplier<AttributeModifier> modifierSupplier;
 	@Getter(AccessLevel.PRIVATE)
 	private final Predicate<ItemStack> matchingPredicate;
+	private final boolean hasTooltip;
 	private final EquipmentSlotType[] types;
 	private IFormattableTextComponent name;
+	private IFormattableTextComponent tooltip;
 
 	ItemBoon(final Supplier<Attribute> attributeSupplier, final Supplier<AttributeModifier> supplier,
-			final Predicate<ItemStack> matchingPredicate, final EquipmentSlotType... equipmentSlotTypes) {
+			final Predicate<ItemStack> matchingPredicate, boolean hasTooltip, final EquipmentSlotType... equipmentSlotTypes) {
 		this.hasModifier = attributeSupplier != null;
 		this.attributeSupplier = attributeSupplier;
 		this.modifierSupplier = supplier;
 		this.matchingPredicate = matchingPredicate;
+		this.hasTooltip = hasTooltip;
 		this.types = equipmentSlotTypes;
 	}
 
@@ -53,6 +57,12 @@ public enum ItemBoon {
 		if(this.name == null)
 			this.name = new TranslationTextComponent(this.getNameId());
 		return this.name;
+	}
+	
+	public IFormattableTextComponent getTooltip() {
+		if(this.tooltip == null)
+			this.tooltip = new TranslationTextComponent(getNameId().concat("_tooltip"));
+		return this.tooltip;
 	}
 
 	public String getNameId() {

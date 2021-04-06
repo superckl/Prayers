@@ -1,0 +1,12 @@
+{
+	"conditions": [
+		{
+			"condition": "minecraft:block_state_property",
+			"block": "minecraft:spawner"
+		},
+		{
+			"condition": "prayers:prayer_active",
+			"level": 60
+		}
+	]
+}

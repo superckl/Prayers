@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "prayers:relic_armor",
-    "prayers:relic_attack_damage"
+    "prayers:relic_attack_damage",
+    "prayers:relic_curios",
+    "prayers:relic_prayer_drain"
   ]
 }

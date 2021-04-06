@@ -10,7 +10,7 @@ public class RelicSubtypeInterpreter implements ISubtypeInterpreter{
 	public String apply(final ItemStack itemStack) {
 		if(RelicItem.isCharged(itemStack))
 			return "charged";
-		return null;
+		return ISubtypeInterpreter.NONE;
 	}
 
 }

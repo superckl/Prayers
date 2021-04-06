@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
@@ -169,6 +170,20 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 
 	public boolean canUseItemPrayer(final Prayer prayer) {
 		return !prayer.isObfusctated(this.ref);
+	}
+
+	@Override
+	protected float modifyDrain(final float drain) {
+		final int drainLvl = this.getPrayerDrainLevel();
+			return super.modifyDrain(drain)*(.35F+.8F/(drainLvl+1));
+	}
+
+	protected int getPrayerDrainLevel() {
+		int pieces = 0;
+		for(final ItemStack stack:this.ref.inventory.armor)
+			if(ItemBoon.PRAYER_DRAIN.has(stack))
+				pieces++;
+		return pieces;
 	}
 
 	public static class Storage implements Capability.IStorage<PlayerPrayerUser>{

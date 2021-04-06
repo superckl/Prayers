@@ -74,7 +74,11 @@ public class ClientEvents {
 
 		//Boon text
 		final Optional<ItemBoon> boons = ItemBoon.getBoon(e.getItemStack());
-		boons.ifPresent(boon -> e.getToolTip().add(boon.getName().withStyle(TextFormatting.LIGHT_PURPLE)));
+		boons.ifPresent(boon -> {
+			e.getToolTip().add(boon.getName().withStyle(TextFormatting.LIGHT_PURPLE));
+			if(boon.isHasTooltip())
+				e.getToolTip().add(boon.getTooltip().withStyle(TextFormatting.LIGHT_PURPLE));
+		});
 	}
 
 }

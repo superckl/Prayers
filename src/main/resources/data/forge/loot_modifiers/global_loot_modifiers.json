@@ -3,6 +3,7 @@
 	"entries": [
 		"prayers:prayer_tome",
 		"prayers:prayer_tome_low",
-		"prayers:relic"
+		"prayers:relic",
+		"prayers:spawner_curio"
 	]
 }
