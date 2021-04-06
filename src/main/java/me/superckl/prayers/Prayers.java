@@ -39,9 +39,9 @@ import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
-import me.superckl.prayers.potion.PotionTransformRecipe;
 import me.superckl.prayers.prayer.ActivationCondition;
 import me.superckl.prayers.prayer.Prayer;
+import me.superckl.prayers.recipe.PotionIngredient;
 import me.superckl.prayers.server.BoonArgument;
 import me.superckl.prayers.server.CommandBoon;
 import me.superckl.prayers.server.CommandSet;
@@ -49,6 +49,7 @@ import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
@@ -108,12 +109,7 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(new BoonEventHandler());
 			MinecraftForge.EVENT_BUS.register(ItemFrameTickManager.INSTANCE);
 			ActivationCondition.registerConditions();
-			BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
-					Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
-			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.REDSTONE, ModPotions.PRAYER_RENEWAL::get));
-			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.INSTANT_PRAYER::get, Items.GLOWSTONE_DUST, ModPotions.STRONG_INSTANT_PRAYER::get));
-			BrewingRecipeRegistry.addRecipe(new PotionTransformRecipe(ModPotions.PRAYER_RENEWAL::get, Items.REDSTONE, ModPotions.LONG_PRAYER_RENEWAL::get));
-
+			this.registerPotions();
 		});
 		CapabilityManager.INSTANCE.register(PlayerPrayerUser.class, new PlayerPrayerUser.Storage(), () -> new DefaultPlayerPrayerUser(null));
 		CapabilityManager.INSTANCE.register(DefaultLivingPrayerUser.class, new TickablePrayerProvider.Storage<DefaultLivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));
@@ -143,6 +139,19 @@ public class Prayers {
 				PacketSetInventoryItemPoints::encode, PacketSetInventoryItemPoints::decode, PacketSetInventoryItemPoints::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateInventoryPrayer.class,
 				PacketDeactivateInventoryPrayer::encode, PacketDeactivateInventoryPrayer::decode, PacketDeactivateInventoryPrayer::handle);
+	}
+
+	private void registerPotions() {
+		BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
+				Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
+		for(final Item item:new Item[] {Items.POTION, Items.LINGERING_POTION, Items.SPLASH_POTION}) {
+			BrewingRecipeRegistry.addRecipe(new PotionIngredient(item, ModPotions.INSTANT_PRAYER.get()),
+					Ingredient.of(Items.REDSTONE), PotionUtils.setPotion(new ItemStack(item), ModPotions.PRAYER_RENEWAL.get()));
+			BrewingRecipeRegistry.addRecipe(new PotionIngredient(item, ModPotions.INSTANT_PRAYER.get()),
+					Ingredient.of(Items.GLOWSTONE_DUST), PotionUtils.setPotion(new ItemStack(item), ModPotions.STRONG_INSTANT_PRAYER.get()));
+			BrewingRecipeRegistry.addRecipe(new PotionIngredient(item, ModPotions.PRAYER_RENEWAL.get()),
+					Ingredient.of(Items.REDSTONE), PotionUtils.setPotion(new ItemStack(item), ModPotions.LONG_PRAYER_RENEWAL.get()));
+		}
 	}
 
 	private void createRegistry(final RegistryEvent.NewRegistry e) {

@@ -11,8 +11,10 @@ public class BoonEventHandler {
 	@SubscribeEvent
 	public void onAttributes(final ItemAttributeModifierEvent e) {
 		if(!(e.getItemStack().getItem() instanceof ArmorItem) || ((ArmorItem) e.getItemStack().getItem()).getSlot() == e.getSlotType())
-			ItemBoon.getBoons(e.getItemStack()).stream().filter(boon -> ArrayUtils.contains(boon.getTypes(), e.getSlotType()))
-			.forEach(boon -> e.addModifier(boon.getAttributeSupplier().get(), boon.getModifierSupplier().get()));
+			ItemBoon.getBoon(e.getItemStack()).ifPresent(boon -> {
+				if(ArrayUtils.contains(boon.getTypes(), e.getSlotType()))
+					e.addModifier(boon.getAttributeSupplier().get(), boon.getModifierSupplier().get());
+			});
 	}
 
 }

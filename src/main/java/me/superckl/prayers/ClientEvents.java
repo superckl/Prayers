@@ -1,6 +1,6 @@
 package me.superckl.prayers;
 
-import java.util.EnumSet;
+import java.util.Optional;
 
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.client.AltarRenderer;
@@ -73,8 +73,8 @@ public class ClientEvents {
 		}
 
 		//Boon text
-		final EnumSet<ItemBoon> boons = ItemBoon.getBoons(e.getItemStack());
-		boons.forEach(boon -> e.getToolTip().add(boon.getName().withStyle(TextFormatting.LIGHT_PURPLE)));
+		final Optional<ItemBoon> boons = ItemBoon.getBoon(e.getItemStack());
+		boons.ifPresent(boon -> e.getToolTip().add(boon.getName().withStyle(TextFormatting.LIGHT_PURPLE)));
 	}
 
 }

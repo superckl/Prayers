@@ -36,7 +36,7 @@ public class ModItems {
 
 	public static final EnumMap<DecreeItem.Type, RegistryObject<DecreeItem>> DECREES = new EnumMap<>(DecreeItem.Type.class);
 
-	public static final Map<ItemBoon, RegistryObject<Item>> RELICS = new EnumMap<>(ItemBoon.class);
+	public static final Map<ItemBoon, RegistryObject<RelicItem>> RELICS = new EnumMap<>(ItemBoon.class);
 
 	public static final RegistryObject<BlockItem> OFFERING_STAND = ModItems.REGISTER.register("offering_stand",
 			() -> new BlockItem(ModBlocks.OFFERING_STAND.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));

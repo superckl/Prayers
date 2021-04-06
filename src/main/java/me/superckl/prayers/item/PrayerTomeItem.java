@@ -40,7 +40,7 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public ActionResult<ItemStack> use(final World level, final PlayerEntity player, final Hand hand) {
 		final ItemStack stack = player.getItemInHand(hand);
-		final LazyOptional<Prayer> prayerOpt = this.getStoredPrayer(stack);
+		final LazyOptional<Prayer> prayerOpt = PrayerTomeItem.getStoredPrayer(stack);
 		if(!prayerOpt.isPresent())
 			return ActionResult.pass(stack);
 		final Prayer prayer = prayerOpt.orElse(null);
@@ -54,7 +54,7 @@ public class PrayerTomeItem extends Item{
 
 	@Override
 	public ITextComponent getName(final ItemStack stack) {
-		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		final Prayer prayer = PrayerTomeItem.getStoredPrayer(stack).orElse(null);
 		if(prayer != null)
 			return new TranslationTextComponent(this.getDescriptionId(stack), prayer.getName().getString());
 		return super.getName(stack);
@@ -63,26 +63,26 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
 		final String id = super.getDescriptionId(stack);
-		final Prayer prayer = this.getStoredPrayer(stack).orElse(null);
+		final Prayer prayer = PrayerTomeItem.getStoredPrayer(stack).orElse(null);
 		final String newId = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> new ClientIdHelper(id, prayer)::modifyId);
 		return newId == null ? id:newId;
 	}
 
 	@Override
 	public boolean isFoil(final ItemStack stack) {
-		return this.getStoredPrayer(stack).isPresent();
+		return PrayerTomeItem.getStoredPrayer(stack).isPresent();
 	}
 
 	@Override
 	public Rarity getRarity(final ItemStack stack) {
-		if(this.getStoredPrayer(stack).isPresent())
+		if(PrayerTomeItem.getStoredPrayer(stack).isPresent())
 			return Rarity.EPIC;
 		return super.getRarity(stack);
 	}
 
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
-		this.getStoredPrayer(stack).ifPresent(prayer -> {
+		PrayerTomeItem.getStoredPrayer(stack).ifPresent(prayer -> {
 			if(level != null && CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).getPrayerLevel() < prayer.getLevel()) {
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.decipher")).withStyle(TextFormatting.GRAY));
 				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"), prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
@@ -91,14 +91,14 @@ public class PrayerTomeItem extends Item{
 		});
 	}
 
-	public LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
+	public static LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(PrayerTomeItem.PRAYER_KEY))
 			return LazyOptional.of(() -> GameRegistry.findRegistry(Prayer.class).getValue(new ResourceLocation(nbt.getString(PrayerTomeItem.PRAYER_KEY))));
 		return LazyOptional.empty();
 	}
 
-	public void storePrayer(final ItemStack stack, final Prayer prayer) {
+	public static void storePrayer(final ItemStack stack, final Prayer prayer) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		nbt.putString(PrayerTomeItem.PRAYER_KEY, prayer.getRegistryName().toString());
 	}
@@ -109,7 +109,7 @@ public class PrayerTomeItem extends Item{
 			for(final Prayer prayer:GameRegistry.findRegistry(Prayer.class).getValues())
 				if(prayer.isRequiresTome()) {
 					final ItemStack stack = new ItemStack(this);
-					this.storePrayer(stack, prayer);
+					PrayerTomeItem.storePrayer(stack, prayer);
 					stacks.add(stack);
 				}
 	}

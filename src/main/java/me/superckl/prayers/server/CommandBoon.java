@@ -28,8 +28,8 @@ public class CommandBoon {
 			if(e instanceof LivingEntity) {
 				final LivingEntity entity = (LivingEntity) e;
 				final ItemStack stack = entity.getMainHandItem();
-				if(!stack.isEmpty() && ItemBoon.getBoons(stack).isEmpty()) {
-					boon.addTo(stack);
+				if(!stack.isEmpty()) {
+					boon.setBoon(stack);
 					targeted++;
 				}
 			}

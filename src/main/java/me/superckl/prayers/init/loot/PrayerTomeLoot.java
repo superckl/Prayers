@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.item.PrayerTomeItem;
 import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
@@ -35,7 +36,8 @@ public class PrayerTomeLoot extends LootModifier{
 				.filter(Prayer::isRequiresTome).filter(prayer -> !this.disallowed.contains(prayer.delegate)).collect(Collectors.toCollection(Lists::newArrayList));
 		final Prayer prayer = prayers.get(context.getRandom().nextInt(prayers.size()));
 		final ItemStack stack = new ItemStack(ModItems.PRAYER_TOME::get);
-		ModItems.PRAYER_TOME.get().storePrayer(stack, prayer);
+		ModItems.PRAYER_TOME.get();
+		PrayerTomeItem.storePrayer(stack, prayer);
 		generatedLoot.add(stack);
 		return generatedLoot;
 	}
