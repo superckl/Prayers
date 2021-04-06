@@ -39,14 +39,14 @@ public class CraftingStandRenderer extends TileEntityRenderer<CraftingStandTileE
 			this.renderStandItem(stack, matrixStackIn, dir, alpha, partialTicks, bufferIn, combinedLightIn, combinedOverlayIn);
 		}
 	}
-	
-	public void renderStandItem(ItemStack stack, MatrixStack matrixStackIn, Direction dir, float progress,
+
+	public void renderStandItem(final ItemStack stack, final MatrixStack matrixStackIn, final Direction dir, final float progress,
 			final float partialTicks, final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
 		matrixStackIn.pushPose();
 		final Vector3f offset = new Vector3f(0.5F+dir.getStepX()*5.5F/16F, 2F/16F, 0.5F+dir.getStepZ()*5.5F/16F);
 		matrixStackIn.translate(offset.x(), offset.y(), offset.z());
 		matrixStackIn.scale(0.3F, 0.3F, 0.3F);
-		RenderType type = stack.getItem() instanceof BlockItem ? Atlases.translucentCullBlockSheet():null;
+		final RenderType type = stack.getItem() instanceof BlockItem ? Atlases.translucentCullBlockSheet():null;
 		RenderHelper.renderFloatingItemStack(matrixStackIn, new RenderHelper.AlphaMultipliedVertexBuffer(bufferIn, type, progress),
 				partialTicks, combinedLightIn, combinedOverlayIn, stack);
 		matrixStackIn.popPose();

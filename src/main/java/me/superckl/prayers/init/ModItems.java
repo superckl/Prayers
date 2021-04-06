@@ -66,10 +66,10 @@ public class ModItems {
 			ModItems.DECREES.put(type, ModItems.REGISTER.register(type.name().toLowerCase()+"_decree",
 					() -> new DecreeItem(type)));
 
-		for(ItemBoon boon:ItemBoon.values())
+		for(final ItemBoon boon:ItemBoon.values())
 			if(boon != ItemBoon.CURIOS)
 				ModItems.RELICS.put(boon, ModItems.REGISTER.register("relic_"+boon.name().toLowerCase(),
-					() -> new RelicItem(boon)));
+						() -> new RelicItem(boon)));
 	}
 
 }

@@ -3,6 +3,7 @@ package me.superckl.prayers.integration.jei;
 import java.util.List;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.CraftingStandBlock;
@@ -32,8 +33,8 @@ public class CraftingStandItemRenderer implements IIngredientRenderer<ItemStack>
 	private final int xPos, yPos;
 	private final BlockState craftingStand;
 	private final CraftingStandRenderer tileRenderer = (CraftingStandRenderer) TileEntityRendererDispatcher.instance.getRenderer(new CraftingStandTileEntity());
-	
-	public CraftingStandItemRenderer(IGuiHelper guiHelper, ITickTimer timer, Direction dir, int xPos, int yPos) {
+
+	public CraftingStandItemRenderer(final IGuiHelper guiHelper, final ITickTimer timer, final Direction dir, final int xPos, final int yPos) {
 		this.guiHelper = guiHelper;
 		this.timer = timer;
 		this.dir = dir;
@@ -44,20 +45,20 @@ public class CraftingStandItemRenderer implements IIngredientRenderer<ItemStack>
 			state = state.setValue(CraftingStandBlock.CENTER, false).setValue(CraftingStandBlock.propertyFromDirection(dir), true);
 		this.craftingStand = state;
 	}
-	
+
 	@Override
-	public void render(MatrixStack matrixStack, int xPosition, int yPosition, ItemStack ingredient) {
+	public void render(final MatrixStack matrixStack, final int xPosition, final int yPosition, final ItemStack ingredient) {
 		matrixStack.pushPose();
-		guiHelper.createDrawableIngredient(ingredient).draw(matrixStack, xPosition, yPosition);
-		matrixStack.translate(xPosition-xPos, yPosition-yPos, 0);
+		this.guiHelper.createDrawableIngredient(ingredient).draw(matrixStack, xPosition, yPosition);
+		matrixStack.translate(xPosition-this.xPos, yPosition-this.yPos, 0);
 		AltarCraftingBackground.setupBlockRendering(matrixStack, 0, 0, AltarCraftingBackground.altarState);
 		matrixStack.translate(0, 1, 0);
-		IRenderTypeBuffer.Impl buffer = ClientHelper.getBufferSource();
-		ClientHelper.getBlockRenderer().renderBlock(craftingStand, matrixStack, buffer,
+		final IRenderTypeBuffer.Impl buffer = ClientHelper.getBufferSource();
+		ClientHelper.getBlockRenderer().renderBlock(this.craftingStand, matrixStack, buffer,
 				15728880, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
 		buffer.endBatch();
 		RenderHelper.setupForFlatItems();
-		tileRenderer.renderStandItem(ingredient, matrixStack, dir, ((float) timer.getValue())/timer.getMaxValue(), ClientHelper.getPartialTicks(),
+		this.tileRenderer.renderStandItem(ingredient, matrixStack, this.dir, (float) this.timer.getValue()/this.timer.getMaxValue(), ClientHelper.getPartialTicks(),
 				buffer, 15728880, OverlayTexture.NO_OVERLAY);
 		buffer.endBatch();
 		RenderHelper.setupFor3DItems();
@@ -65,7 +66,7 @@ public class CraftingStandItemRenderer implements IIngredientRenderer<ItemStack>
 	}
 
 	@Override
-	public List<ITextComponent> getTooltip(ItemStack ingredient, ITooltipFlag tooltipFlag) {
+	public List<ITextComponent> getTooltip(final ItemStack ingredient, final ITooltipFlag tooltipFlag) {
 		return ingredient.getTooltipLines(ClientHelper.getPlayer(), tooltipFlag);
 	}
 

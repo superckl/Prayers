@@ -80,7 +80,7 @@ public class ItemEvents {
 				}
 				if(nbt.contains(RelicItem.BOON_KEY, Constants.NBT.TAG_STRING)) {
 					final ItemBoon boon = ItemBoon.valueOf(nbt.getString(RelicItem.BOON_KEY));
-					ItemStack relic = new ItemStack(ModItems.RELICS.get(boon)::get);
+					final ItemStack relic = new ItemStack(ModItems.RELICS.get(boon)::get);
 					RelicItem.setCharged(relic);
 					final ItemEntity item = new ItemEntity(entity.level, entity.getX(), entity.getY(), entity.getZ(), relic);
 					e.getDrops().add(item);
@@ -88,41 +88,41 @@ public class ItemEvents {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onPlayerDamage(final LivingDamageEvent e) {
-		if((e.getEntityLiving() instanceof PlayerEntity) && !e.getSource().isBypassInvul()) {
-		final PlayerEntity player = (PlayerEntity) e.getEntityLiving();
-		if(e.getAmount() >= player.getHealth()) {
-			final int slot = player.inventory.findSlotMatchingItem(new ItemStack(ModItems.DIVINE_TOTEM::get));
-			if(slot != -1) {
-				e.setCanceled(true);
-				player.inventory.removeItem(slot, 1);
+		if(e.getEntityLiving() instanceof PlayerEntity && !e.getSource().isBypassInvul()) {
+			final PlayerEntity player = (PlayerEntity) e.getEntityLiving();
+			if(e.getAmount() >= player.getHealth()) {
+				final int slot = player.inventory.findSlotMatchingItem(new ItemStack(ModItems.DIVINE_TOTEM::get));
+				if(slot != -1) {
+					e.setCanceled(true);
+					player.inventory.removeItem(slot, 1);
 
-				if (player instanceof ServerPlayerEntity) {
-					final ServerPlayerEntity serverplayerentity = (ServerPlayerEntity)player;
-					serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
-					CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, new ItemStack(Items.TOTEM_OF_UNDYING));
+					if (player instanceof ServerPlayerEntity) {
+						final ServerPlayerEntity serverplayerentity = (ServerPlayerEntity)player;
+						serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
+						CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, new ItemStack(Items.TOTEM_OF_UNDYING));
+					}
+
+					player.setHealth(player.getMaxHealth());
+					player.removeAllEffects();
+					player.addEffect(new EffectInstance(Effects.REGENERATION, 900, 1));
+					player.addEffect(new EffectInstance(Effects.ABSORPTION, 100, 1));
+					player.addEffect(new EffectInstance(Effects.FIRE_RESISTANCE, 800, 0));
+					player.level.broadcastEntityEvent(player, (byte)35);
 				}
-
-				player.setHealth(player.getMaxHealth());
-				player.removeAllEffects();
-				player.addEffect(new EffectInstance(Effects.REGENERATION, 900, 1));
-				player.addEffect(new EffectInstance(Effects.ABSORPTION, 100, 1));
-				player.addEffect(new EffectInstance(Effects.FIRE_RESISTANCE, 800, 0));
-				player.level.broadcastEntityEvent(player, (byte)35);
 			}
 		}
-		}
 	}
-	
+
 	//We have to add boon damage manually since wither skulls don't check for damage modifiers on their source
 	@SubscribeEvent
-	public void onLivingHurt(LivingHurtEvent e) {
-		if(e.getSource().getDirectEntity() instanceof WitherSkullEntity && e.getSource().getEntity() instanceof WitherEntity) {
+	public void onLivingHurt(final LivingHurtEvent e) {
+		if(e.getSource().getDirectEntity() instanceof WitherSkullEntity && e.getSource().getEntity() instanceof WitherEntity)
 			RelicItem.getBoon(e.getSource().getEntity()).ifPresent(boon -> {
 				if(boon == ItemBoon.ATTACK_DAMAGE) {
-					AttributeModifier mod = boon.getModifierSupplier().get();
+					final AttributeModifier mod = boon.getModifierSupplier().get();
 					switch(mod.getOperation()) {
 					case ADDITION:
 						e.setAmount((float) (e.getAmount()+mod.getAmount()));
@@ -136,16 +136,15 @@ public class ItemEvents {
 					}
 				}
 			});
-		}
 	}
-	
+
 	//Cancel any damage from fake players to upgraded withers to prevent cheesing
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onLivingAttack(LivingAttackEvent e) {
-		if(Config.getInstance().getPreventWitherCheese().get() && e.getEntity() instanceof WitherEntity && 
+	public void onLivingAttack(final LivingAttackEvent e) {
+		if(Config.getInstance().getPreventWitherCheese().get() && e.getEntity() instanceof WitherEntity &&
 				e.getSource().getEntity() instanceof FakePlayer &&
-					(TalismanItem.hasStoredTalisman(e.getEntity()) || RelicItem.getBoon(e.getEntity()).isPresent()))
-				e.setCanceled(true);
+				(TalismanItem.hasStoredTalisman(e.getEntity()) || RelicItem.getBoon(e.getEntity()).isPresent()))
+			e.setCanceled(true);
 	}
 
 	@SubscribeEvent

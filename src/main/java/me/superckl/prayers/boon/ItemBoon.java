@@ -48,7 +48,7 @@ public enum ItemBoon {
 			this.name = new TranslationTextComponent(this.getNameId());
 		return this.name;
 	}
-	
+
 	public String getNameId() {
 		return Util.makeDescriptionId("boon", new ResourceLocation(Prayers.MOD_ID, this.name().toLowerCase()));
 	}

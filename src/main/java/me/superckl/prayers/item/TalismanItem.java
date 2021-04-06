@@ -249,11 +249,11 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		}
 		return false;
 	}
-	
+
 	public static boolean hasStoredTalisman(final Entity entity) {
 		final CompoundNBT perData = entity.getPersistentData();
-		return perData.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND) && 
-				perData.getCompound(Prayers.MOD_ID).contains(TALISMAN_KEY, Constants.NBT.TAG_COMPOUND);
+		return perData.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND) &&
+				perData.getCompound(Prayers.MOD_ID).contains(TalismanItem.TALISMAN_KEY, Constants.NBT.TAG_COMPOUND);
 	}
 
 	@Override

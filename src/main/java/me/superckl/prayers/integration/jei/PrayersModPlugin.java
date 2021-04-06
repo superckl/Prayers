@@ -23,19 +23,19 @@ public class PrayersModPlugin implements IModPlugin{
 	}
 
 	@Override
-	public void registerCategories(IRecipeCategoryRegistration registration) {
+	public void registerCategories(final IRecipeCategoryRegistration registration) {
 		registration.addRecipeCategories(new AltarCraftingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
 	}
-	
+
 	@Override
-	public void registerRecipes(IRecipeRegistration registration) {
+	public void registerRecipes(final IRecipeRegistration registration) {
 		registration.addRecipes(ClientHelper.getLevel().getRecipeManager().getAllRecipesFor(AbstractAltarCraftingRecipe.TYPE), AltarCraftingRecipeCategory.UID);
 	}
-	
+
 	@Override
-	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		for(RegistryObject<BlockItem> obj:ModItems.ALTARS.values())
+	public void registerRecipeCatalysts(final IRecipeCatalystRegistration registration) {
+		for(final RegistryObject<BlockItem> obj:ModItems.ALTARS.values())
 			registration.addRecipeCatalyst(new ItemStack(obj::get), AltarCraftingRecipeCategory.UID);
 	}
-	
+
 }

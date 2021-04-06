@@ -23,9 +23,9 @@ public class RelicLoot extends LootModifier{
 
 	@Override
 	protected List<ItemStack> doApply(final List<ItemStack> generatedLoot, final LootContext context) {
-		EnumSet<ItemBoon> set = EnumSet.allOf(ItemBoon.class);
+		final EnumSet<ItemBoon> set = EnumSet.allOf(ItemBoon.class);
 		set.remove(ItemBoon.CURIOS);
-		ItemBoon boon = Lists.newArrayList(set).get(context.getRandom().nextInt(set.size()));
+		final ItemBoon boon = Lists.newArrayList(set).get(context.getRandom().nextInt(set.size()));
 		generatedLoot.add(new ItemStack(ModItems.RELICS.get(boon)::get));
 		return generatedLoot;
 	}

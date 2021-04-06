@@ -28,18 +28,18 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 public class RelicItem extends Item{
-	
+
 	public static final String BOON_KEY = "boon";
 	public static final String CHARGED_KEY = "charged";
-	
+
 	@Getter
 	private final ItemBoon type;
-	
-	public RelicItem(ItemBoon type) {
+
+	public RelicItem(final ItemBoon type) {
 		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP));
 		this.type = type;
 	}
-	
+
 	@Override
 	public ActionResultType interactLivingEntity(final ItemStack stack, final PlayerEntity player,
 			final LivingEntity entity, final Hand hand) {
@@ -56,69 +56,68 @@ public class RelicItem extends Item{
 		}
 		return ActionResultType.PASS;
 	}
-	
+
 	@Override
-	public String getDescriptionId(ItemStack stack) {
+	public String getDescriptionId(final ItemStack stack) {
 		String id = super.getDescriptionId(stack);
 		if(RelicItem.isCharged(stack))
 			id = id.concat("_charged");
 		return id;
 	}
-	
+
 	@Override
-	public boolean isFoil(ItemStack stack) {
+	public boolean isFoil(final ItemStack stack) {
 		return RelicItem.isCharged(stack);
 	}
-	
+
 	@Override
-	public void appendHoverText(ItemStack stack, World level, List<ITextComponent> tooltips, ITooltipFlag flag) {
+	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltips, final ITooltipFlag flag) {
 		if(RelicItem.isCharged(stack))
 			tooltips.add(new TranslationTextComponent(LangUtil.buildTextLoc("relic.apply")).withStyle(TextFormatting.GRAY));
 	}
-	
-	public boolean storeBoon(Entity entity, ItemStack stack) {
+
+	public boolean storeBoon(final Entity entity, final ItemStack stack) {
 		final CompoundNBT perData = entity.getPersistentData();
 		if(!perData.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND))
 			perData.put(Prayers.MOD_ID, new CompoundNBT());
 		final CompoundNBT prayersData = perData.getCompound(Prayers.MOD_ID);
-		if(!prayersData.contains(BOON_KEY, Constants.NBT.TAG_STRING)) {
-			prayersData.put(BOON_KEY, StringNBT.valueOf(this.type.name()));
+		if(!prayersData.contains(RelicItem.BOON_KEY, Constants.NBT.TAG_STRING)) {
+			prayersData.put(RelicItem.BOON_KEY, StringNBT.valueOf(this.type.name()));
 			return true;
 		}
 		return false;
 	}
-	
-	public static Optional<ItemBoon> getBoon(Entity entity) {
+
+	public static Optional<ItemBoon> getBoon(final Entity entity) {
 		final CompoundNBT perData = entity.getPersistentData();
 		if(perData.contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND)) {
 			final CompoundNBT prayersData = perData.getCompound(Prayers.MOD_ID);
-			if(prayersData.contains(BOON_KEY, Constants.NBT.TAG_STRING))
-				return Optional.of(ItemBoon.valueOf(prayersData.getString(BOON_KEY)));
+			if(prayersData.contains(RelicItem.BOON_KEY, Constants.NBT.TAG_STRING))
+				return Optional.of(ItemBoon.valueOf(prayersData.getString(RelicItem.BOON_KEY)));
 		}
 		return Optional.empty();
 	}
-	
-	public static void setCharged(ItemStack stack) {
+
+	public static void setCharged(final ItemStack stack) {
 		final CompoundNBT prayersData = stack.getOrCreateTagElement(Prayers.MOD_ID);
-		prayersData.putBoolean(CHARGED_KEY, true);
+		prayersData.putBoolean(RelicItem.CHARGED_KEY, true);
 	}
-	
-	public static boolean isCharged(ItemStack stack) {
+
+	public static boolean isCharged(final ItemStack stack) {
 		if(stack.getTag() != null && stack.getTag().contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND) &&
-				stack.getTagElement(Prayers.MOD_ID).contains(CHARGED_KEY)) {
-			return stack.getTagElement(Prayers.MOD_ID).getBoolean(CHARGED_KEY);
-		}
+				stack.getTagElement(Prayers.MOD_ID).contains(RelicItem.CHARGED_KEY))
+			return stack.getTagElement(Prayers.MOD_ID).getBoolean(RelicItem.CHARGED_KEY);
 		return false;
 	}
-	
+
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> stacks) {
+	public void fillItemCategory(final ItemGroup group, final NonNullList<ItemStack> stacks) {
 		super.fillItemCategory(group, stacks);
 		if(this.allowdedIn(group)) {
-			ItemStack stack = new ItemStack(this);
+			final ItemStack stack = new ItemStack(this);
 			RelicItem.setCharged(stack);
 			stacks.add(stack);
 		}
 	}
-	
+
 }

@@ -28,55 +28,55 @@ public class ClientHelper {
 	}
 
 	public static IRenderTypeBuffer.Impl getBufferSource(){
-		return mc.renderBuffers().bufferSource();
+		return ClientHelper.mc.renderBuffers().bufferSource();
 	}
-	
+
 	public static float getPartialTicks() {
-		return mc.getFrameTime();
+		return ClientHelper.mc.getFrameTime();
 	}
-	
+
 	public static BlockRendererDispatcher getBlockRenderer() {
-		return mc.getBlockRenderer();
+		return ClientHelper.mc.getBlockRenderer();
 	}
-	
+
 	public static ParticleManager getParticleEnginge() {
-		return mc.particleEngine;
+		return ClientHelper.mc.particleEngine;
 	}
-	
+
 	public static ItemRenderer getItemRenderer() {
-		return mc.getItemRenderer();
+		return ClientHelper.mc.getItemRenderer();
 	}
-	
+
 	public static RayTraceResult getRayTrace() {
-		return mc.hitResult;
+		return ClientHelper.mc.hitResult;
 	}
-	
+
 	public static MainWindow getWindow() {
-		return mc.getWindow();
+		return ClientHelper.mc.getWindow();
 	}
-	
+
 	public static FontRenderer getFontRenderer() {
-		return mc.font;
+		return ClientHelper.mc.font;
 	}
-	
+
 	public static TextureManager getTextureManager() {
-		return mc.getTextureManager();
+		return ClientHelper.mc.getTextureManager();
 	}
-	
+
 	public static GameRenderer getGameRenderer() {
-		return mc.gameRenderer;
+		return ClientHelper.mc.gameRenderer;
 	}
-	
+
 	public static Screen getScreen() {
-		return mc.screen;
+		return ClientHelper.mc.screen;
 	}
-	
-	public static void openScreen(Screen screen) {
-		mc.setScreen(screen);
+
+	public static void openScreen(final Screen screen) {
+		ClientHelper.mc.setScreen(screen);
 	}
-	
+
 	public static SoundHandler getSoundManager() {
-		return mc.getSoundManager();
+		return ClientHelper.mc.getSoundManager();
 	}
-	
+
 }
