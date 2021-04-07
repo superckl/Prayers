@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
 
 import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.client.gui.PrayerSelectGUI;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.TalismanItem;
@@ -25,7 +26,7 @@ public class KeyBindings {
 
 	@SubscribeEvent
 	public static void onKeyPress(final KeyInputEvent e) {
-		if (KeyBindings.OPEN_PRAYER_GUI.isDown())
+		if (KeyBindings.OPEN_PRAYER_GUI.isDown() && CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).isUnlocked())
 			ClientHelper.openScreen(new PrayerSelectGUI());
 		else if(KeyBindings.TOGGLE_TALISMANS.isDown() && ClientHelper.getPlayer() != null) {
 			final List<ItemStack> stacks = ClientHelper.getPlayer().inventory.items;

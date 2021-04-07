@@ -6,6 +6,7 @@ import java.util.Map;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.boon.ItemBoon;
+import me.superckl.prayers.item.BlessedWaterItem;
 import me.superckl.prayers.item.DivineTotemItem;
 import me.superckl.prayers.item.PrayerTomeItem;
 import me.superckl.prayers.item.RelicItem;
@@ -51,8 +52,7 @@ public class ModItems {
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> GILDED_BONE = ModItems.REGISTER.register("gilded_bone",
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
-	public static final RegistryObject<Item> BLESSED_WATER = ModItems.REGISTER.register("blessed_water",
-			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP).stacksTo(1)));
+	public static final RegistryObject<Item> BLESSED_WATER = ModItems.REGISTER.register("blessed_water", BlessedWaterItem::new);
 	public static final RegistryObject<VesselItem> VESSEL = ModItems.REGISTER.register("vessel", VesselItem::new);
 	public static final RegistryObject<PrayerTomeItem> PRAYER_TOME = ModItems.REGISTER.register("prayer_tome", PrayerTomeItem::new);
 	public static final RegistryObject<TalismanItem> TALISMAN = ModItems.REGISTER.register("talisman", TalismanItem::new);

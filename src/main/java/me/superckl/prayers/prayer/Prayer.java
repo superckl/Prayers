@@ -173,7 +173,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 
 	public boolean isObfusctated(final PlayerEntity player) {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
-		return this.requiresTome && !user.isUnlocked(this) || user.getPrayerLevel() < this.getLevel();
+		return !user.isUnlocked() || this.requiresTome && !user.isUnlocked(this) || user.getPrayerLevel() < this.getLevel();
 	}
 
 	public void onActivate(final LivingEntity e) {

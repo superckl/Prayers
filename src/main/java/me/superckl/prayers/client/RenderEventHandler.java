@@ -19,6 +19,7 @@ import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.block.entity.CraftingStandTileEntity;
 import me.superckl.prayers.block.entity.OfferingStandTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.client.gui.PrayerBar;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModItems;
@@ -64,11 +65,12 @@ public class RenderEventHandler {
 
 	private final PrayerBar widget = new PrayerBar(true, false);
 
-	//This event renders the player's prayer points
+	//This event renders the player's prayer points and overlays from looking at blocks
 	@SubscribeEvent
 	public void onRenderOverlay(final RenderGameOverlayEvent.Post e) {
 		//Render after all HUD elements have been rendered
-		if (e.getType() != null && e.getType() == ElementType.ALL) {
+		final PlayerPrayerUser user = ClientHelper.getPlayer().isAlive() ? CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()):null;
+		if (e.getType() == ElementType.ALL && user != null && user.isUnlocked()) {
 			final int height = e.getWindow().getGuiScaledHeight();
 			final int startY = height - 21 + (20 - PrayerBar.HEIGHT)/2;
 			this.widget.renderAt(e.getMatrixStack(), 8, startY);
@@ -77,7 +79,7 @@ public class RenderEventHandler {
 			final BlockPos hit = ((BlockRayTraceResult) ClientHelper.getRayTrace()).getBlockPos();
 			final Block hitBlock = ClientHelper.getLevel().getBlockState(hit).getBlock();
 
-			if(hitBlock instanceof AltarBlock) {
+			if(hitBlock instanceof AltarBlock && user != null && user.isUnlocked()) {
 				final AltarTileEntity altar = (AltarTileEntity) ClientHelper.getLevel().getBlockEntity(hit);
 				final double current = altar.getCurrentPoints();
 				final double max = altar.getMaxPoints();

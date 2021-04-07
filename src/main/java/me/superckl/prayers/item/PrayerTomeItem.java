@@ -83,11 +83,15 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		PrayerTomeItem.getStoredPrayer(stack).ifPresent(prayer -> {
-			if(level != null && CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).getPrayerLevel() < prayer.getLevel()) {
-				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.decipher")).withStyle(TextFormatting.GRAY));
-				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"), prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
-			}else
-				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.use_unlock"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
+			if(level != null) {
+				final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer());
+				if(user.isUnlocked() && user.getPrayerLevel() < prayer.getLevel()) {
+					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.decipher")).withStyle(TextFormatting.GRAY));
+					tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"), prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
+					return;
+				}
+			}
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("ancient_tome.use_unlock"), prayer.getName().withStyle(TextFormatting.AQUA)).withStyle(TextFormatting.GRAY));
 		});
 	}
 

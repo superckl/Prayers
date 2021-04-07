@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.PrayerInventoryItem;
@@ -39,6 +40,9 @@ import net.minecraftforge.registries.IForgeRegistry;
 public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 
 	protected boolean autoSync;
+	@Getter
+	@Setter
+	protected boolean unlocked;
 
 	public PlayerPrayerUser(final PlayerEntity ref) {
 		this(ref, true);
@@ -50,6 +54,8 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	}
 
 	public Result canActivatePrayer(final Prayer prayer) {
+		if(!this.unlocked)
+			return Result.NO_LOCKED;
 		if(!prayer.isEnabled())
 			return Result.NO_DISABLED;
 		if(prayer.isRequiresTome() && !this.isUnlocked(prayer))
@@ -228,6 +234,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 
 		public static final String MAX_BOOST_KEY = "max_prayer_points_boost";
 		public static final String LEVEL_KEY = "prayer_level";
+		public static final String UNLOCKED_KEY = "unlocked";
 		public static final String CURRENT_POINTS_KEY = "current_prayer_points";
 		public static final String ENABLED_PRAYERS_KEY = "enabled_prayers";
 		public static final String XP_KEY = "xp";
@@ -240,6 +247,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 			parent.putFloat(Storage.MAX_BOOST_KEY, instance.getMaxPointsBoost());
 			parent.putFloat(Storage.CURRENT_POINTS_KEY, instance.getCurrentPrayerPoints());
 			parent.putFloat(Storage.XP_KEY, instance.getXP());
+			parent.putBoolean(Storage.UNLOCKED_KEY, instance.unlocked);
 			final ListNBT unlocked = new ListNBT();
 			instance.getUnlockedPrayers().forEach(prayer -> unlocked.add(StringNBT.valueOf(prayer.getRegistryName().toString())));
 			parent.put(Storage.UNLOCKED_PRAYERS_KEY, unlocked);
@@ -258,6 +266,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 			instance.setMaxPointsBoost(parent.getFloat(Storage.MAX_BOOST_KEY));
 			instance.setCurrentPrayerPoints(parent.getFloat(Storage.CURRENT_POINTS_KEY));
 			instance.setXP(parent.getFloat(Storage.XP_KEY));
+			instance.setUnlocked(parent.getBoolean(Storage.UNLOCKED_KEY));
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
 			final ListNBT unlocked = parent.getList(Storage.UNLOCKED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			unlocked.forEach(stringNbt -> instance.unlockPrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
@@ -277,7 +286,8 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		NO_LEVEL(0.2F),
 		NO_POINTS(0.5F),
 		NO_ITEM(0.5F),
-		NO_EXLCUDE(0.5F);
+		NO_EXLCUDE(0.5F),
+		NO_LOCKED(0.2F);
 
 		@Getter
 		private final float renderAlpha;

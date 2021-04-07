@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.block.entity.AltarTileEntity;
+import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;
@@ -86,7 +87,8 @@ public class AltarBlock extends FourWayShapedBlock{
 		if(placer instanceof PlayerEntity) {
 			final AltarTileEntity altar = (AltarTileEntity) worldIn.getBlockEntity(pos);
 			altar.checkMultiblock(true);
-			altar.setOwner(((PlayerEntity) placer).getUUID(), true);
+			if(CapabilityHandler.getPrayerCapability((PlayerEntity) placer).isUnlocked())
+				altar.setOwner(((PlayerEntity) placer).getUUID(), true);
 		}
 	}
 
@@ -94,6 +96,8 @@ public class AltarBlock extends FourWayShapedBlock{
 	public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
 		final AltarTileEntity altar = (AltarTileEntity) worldIn.getBlockEntity(pos);
+		if(!CapabilityHandler.getPrayerCapability(player).isUnlocked())
+			return ActionResultType.PASS;
 		if(!player.isCrouching()) {
 			if(worldIn.isClientSide)
 				return ActionResultType.SUCCESS;
