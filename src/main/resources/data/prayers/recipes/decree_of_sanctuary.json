@@ -1,0 +1,22 @@
+{
+  "type": "prayers:altar_crafting",
+  "group": "blessing",
+  "points": 5000,
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "prayers:reliquary"
+    },
+    {
+      "item": "minecraft:poppy"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    }
+  ],
+  "result": {
+    "item": "prayers:sanctuary_decree"
+  }
+}
