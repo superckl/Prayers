@@ -3,14 +3,17 @@ package me.superckl.prayers.capability;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.boon.ItemBoon;
+import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
@@ -141,6 +144,59 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		return super.isPrayerActive(prayer) || checkItem && this.hasActiveItem(prayer);
 	}
 
+	public boolean canUseItemPrayer(final Prayer prayer) {
+		return !prayer.isObfusctated(this.ref);
+	}
+
+	@Override
+	public float drainPoints(final float drain) {
+		return this.drainPoints(drain, true);
+	}
+
+	public float drainPoints(float drain, final boolean drainReliquaries) {
+		final float initDrain = drain;
+		drain = 0;
+		if(drainReliquaries) {
+			drain = this.drainReliquaries(initDrain);
+			if(drain == initDrain)
+				return initDrain;
+		}
+		return drain+super.drainPoints(initDrain-drain);
+	}
+
+	public float drainReliquaries(float drain) {
+		final float initDrain = drain;
+		for(final InventoryPrayerProvider provider:this.findReliquaries()) {
+			drain = drain - provider.drainPoints(drain);
+			if(drain == 0)
+				return initDrain;
+		}
+		return initDrain - drain;
+	}
+
+	@Override
+	protected float modifyDrain(final float drain) {
+		final int drainLvl = this.getPrayerDrainLevel();
+		return drain*(.35F+.8F/(drainLvl+1));
+	}
+
+	protected int getPrayerDrainLevel() {
+		int pieces = 0;
+		for(final ItemStack stack:this.ref.inventory.armor)
+			if(ItemBoon.PRAYER_DRAIN.has(stack))
+				pieces++;
+		return pieces;
+	}
+
+	public List<InventoryPrayerProvider> findReliquaries(){
+		final List<InventoryPrayerProvider> providers = Lists.newArrayList();
+		this.ref.inventory.items.forEach(stack -> {
+			if(stack.getItem() == ModItems.RELIQUARY.get())
+				providers.add(CapabilityHandler.getPrayerCapability(stack));
+		});
+		return providers;
+	}
+
 	public boolean hasActiveItem(final Prayer prayer) {
 		final Stream<ItemStack> stream = Stream.concat(this.ref.inventory.items.stream(), this.ref.inventory.armor.stream());
 		final Iterator<ItemStack> it = Stream.concat(stream, this.ref.inventory.offhand.stream()).iterator();
@@ -166,24 +222,6 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		}
 		active.removeIf(prayer -> !this.canUseItemPrayer(prayer));
 		return active;
-	}
-
-	public boolean canUseItemPrayer(final Prayer prayer) {
-		return !prayer.isObfusctated(this.ref);
-	}
-
-	@Override
-	protected float modifyDrain(final float drain) {
-		final int drainLvl = this.getPrayerDrainLevel();
-			return super.modifyDrain(drain)*(.35F+.8F/(drainLvl+1));
-	}
-
-	protected int getPrayerDrainLevel() {
-		int pieces = 0;
-		for(final ItemStack stack:this.ref.inventory.armor)
-			if(ItemBoon.PRAYER_DRAIN.has(stack))
-				pieces++;
-		return pieces;
 	}
 
 	public static class Storage implements Capability.IStorage<PlayerPrayerUser>{

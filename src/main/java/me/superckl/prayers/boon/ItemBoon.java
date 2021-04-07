@@ -44,7 +44,7 @@ public enum ItemBoon {
 	private IFormattableTextComponent tooltip;
 
 	ItemBoon(final Supplier<Attribute> attributeSupplier, final Supplier<AttributeModifier> supplier,
-			final Predicate<ItemStack> matchingPredicate, boolean hasTooltip, final EquipmentSlotType... equipmentSlotTypes) {
+			final Predicate<ItemStack> matchingPredicate, final boolean hasTooltip, final EquipmentSlotType... equipmentSlotTypes) {
 		this.hasModifier = attributeSupplier != null;
 		this.attributeSupplier = attributeSupplier;
 		this.modifierSupplier = supplier;
@@ -58,10 +58,10 @@ public enum ItemBoon {
 			this.name = new TranslationTextComponent(this.getNameId());
 		return this.name;
 	}
-	
+
 	public IFormattableTextComponent getTooltip() {
 		if(this.tooltip == null)
-			this.tooltip = new TranslationTextComponent(getNameId().concat("_tooltip"));
+			this.tooltip = new TranslationTextComponent(this.getNameId().concat("_tooltip"));
 		return this.tooltip;
 	}
 

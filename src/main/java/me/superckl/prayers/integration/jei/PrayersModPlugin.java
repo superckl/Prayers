@@ -18,7 +18,6 @@ import me.superckl.prayers.recipe.AbstractAltarCraftingRecipe;
 import me.superckl.prayers.recipe.ApplyBoonRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -40,7 +39,7 @@ public class PrayersModPlugin implements IModPlugin{
 	@Override
 	public void registerCategories(final IRecipeCategoryRegistration registration) {
 		registration.addRecipeCategories(new AltarCraftingRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
-				new WitherUpgradeRecipeCategory(registration.getJeiHelpers().getGuiHelper(), registration.getJeiHelpers().getStackHelper()));
+				new WitherUpgradeRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
 	}
 
 	@Override
@@ -59,7 +58,7 @@ public class PrayersModPlugin implements IModPlugin{
 		upgrades.add(new WitherUpgradeRecipe(talisman, autoTalisman));
 		registration.addRecipes(upgrades, WitherUpgradeRecipeCategory.UID);
 	}
-	
+
 	@Override
 	public void registerRecipeCatalysts(final IRecipeCatalystRegistration registration) {
 		for(final RegistryObject<BlockItem> obj:ModItems.ALTARS.values())

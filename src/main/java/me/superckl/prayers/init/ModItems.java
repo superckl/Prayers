@@ -9,6 +9,7 @@ import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.item.DivineTotemItem;
 import me.superckl.prayers.item.PrayerTomeItem;
 import me.superckl.prayers.item.RelicItem;
+import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.item.VesselItem;
 import me.superckl.prayers.item.decree.DecreeItem;
@@ -56,6 +57,7 @@ public class ModItems {
 	public static final RegistryObject<PrayerTomeItem> PRAYER_TOME = ModItems.REGISTER.register("prayer_tome", PrayerTomeItem::new);
 	public static final RegistryObject<TalismanItem> TALISMAN = ModItems.REGISTER.register("talisman", TalismanItem::new);
 	public static final RegistryObject<DivineTotemItem> DIVINE_TOTEM = ModItems.REGISTER.register("divine_totem", DivineTotemItem::new);
+	public static final RegistryObject<ReliquaryItem> RELIQUARY = ModItems.REGISTER.register("reliquary", ReliquaryItem::new);
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())

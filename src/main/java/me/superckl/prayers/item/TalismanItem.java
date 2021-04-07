@@ -5,14 +5,11 @@ import java.util.List;
 
 import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.entity.ai.WitherUsePrayersGoal;
 import me.superckl.prayers.init.ModItems;
-import me.superckl.prayers.network.packet.PrayersPacketHandler;
-import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.prayer.ActivationCondition;
 import me.superckl.prayers.prayer.Prayer;
 import me.superckl.prayers.util.LangUtil;
@@ -21,14 +18,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -45,7 +38,6 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.network.PacketDistributor;
 
 public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
@@ -54,7 +46,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public static final String TALISMAN_KEY = "talisman";
 
 	public TalismanItem() {
-		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true);
+		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true, 1/10F);
 	}
 
 	@Override
@@ -71,28 +63,6 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		TalismanItem.storePrayer(stack, prayer);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, player.getSoundSource(), 0.25F, 0.75F);
 		return ActionResult.sidedSuccess(stack, level.isClientSide);
-	}
-
-	@SuppressWarnings("resource")
-	@Override
-	public ActionResultType useOn(final ItemUseContext context) {
-		final TileEntity te = context.getLevel().getBlockEntity(context.getClickedPos());
-		if(te instanceof AltarTileEntity) {
-			if(context.getLevel().isClientSide)
-				return ActionResultType.sidedSuccess(true);
-			final AltarTileEntity aTE = (AltarTileEntity) te;
-			if(aTE.canRegen()) {
-				final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(context.getItemInHand());
-				final float recharge = provider.getMaxPrayerPoints()-provider.getCurrentPrayerPoints();
-				final float actual = aTE.removePoints(recharge);
-				provider.addPoints(actual);
-				final EquipmentSlotType type = context.getHand() == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND:EquipmentSlotType.OFFHAND;
-				PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) context.getPlayer()),
-						new PacketSetInventoryItemPoints(provider.getCurrentPrayerPoints(), type));
-			}
-			return ActionResultType.sidedSuccess(false);
-		}
-		return ActionResultType.PASS;
 	}
 
 	@Override
@@ -167,7 +137,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 				// something is actually wrong.
 				provider = CapabilityHandler.getPrayerCapability(stack.copy());
 			}
-			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("talisman.points"), (int) provider.getCurrentPrayerPoints(), (int) provider.getMaxPrayerPoints()).withStyle(TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("item.stored_points"), (int) provider.getCurrentPrayerPoints(), (int) provider.getMaxPrayerPoints()).withStyle(TextFormatting.GRAY));
 		}
 		if(shouldToggle)
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("click_toggle")).withStyle(TextFormatting.DARK_GRAY));

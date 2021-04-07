@@ -23,7 +23,8 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 	public boolean canActivatePrayer(final PlayerEntity player, final Prayer prayer) {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
 		return prayer.isEnabled() && user.canUseItemPrayer(prayer) && !user.hasActiveItem(prayer) &&
-				(this.getCurrentPrayerPoints() >= prayer.getDrain()/20F || ((PrayerInventoryItem<?>) this.ref.getItem()).isShouldDrainHolder() && user.getCurrentPrayerPoints() >= prayer.getDrain()/20F);
+				(this.getCurrentPrayerPoints() >= user.modifyDrain(prayer.getDrain()/20F) ||
+				((PrayerInventoryItem<?>) this.ref.getItem()).isShouldDrainHolder() && user.getCurrentPrayerPoints() >= user.modifyDrain(prayer.getDrain()/20F));
 	}
 
 	public void inventoryTick(final PlayerEntity entity, final int slot) {
@@ -39,15 +40,17 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 				this.deactivatePrayer(prayer);
 			}
 		}
-		final float drain = (float) prayers.stream().mapToDouble(Prayer::getDrain).sum();
-		float newPoints = this.getCurrentPrayerPoints()-drain/20F;
+		float drain = user.modifyDrain((float) prayers.stream().mapToDouble(Prayer::getDrain).sum()/20F);
+		final PrayerInventoryItem<?> item = (PrayerInventoryItem<?>) this.ref.getItem();
+		final boolean drainHolder = item.isShouldDrainHolder();
+		if(drainHolder)
+			drain = drain - user.drainReliquaries(drain);
+		float newPoints = this.getCurrentPrayerPoints()-drain;
 		if (newPoints < 0) {
-			final float diff = -newPoints;
+			drain = -newPoints;
 			newPoints = 0;
-			final PrayerInventoryItem<?> item = (PrayerInventoryItem<?>) this.ref.getItem();
-			if(item.isShouldDrainHolder()) {
-
-				final float remainingPoints = user.setCurrentPrayerPoints(user.getCurrentPrayerPoints()-diff);
+			if(drainHolder) {
+				final float remainingPoints = user.drainPoints(drain, false);
 				if(remainingPoints <= 0) {
 					this.deactivateAllPrayers();
 					if(entity instanceof ServerPlayerEntity)
@@ -86,6 +89,7 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 			super.activatePrayer(prayer);
 			if(deactivated)
 				prayer.onActivate(player);
+			return true;
 		}
 		return false;
 	}

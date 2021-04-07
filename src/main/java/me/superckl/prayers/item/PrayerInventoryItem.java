@@ -2,6 +2,7 @@ package me.superckl.prayers.item;
 
 import lombok.Getter;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -10,9 +11,14 @@ import me.superckl.prayers.util.MathUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -23,10 +29,13 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 
 	@Getter
 	protected final boolean shouldDrainHolder;
+	@Getter
+	protected final float rechargeLossFactor;
 
-	public PrayerInventoryItem(final Properties props, final boolean shouldDrainHolder) {
+	public PrayerInventoryItem(final Properties props, final boolean shouldDrainHolder, final float rechargeLossFactor) {
 		super(props);
 		this.shouldDrainHolder = shouldDrainHolder;
+		this.rechargeLossFactor = rechargeLossFactor;
 	}
 
 	@Override
@@ -39,6 +48,28 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 		final float newVal = provider.getCurrentPrayerPoints();
 		if(MathUtil.isIntDifferent(old, newVal))
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity), new PacketSetInventoryItemPoints(newVal, slot));
+	}
+
+	@SuppressWarnings("resource")
+	@Override
+	public ActionResultType useOn(final ItemUseContext context) {
+		final TileEntity te = context.getLevel().getBlockEntity(context.getClickedPos());
+		if(te instanceof AltarTileEntity) {
+			if(context.getLevel().isClientSide)
+				return ActionResultType.sidedSuccess(true);
+			final AltarTileEntity aTE = (AltarTileEntity) te;
+			if(aTE.canRegen()) {
+				final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(context.getItemInHand());
+				final float recharge = provider.getMaxPrayerPoints()-provider.getCurrentPrayerPoints();
+				final float actual = aTE.removePoints(recharge/this.rechargeLossFactor)*this.rechargeLossFactor;
+				provider.addPoints(actual);
+				final EquipmentSlotType type = context.getHand() == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND:EquipmentSlotType.OFFHAND;
+				PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) context.getPlayer()),
+						new PacketSetInventoryItemPoints(provider.getCurrentPrayerPoints(), type));
+			}
+			return ActionResultType.sidedSuccess(false);
+		}
+		return ActionResultType.PASS;
 	}
 
 	@Override

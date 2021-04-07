@@ -83,18 +83,24 @@ public abstract class TickablePrayerProvider<T> {
 	public void tick() {
 		if(!this.shouldDrain)
 			return;
-		final float drain = this.modifyDrain((float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum());
+		final float drain = this.modifyDrain((float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum()/20F);
 		if(drain == 0)
 			return;
-		float newPoints = this.getCurrentPrayerPoints()-drain/20F;
+		this.drainPoints(drain);
+	}
+
+	public float drainPoints(final float drain) {
+		final float copy = this.getCurrentPrayerPoints();
+		float newPoints = copy-drain;
 		if (newPoints < 0) {
 			newPoints = 0;
 			this.deactivateAllPrayers();
 		}
 		this.setCurrentPrayerPoints(newPoints);
+		return copy - this.getCurrentPrayerPoints();
 	}
 
-	protected float modifyDrain(final float drain) { return drain; }
+	protected float modifyDrain(final float drain) {return drain;}
 
 	public float addPoints(final float points) {
 		final float toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());

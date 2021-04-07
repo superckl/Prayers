@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RGR",
+    "DOD",
+    "RGR"
+  ],
+  "key": {
+    "G": {
+      "item": "prayers:gold_leaf"
+    },
+    "R": {
+      "tag": "prayers:relic"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "O": {
+      "item": "prayers:ornate_redstone"
+    }
+  },
+  "result":{
+    "item": "prayers:reliquary"
+  }
+}
