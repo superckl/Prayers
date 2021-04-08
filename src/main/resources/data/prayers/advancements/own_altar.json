@@ -1,0 +1,30 @@
+{
+  "parent": "prayers:root",
+  "display": {
+    "icon": {
+      "item": "prayers:sandstone_altar"
+    },
+    "title": {
+      "translate": "advancements.prayers.own_altar.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.own_altar.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "altar": {
+      "trigger": "prayers:own_altar",
+      "conditions": {
+      }
+    }
+  },
+  "requirements": [
+    [
+      "altar"
+    ]
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:craft_crafting_stand",
+  "display": {
+    "icon": {
+      "item": "prayers:gold_leaf"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_gold_leaf.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_gold_leaf.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "gold_leaf": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:gold_leaf"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "gold_leaf"
+    ]
+  ]
+}

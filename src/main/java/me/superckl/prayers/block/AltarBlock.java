@@ -96,8 +96,6 @@ public class AltarBlock extends FourWayShapedBlock{
 	public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player,
 			final Hand handIn, final BlockRayTraceResult hit) {
 		final AltarTileEntity altar = (AltarTileEntity) worldIn.getBlockEntity(pos);
-		if(!CapabilityHandler.getPrayerCapability(player).isUnlocked())
-			return ActionResultType.PASS;
 		if(!player.isCrouching()) {
 			if(worldIn.isClientSide)
 				return ActionResultType.SUCCESS;

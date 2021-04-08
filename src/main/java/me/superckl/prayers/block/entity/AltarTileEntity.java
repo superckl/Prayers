@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
+import me.superckl.prayers.OwnAltarCriteriaTrigger;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.capability.CapabilityHandler;
@@ -79,6 +80,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	private Direction itemDirection;
 	private UUID altarItemOwner;
 	private int itemTicks;
+	private int itemTicks0;
 	private int reqTicks;
 
 	public AltarTileEntity(final AltarTypes altarType) {
@@ -228,16 +230,22 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 				this.syncToClientLight(null);
 			}
 			//Send update packets to client
-			if(owner != null)
+			if(owner != null) {
 				savedData.setAltar(owner, this.worldPosition);
+				final PlayerEntity player = this.level.getPlayerByUUID(owner);
+				if(player instanceof ServerPlayerEntity)
+					OwnAltarCriteriaTrigger.INSTANCE.trigger((ServerPlayerEntity) player);
+			}
 			return true;
 		}
 		return false;
 	}
 
 	public void setItemTicks(final int ticks) {
-		if(this.level.isClientSide)
+		if(this.level.isClientSide) {
+			this.itemTicks0 = this.itemTicks;
 			this.itemTicks = ticks;
+		}
 	}
 
 	public float rechargeUser(final PlayerEntity player) {
@@ -271,6 +279,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 
 	@Override
 	public void tick() {
+		this.itemTicks0 = this.itemTicks;
 		if(this.level.isClientSide)
 			return;
 		if(!this.altarItem.isEmpty() && !this.isTopClear(true)) {
@@ -366,6 +375,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			return ActionResultType.SUCCESS;
 		if(player instanceof ServerPlayerEntity)
 			this.getConnected().forEach(altar -> altar.syncToClientLight((ServerPlayerEntity) player));
+		if(!CapabilityHandler.getPrayerCapability(player).isUnlocked())
+			return ActionResultType.PASS;
 		if(player.isCrouching()) {
 			if(!this.altarItem.isEmpty() && player.getItemInHand(hand).isEmpty()) {
 				player.addItem(this.altarItem);
@@ -460,6 +471,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			final int[] dirs = altarNBT.getIntArray(AltarTileEntity.DIRECTION_KEY);
 			this.itemDirection = Direction.getNearest(dirs[0], dirs[1], dirs[2]);
 			this.itemTicks = altarNBT.getInt(AltarTileEntity.ITEM_PROGRESS_KEY);
+			this.itemTicks0 = this.itemTicks;
 			this.altarItemOwner = altarNBT.getUUID(AltarTileEntity.ITEM_OWNER_KEY);
 			this.reqTicks = AltarItem.find(this.altarItem).getSacrificeTicks();
 		}

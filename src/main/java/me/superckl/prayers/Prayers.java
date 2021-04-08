@@ -46,6 +46,7 @@ import me.superckl.prayers.server.BoonArgument;
 import me.superckl.prayers.server.CommandBoon;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
@@ -96,7 +97,6 @@ public class Prayers {
 		Prayer.REGISTER.register(bus);
 		AltarItem.REGISTER.register(bus);
 		ModLoot.REGISTER.register(bus);
-
 		ModLoot.registerConditions();
 	}
 
@@ -110,6 +110,7 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(ItemFrameTickManager.INSTANCE);
 			ActivationCondition.registerConditions();
 			this.registerPotions();
+			CriteriaTriggers.register(OwnAltarCriteriaTrigger.INSTANCE);
 		});
 		CapabilityManager.INSTANCE.register(PlayerPrayerUser.class, new PlayerPrayerUser.Storage(), () -> new DefaultPlayerPrayerUser(null));
 		CapabilityManager.INSTANCE.register(DefaultLivingPrayerUser.class, new TickablePrayerProvider.Storage<DefaultLivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));

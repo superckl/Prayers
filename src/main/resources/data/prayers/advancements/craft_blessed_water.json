@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:craft_crafting_stand",
+  "display": {
+    "icon": {
+      "item": "prayers:blessed_water"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_blessed_water.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_blessed_water.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "blessed_water": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:blessed_water"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "blessed_water"
+    ]
+  ]
+}

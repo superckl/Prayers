@@ -1,0 +1,38 @@
+{
+  "parent": "prayers:own_altar",
+  "display": {
+    "icon": {
+      "item": "prayers:offering_stand"
+    },
+    "title": {
+      "translate": "advancements.prayers.use_offering_stand.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.use_offering_stand.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "use_offering": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+            "item": "minecraft:bone"
+        },
+        "location": {
+          "block": {
+            "block": "prayers:offering_stand"
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "use_offering"
+    ]
+  ]
+}

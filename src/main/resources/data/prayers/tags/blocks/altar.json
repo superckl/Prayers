@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "prayers:sandstone_altar",
+    "prayers:gilded_sandstone_altar",
+    "prayers:marble_altar"
+  ]
+}

@@ -79,7 +79,7 @@ public class RenderEventHandler {
 			final BlockPos hit = ((BlockRayTraceResult) ClientHelper.getRayTrace()).getBlockPos();
 			final Block hitBlock = ClientHelper.getLevel().getBlockState(hit).getBlock();
 
-			if(hitBlock instanceof AltarBlock && user != null && user.isUnlocked()) {
+			if(hitBlock instanceof AltarBlock) {
 				final AltarTileEntity altar = (AltarTileEntity) ClientHelper.getLevel().getBlockEntity(hit);
 				final double current = altar.getCurrentPoints();
 				final double max = altar.getMaxPoints();

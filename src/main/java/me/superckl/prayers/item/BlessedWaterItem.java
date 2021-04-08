@@ -57,9 +57,10 @@ public class BlessedWaterItem extends Item{
 	public UseAction getUseAnimation(final ItemStack p_77661_1_) {
 		return UseAction.DRINK;
 	}
-	
-	public ActionResult<ItemStack> use(World level, PlayerEntity player, Hand hand) {
-	      return DrinkHelper.useDrink(level, player, hand);
-	   }
+
+	@Override
+	public ActionResult<ItemStack> use(final World level, final PlayerEntity player, final Hand hand) {
+		return DrinkHelper.useDrink(level, player, hand);
+	}
 
 }

@@ -1,0 +1,38 @@
+{
+  "parent": "prayers:unlock_prayers",
+  "display": {
+    "icon": {
+      "item": "minecraft:bone"
+    },
+    "title": {
+      "translate": "advancements.prayers.use_altar.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.use_altar.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "use_altar": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+            "item": "minecraft:bone"
+        },
+        "location": {
+          "block": {
+            "tag": "prayers:altar"
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "use_altar"
+    ]
+  ]
+}

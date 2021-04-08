@@ -1,0 +1,33 @@
+{
+  "parent": "prayers:craft_blessed_water",
+  "display": {
+    "icon": {
+      "item": "prayers:prayer_tome"
+    },
+    "title": {
+      "translate": "advancements.prayers.unlock_prayers.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.unlock_prayers.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "blessed_water": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "item": "prayers:blessed_water"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "blessed_water"
+    ]
+  ]
+}

@@ -1,6 +1,9 @@
 package me.superckl.prayers.block;
 
+import java.util.List;
+
 import me.superckl.prayers.block.entity.CraftingStandTileEntity;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -8,6 +11,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.InventoryHelper;
@@ -26,6 +30,9 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -142,6 +149,12 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 			return ActionResultType.sidedSuccess(worldIn.isClientSide);
 		}
 		return craftingStand.onActivate(player, handIn, dir);
+	}
+
+	@Override
+	public void appendHoverText(final ItemStack stack, final IBlockReader level, final List<ITextComponent> tooltip,
+			final ITooltipFlag flag) {
+		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("block.place_altar")).withStyle(TextFormatting.GRAY));
 	}
 
 	@Override

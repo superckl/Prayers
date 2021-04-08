@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:own_altar",
+  "display": {
+    "icon": {
+      "item": "prayers:crafting_stand"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_crafting_stand.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_crafting_stand.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crafting_stand": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:crafting_stand"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "crafting_stand"
+    ]
+  ]
+}

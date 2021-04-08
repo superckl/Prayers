@@ -1,16 +1,21 @@
 package me.superckl.prayers.block;
 
+import java.util.List;
+
 import me.superckl.prayers.block.entity.OfferingStandTileEntity;
 import me.superckl.prayers.init.ModTiles;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -22,6 +27,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
@@ -65,6 +73,12 @@ public class OfferingStandBlock extends ShapedBlock{
 			InventoryHelper.dropContents(worldIn, pos, new RecipeWrapper(offering_stand.getInternalItemHandler()));
 			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
+	}
+
+	@Override
+	public void appendHoverText(final ItemStack stack, final IBlockReader level, final List<ITextComponent> tooltip,
+			final ITooltipFlag flag) {
+		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("block.place_altar")).withStyle(TextFormatting.GRAY));
 	}
 
 	@Override

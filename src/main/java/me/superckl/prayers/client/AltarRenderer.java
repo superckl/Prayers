@@ -33,8 +33,9 @@ public class AltarRenderer extends TileEntityRenderer<AltarTileEntity>{
 
 		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(90+dir.toYRot()));
 		final float current = tileEntityIn.getItemTicks();
+		final float previous = tileEntityIn.getItemTicks0();
 		final float max = tileEntityIn.getReqTicks();
-		final float scale = 0.6F*(current == 0? 1:MathHelper.lerp(partialTicks, 1-(current-1)/max, 1-current/max));
+		final float scale = 0.6F*(current == 0? 1:MathHelper.lerp(partialTicks, 1-previous/max, 1-current/max));
 		matrixStackIn.scale(scale, scale, scale);
 		ClientHelper.getItemRenderer().renderStatic(tileEntityIn.getAltarItem(), TransformType.FIXED, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
 		matrixStackIn.popPose();
