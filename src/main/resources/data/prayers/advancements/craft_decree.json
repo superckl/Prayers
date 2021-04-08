@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:craft_reliquary",
+  "display": {
+    "icon": {
+      "item": "prayers:fertility_decree"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_decree.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_decree.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "decree": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "tag": "prayers:decree"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "decree"
+    ]
+  ]
+}

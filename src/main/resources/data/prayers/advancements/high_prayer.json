@@ -1,0 +1,32 @@
+{
+  "parent": "prayers:unlock_prayers",
+  "display": {
+    "icon": {
+      "item": "prayers:prayer_tome",
+      "nbt": "{prayers: {prayer: \"prayers:flight\"}}"
+    },
+    "title": {
+      "translate": "advancements.prayers.high_prayer.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.high_prayer.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "99": {
+      "trigger": "prayers:prayer_level",
+      "conditions": {
+        "level": 99
+      }
+    }
+  },
+  "requirements": [
+    [
+      "99"
+    ]
+  ]
+}

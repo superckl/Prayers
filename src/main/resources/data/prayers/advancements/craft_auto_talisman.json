@@ -1,0 +1,37 @@
+{
+  "parent": "prayers:craft_talisman",
+  "display": {
+    "icon": {
+      "item": "prayers:talisman",
+      "nbt": "{prayers: {auto_activate: true}}"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_auto_talisman.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_auto_talisman.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "auto_talisman": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:talisman",
+            "nbt": "{prayers: {auto_activate: true}}"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "auto_talisman"
+    ]
+  ]
+}

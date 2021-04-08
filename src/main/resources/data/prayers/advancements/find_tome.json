@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:root",
+  "display": {
+    "icon": {
+      "item": "prayers:prayer_tome"
+    },
+    "title": {
+      "translate": "advancements.prayers.find_tome.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.find_tome.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "tome": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:prayer_tome"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "tome"
+    ]
+  ]
+}

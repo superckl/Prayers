@@ -12,11 +12,11 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
-import me.superckl.prayers.OwnAltarCriteriaTrigger;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
+import me.superckl.prayers.criteria.OwnAltarCriteriaTrigger;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;

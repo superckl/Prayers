@@ -15,6 +15,9 @@ import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.capability.TickablePrayerProvider;
+import me.superckl.prayers.criteria.ApplyBoonCriteria;
+import me.superckl.prayers.criteria.OwnAltarCriteriaTrigger;
+import me.superckl.prayers.criteria.PrayerLevelCriteria;
 import me.superckl.prayers.entity.ai.EntityEventHandler;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModEffects;
@@ -111,6 +114,8 @@ public class Prayers {
 			ActivationCondition.registerConditions();
 			this.registerPotions();
 			CriteriaTriggers.register(OwnAltarCriteriaTrigger.INSTANCE);
+			CriteriaTriggers.register(ApplyBoonCriteria.INSTANCE);
+			CriteriaTriggers.register(PrayerLevelCriteria.INSTANCE);
 		});
 		CapabilityManager.INSTANCE.register(PlayerPrayerUser.class, new PlayerPrayerUser.Storage(), () -> new DefaultPlayerPrayerUser(null));
 		CapabilityManager.INSTANCE.register(DefaultLivingPrayerUser.class, new TickablePrayerProvider.Storage<DefaultLivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));

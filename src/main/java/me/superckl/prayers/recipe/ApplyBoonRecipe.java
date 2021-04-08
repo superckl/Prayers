@@ -3,7 +3,6 @@ package me.superckl.prayers.recipe;
 import com.google.gson.JsonObject;
 
 import lombok.Getter;
-import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.item.RelicItem;
@@ -43,7 +42,6 @@ public class ApplyBoonRecipe extends SpecialRecipe{
 		ItemBoon toApply = null;
 		for(int i = 0; i < inv.getContainerSize(); i++) {
 			final ItemStack stack = inv.getItem(i);
-			LogHelper.info(stack);
 			if(!stack.isEmpty()) {
 				if(stack.getItem() instanceof RelicItem && RelicItem.isCharged(stack) && toApply == null) {
 					toApply = ((RelicItem)stack.getItem()).getType();

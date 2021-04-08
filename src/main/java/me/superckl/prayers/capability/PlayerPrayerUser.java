@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.superckl.prayers.boon.ItemBoon;
+import me.superckl.prayers.criteria.PrayerLevelCriteria;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -130,6 +131,8 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		while(xp >= this.xpForLevel()) {
 			xp -= this.xpForLevel();
 			this.setPrayerLevel(this.getPrayerLevel()+1);
+			if(this.ref instanceof ServerPlayerEntity)
+				PrayerLevelCriteria.INSTANCE.trigger((ServerPlayerEntity) this.ref, this.getPrayerLevel());
 		}
 		this.setXP(xp);
 	}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "prayers:fertility_decree",
+    "prayers:infertility_decree",
+    "prayers:persistence_decree",
+    "prayers:sanctuary_decree"
+  ]
+}

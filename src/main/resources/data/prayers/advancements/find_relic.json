@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:unlock_prayers",
+  "display": {
+    "icon": {
+      "item": "prayers:relic_curios"
+    },
+    "title": {
+      "translate": "advancements.prayers.find_relic.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.find_relic.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "relic": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "tag": "prayers:relic"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "relic"
+    ]
+  ]
+}

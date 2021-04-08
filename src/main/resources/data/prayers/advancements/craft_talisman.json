@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:unlock_prayers",
+  "display": {
+    "icon": {
+      "item": "prayers:talisman"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_talisman.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_talisman.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "talisman": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:talisman"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "talisman"
+    ]
+  ]
+}

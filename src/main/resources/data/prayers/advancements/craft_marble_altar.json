@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:craft_gilded_altar",
+  "display": {
+    "icon": {
+      "item": "prayers:marble_altar"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_marble_altar.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_marble_altar.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "marble_altar": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:marble_altar"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "marble_altar"
+    ]
+  ]
+}

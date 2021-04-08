@@ -102,6 +102,10 @@ public class PrayerButton extends ImageButton{
 		case YES:
 			tooltip.addAll(this.prayer.get().getTooltipDescription());
 			break;
+		case NO_LOCKED:
+			break;
+		default:
+			break;
 		}
 		ClientHelper.getScreen().renderWrappedToolTip(matrixStack, tooltip, mouseX, mouseY, ClientHelper.getFontRenderer());
 	}

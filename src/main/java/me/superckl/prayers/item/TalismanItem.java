@@ -19,12 +19,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
@@ -54,6 +56,11 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		final Collection<Prayer> active = CapabilityHandler.getPrayerCapability(player).getActivePrayers();
 		final ItemStack stack = player.getItemInHand(hand);
 		final Prayer stored = TalismanItem.getStoredPrayer(stack).orElse(null);
+		if(stored != null && player.isCrouching()) {
+			TalismanItem.removePrayer(stack);
+			level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, player.getSoundSource(), 0.25F, 0.75F);
+			return ActionResult.sidedSuccess(stack, level.isClientSide);
+		}
 		if(active.size() != 1)
 			return ActionResult.fail(stack);
 		final Prayer prayer = active.iterator().next();
@@ -186,6 +193,16 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 		return notEqual;
 	}
 
+	@Override
+	public void fillItemCategory(final ItemGroup tab, final NonNullList<ItemStack> items) {
+		super.fillItemCategory(tab, items);
+		if(this.allowdedIn(tab)) {
+			final ItemStack talisman = new ItemStack(this);
+			TalismanItem.setAutoActivate(talisman);
+			items.add(talisman);
+		}
+	}
+
 	public static LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(TalismanItem.PRAYER_KEY))
@@ -196,6 +213,15 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public static void storePrayer(final ItemStack stack, final Prayer prayer) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		nbt.putString(TalismanItem.PRAYER_KEY, prayer.getRegistryName().toString());
+	}
+
+	public static void removePrayer(final ItemStack stack) {
+		if(stack.hasTag() && stack.getTag().contains(Prayers.MOD_ID, Constants.NBT.TAG_COMPOUND)) {
+			final CompoundNBT nbt = stack.getTagElement(Prayers.MOD_ID);
+			nbt.remove(TalismanItem.PRAYER_KEY);
+			if(nbt.isEmpty())
+				stack.removeTagKey(Prayers.MOD_ID);
+		}
 	}
 
 	public static void setAutoActivate(final ItemStack stack) {

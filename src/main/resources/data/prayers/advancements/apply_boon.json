@@ -1,0 +1,29 @@
+{
+  "parent": "prayers:find_relic",
+  "display": {
+    "icon": {
+      "item": "prayers:relic_curios",
+      "nbt": "{prayers: {charged: true}}"
+    },
+    "title": {
+      "translate": "advancements.prayers.apply_boon.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.apply_boon.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "apply_boon": {
+      "trigger": "prayers:apply_boon"
+    }
+  },
+  "requirements": [
+    [
+      "apply_boon"
+    ]
+  ]
+}

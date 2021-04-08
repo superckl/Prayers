@@ -10,6 +10,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.TickablePrayerProvider;
+import me.superckl.prayers.criteria.PrayerLevelCriteria;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
@@ -57,6 +58,7 @@ public class CommandSet {
 			user.setPrayerLevel(level);
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e),
 					PacketSetPrayerLevel.builder().entityID(e.getId()).level(level).build());
+			PrayerLevelCriteria.INSTANCE.trigger(e, level);
 		}
 		context.getSource().sendSuccess(new TranslationTextComponent(LangUtil.buildTextLoc("command.level.players"), targets.size()), true);
 		return targets.size();

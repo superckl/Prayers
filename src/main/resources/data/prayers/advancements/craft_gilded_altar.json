@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:craft_gold_leaf",
+  "display": {
+    "icon": {
+      "item": "prayers:gilded_sandstone_altar"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_gilded_altar.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_gilded_altar.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "gilded_altar": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:gilded_sandstone_altar"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "gilded_altar"
+    ]
+  ]
+}

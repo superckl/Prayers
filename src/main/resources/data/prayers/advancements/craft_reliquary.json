@@ -1,0 +1,35 @@
+{
+  "parent": "prayers:find_relic",
+  "display": {
+    "icon": {
+      "item": "prayers:reliquary"
+    },
+    "title": {
+      "translate": "advancements.prayers.craft_reliquary.title"
+    },
+    "description": {
+      "translate": "advancements.prayers.craft_reliquary.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "reliquary": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "prayers:reliquary"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "reliquary"
+    ]
+  ]
+}

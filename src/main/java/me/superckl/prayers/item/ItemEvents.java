@@ -3,6 +3,7 @@ package me.superckl.prayers.item;
 import me.superckl.prayers.Config;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.boon.ItemBoon;
+import me.superckl.prayers.criteria.ApplyBoonCriteria;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.decree.DecreeData;
 import me.superckl.prayers.item.decree.DecreeItem;
@@ -39,6 +40,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent.CropGrowEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -63,6 +65,12 @@ public class ItemEvents {
 					break;
 			}
 		}
+	}
+
+	@SubscribeEvent
+	public void onCraft(final PlayerEvent.ItemCraftedEvent e) {
+		if(!e.getPlayer().level.isClientSide && ItemBoon.getBoon(e.getCrafting()).isPresent())
+			ApplyBoonCriteria.INSTANCE.trigger((ServerPlayerEntity) e.getPlayer());
 	}
 
 	@SubscribeEvent
