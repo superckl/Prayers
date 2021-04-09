@@ -1,15 +1,15 @@
 {
-  "parent": "prayers:unlock_prayers",
+  "parent": "prayers:use_altar",
   "display": {
     "icon": {
       "item": "prayers:prayer_tome",
       "nbt": "{prayers: {prayer: \"prayers:flight\"}}"
     },
     "title": {
-      "translate": "advancements.prayers.high_prayer.title"
+      "translate": "advancements.prayers.mastery.title"
     },
     "description": {
-      "translate": "advancements.prayers.high_prayer.description"
+      "translate": "advancements.prayers.mastery.description"
     },
     "frame": "challenge",
     "show_toast": true,

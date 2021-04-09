@@ -1,6 +1,44 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "prayers:item/reliquary"
-  }
+        "layer0": "prayers:item/reliquary_0"
+  },
+  "overrides": [
+  		{
+            "predicate": {
+                "prayers:points": 0
+            },
+            "model": "prayers:item/reliquary_drain_5"
+        },
+        {
+            "predicate": {
+                "prayers:points": 0.17
+            },
+            "model": "prayers:item/reliquary_drain_4"
+        },
+        {
+            "predicate": {
+                "prayers:points": 0.33
+            },
+            "model": "prayers:item/reliquary_drain_3"
+        },
+        {
+            "predicate": {
+                "prayers:points": 0.5
+            },
+            "model": "prayers:item/reliquary_drain_2"
+        },
+        {
+            "predicate": {
+                "prayers:points": 0.67
+            },
+            "model": "prayers:item/reliquary_drain_1"
+        },
+        {
+            "predicate": {
+                "prayers:points": 0.83
+            },
+            "model": "prayers:item/reliquary_drain_0"
+        }
+    ]
 }

@@ -17,6 +17,7 @@ import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.criteria.PrayerLevelCriteria;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.PrayerInventoryItem;
+import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
@@ -200,7 +201,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	public List<InventoryPrayerProvider> findReliquaries(){
 		final List<InventoryPrayerProvider> providers = Lists.newArrayList();
 		this.ref.inventory.items.forEach(stack -> {
-			if(stack.getItem() == ModItems.RELIQUARY.get())
+			if(stack.getItem() == ModItems.RELIQUARY.get() && ReliquaryItem.isActive(stack))
 				providers.add(CapabilityHandler.getPrayerCapability(stack));
 		});
 		return providers;

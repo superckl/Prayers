@@ -2,7 +2,8 @@
   "parent": "prayers:root",
   "display": {
     "icon": {
-      "item": "prayers:prayer_tome"
+      "item": "prayers:prayer_tome",
+      "nbt": "{prayers: {prayer: \"prayers:flight\"}}"
     },
     "title": {
       "translate": "advancements.prayers.find_tome.title"

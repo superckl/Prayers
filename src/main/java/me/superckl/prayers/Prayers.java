@@ -34,6 +34,7 @@ import me.superckl.prayers.network.packet.PacketSetAltarItemTicks;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketDeactivateInventoryPrayer;
 import me.superckl.prayers.network.packet.inventory.PacketInventorySlotChanged;
+import me.superckl.prayers.network.packet.inventory.PacketReliquaryState;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.network.packet.inventory.PacketTalismanState;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
@@ -141,6 +142,8 @@ public class Prayers {
 				PacketSetAltarItemTicks::encode, PacketSetAltarItemTicks::decode, PacketSetAltarItemTicks::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketTalismanState.class,
 				PacketTalismanState::encode, PacketTalismanState::decode, PacketTalismanState::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketReliquaryState.class,
+				PacketReliquaryState::encode, PacketReliquaryState::decode, PacketReliquaryState::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetInventoryItemPoints.class,
 				PacketSetInventoryItemPoints::encode, PacketSetInventoryItemPoints::decode, PacketSetInventoryItemPoints::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateInventoryPrayer.class,

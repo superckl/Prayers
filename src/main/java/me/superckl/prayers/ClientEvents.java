@@ -3,6 +3,8 @@ package me.superckl.prayers;
 import java.util.Optional;
 
 import me.superckl.prayers.boon.ItemBoon;
+import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.client.AltarRenderer;
 import me.superckl.prayers.client.CraftingStandRenderer;
 import me.superckl.prayers.client.OfferingStandRenderer;
@@ -15,6 +17,9 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.LangUtil;
+import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.ItemModelsProperties;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -46,6 +51,17 @@ public class ClientEvents {
 			MinecraftForge.EVENT_BUS.register(KeyBindings.class);
 			MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
 			MinecraftForge.EVENT_BUS.register(ClientEvents.class);
+			final IItemPropertyGetter pointsGetter = (stack, level, entity) -> {
+				InventoryPrayerProvider provider;
+				try {
+					provider = CapabilityHandler.getPrayerCapability(stack);
+				} catch (final IllegalArgumentException e) {
+					provider = CapabilityHandler.getPrayerCapability(stack.copy());
+				}
+				return provider.getCurrentPrayerPoints()/provider.getMaxPrayerPoints();
+			};
+			ItemModelsProperties.register(ModItems.RELIQUARY.get(), new ResourceLocation(Prayers.MOD_ID, "points"), pointsGetter);
+			ItemModelsProperties.register(ModItems.TALISMAN.get(), new ResourceLocation(Prayers.MOD_ID, "points"), pointsGetter);
 		});
 		ClientRegistry.registerKeyBinding(KeyBindings.OPEN_PRAYER_GUI);
 		ClientRegistry.registerKeyBinding(KeyBindings.TOGGLE_TALISMANS);

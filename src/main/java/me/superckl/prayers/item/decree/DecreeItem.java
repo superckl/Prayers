@@ -37,6 +37,7 @@ public class DecreeItem extends Item{
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("decree."+this.type.name().toLowerCase())).withStyle(TextFormatting.GRAY));
+		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("decree_frame")).withStyle(TextFormatting.GRAY));
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("decree.radius"), Config.getInstance().getDecreeRanges().get(this.type).get()).withStyle(TextFormatting.GRAY));
 	}
 
