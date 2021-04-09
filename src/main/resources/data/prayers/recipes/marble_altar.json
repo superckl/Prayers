@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MVM",
+    "RAR",
+    "MDM"
+  ],
+  "key": {
+    "M": {
+      "item": "prayers:sacred_marble"
+    },
+    "A": {
+      "item": "prayers:gilded_sandstone_altar"
+    },
+    "D": {
+      "item": "minecraft:diamond_block"
+    },
+    "V": {
+      "type": "prayers:full_vessel"
+    },
+    "R": {
+      "item": "prayers:ornate_redstone"
+    }
+  },
+  "result":{
+    "item": "prayers:marble_altar"
+  }
+}

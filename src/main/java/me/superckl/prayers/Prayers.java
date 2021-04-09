@@ -45,6 +45,7 @@ import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
 import me.superckl.prayers.prayer.ActivationCondition;
 import me.superckl.prayers.prayer.Prayer;
+import me.superckl.prayers.recipe.FullVesselIngredient;
 import me.superckl.prayers.recipe.PotionIngredient;
 import me.superckl.prayers.server.BoonArgument;
 import me.superckl.prayers.server.CommandBoon;
@@ -57,6 +58,7 @@ import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
@@ -65,6 +67,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -88,6 +91,7 @@ public class Prayers {
 		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(this::commonSetup);
 		bus.addListener(this::createRegistry);
+		bus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializer);
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientEvents::register);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
 
@@ -166,6 +170,11 @@ public class Prayers {
 	private void createRegistry(final RegistryEvent.NewRegistry e) {
 		new RegistryBuilder<Prayer>().setName(new ResourceLocation(Prayers.MOD_ID, "prayers")).setType(Prayer.class).create();
 		new RegistryBuilder<AltarItem>().setName(new ResourceLocation(Prayers.MOD_ID, "altar_items")).setType(AltarItem.class).create();
+	}
+
+	public void registerRecipeSerializer(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
+		CraftingHelper.register(new ResourceLocation(Prayers.MOD_ID, "full_vessel"), FullVesselIngredient.Serializer.INSTANCE);
+		CraftingHelper.register(new ResourceLocation(Prayers.MOD_ID, "potion"), PotionIngredient.Serializer.INSTANCE);
 	}
 
 	@SubscribeEvent

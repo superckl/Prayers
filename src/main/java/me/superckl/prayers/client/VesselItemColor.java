@@ -2,7 +2,6 @@ package me.superckl.prayers.client;
 
 import java.awt.Color;
 
-import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.VesselItem;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.ItemStack;
@@ -14,7 +13,7 @@ public class VesselItemColor implements IItemColor{
 	public int getColor(final ItemStack stack, final int layer) {
 		if(layer != 0)
 			return -1;
-		final int kills = ModItems.VESSEL.get().getStoredKills(stack).size();
+		final int kills = VesselItem.getStoredKills(stack).size();
 		final float percentage = (float) kills/VesselItem.REQ_MOBS.size();
 
 		final int r0 = Color.LIGHT_GRAY.getRed();

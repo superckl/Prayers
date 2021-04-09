@@ -55,7 +55,7 @@ public class VesselItem extends Item {
 
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltip, final ITooltipFlag flag) {
-		final Set<ResourceLocation> kills = this.getStoredKills(stack);
+		final Set<ResourceLocation> kills = VesselItem.getStoredKills(stack);
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("soul_orb.souls"), kills.size(), VesselItem.REQ_MOBS.size()));
 		if(level == null || InputMappings.isKeyDown(ClientHelper.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
 			if(VesselItem.REQ_NAMES == null) {
@@ -79,48 +79,52 @@ public class VesselItem extends Item {
 	public void fillItemCategory(final ItemGroup group, final NonNullList<ItemStack> stacks) {
 		if(this.allowdedIn(group)) {
 			stacks.add(new ItemStack(this));
-			final ItemStack allKills = new ItemStack(this);
-			this.storeKills(VesselItem.REQ_MOBS, allKills);
-			stacks.add(allKills);
+			stacks.add(VesselItem.makeFullVessel());
 		}
+	}
+
+	public static ItemStack makeFullVessel() {
+		final ItemStack allKills = new ItemStack(ModItems.VESSEL::get);
+		VesselItem.storeKills(VesselItem.REQ_MOBS, allKills);
+		return allKills;
 	}
 
 	@Override
 	public String getDescriptionId(final ItemStack stack) {
 		String description = super.getDescriptionId();
-		if(this.hasAllKills(stack))
+		if(VesselItem.hasAllKills(stack))
 			description = description.concat("_full");
 		return description;
 	}
 
 	@Override
 	public boolean isFoil(final ItemStack stack) {
-		return this.hasAllKills(stack);
+		return VesselItem.hasAllKills(stack);
 	}
 
 	@Override
 	public Rarity getRarity(final ItemStack stack) {
-		if(this.hasAllKills(stack))
+		if(VesselItem.hasAllKills(stack))
 			return Rarity.EPIC;
 		return super.getRarity(stack);
 	}
 
-	public boolean hasAllKills(final ItemStack stack) {
-		return this.getStoredKills(stack).size() == VesselItem.REQ_MOBS.size();
+	public static  boolean hasAllKills(final ItemStack stack) {
+		return VesselItem.getStoredKills(stack).size() == VesselItem.REQ_MOBS.size();
 	}
 
 	public boolean onKill(final EntityType<?> type, final ItemStack stack) {
 		if(!VesselItem.REQ_MOBS.contains(type.getRegistryName()))
 			return false;
-		final Set<ResourceLocation> kills = this.getStoredKills(stack);
+		final Set<ResourceLocation> kills = VesselItem.getStoredKills(stack);
 		if(kills.add(type.getRegistryName())) {
-			this.storeKills(kills, stack);
+			VesselItem.storeKills(kills, stack);
 			return true;
 		}
 		return false;
 	}
 
-	public Set<ResourceLocation> getStoredKills(final ItemStack stack){
+	public static Set<ResourceLocation> getStoredKills(final ItemStack stack){
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		final ListNBT kills = nbt.getList(VesselItem.KILL_LIST_NBT, Constants.NBT.TAG_STRING);
 		final Set<ResourceLocation> rLocs = Sets.newHashSet();
@@ -128,7 +132,7 @@ public class VesselItem extends Item {
 		return rLocs;
 	}
 
-	private void storeKills(final Set<ResourceLocation> kills, final ItemStack stack) {
+	private static void storeKills(final Set<ResourceLocation> kills, final ItemStack stack) {
 		final ListNBT list = new ListNBT();
 		kills.forEach(rLoc -> list.add(StringNBT.valueOf(rLoc.toString())));
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);

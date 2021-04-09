@@ -33,10 +33,12 @@ public class PotionIngredient extends Ingredient{
 
 	@Override
 	public IIngredientSerializer<? extends Ingredient> getSerializer() {
-		return new Serializer();
+		return Serializer.INSTANCE;
 	}
 
 	public static class Serializer implements IIngredientSerializer<PotionIngredient>{
+
+		public static final Serializer INSTANCE = new Serializer();
 
 		@Override
 		public PotionIngredient parse(final PacketBuffer buffer) {
