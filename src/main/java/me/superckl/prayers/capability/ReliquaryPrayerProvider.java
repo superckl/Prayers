@@ -1,5 +1,6 @@
 package me.superckl.prayers.capability;
 
+import me.superckl.prayers.Config;
 import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -11,13 +12,15 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 public class ReliquaryPrayerProvider extends InventoryPrayerProvider{
 
+	private final float maxPoints = Config.getInstance().getReliquaryPoints().get().floatValue();
+
 	public ReliquaryPrayerProvider(final ItemStack ref) {
 		super(ref);
 	}
 
 	@Override
 	public float getMaxPrayerPoints() {
-		return 500;
+		return this.maxPoints;
 	}
 
 	@Override

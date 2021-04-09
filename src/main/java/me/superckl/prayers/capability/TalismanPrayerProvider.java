@@ -1,8 +1,11 @@
 package me.superckl.prayers.capability;
 
+import me.superckl.prayers.Config;
 import net.minecraft.item.ItemStack;
 
 public class TalismanPrayerProvider extends InventoryPrayerProvider{
+
+	private final float maxPoints = Config.getInstance().getTalimsanPoints().get().floatValue();
 
 	public TalismanPrayerProvider(final ItemStack ref) {
 		super(ref);
@@ -10,7 +13,7 @@ public class TalismanPrayerProvider extends InventoryPrayerProvider{
 
 	@Override
 	public float getMaxPrayerPoints() {
-		return 200;
+		return this.maxPoints;
 	}
 
 }

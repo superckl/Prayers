@@ -2,6 +2,7 @@ package me.superckl.prayers.item;
 
 import java.util.List;
 
+import me.superckl.prayers.Config;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
@@ -24,7 +25,7 @@ public class ReliquaryItem extends PrayerInventoryItem<ReliquaryPrayerProvider>{
 	public static final String ACTIVE_KEY = "active";
 
 	public ReliquaryItem() {
-		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), false, 1/4F);
+		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), false, 1F/Config.getInstance().getReliquaryLossFactor().get().floatValue());
 	}
 
 	@Override

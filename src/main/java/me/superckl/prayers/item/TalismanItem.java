@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import me.superckl.prayers.ClientHelper;
+import me.superckl.prayers.Config;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
@@ -48,7 +49,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public static final String TALISMAN_KEY = "talisman";
 
 	public TalismanItem() {
-		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true, 1/10F);
+		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true, 1F/Config.getInstance().getTalismanLossFactor().get().floatValue());
 	}
 
 	@Override

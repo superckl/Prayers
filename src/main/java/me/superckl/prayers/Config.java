@@ -29,12 +29,22 @@ public class Config {
 
 	@Getter
 	private static Config instance;
+	//Prayers
 	private final ConfigValue<List<String>> prayers;
+
+	//Decrees
 	private final Map<DecreeItem.Type, IntValue> decreeRanges = new EnumMap<>(DecreeItem.Type.class);
 	private final DoubleValue fertilityCropChance;
 	private final DoubleValue fertilityAnimalChance;
+
+	//Boons
 	private final Map<ItemBoon, DoubleValue> boonValues = new EnumMap<>(ItemBoon.class);
 	private final BooleanValue preventWitherCheese;
+
+	private final DoubleValue talimsanPoints;
+	private final DoubleValue talismanLossFactor;
+	private final DoubleValue reliquaryPoints;
+	private final DoubleValue reliquaryLossFactor;
 
 	private Config(final ForgeConfigSpec.Builder builder) {
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
@@ -73,6 +83,18 @@ public class Config {
 
 		builder.comment("If true, Prayers will attempt to prevent 'cheesing' of upgraded withers by cancelling any damage from fake players (e.g., grinders)");
 		this.preventWitherCheese = builder.define("Prevent Wither Cheese", true);
+
+		builder.comment("Maximum points that can be stored in a talisman (default 200)");
+		this.talimsanPoints = builder.defineInRange("Items.Talisman Points", 200, 0, Double.MAX_VALUE);
+
+		builder.comment("Loss factor for recharging talisman. Applied inversely (default 10, so 1-1/5 -> 80% loss)");
+		this.talismanLossFactor = builder.defineInRange("Items.Talisman Loss", 5, 1, Double.MAX_VALUE);
+
+		builder.comment("Maximum points that can be stored in a reliquary (default 500)");
+		this.reliquaryPoints = builder.defineInRange("Items.Reliquary Points", 600, 0, Double.MAX_VALUE);
+
+		builder.comment("Loss factor for recharging reliquary. Applied inversely (default 2, so 1-1/2 -> 50% loss)");
+		this.reliquaryLossFactor = builder.defineInRange("Items.Talisman Loss", 2, 1, Double.MAX_VALUE);
 	}
 
 	public static ForgeConfigSpec setup() {
