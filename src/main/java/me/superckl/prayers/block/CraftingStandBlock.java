@@ -155,6 +155,7 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 	public void appendHoverText(final ItemStack stack, final IBlockReader level, final List<ITextComponent> tooltip,
 			final ITooltipFlag flag) {
 		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("block.place_altar")).withStyle(TextFormatting.GRAY));
+		tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("block.view_place")).withStyle(TextFormatting.GRAY));
 	}
 
 	@Override
