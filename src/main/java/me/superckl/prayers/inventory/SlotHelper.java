@@ -55,8 +55,4 @@ public abstract class SlotHelper {
 		return Optional.empty();
 	}
 
-	public static SlotHelper fromBuffer(final PacketBuffer buffer) {
-		return SlotHelper.deserializers.get(buffer.readUtf(PrayerUserPacket.BUFFER_STRING_LENGTH)).apply(buffer);
-	}
-
 }
