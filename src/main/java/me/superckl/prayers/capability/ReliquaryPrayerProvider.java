@@ -1,6 +1,7 @@
 package me.superckl.prayers.capability;
 
 import me.superckl.prayers.Config;
+import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -29,7 +30,7 @@ public class ReliquaryPrayerProvider extends InventoryPrayerProvider{
 	}
 
 	@Override
-	public void inventoryTick(final PlayerEntity entity, final int slot) {
+	public void inventoryTick(final PlayerEntity entity, final SlotHelper slot) {
 		if(this.getCurrentPrayerPoints() <= 0 && !entity.level.isClientSide) {
 			ReliquaryItem.applyState(this.ref, TalismanItem.State.DEACTIVATE);
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),

@@ -1,7 +1,5 @@
 package me.superckl.prayers.client.input;
 
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
 
 import me.superckl.prayers.ClientHelper;
@@ -9,6 +7,8 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.client.gui.PrayerSelectGUI;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.inventory.PlayerInventoryHelper;
+import me.superckl.prayers.inventory.SlotAwareIterator;
 import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -32,22 +32,22 @@ public class KeyBindings {
 		if (KeyBindings.OPEN_PRAYER_GUI.isDown() && CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()).isUnlocked())
 			ClientHelper.openScreen(new PrayerSelectGUI());
 		else if(KeyBindings.TOGGLE_TALISMANS.isDown() && ClientHelper.getPlayer() != null) {
-			final List<ItemStack> stacks = ClientHelper.getPlayer().inventory.items;
-			for(int i = 0; i < stacks.size(); i++) {
-				final ItemStack stack = stacks.get(i);
+			final SlotAwareIterator<?> it = PlayerInventoryHelper.allItems(ClientHelper.getPlayer());
+			while(it.hasNext()) {
+				final ItemStack stack = it.next();
 				if(!stack.isEmpty() && stack.getItem() == ModItems.TALISMAN.get())
 					if(ModItems.TALISMAN.get().applyState(stack, ClientHelper.getPlayer(), TalismanItem.State.TOGGLE))
 						PrayersPacketHandler.INSTANCE.sendToServer(PacketTalismanState.builder().entityID(ClientHelper.getPlayer().getId())
-								.slot(i).state(TalismanItem.State.TOGGLE).build());
+								.slot(it.getHelper()).state(TalismanItem.State.TOGGLE).build());
 			}
 		}else if(KeyBindings.TOGGLE_RELIQUARIES.isDown()) {
-			final List<ItemStack> stacks = ClientHelper.getPlayer().inventory.items;
-			for(int i = 0; i < stacks.size(); i++) {
-				final ItemStack stack = stacks.get(i);
+			final SlotAwareIterator<?> it = PlayerInventoryHelper.allItems(ClientHelper.getPlayer());
+			while(it.hasNext()) {
+				final ItemStack stack = it.next();
 				if(!stack.isEmpty() && stack.getItem() == ModItems.RELIQUARY.get())
 					if(ReliquaryItem.applyState(stack, TalismanItem.State.TOGGLE))
 						PrayersPacketHandler.INSTANCE.sendToServer(PacketReliquaryState.builder().entityID(ClientHelper.getPlayer().getId())
-								.slot(i).state(TalismanItem.State.TOGGLE).build());
+								.slot(it.getHelper()).state(TalismanItem.State.TOGGLE).build());
 			}
 		}
 	}

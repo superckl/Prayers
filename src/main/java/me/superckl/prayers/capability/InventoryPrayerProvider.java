@@ -3,6 +3,8 @@ package me.superckl.prayers.capability;
 import java.util.Collection;
 import java.util.Iterator;
 
+import me.superckl.prayers.LogHelper;
+import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketDeactivateInventoryPrayer;
@@ -27,7 +29,7 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 				((PrayerInventoryItem<?>) this.ref.getItem()).isShouldDrainHolder() && user.getCurrentPrayerPoints() >= user.modifyDrain(prayer.getDrain()/20F));
 	}
 
-	public void inventoryTick(final PlayerEntity entity, final int slot) {
+	public void inventoryTick(final PlayerEntity entity, final SlotHelper slot) {
 		final Collection<Prayer> prayers = this.getActivePrayers();
 		if(prayers.isEmpty())
 			return;
@@ -50,17 +52,19 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 			drain = -newPoints;
 			newPoints = 0;
 			if(drainHolder) {
-				final float remainingPoints = user.drainPoints(drain, false);
-				if(remainingPoints <= 0) {
+				final float drained = user.drainPoints(drain, false);
+				if(drained < drain) {
 					this.deactivateAllPrayers();
 					if(entity instanceof ServerPlayerEntity)
-						PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity), new PacketDeactivateInventoryPrayer(slot));
+						PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
+								PacketDeactivateInventoryPrayer.builder().entityID(entity.getId()).slot(slot).build());
 					item.onPointsDepleted();
 				}
 			}else {
 				this.deactivateAllPrayers();
 				if(entity instanceof ServerPlayerEntity)
-					PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity), new PacketDeactivateInventoryPrayer(slot));
+					PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
+							PacketDeactivateInventoryPrayer.builder().entityID(entity.getId()).slot(slot).build());
 				item.onPointsDepleted();
 			}
 		}

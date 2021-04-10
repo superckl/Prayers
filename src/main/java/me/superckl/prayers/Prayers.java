@@ -27,6 +27,8 @@ import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
+import me.superckl.prayers.inventory.MainInventorySlotHelper;
+import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.item.ItemEvents;
 import me.superckl.prayers.item.decree.ItemFrameTickManager;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
@@ -152,6 +154,9 @@ public class Prayers {
 				PacketSetInventoryItemPoints::encode, PacketSetInventoryItemPoints::decode, PacketSetInventoryItemPoints::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateInventoryPrayer.class,
 				PacketDeactivateInventoryPrayer::encode, PacketDeactivateInventoryPrayer::decode, PacketDeactivateInventoryPrayer::handle);
+
+		SlotHelper.registerHelper("main_inventory", MainInventorySlotHelper.class, MainInventorySlotHelper.DESERIALIZER,
+				MainInventorySlotHelper.PREDICATE, MainInventorySlotHelper.FACTORY);
 	}
 
 	private void registerPotions() {

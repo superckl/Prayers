@@ -7,7 +7,6 @@ import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.item.TalismanItem.State;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
-import me.superckl.prayers.network.packet.user.PrayerUserPacket;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -17,15 +16,13 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 @SuperBuilder
-public class PacketReliquaryState extends PrayerUserPacket{
+public class PacketReliquaryState extends InventoryItemPacket{
 
-	private final int slot;
 	private final State state;
 
 	@Override
 	public void encode(final PacketBuffer buffer) {
 		super.encode(buffer);
-		buffer.writeVarInt(this.slot);
 		buffer.writeEnum(this.state);
 	}
 
@@ -35,7 +32,7 @@ public class PacketReliquaryState extends PrayerUserPacket{
 			final Entity entity = this.getLevel(supplier.get()).getEntity(this.entityID);
 			if(entity instanceof PlayerEntity) {
 				final PlayerEntity player = (PlayerEntity) entity;
-				final ItemStack stack = player.inventory.getItem(this.slot);
+				final ItemStack stack = this.getStack(supplier.get());
 				if(!stack.isEmpty() && stack.getItem() == ModItems.RELIQUARY.get()) {
 					ModItems.RELIQUARY.get();
 					//Since this is from a client, defensively check this can actually be done
@@ -54,7 +51,7 @@ public class PacketReliquaryState extends PrayerUserPacket{
 	}
 
 	public static PacketReliquaryState decode(final PacketBuffer buffer) {
-		return PrayerUserPacket.decode(PacketReliquaryState.builder(), buffer).slot(buffer.readVarInt())
+		return InventoryItemPacket.decode(PacketReliquaryState.builder(), buffer)
 				.state(buffer.readEnum(State.class)).build();
 	}
 

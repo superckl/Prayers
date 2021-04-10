@@ -5,6 +5,7 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
+import me.superckl.prayers.inventory.MainInventorySlotHelper;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.util.MathUtil;
@@ -44,10 +45,11 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 			return;
 		final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(stack);
 		final float old = provider.getCurrentPrayerPoints();
-		provider.inventoryTick((PlayerEntity) entity, slot);
+		provider.inventoryTick((PlayerEntity) entity, new MainInventorySlotHelper(slot));
 		final float newVal = provider.getCurrentPrayerPoints();
-		if(MathUtil.isIntDifferent(old, newVal))
-			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity), new PacketSetInventoryItemPoints(newVal, slot));
+		if(newVal == 0 || MathUtil.isIntDifferent(old, newVal))
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
+					PacketSetInventoryItemPoints.builder().entityID(entity.getId()).points(newVal).slot(new MainInventorySlotHelper(slot)).build());
 	}
 
 	@SuppressWarnings("resource")
@@ -65,7 +67,8 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 				provider.addPoints(actual);
 				final EquipmentSlotType type = context.getHand() == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND:EquipmentSlotType.OFFHAND;
 				PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) context.getPlayer()),
-						new PacketSetInventoryItemPoints(provider.getCurrentPrayerPoints(), type));
+						PacketSetInventoryItemPoints.builder().entityID(context.getPlayer().getId()).points(provider.getCurrentPrayerPoints())
+						.slot(new MainInventorySlotHelper(type)).build());
 			}
 			return ActionResultType.sidedSuccess(false);
 		}

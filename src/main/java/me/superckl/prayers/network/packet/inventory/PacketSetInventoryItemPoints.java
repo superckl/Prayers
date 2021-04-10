@@ -2,56 +2,31 @@ package me.superckl.prayers.network.packet.inventory;
 
 import java.util.function.Supplier;
 
-import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.ClientHelper;
+import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.item.PrayerInventoryItem;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-@RequiredArgsConstructor
-public class PacketSetInventoryItemPoints {
+@SuperBuilder
+public class PacketSetInventoryItemPoints extends InventoryItemPacket{
 
 	private final float points;
-	private final int slot;
-	private final boolean isEquipment;
-	private final EquipmentSlotType type;
 
-	public PacketSetInventoryItemPoints(final float points, final int slot) {
-		this.points = points;
-		this.slot = slot;
-		this.isEquipment = false;
-		this.type = null;
-	}
-
-	public PacketSetInventoryItemPoints(final float points, final EquipmentSlotType type) {
-		this.points = points;
-		this.type = type;
-		this.isEquipment = true;
-		this.slot = -1;
-	}
-
+	@Override
 	public void encode(final PacketBuffer buffer) {
+		super.encode(buffer);
 		buffer.writeFloat(this.points);
-		buffer.writeBoolean(this.isEquipment);
-		if(this.isEquipment)
-			buffer.writeEnum(this.type);
-		else
-			buffer.writeVarInt(this.slot);
 	}
 
+	@Override
 	public void handle(final Supplier<NetworkEvent.Context> supplier) {
 		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				final ItemStack stack;
-				if(this.isEquipment)
-					stack = ClientHelper.getPlayer().getItemBySlot(this.type);
-				else
-					stack = ClientHelper.getPlayer().inventory.getItem(this.slot);
+				final ItemStack stack = this.getStack(supplier.get());
 				if(!stack.isEmpty() && stack.getItem() instanceof PrayerInventoryItem)
 					CapabilityHandler.getPrayerCapability(stack).setCurrentPrayerPoints(this.points);
 			});
@@ -59,11 +34,7 @@ public class PacketSetInventoryItemPoints {
 	}
 
 	public static PacketSetInventoryItemPoints decode(final PacketBuffer buffer) {
-		final float points = buffer.readFloat();
-		final boolean isEquip = buffer.readBoolean();
-		if(isEquip)
-			return new PacketSetInventoryItemPoints(points, buffer.readEnum(EquipmentSlotType.class));
-		return new PacketSetInventoryItemPoints(points, buffer.readVarInt());
+		return InventoryItemPacket.decode(PacketSetInventoryItemPoints.builder(), buffer).points(buffer.readFloat()).build();
 	}
 
 }

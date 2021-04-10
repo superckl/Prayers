@@ -10,6 +10,8 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.inventory.PlayerInventoryHelper;
+import me.superckl.prayers.inventory.SlotAwareIterator;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketTalismanState;
@@ -56,14 +58,15 @@ public abstract class ActivationCondition {
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
 		if(!prayer.isEnabled() || user.isPrayerActive(prayer) || !user.canUseItemPrayer(prayer))
 			return;
-		for(int i = 0; i < player.inventory.items.size(); i++) {
-			final ItemStack stack = player.inventory.items.get(i);
+		final SlotAwareIterator<?> it = PlayerInventoryHelper.allItems(player);
+		while(it.hasNext()) {
+			final ItemStack stack = it.next();
 			final TalismanItem item = ModItems.TALISMAN.get();
 			if(!stack.isEmpty() && stack.getItem() == item && TalismanItem.canAutoActivate(stack)) {
 				final Prayer stored = TalismanItem.getStoredPrayer(stack).orElse(null);
 				if(stored == prayer && item.applyState(stack, player, TalismanItem.State.ACTIVATE)) {
 					PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
-							PacketTalismanState.builder().entityID(player.getId()).slot(i).state(TalismanItem.State.ACTIVATE).build());
+							PacketTalismanState.builder().entityID(player.getId()).slot(it.getHelper()).state(TalismanItem.State.ACTIVATE).build());
 					break;
 				}
 			}

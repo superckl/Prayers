@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -91,12 +92,12 @@ public abstract class TickablePrayerProvider<T> {
 
 	public float drainPoints(final float drain) {
 		final float copy = this.getCurrentPrayerPoints();
-		float newPoints = copy-drain;
+		double newPoints = ((double) copy)- (double) drain;
 		if (newPoints < 0) {
 			newPoints = 0;
 			this.deactivateAllPrayers();
 		}
-		this.setCurrentPrayerPoints(newPoints);
+		this.setCurrentPrayerPoints((float) newPoints);
 		return copy - this.getCurrentPrayerPoints();
 	}
 

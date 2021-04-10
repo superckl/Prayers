@@ -1,9 +1,12 @@
 package me.superckl.prayers.client.gui;
 
+import java.util.Optional;
+
 import org.lwjgl.glfw.GLFW;
 
 import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -25,14 +28,16 @@ public class GuiEventHandler {
 			if(slot != null && slot.container == ClientHelper.getPlayer().inventory) {
 				final ItemStack stack = containerS.getSlotUnderMouse().getItem();
 				if(!stack.isEmpty() && stack.getItem() == ModItems.TALISMAN.get()) {
-					if(ModItems.TALISMAN.get().applyState(stack, ClientHelper.getPlayer(), TalismanItem.State.TOGGLE))
+					final Optional<SlotHelper> helper = SlotHelper.fromSlot(ClientHelper.getPlayer(), slot);
+					if(helper.isPresent() && ModItems.TALISMAN.get().applyState(stack, ClientHelper.getPlayer(), TalismanItem.State.TOGGLE))
 						PrayersPacketHandler.INSTANCE.sendToServer(PacketTalismanState.builder().entityID(ClientHelper.getPlayer().getId())
-								.slot(slot.getSlotIndex()).state(TalismanItem.State.TOGGLE).build());
+								.slot(helper.get()).state(TalismanItem.State.TOGGLE).build());
 					e.setCanceled(true);
 				}else if(!stack.isEmpty() && stack.getItem() == ModItems.RELIQUARY.get()) {
-					if(ReliquaryItem.applyState(stack, TalismanItem.State.TOGGLE))
+					final Optional<SlotHelper> helper = SlotHelper.fromSlot(ClientHelper.getPlayer(), slot);
+					if(helper.isPresent() && ReliquaryItem.applyState(stack, TalismanItem.State.TOGGLE))
 						PrayersPacketHandler.INSTANCE.sendToServer(PacketReliquaryState.builder().entityID(ClientHelper.getPlayer().getId())
-								.slot(slot.getSlotIndex()).state(TalismanItem.State.TOGGLE).build());
+								.slot(helper.get()).state(TalismanItem.State.TOGGLE).build());
 					e.setCanceled(true);
 				}
 			}
