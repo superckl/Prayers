@@ -2,6 +2,7 @@ package me.superckl.prayers.integration.curios;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.capability.TickablePrayerProvider;
 import me.superckl.prayers.inventory.SlotAwareIterator;
 import me.superckl.prayers.inventory.SlotHelper;
@@ -32,7 +33,7 @@ public class CuriosIntegration {
 
 	public static void attachCapability(final AttachCapabilitiesEvent<ItemStack> e) {
 		if(e.getObject().getItem() instanceof PrayerInventoryItem<?>) {
-			final TickablePrayerProvider.Provider<ICurio> provider = new TickablePrayerProvider.Provider<>(new PrayerItemCurio(), () -> CuriosCapability.ITEM);
+			final TickablePrayerProvider.Provider<ICurio> provider = new TickablePrayerProvider.Provider<>(new PrayerItemCurio(e.getObject()), () -> CuriosCapability.ITEM);
 			e.addCapability(CuriosCapability.ID_ITEM, provider);
 			e.addListener(provider::invalidate);
 		}
@@ -42,18 +43,25 @@ public class CuriosIntegration {
 		return CuriosApi.getCuriosHelper().getCuriosHandler(entity).map(CurioSlotAwareIterator::new);
 	}
 
+	@RequiredArgsConstructor
 	public static class PrayerItemCurio implements ICurio{
+
+		private final ItemStack stack;
 
 		@Override
 		public void curioTick(final String identifier, final int index, final LivingEntity livingEntity) {
 			if(livingEntity instanceof PlayerEntity) {
 				final PlayerEntity player = (PlayerEntity) livingEntity;
 				final SlotHelper helper = new CurioSlotHelper(new SlotContext(identifier, null, index));
-				final ItemStack stack = helper.getStack(player).orElseThrow(() -> new IllegalStateException("Curio ticked but is not worn by player!"));
-				if(stack.getItem() instanceof PrayerInventoryItem<?>)
-					PrayerInventoryItem.onInventoryTick(stack, player, helper);
+				if(this.stack.getItem() instanceof PrayerInventoryItem<?>)
+					PrayerInventoryItem.onInventoryTick(this.stack, player, helper);
 			}
 
+		}
+
+		@Override
+		public boolean canEquipFromUse(final SlotContext slotContext) {
+			return false;
 		}
 
 	}
