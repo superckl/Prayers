@@ -11,6 +11,10 @@ public interface SlotAwareIterator<T extends SlotHelper> extends Iterator<ItemSt
 	 */
 	T getHelper();
 
+	default Iterable<ItemStack> iterable(){
+		return () -> this;
+	}
+
 	public static class Combined implements SlotAwareIterator<SlotHelper>{
 
 		private final SlotAwareIterator<?>[] iterators;

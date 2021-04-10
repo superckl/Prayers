@@ -6,7 +6,6 @@ import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.item.PrayerInventoryItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -19,9 +18,10 @@ public class PacketDeactivateInventoryPrayer extends InventoryItemPacket{
 		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				final ItemStack stack = this.getStack(supplier.get());
-				if(!stack.isEmpty() && stack.getItem() instanceof PrayerInventoryItem)
-					CapabilityHandler.getPrayerCapability(stack).deactivateAllPrayers(ClientHelper.getPlayer());
+				this.getStack(supplier.get()).ifPresent(stack -> {
+					if(!stack.isEmpty() && stack.getItem() instanceof PrayerInventoryItem)
+						CapabilityHandler.getPrayerCapability(stack).deactivateAllPrayers(ClientHelper.getPlayer());
+				});
 			});
 		supplier.get().setPacketHandled(true);
 	}

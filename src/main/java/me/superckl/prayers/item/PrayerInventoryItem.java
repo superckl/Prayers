@@ -6,6 +6,7 @@ import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.inventory.MainInventorySlotHelper;
+import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.inventory.PacketSetInventoryItemPoints;
 import me.superckl.prayers.util.MathUtil;
@@ -41,15 +42,22 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 
 	@Override
 	public void inventoryTick(final ItemStack stack, final World level, final Entity entity, final int slot, final boolean selected) {
-		if(level.isClientSide || !(entity instanceof PlayerEntity))
+		//Ignore the tick if the slot is undefined. It is likely in a modded slot that must be handled by other methods
+		if(!(entity instanceof PlayerEntity) || slot == -1)
+			return;
+		PrayerInventoryItem.onInventoryTick(stack, (PlayerEntity) entity, new MainInventorySlotHelper(slot));
+	}
+
+	public static void onInventoryTick(final ItemStack stack, final PlayerEntity player, final SlotHelper slot) {
+		if(player.level.isClientSide)
 			return;
 		final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(stack);
 		final double old = provider.getCurrentPrayerPoints();
-		provider.inventoryTick((PlayerEntity) entity, new MainInventorySlotHelper(slot));
+		provider.inventoryTick(player, slot);
 		final double newVal = provider.getCurrentPrayerPoints();
 		if(newVal == 0 || MathUtil.isIntDifferent(old, newVal))
-			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
-					PacketSetInventoryItemPoints.builder().entityID(entity.getId()).points(newVal).slot(new MainInventorySlotHelper(slot)).build());
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
+					PacketSetInventoryItemPoints.builder().entityID(player.getId()).points(newVal).slot(slot).build());
 	}
 
 	@SuppressWarnings("resource")

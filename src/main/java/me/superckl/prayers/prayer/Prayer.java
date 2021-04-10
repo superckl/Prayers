@@ -59,8 +59,8 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public static final RegistryObject<Prayer> PROTECT_RANGE = Prayer.REGISTER.register("protect_range", Prayer.builder().drain(2.5F).level(40)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectrange.png")).overhead(true)
 			.effect(() -> new DamageEffect(DamageType.RANGE, true, true, -0.5F)).exclusionType("protect")::build);
-//	public static final RegistryObject<Prayer> PROTECT_ITEM = Prayer.REGISTER.register("protect_item", Prayer.builder().drain(0.2F).level(25)
-//			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectitem.png"))::build);
+	//	public static final RegistryObject<Prayer> PROTECT_ITEM = Prayer.REGISTER.register("protect_item", Prayer.builder().drain(0.2F).level(25)
+	//			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectitem.png"))::build);
 	public static final RegistryObject<Prayer> PROTECT_POISON = Prayer.REGISTER.register("protect_poison", Prayer.builder().drain(1F).level(20)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectpoison.png")).effect(PoisonProtEffect::new)::build);
 	public static final RegistryObject<Prayer> PROTECT_FIRE = Prayer.REGISTER.register("protect_fire", Prayer.builder().drain(2.5F).level(35)

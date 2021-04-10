@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.item.PrayerInventoryItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -26,9 +25,11 @@ public class PacketSetInventoryItemPoints extends InventoryItemPacket{
 		//Only the server should be sending these packets
 		if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
 			supplier.get().enqueueWork(() -> {
-				final ItemStack stack = this.getStack(supplier.get());
-				if(!stack.isEmpty() && stack.getItem() instanceof PrayerInventoryItem)
-					CapabilityHandler.getPrayerCapability(stack).setCurrentPrayerPoints(this.points);
+				this.getStack(supplier.get()).ifPresent(stack -> {
+					if(!stack.isEmpty() && stack.getItem() instanceof PrayerInventoryItem)
+						CapabilityHandler.getPrayerCapability(stack).setCurrentPrayerPoints(this.points);
+				});
+
 			});
 		supplier.get().setPacketHandled(true);
 	}

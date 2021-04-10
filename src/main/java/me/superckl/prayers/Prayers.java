@@ -27,6 +27,8 @@ import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModPotions;
 import me.superckl.prayers.init.ModRecipes;
 import me.superckl.prayers.init.ModTiles;
+import me.superckl.prayers.integration.curios.CuriosIntegration;
+import me.superckl.prayers.inventory.ContainerSlotHelper;
 import me.superckl.prayers.inventory.MainInventorySlotHelper;
 import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.item.ItemEvents;
@@ -75,10 +77,12 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -88,11 +92,14 @@ public class Prayers {
 
 	public static final String MOD_ID = "prayers";
 
+	public static boolean hasCurios;
+
 	public Prayers() {
 		LogHelper.setLogger(LogManager.getFormatterLogger(Prayers.MOD_ID));
 		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(this::commonSetup);
 		bus.addListener(this::createRegistry);
+		bus.addListener(this::enqueueIMC);
 		bus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializer);
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientEvents::register);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
@@ -108,6 +115,8 @@ public class Prayers {
 		AltarItem.REGISTER.register(bus);
 		ModLoot.REGISTER.register(bus);
 		ModLoot.registerConditions();
+
+		Prayers.hasCurios = ModList.get().isLoaded("curios");
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event){
@@ -155,8 +164,10 @@ public class Prayers {
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateInventoryPrayer.class,
 				PacketDeactivateInventoryPrayer::encode, PacketDeactivateInventoryPrayer::decode, PacketDeactivateInventoryPrayer::handle);
 
-		SlotHelper.registerHelper("main_inventory", MainInventorySlotHelper.class, MainInventorySlotHelper.DESERIALIZER,
-				MainInventorySlotHelper.PREDICATE, MainInventorySlotHelper.FACTORY);
+		SlotHelper.registerHelper("main_inventory", MainInventorySlotHelper.class, MainInventorySlotHelper::deserialize);
+		SlotHelper.registerHelper("current_container", ContainerSlotHelper.class, ContainerSlotHelper::deserialize);
+		if(Prayers.hasCurios)
+			CuriosIntegration.commonSetup(event);
 	}
 
 	private void registerPotions() {
@@ -180,6 +191,11 @@ public class Prayers {
 	public void registerRecipeSerializer(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
 		CraftingHelper.register(new ResourceLocation(Prayers.MOD_ID, "full_vessel"), FullVesselIngredient.Serializer.INSTANCE);
 		CraftingHelper.register(new ResourceLocation(Prayers.MOD_ID, "potion"), PotionIngredient.Serializer.INSTANCE);
+	}
+
+	private void enqueueIMC(final InterModEnqueueEvent e) {
+		if(Prayers.hasCurios)
+			CuriosIntegration.sendSlotIMC(e);
 	}
 
 	@SubscribeEvent

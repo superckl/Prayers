@@ -1,6 +1,7 @@
 package me.superckl.prayers.capability;
 
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.integration.curios.CuriosIntegration;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
@@ -53,6 +54,8 @@ public class CapabilityHandler {
 			e.addCapability(new ResourceLocation(Prayers.MOD_ID, "inventory_prayer_provider"), provider);
 			e.addListener(provider::invalidate);
 		}
+		if(Prayers.hasCurios)
+			CuriosIntegration.attachCapability(e);
 	}
 
 	//Sync prayer data when a client logs in

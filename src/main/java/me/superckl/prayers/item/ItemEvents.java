@@ -5,6 +5,7 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.criteria.ApplyBoonCriteria;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.inventory.PlayerInventoryHelper;
 import me.superckl.prayers.item.decree.DecreeData;
 import me.superckl.prayers.item.decree.DecreeItem;
 import me.superckl.prayers.item.decree.InfertilityDecreeData;
@@ -58,7 +59,7 @@ public class ItemEvents {
 		if(source instanceof PlayerEntity) {
 			final PlayerEntity killer = (PlayerEntity) source;
 			final VesselItem soulItem = ModItems.VESSEL.get();
-			for(final ItemStack stack:killer.inventory.items) {
+			for(final ItemStack stack:PlayerInventoryHelper.allItems(killer).iterable()) {
 				if(stack.getItem() != soulItem)
 					continue;
 				if(soulItem.onKill(type, stack))

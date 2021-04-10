@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -16,6 +15,7 @@ import lombok.Setter;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.criteria.PrayerLevelCriteria;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.inventory.PlayerInventoryHelper;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -200,7 +200,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 
 	public List<InventoryPrayerProvider> findReliquaries(){
 		final List<InventoryPrayerProvider> providers = Lists.newArrayList();
-		this.ref.inventory.items.forEach(stack -> {
+		PlayerInventoryHelper.allItemsStream(this.ref).forEach(stack -> {
 			if(stack.getItem() == ModItems.RELIQUARY.get() && ReliquaryItem.isActive(stack))
 				providers.add(CapabilityHandler.getPrayerCapability(stack));
 		});
@@ -208,8 +208,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	}
 
 	public boolean hasActiveItem(final Prayer prayer) {
-		final Stream<ItemStack> stream = Stream.concat(this.ref.inventory.items.stream(), this.ref.inventory.armor.stream());
-		final Iterator<ItemStack> it = Stream.concat(stream, this.ref.inventory.offhand.stream()).iterator();
+		final Iterator<ItemStack> it = PlayerInventoryHelper.allItems(this.ref);
 		while(it.hasNext()) {
 			final ItemStack stack = it.next();
 			if(stack.isEmpty() || !(stack.getItem() instanceof PrayerInventoryItem))
@@ -222,8 +221,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 
 	public Set<Prayer> getActiveItems(){
 		final Set<Prayer> active = Sets.newHashSet();
-		final Stream<ItemStack> stream = Stream.concat(this.ref.inventory.items.stream(), this.ref.inventory.armor.stream());
-		final Iterator<ItemStack> it = Stream.concat(stream, this.ref.inventory.offhand.stream()).iterator();
+		final Iterator<ItemStack> it = PlayerInventoryHelper.allItems(this.ref);
 		while(it.hasNext()) {
 			final ItemStack stack = it.next();
 			if(stack.isEmpty() || !(stack.getItem() instanceof PrayerInventoryItem))

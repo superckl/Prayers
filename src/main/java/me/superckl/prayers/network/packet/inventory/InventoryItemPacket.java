@@ -1,5 +1,7 @@
 package me.superckl.prayers.network.packet.inventory;
 
+import java.util.Optional;
+
 import lombok.experimental.SuperBuilder;
 import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.network.packet.user.PrayerUserPacket;
@@ -20,7 +22,7 @@ public class InventoryItemPacket extends PrayerUserPacket{
 		this.slot.writeToBuffer(buffer);
 	}
 
-	public ItemStack getStack(final NetworkEvent.Context context) {
+	public Optional<ItemStack> getStack(final NetworkEvent.Context context) {
 		final Entity entity = this.getLevel(context).getEntity(this.entityID);
 		if(entity instanceof PlayerEntity)
 			return this.slot.getStack((PlayerEntity) entity);
