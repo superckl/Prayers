@@ -3,7 +3,6 @@ package me.superckl.prayers.capability;
 import java.util.Collection;
 import java.util.Iterator;
 
-import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.inventory.SlotHelper;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
@@ -42,17 +41,17 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 				this.deactivatePrayer(prayer);
 			}
 		}
-		float drain = user.modifyDrain((float) prayers.stream().mapToDouble(Prayer::getDrain).sum()/20F);
+		double drain = user.modifyDrain(prayers.stream().mapToDouble(Prayer::getDrain).sum()/20F);
 		final PrayerInventoryItem<?> item = (PrayerInventoryItem<?>) this.ref.getItem();
 		final boolean drainHolder = item.isShouldDrainHolder();
 		if(drainHolder)
 			drain = drain - user.drainReliquaries(drain);
-		float newPoints = this.getCurrentPrayerPoints()-drain;
+		double newPoints = this.getCurrentPrayerPoints()-drain;
 		if (newPoints < 0) {
 			drain = -newPoints;
 			newPoints = 0;
 			if(drainHolder) {
-				final float drained = user.drainPoints(drain, false);
+				final double drained = user.drainPoints(drain, false);
 				if(drained < drain) {
 					this.deactivateAllPrayers();
 					if(entity instanceof ServerPlayerEntity)

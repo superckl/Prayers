@@ -31,9 +31,9 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 	@Getter
 	protected final boolean shouldDrainHolder;
 	@Getter
-	protected final float rechargeLossFactor;
+	protected final double rechargeLossFactor;
 
-	public PrayerInventoryItem(final Properties props, final boolean shouldDrainHolder, final float rechargeLossFactor) {
+	public PrayerInventoryItem(final Properties props, final boolean shouldDrainHolder, final double rechargeLossFactor) {
 		super(props);
 		this.shouldDrainHolder = shouldDrainHolder;
 		this.rechargeLossFactor = rechargeLossFactor;
@@ -44,9 +44,9 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 		if(level.isClientSide || !(entity instanceof PlayerEntity))
 			return;
 		final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(stack);
-		final float old = provider.getCurrentPrayerPoints();
+		final double old = provider.getCurrentPrayerPoints();
 		provider.inventoryTick((PlayerEntity) entity, new MainInventorySlotHelper(slot));
-		final float newVal = provider.getCurrentPrayerPoints();
+		final double newVal = provider.getCurrentPrayerPoints();
 		if(newVal == 0 || MathUtil.isIntDifferent(old, newVal))
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) entity),
 					PacketSetInventoryItemPoints.builder().entityID(entity.getId()).points(newVal).slot(new MainInventorySlotHelper(slot)).build());
@@ -62,8 +62,8 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 			final AltarTileEntity aTE = (AltarTileEntity) te;
 			if(aTE.canRegen()) {
 				final InventoryPrayerProvider provider = CapabilityHandler.getPrayerCapability(context.getItemInHand());
-				final float recharge = provider.getMaxPrayerPoints()-provider.getCurrentPrayerPoints();
-				final float actual = aTE.removePoints(recharge/this.rechargeLossFactor)*this.rechargeLossFactor;
+				final double recharge = provider.getMaxPrayerPoints()-provider.getCurrentPrayerPoints();
+				final double actual = aTE.removePoints(recharge/this.rechargeLossFactor)*this.rechargeLossFactor;
 				provider.addPoints(actual);
 				final EquipmentSlotType type = context.getHand() == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND:EquipmentSlotType.OFFHAND;
 				PrayersPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) context.getPlayer()),

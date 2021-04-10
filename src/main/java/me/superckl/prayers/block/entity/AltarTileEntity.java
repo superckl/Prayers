@@ -73,8 +73,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	private boolean validMultiblock = false;
 	private UUID owner;
 	private Set<BlockPos> connected = ImmutableSet.of();
-	private float maxPoints = 0;
-	private float currentPoints = 0;
+	private double maxPoints = 0;
+	private double currentPoints = 0;
 
 	private ItemStack altarItem = ItemStack.EMPTY;
 	private Direction itemDirection;
@@ -107,8 +107,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		} else {
 			final List<AltarTileEntity> tiles = AltarTileEntity.toAltars(connected, this.level);
 			if(numConnected <= this.altarType.getMaxConnected()) {
-				final float points = (float) (tiles.stream().mapToDouble(te -> te.currentPoints).sum()/numConnected);
-				final float maxPoints = this.altarType.getMaxPoints()*MathHelper.sqrt(numConnected);
+				final double points = tiles.stream().mapToDouble(te -> te.currentPoints).sum()/numConnected;
+				final double maxPoints = this.altarType.getMaxPoints()*MathHelper.sqrt(numConnected);
 				tiles.forEach(tile -> {
 					tile.validMultiblock = true;
 					tile.connected = connected;
@@ -130,16 +130,16 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		return connected;
 	}
 
-	public float getMaxPoints() {
+	public double getMaxPoints() {
 		if(!this.validMultiblock)
 			return this.maxPoints;
-		return (float) this.getConnected().stream().mapToDouble(altar -> altar.maxPoints).sum();
+		return this.getConnected().stream().mapToDouble(altar -> altar.maxPoints).sum();
 	}
 
-	public float getCurrentPoints() {
+	public double getCurrentPoints() {
 		if(!this.validMultiblock)
 			return this.currentPoints;
-		return (float) this.getConnected().stream().mapToDouble(altar -> altar.currentPoints).sum();
+		return this.getConnected().stream().mapToDouble(altar -> altar.currentPoints).sum();
 	}
 
 	public List<AltarTileEntity> getConnected(){
@@ -150,25 +150,25 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		return blockPos.stream().map(pos -> (AltarTileEntity) reader.getBlockEntity(pos)).collect(Collectors.toList());
 	}
 
-	public float addPoints(final float points) {
+	public double addPoints(final double points) {
 		final List<AltarTileEntity> connected = this.getConnected();
-		final float toAdd = points/connected.size();
-		return (float) connected.stream().mapToDouble(altar -> altar.addPointsInternal(toAdd)).sum();
+		final double toAdd = points/connected.size();
+		return connected.stream().mapToDouble(altar -> altar.addPointsInternal(toAdd)).sum();
 	}
 
-	public float removePoints(final float points) {
+	public double removePoints(final double points) {
 		return -this.addPoints(-points);
 	}
 
-	private float addPointsInternal(final float points) {
+	private double addPointsInternal(final double points) {
 		this.currentPoints += points;
 		if(this.currentPoints > this.maxPoints) {
-			final float diff = this.maxPoints - this.currentPoints;
+			final double diff = this.maxPoints - this.currentPoints;
 			this.currentPoints = this.maxPoints;
 			return diff;
 		}
 		if(this.currentPoints < 0) {
-			final float diff = this.currentPoints;
+			final double diff = this.currentPoints;
 			this.currentPoints = 0;
 			return points - diff;
 		}
@@ -248,16 +248,16 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		}
 	}
 
-	public float rechargeUser(final PlayerEntity player) {
+	public double rechargeUser(final PlayerEntity player) {
 		if(this.level.isClientSide || !this.canRegen())
 			return 0;
 		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
-		final float current = user.getCurrentPrayerPoints();
-		final float max = user.getMaxPrayerPoints();
+		final double current = user.getCurrentPrayerPoints();
+		final double max = user.getMaxPrayerPoints();
 		if(current < max) {
 			final List<AltarTileEntity> altars = this.getConnected();
-			final float altarCharge = this.getCurrentPoints();
-			final float recharge = Math.min(altarCharge, max-current);
+			final double altarCharge = this.getCurrentPoints();
+			final double recharge = Math.min(altarCharge, max-current);
 			altars.forEach(altar -> {
 				altar.currentPoints -= recharge/altars.size();
 			});
@@ -283,9 +283,9 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		if(this.level.isClientSide)
 			return;
 		if(!this.altarItem.isEmpty() && !this.isTopClear(true)) {
-			final double x = this.level.random.nextFloat() * 0.5 + 0.25;
-			final double y = 1+this.level.random.nextFloat() * 0.1;
-			final double z = this.level.random.nextFloat() * 0.5 + 0.25;
+			final double x = this.level.random.nextDouble() * 0.5 + 0.25;
+			final double y = 1+this.level.random.nextDouble() * 0.1;
+			final double z = this.level.random.nextDouble() * 0.5 + 0.25;
 			final ItemEntity itemEntity = new ItemEntity(this.level, this.worldPosition.getX() + x, this.worldPosition.getY() + y, this.worldPosition.getZ() + z, this.altarItem);
 			itemEntity.setDefaultPickUpDelay();
 			this.level.addFreshEntity(itemEntity);
@@ -293,7 +293,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			this.setChanged();
 		}
 		if (this.canRegen()) {
-			if(this.rand.nextFloat() < 0.015F)
+			if(this.rand.nextDouble() < 0.015F)
 				this.spawnActiveParticle();
 			if(this.currentPoints < this.maxPoints) {
 				this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
@@ -444,8 +444,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		altarNBT.putBoolean(AltarTileEntity.VALID_KEY, this.validMultiblock);
 		if(this.owner != null)
 			altarNBT.putUUID(AltarTileEntity.OWNER_KEY, this.owner);
-		altarNBT.putFloat(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
-		altarNBT.putFloat(AltarTileEntity.MAX_POINTS_KEY, this.maxPoints);
+		altarNBT.putDouble(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
+		altarNBT.putDouble(AltarTileEntity.MAX_POINTS_KEY, this.maxPoints);
 		if(!this.altarItem.isEmpty()) {
 			altarNBT.put(AltarTileEntity.ALTAR_ITEM_KEY, this.altarItem.save(new CompoundNBT()));
 			altarNBT.putInt(AltarTileEntity.ITEM_PROGRESS_KEY, this.itemTicks);
@@ -464,8 +464,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		super.load(state, nbt);
 		final CompoundNBT altarNBT = nbt.getCompound(AltarTileEntity.ALTAR_KEY);
 		this.validMultiblock = altarNBT.getBoolean(AltarTileEntity.VALID_KEY);
-		this.maxPoints = altarNBT.getFloat(AltarTileEntity.MAX_POINTS_KEY);
-		this.currentPoints = altarNBT.getFloat(AltarTileEntity.CURRENT_POINTS_KEY);
+		this.maxPoints = altarNBT.getDouble(AltarTileEntity.MAX_POINTS_KEY);
+		this.currentPoints = altarNBT.getDouble(AltarTileEntity.CURRENT_POINTS_KEY);
 		if(altarNBT.contains(AltarTileEntity.ALTAR_ITEM_KEY)) {
 			this.altarItem = ItemStack.of(altarNBT.getCompound(AltarTileEntity.ALTAR_ITEM_KEY));
 			final int[] dirs = altarNBT.getIntArray(AltarTileEntity.DIRECTION_KEY);
@@ -502,7 +502,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		nbt.putBoolean(AltarTileEntity.HAS_OWNER_KEY, this.owner != null);
 		if(this.owner!= null)
 			nbt.putUUID(AltarTileEntity.OWNER_KEY, this.owner);
-		nbt.putFloat(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
+		nbt.putDouble(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
 		return new SUpdateTileEntityPacket(this.worldPosition, -1, nbt);
 	}
 
@@ -515,7 +515,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			this.owner = nbt.getUUID(AltarTileEntity.OWNER_KEY);
 		else
 			this.owner = null;
-		this.currentPoints = nbt.getFloat(AltarTileEntity.CURRENT_POINTS_KEY);
+		this.currentPoints = nbt.getDouble(AltarTileEntity.CURRENT_POINTS_KEY);
 	}
 
 }

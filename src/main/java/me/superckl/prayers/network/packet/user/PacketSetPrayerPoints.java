@@ -11,16 +11,16 @@ import net.minecraftforge.fml.network.NetworkEvent.Context;
 @SuperBuilder
 public class PacketSetPrayerPoints extends PrayerUserPacket{
 
-	private final float amount;
+	private final double amount;
 
 	@Override
 	public void encode(final PacketBuffer buffer) {
 		super.encode(buffer);
-		buffer.writeFloat(this.amount);
+		buffer.writeDouble(this.amount);
 	}
 
 	public static PacketSetPrayerPoints decode(final PacketBuffer buffer) {
-		return PrayerUserPacket.decode(PacketSetPrayerPoints.builder(), buffer).amount(buffer.readFloat()).build();
+		return PrayerUserPacket.decode(PacketSetPrayerPoints.builder(), buffer).amount(buffer.readDouble()).build();
 	}
 
 	@Override

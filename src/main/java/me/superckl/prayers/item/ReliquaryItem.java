@@ -25,7 +25,7 @@ public class ReliquaryItem extends PrayerInventoryItem<ReliquaryPrayerProvider>{
 	public static final String ACTIVE_KEY = "active";
 
 	public ReliquaryItem() {
-		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), false, 1F/Config.getInstance().getReliquaryLossFactor().get().floatValue());
+		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), false, 1F/Config.getInstance().getReliquaryLossFactor().get());
 	}
 
 	@Override

@@ -49,7 +49,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public static final String TALISMAN_KEY = "talisman";
 
 	public TalismanItem() {
-		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true, 1F/Config.getInstance().getTalismanLossFactor().get().floatValue());
+		super(new Item.Properties().stacksTo(1).tab(ModItems.PRAYERS_GROUP), true, 1F/Config.getInstance().getTalismanLossFactor().get());
 	}
 
 	@Override

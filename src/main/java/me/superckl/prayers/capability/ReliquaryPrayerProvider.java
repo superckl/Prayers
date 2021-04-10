@@ -13,14 +13,14 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 public class ReliquaryPrayerProvider extends InventoryPrayerProvider{
 
-	private final float maxPoints = Config.getInstance().getReliquaryPoints().get().floatValue();
+	private final double maxPoints = Config.getInstance().getReliquaryPoints().get();
 
 	public ReliquaryPrayerProvider(final ItemStack ref) {
 		super(ref);
 	}
 
 	@Override
-	public float getMaxPrayerPoints() {
+	public double getMaxPrayerPoints() {
 		return this.maxPoints;
 	}
 

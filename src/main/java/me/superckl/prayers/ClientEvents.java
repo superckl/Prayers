@@ -58,7 +58,7 @@ public class ClientEvents {
 				} catch (final IllegalArgumentException e) {
 					provider = CapabilityHandler.getPrayerCapability(stack.copy());
 				}
-				return provider.getCurrentPrayerPoints()/provider.getMaxPrayerPoints();
+				return (float) (provider.getCurrentPrayerPoints()/provider.getMaxPrayerPoints());
 			};
 			ItemModelsProperties.register(ModItems.RELIQUARY.get(), new ResourceLocation(Prayers.MOD_ID, "points"), pointsGetter);
 			ItemModelsProperties.register(ModItems.TALISMAN.get(), new ResourceLocation(Prayers.MOD_ID, "points"), pointsGetter);

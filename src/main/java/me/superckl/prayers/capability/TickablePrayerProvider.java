@@ -12,7 +12,6 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import me.superckl.prayers.LogHelper;
 import me.superckl.prayers.prayer.Prayer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -31,7 +30,7 @@ import net.minecraftforge.registries.IRegistryDelegate;
 public abstract class TickablePrayerProvider<T> {
 
 	@Getter
-	protected float currentPrayerPoints;
+	protected double currentPrayerPoints;
 	private final Set<IRegistryDelegate<Prayer>> activePrayers = Sets.newHashSet();
 	@Getter
 	@Setter
@@ -41,7 +40,7 @@ public abstract class TickablePrayerProvider<T> {
 		this.currentPrayerPoints = this.getMaxPrayerPoints();
 	}
 
-	public float setCurrentPrayerPoints(final float currentPoints) {
+	public double setCurrentPrayerPoints(final double currentPoints) {
 		if(currentPoints < 0)
 			this.currentPrayerPoints = 0;
 		else
@@ -79,32 +78,32 @@ public abstract class TickablePrayerProvider<T> {
 		return this.activePrayers.stream().map(IRegistryDelegate::get).collect(Collectors.toSet());
 	}
 
-	public abstract float getMaxPrayerPoints();
+	public abstract double getMaxPrayerPoints();
 
 	public void tick() {
 		if(!this.shouldDrain)
 			return;
-		final float drain = this.modifyDrain((float) this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum()/20F);
+		final double drain = this.modifyDrain(this.getActivePrayers().stream().mapToDouble(Prayer::getDrain).sum()/20);
 		if(drain == 0)
 			return;
 		this.drainPoints(drain);
 	}
 
-	public float drainPoints(final float drain) {
-		final float copy = this.getCurrentPrayerPoints();
-		double newPoints = ((double) copy)- (double) drain;
+	public double drainPoints(final double drain) {
+		final double copy = this.getCurrentPrayerPoints();
+		double newPoints = copy- drain;
 		if (newPoints < 0) {
 			newPoints = 0;
 			this.deactivateAllPrayers();
 		}
-		this.setCurrentPrayerPoints((float) newPoints);
+		this.setCurrentPrayerPoints(newPoints);
 		return copy - this.getCurrentPrayerPoints();
 	}
 
-	protected float modifyDrain(final float drain) {return drain;}
+	protected double modifyDrain(final double drain) {return drain;}
 
-	public float addPoints(final float points) {
-		final float toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());
+	public double addPoints(final double points) {
+		final double toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());
 		this.setCurrentPrayerPoints(this.getCurrentPrayerPoints()+toAdd);
 		return toAdd;
 	}
@@ -156,7 +155,7 @@ public abstract class TickablePrayerProvider<T> {
 		@Override
 		public CompoundNBT writeNBT(final Capability<T> capability, final T instance, final Direction side) {
 			final CompoundNBT parent = new CompoundNBT();
-			parent.putFloat(Storage.CURRENT_POINTS_KEY, instance.getCurrentPrayerPoints());
+			parent.putDouble(Storage.CURRENT_POINTS_KEY, instance.getCurrentPrayerPoints());
 			parent.putBoolean(Storage.SHOULD_DRAIN_KEY, instance.shouldDrain);
 			final ListNBT enabled = new ListNBT();
 			instance.getActivePrayers().forEach(prayer -> enabled.add(StringNBT.valueOf(prayer.getRegistryName().toString())));
@@ -168,7 +167,7 @@ public abstract class TickablePrayerProvider<T> {
 		public void readNBT(final Capability<T> capability, final T instance, final Direction side, final INBT nbt) {
 			instance.deactivateAllPrayers();
 			final CompoundNBT parent = (CompoundNBT) nbt;
-			instance.setCurrentPrayerPoints(parent.getFloat(Storage.CURRENT_POINTS_KEY));
+			instance.setCurrentPrayerPoints(parent.getDouble(Storage.CURRENT_POINTS_KEY));
 			instance.setShouldDrain(parent.getBoolean(Storage.SHOULD_DRAIN_KEY));
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);

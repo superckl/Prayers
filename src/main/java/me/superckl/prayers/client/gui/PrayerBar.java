@@ -26,8 +26,8 @@ public class PrayerBar {
 
 		//Bar is 40x12, icon is 16x16
 		//Determine positioning of text and icon (defaults to bottom right)
-		final float current = user.getCurrentPrayerPoints();
-		final float max = user.getMaxPrayerPoints();
+		final double current = user.getCurrentPrayerPoints();
+		final double max = user.getMaxPrayerPoints();
 		TextFormatting color = TextFormatting.WHITE;
 		if (current >= max)
 			color = TextFormatting.AQUA;
@@ -46,8 +46,8 @@ public class PrayerBar {
 		//This is 2+1 to create a gap of size 2
 		final int barOffset = 3;
 
-		final float prayerPercentage = Math.min(user.getCurrentPrayerPoints()/user.getMaxPrayerPoints(), 1F);
-		final int barWidth = Math.round(prayerPercentage*40);
+		final double prayerPercentage = Math.min(user.getCurrentPrayerPoints()/user.getMaxPrayerPoints(), 1F);
+		final int barWidth = (int) Math.round(prayerPercentage*40);
 
 		//Bind texture and render text and icon
 		ClientHelper.getTextureManager().bind(PrayerSelectGUI.PRAYER_GUI_TEXTURE);

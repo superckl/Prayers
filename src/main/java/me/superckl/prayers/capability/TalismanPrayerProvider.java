@@ -5,14 +5,14 @@ import net.minecraft.item.ItemStack;
 
 public class TalismanPrayerProvider extends InventoryPrayerProvider{
 
-	private final float maxPoints = Config.getInstance().getTalimsanPoints().get().floatValue();
+	private final double maxPoints = Config.getInstance().getTalimsanPoints().get();
 
 	public TalismanPrayerProvider(final ItemStack ref) {
 		super(ref);
 	}
 
 	@Override
-	public float getMaxPrayerPoints() {
+	public double getMaxPrayerPoints() {
 		return this.maxPoints;
 	}
 

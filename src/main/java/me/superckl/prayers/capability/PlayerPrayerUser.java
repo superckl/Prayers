@@ -76,9 +76,9 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	}
 
 	@Override
-	public float setCurrentPrayerPoints(final float currentPoints) {
-		final float old = this.getCurrentPrayerPoints();
-		final float newVal = super.setCurrentPrayerPoints(currentPoints);
+	public double setCurrentPrayerPoints(final double currentPoints) {
+		final double old = this.getCurrentPrayerPoints();
+		final double newVal = super.setCurrentPrayerPoints(currentPoints);
 		if(this.autoSync && !this.ref.level.isClientSide && ((ServerPlayerEntity)this.ref).connection != null && (newVal == 0 && old > 0 || old == 0 && newVal > 0  || MathUtil.isIntDifferent(old, newVal)))
 			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this.ref),
 					PacketSetPrayerPoints.builder().entityID(this.ref.getId()).amount(newVal).build());
@@ -105,11 +105,11 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		return changed;
 	}
 
-	public abstract float addMaxPointsBoost(float boost);
+	public abstract double addMaxPointsBoost(double boost);
 
-	public abstract float setMaxPointsBoost(float boost);
+	public abstract double setMaxPointsBoost(double boost);
 
-	public abstract float getMaxPointsBoost();
+	public abstract double getMaxPointsBoost();
 
 	public abstract int getPrayerLevel();
 
@@ -159,12 +159,12 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	}
 
 	@Override
-	public float drainPoints(final float drain) {
+	public double drainPoints(final double drain) {
 		return this.drainPoints(drain, true);
 	}
 
-	public float drainPoints(float drain, final boolean drainReliquaries) {
-		final float initDrain = drain;
+	public double drainPoints(double drain, final boolean drainReliquaries) {
+		final double initDrain = drain;
 		drain = 0;
 		if(drainReliquaries) {
 			drain = this.drainReliquaries(initDrain);
@@ -174,8 +174,8 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		return drain+super.drainPoints(initDrain-drain);
 	}
 
-	public float drainReliquaries(float drain) {
-		final float initDrain = drain;
+	public double drainReliquaries(double drain) {
+		final double initDrain = drain;
 		for(final InventoryPrayerProvider provider:this.findReliquaries()) {
 			drain = drain - provider.drainPoints(drain);
 			if(drain == 0)
@@ -185,7 +185,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	}
 
 	@Override
-	protected float modifyDrain(final float drain) {
+	protected double modifyDrain(final double drain) {
 		final int drainLvl = this.getPrayerDrainLevel();
 		return drain*(.35F+.8F/(drainLvl+1));
 	}
@@ -248,8 +248,8 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		public CompoundNBT writeNBT(final Capability<PlayerPrayerUser> capability, final PlayerPrayerUser instance, final Direction side) {
 			final CompoundNBT parent = new CompoundNBT();
 			parent.putInt(Storage.LEVEL_KEY, instance.getPrayerLevel());
-			parent.putFloat(Storage.MAX_BOOST_KEY, instance.getMaxPointsBoost());
-			parent.putFloat(Storage.CURRENT_POINTS_KEY, instance.getCurrentPrayerPoints());
+			parent.putDouble(Storage.MAX_BOOST_KEY, instance.getMaxPointsBoost());
+			parent.putDouble(Storage.CURRENT_POINTS_KEY, instance.getCurrentPrayerPoints());
 			parent.putFloat(Storage.XP_KEY, instance.getXP());
 			parent.putBoolean(Storage.UNLOCKED_KEY, instance.unlocked);
 			final ListNBT unlocked = new ListNBT();
@@ -267,8 +267,8 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 			instance.autoSync = false;
 			final CompoundNBT parent = (CompoundNBT) nbt;
 			instance.setPrayerLevel(parent.getInt(Storage.LEVEL_KEY));
-			instance.setMaxPointsBoost(parent.getFloat(Storage.MAX_BOOST_KEY));
-			instance.setCurrentPrayerPoints(parent.getFloat(Storage.CURRENT_POINTS_KEY));
+			instance.setMaxPointsBoost(parent.getDouble(Storage.MAX_BOOST_KEY));
+			instance.setCurrentPrayerPoints(parent.getDouble(Storage.CURRENT_POINTS_KEY));
 			instance.setXP(parent.getFloat(Storage.XP_KEY));
 			instance.setUnlocked(parent.getBoolean(Storage.UNLOCKED_KEY));
 			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);

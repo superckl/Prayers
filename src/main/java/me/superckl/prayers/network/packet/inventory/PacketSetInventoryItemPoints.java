@@ -13,12 +13,12 @@ import net.minecraftforge.fml.network.NetworkEvent;
 @SuperBuilder
 public class PacketSetInventoryItemPoints extends InventoryItemPacket{
 
-	private final float points;
+	private final double points;
 
 	@Override
 	public void encode(final PacketBuffer buffer) {
 		super.encode(buffer);
-		buffer.writeFloat(this.points);
+		buffer.writeDouble(this.points);
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class PacketSetInventoryItemPoints extends InventoryItemPacket{
 	}
 
 	public static PacketSetInventoryItemPoints decode(final PacketBuffer buffer) {
-		return InventoryItemPacket.decode(PacketSetInventoryItemPoints.builder(), buffer).points(buffer.readFloat()).build();
+		return InventoryItemPacket.decode(PacketSetInventoryItemPoints.builder(), buffer).points(buffer.readDouble()).build();
 	}
 
 }

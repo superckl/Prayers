@@ -16,8 +16,8 @@ public class DefaultPlayerPrayerUser extends PlayerPrayerUser{
 	@Getter
 	private int prayerLevel;
 	@Getter
-	private float maxPointsBoost;
-	private float maxPoints;
+	private double maxPointsBoost;
+	private double maxPoints;
 	private float xp;
 
 	private final Set<IRegistryDelegate<Prayer>> unlockedPrayers = Sets.newHashSet();
@@ -31,12 +31,12 @@ public class DefaultPlayerPrayerUser extends PlayerPrayerUser{
 	}
 
 	@Override
-	public float getMaxPrayerPoints() {
+	public double getMaxPrayerPoints() {
 		return this.maxPoints;
 	}
 
 	@Override
-	public float addMaxPointsBoost(final float boost) {
+	public double addMaxPointsBoost(final double boost) {
 		this.maxPointsBoost += boost;
 		if(this.maxPointsBoost < 0)
 			this.maxPointsBoost = 0;
@@ -45,7 +45,7 @@ public class DefaultPlayerPrayerUser extends PlayerPrayerUser{
 	}
 
 	@Override
-	public float setMaxPointsBoost(final float boost) {
+	public double setMaxPointsBoost(final double boost) {
 		if(boost < 0)
 			this.maxPointsBoost = 0;
 		else
@@ -64,7 +64,7 @@ public class DefaultPlayerPrayerUser extends PlayerPrayerUser{
 		return this.prayerLevel;
 	}
 
-	protected float computeMaxPoints() {
+	protected double computeMaxPoints() {
 		return 10*this.prayerLevel+this.maxPointsBoost;
 	}
 

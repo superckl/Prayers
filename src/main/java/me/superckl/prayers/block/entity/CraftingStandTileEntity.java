@@ -115,10 +115,10 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 		this.findValidAltar().ifPresent(altar -> {
 			if(!this.canRecipeOutput(this.activeRecipe))
 				return; //no room to output, don't tick
-			final float reqPoints = this.activeRecipe.getPoints();
-			final float transfer = altar.getAltarType().getTransferRate();
-			final float toTransfer = Math.min(transfer, reqPoints-this.consumedPoints);
-			final float transferred = altar.removePoints(toTransfer);
+			final double reqPoints = this.activeRecipe.getPoints();
+			final double transfer = altar.getAltarType().getTransferRate();
+			final double toTransfer = Math.min(transfer, reqPoints-this.consumedPoints);
+			final double transferred = altar.removePoints(toTransfer);
 			this.consumedPoints += transferred;
 
 			for(final Direction dir:Direction.Plane.HORIZONTAL) {
