@@ -36,7 +36,7 @@ public abstract class LivingPrayerUser<T extends LivingEntity> extends TickableP
 		final Iterator<Prayer> it = this.getActivePrayers().iterator();
 		boolean removed = false;
 		while(it.hasNext())
-			removed = removed || this.deactivatePrayer(it.next());
+			removed = this.deactivatePrayer(it.next()) || removed;
 		return removed;
 	}
 
