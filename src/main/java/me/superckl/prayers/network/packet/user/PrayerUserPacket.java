@@ -3,9 +3,9 @@ package me.superckl.prayers.network.packet.user;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.LivingPrayerUser;
+import me.superckl.prayers.client.ClientHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;

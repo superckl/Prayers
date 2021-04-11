@@ -1,11 +1,11 @@
 package me.superckl.prayers.init;
 
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.init.loot.CurioLootCondition;
-import me.superckl.prayers.init.loot.PrayerActiveCondition;
-import me.superckl.prayers.init.loot.PrayerTomeLoot;
-import me.superckl.prayers.init.loot.RelicLoot;
-import me.superckl.prayers.init.loot.SpawnerCurioLoot;
+import me.superckl.prayers.loot.CurioLootCondition;
+import me.superckl.prayers.loot.PrayerActiveCondition;
+import me.superckl.prayers.loot.PrayerTomeLoot;
+import me.superckl.prayers.loot.RelicLoot;
+import me.superckl.prayers.loot.SpawnerCurioLoot;
 import net.minecraft.loot.LootConditionType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;

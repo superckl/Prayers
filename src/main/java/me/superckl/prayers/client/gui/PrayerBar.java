@@ -4,9 +4,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import lombok.AllArgsConstructor;
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
+import me.superckl.prayers.client.ClientHelper;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;

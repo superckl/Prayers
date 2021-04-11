@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.lwjgl.glfw.GLFW;
 
-import me.superckl.prayers.ClientHelper;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.inventory.ContainerSlotHelper;
 import me.superckl.prayers.inventory.MainInventorySlotHelper;

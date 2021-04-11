@@ -1,4 +1,4 @@
-package me.superckl.prayers.client;
+package me.superckl.prayers.client.render;
 
 import java.util.Random;
 
@@ -7,7 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.ClientHelper;
+import me.superckl.prayers.client.ClientHelper;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;

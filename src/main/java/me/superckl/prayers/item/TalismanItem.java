@@ -3,12 +3,13 @@ package me.superckl.prayers.item;
 import java.util.Collection;
 import java.util.List;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Config;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
+import me.superckl.prayers.client.ClientHelper;
+import me.superckl.prayers.client.ClientIdHelper;
 import me.superckl.prayers.entity.ai.WitherUsePrayersGoal;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.prayer.ActivationCondition;

@@ -1,4 +1,4 @@
-package me.superckl.prayers.client;
+package me.superckl.prayers.client.render;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -11,7 +11,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.CraftingStandBlock;
 import me.superckl.prayers.block.OfferingStandBlock;
@@ -20,6 +19,7 @@ import me.superckl.prayers.block.entity.CraftingStandTileEntity;
 import me.superckl.prayers.block.entity.OfferingStandTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.client.gui.PrayerBar;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModItems;

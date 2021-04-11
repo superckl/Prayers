@@ -1,4 +1,4 @@
-package me.superckl.prayers.init.loot;
+package me.superckl.prayers.loot;
 
 import java.lang.reflect.InvocationTargetException;
 

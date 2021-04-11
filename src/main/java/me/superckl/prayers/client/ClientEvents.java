@@ -1,18 +1,19 @@
-package me.superckl.prayers;
+package me.superckl.prayers.client;
 
 import java.util.Optional;
 
+import me.superckl.prayers.AltarItem;
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.InventoryPrayerProvider;
-import me.superckl.prayers.client.AltarRenderer;
-import me.superckl.prayers.client.CraftingStandRenderer;
-import me.superckl.prayers.client.OfferingStandRenderer;
-import me.superckl.prayers.client.RenderEventHandler;
-import me.superckl.prayers.client.VesselItemColor;
 import me.superckl.prayers.client.gui.GuiEventHandler;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.client.particle.PrayerParticle;
+import me.superckl.prayers.client.render.AltarRenderer;
+import me.superckl.prayers.client.render.CraftingStandRenderer;
+import me.superckl.prayers.client.render.OfferingStandRenderer;
+import me.superckl.prayers.client.render.RenderEventHandler;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;

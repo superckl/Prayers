@@ -2,9 +2,9 @@ package me.superckl.prayers.client.input;
 
 import org.lwjgl.glfw.GLFW;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.client.gui.PrayerSelectGUI;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.inventory.PlayerInventoryHelper;

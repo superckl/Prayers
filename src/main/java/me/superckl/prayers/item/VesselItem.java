@@ -12,8 +12,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.util.ITooltipFlag;

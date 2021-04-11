@@ -3,8 +3,8 @@ package me.superckl.prayers.network.packet.inventory;
 import java.util.function.Supplier;
 
 import lombok.Getter;
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.entity.InteractableInventoryTileEntity;
+import me.superckl.prayers.client.ClientHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;

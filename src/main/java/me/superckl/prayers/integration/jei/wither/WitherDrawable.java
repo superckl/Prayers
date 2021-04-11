@@ -2,8 +2,8 @@ package me.superckl.prayers.integration.jei.wither;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import me.superckl.prayers.ClientHelper;
-import me.superckl.prayers.client.RenderHelper;
+import me.superckl.prayers.client.ClientHelper;
+import me.superckl.prayers.client.render.RenderHelper;
 import mezz.jei.api.gui.drawable.IDrawable;
 import net.minecraft.entity.boss.WitherEntity;
 

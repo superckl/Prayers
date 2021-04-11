@@ -2,8 +2,8 @@ package me.superckl.prayers.integration.jei.altar;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.init.ModBlocks;
 import mezz.jei.api.gui.drawable.IDrawable;
 import net.minecraft.block.BlockState;

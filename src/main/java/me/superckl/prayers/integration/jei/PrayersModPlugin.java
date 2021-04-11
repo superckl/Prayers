@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.integration.jei.altar.AltarCraftingRecipeCategory;
 import me.superckl.prayers.integration.jei.subtype.RelicSubtypeInterpreter;

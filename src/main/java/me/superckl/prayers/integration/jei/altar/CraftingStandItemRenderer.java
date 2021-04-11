@@ -5,10 +5,10 @@ import java.util.List;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.CraftingStandBlock;
 import me.superckl.prayers.block.entity.CraftingStandTileEntity;
-import me.superckl.prayers.client.CraftingStandRenderer;
+import me.superckl.prayers.client.ClientHelper;
+import me.superckl.prayers.client.render.CraftingStandRenderer;
 import me.superckl.prayers.init.ModBlocks;
 import mezz.jei.api.gui.ITickTimer;
 import mezz.jei.api.helpers.IGuiHelper;

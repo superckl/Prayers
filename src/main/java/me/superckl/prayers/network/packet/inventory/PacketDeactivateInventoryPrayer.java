@@ -3,8 +3,8 @@ package me.superckl.prayers.network.packet.inventory;
 import java.util.function.Supplier;
 
 import lombok.experimental.SuperBuilder;
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.item.PrayerInventoryItem;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;

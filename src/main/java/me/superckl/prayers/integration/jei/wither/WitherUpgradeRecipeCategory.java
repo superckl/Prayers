@@ -5,9 +5,9 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.client.RenderHelper;
+import me.superckl.prayers.client.ClientHelper;
+import me.superckl.prayers.client.render.RenderHelper;
 import me.superckl.prayers.integration.jei.altar.AltarCraftingRecipeCategory;
 import me.superckl.prayers.util.LangUtil;
 import mezz.jei.api.constants.VanillaTypes;

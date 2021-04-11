@@ -1,4 +1,4 @@
-package me.superckl.prayers.init.loot;
+package me.superckl.prayers.loot;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;

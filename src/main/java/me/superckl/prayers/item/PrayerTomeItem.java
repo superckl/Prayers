@@ -2,10 +2,11 @@ package me.superckl.prayers.item;
 
 import java.util.List;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
+import me.superckl.prayers.client.ClientHelper;
+import me.superckl.prayers.client.ClientIdHelper;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.prayer.Prayer;
 import me.superckl.prayers.util.LangUtil;

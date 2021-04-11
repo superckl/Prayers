@@ -15,6 +15,7 @@ import me.superckl.prayers.capability.InventoryPrayerProvider;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.TalismanPrayerProvider;
 import me.superckl.prayers.capability.TickablePrayerProvider;
+import me.superckl.prayers.client.ClientEvents;
 import me.superckl.prayers.criteria.ApplyBoonCriteria;
 import me.superckl.prayers.criteria.OwnAltarCriteriaTrigger;
 import me.superckl.prayers.criteria.PrayerLevelCriteria;

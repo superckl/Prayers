@@ -1,4 +1,4 @@
-package me.superckl.prayers;
+package me.superckl.prayers.client;
 
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;

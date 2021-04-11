@@ -1,4 +1,4 @@
-package me.superckl.prayers.client;
+package me.superckl.prayers.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 

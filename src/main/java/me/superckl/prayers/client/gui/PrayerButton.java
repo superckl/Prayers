@@ -6,10 +6,10 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.capability.PlayerPrayerUser.Result;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;

@@ -3,8 +3,8 @@ package me.superckl.prayers.network.packet;
 import java.util.function.Supplier;
 
 import lombok.RequiredArgsConstructor;
-import me.superckl.prayers.ClientHelper;
 import me.superckl.prayers.block.entity.AltarTileEntity;
+import me.superckl.prayers.client.ClientHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
