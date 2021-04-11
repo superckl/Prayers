@@ -30,6 +30,11 @@ public class MainInventorySlotHelper extends SlotHelper{
 	}
 
 	@Override
+	public boolean canModify(final PlayerEntity player) {
+		return true;
+	}
+
+	@Override
 	public void serialize(final PacketBuffer buffer) {
 		if(this.type == null) {
 			buffer.writeBoolean(false);

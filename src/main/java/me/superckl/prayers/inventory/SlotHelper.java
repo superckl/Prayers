@@ -20,7 +20,8 @@ public abstract class SlotHelper {
 	private static final Map<Class<? extends SlotHelper>, String> classes = Maps.newConcurrentMap();
 	private static final Map<String, Function<PacketBuffer, ? extends SlotHelper>> deserializers = Maps.newConcurrentMap();
 
-	public abstract Optional<ItemStack> getStack(PlayerEntity entity);
+	public abstract Optional<ItemStack> getStack(PlayerEntity player);
+	public abstract boolean canModify(PlayerEntity player);
 
 	public final void writeToBuffer(final PacketBuffer buffer) {
 		buffer.writeUtf(SlotHelper.classes.get(this.getClass()), PrayerUserPacket.BUFFER_STRING_LENGTH);

@@ -28,6 +28,14 @@ public class ContainerSlotHelper extends SlotHelper{
 	}
 
 	@Override
+	public boolean canModify(final PlayerEntity player) {
+		if(player.containerMenu.containerId != this.containerId)
+			return false;
+		final Slot slot = player.containerMenu.getSlot(this.slot);
+		return slot.mayPickup(player) && slot.mayPlace(slot.getItem());
+	}
+
+	@Override
 	public void serialize(final PacketBuffer buffer) {
 		buffer.writeVarInt(this.containerId);
 		buffer.writeVarInt(this.slot);

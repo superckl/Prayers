@@ -28,7 +28,7 @@ public class GuiEventHandler {
 		if(e.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && e.getGui() instanceof ContainerScreen<?>) {
 			final ContainerScreen<?> containerS = (ContainerScreen<?>) e.getGui();
 			final Optional<SlotHelper> helper = this.getHoveredSlot(containerS);
-			if(helper.isPresent()) {
+			if(helper.isPresent() && helper.get().canModify(ClientHelper.getPlayer())) {
 				final ItemStack stack = helper.get().getStack(ClientHelper.getPlayer()).orElseThrow(() ->
 				new IllegalStateException("Matched slot helper did not return itemstack!"));
 				if(!stack.isEmpty() && stack.getItem() == ModItems.TALISMAN.get()) {

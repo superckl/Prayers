@@ -33,7 +33,7 @@ public abstract class InventoryItemStatePacket<T extends Item> extends Inventory
 			if(entity instanceof PlayerEntity) {
 				final PlayerEntity player = (PlayerEntity) entity;
 				final Optional<ItemStack> optStack = this.getStack(supplier.get()).filter(stack -> !stack.isEmpty() && stack.getItem() == this.getItem());
-				if(!optStack.isPresent() && supplier.get().getDirection() == NetworkDirection.PLAY_TO_SERVER)
+				if((!optStack.isPresent() || !this.slot.canModify(player)) && supplier.get().getDirection() == NetworkDirection.PLAY_TO_SERVER)
 					//Notify the client (sender) that nothing actually changed by sending them the opposite state
 					PrayersPacketHandler.INSTANCE.reply(this.opposite(), supplier.get());
 				else if(optStack.isPresent()){

@@ -35,6 +35,11 @@ public class CurioSlotHelper extends SlotHelper{
 		}
 	}
 
+	@Override
+	public boolean canModify(final PlayerEntity player) {
+		return true;
+	}
+
 	public static CurioSlotHelper deserialize(final PacketBuffer buffer) {
 		return new CurioSlotHelper(new SlotContext(buffer.readUtf(PrayerUserPacket.BUFFER_STRING_LENGTH),
 				null, buffer.readVarInt()));
