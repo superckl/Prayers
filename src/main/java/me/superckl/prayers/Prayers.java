@@ -58,6 +58,8 @@ import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.ArgumentSerializer;
+import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -128,10 +130,14 @@ public class Prayers {
 			MinecraftForge.EVENT_BUS.register(new BoonEventHandler());
 			MinecraftForge.EVENT_BUS.register(ItemFrameTickManager.INSTANCE);
 			ActivationCondition.registerConditions();
+
 			this.registerPotions();
+
 			CriteriaTriggers.register(OwnAltarCriteriaTrigger.INSTANCE);
 			CriteriaTriggers.register(ApplyBoonCriteria.INSTANCE);
 			CriteriaTriggers.register(PrayerLevelCriteria.INSTANCE);
+
+			ArgumentTypes.register("boon", BoonArgument.class, new ArgumentSerializer<>(BoonArgument::new));
 		});
 		CapabilityManager.INSTANCE.register(PlayerPrayerUser.class, new PlayerPrayerUser.Storage(), () -> new DefaultPlayerPrayerUser(null));
 		CapabilityManager.INSTANCE.register(DefaultLivingPrayerUser.class, new TickablePrayerProvider.Storage<DefaultLivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));
