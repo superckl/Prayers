@@ -89,7 +89,6 @@ public class PrayerBar {
 	public static void renderMainPrayerBar(final MatrixStack stack, final MainWindow window) {
 		final int height = window.getGuiScaledHeight();
 		final int width = window.getGuiScaledWidth();
-		final int startY = height - 21 + (20 - PrayerBar.HEIGHT)/2;
 		PrayerBar.renderMainPrayerBarAt(stack, (int) (width*ClientConfig.getInstance().getWidgetX().get()), (int) (height*ClientConfig.getInstance().getWidgetY().get()));
 	}
 
