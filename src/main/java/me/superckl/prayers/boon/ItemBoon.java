@@ -1,6 +1,7 @@
 package me.superckl.prayers.boon;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -25,9 +26,11 @@ import net.minecraftforge.common.util.Constants;
 public enum ItemBoon {
 
 	ATTACK_DAMAGE(() -> Attributes.ATTACK_DAMAGE, new DamageSupplier(), ItemStackPredicates.IS_WEAPON, false,
-			EquipmentSlotType.MAINHAND, EquipmentSlotType.OFFHAND),
+			DamageSupplier.validSlots()),
 	ARMOR(() -> Attributes.ARMOR, new ArmorSupplier(), ItemStackPredicates.IS_ARMOR, false,
-			EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD),
+			ArmorSupplier.validSlots()),
+	SPEED(() -> Attributes.MOVEMENT_SPEED, new SpeedSupplier(), ItemStackPredicates.IS_ARMOR, false,
+			SpeedSupplier.validSlots()),
 	PRAYER_DRAIN(null, null, ItemStackPredicates.IS_ARMOR, true),
 	CURIOS(null, null, ItemStackPredicates.IS_WEAPON, true);
 
@@ -35,7 +38,7 @@ public enum ItemBoon {
 
 	private final boolean hasModifier;
 	private final Supplier<Attribute> attributeSupplier;
-	private final Supplier<AttributeModifier> modifierSupplier;
+	private final Function<EquipmentSlotType, AttributeModifier> modifierSupplier;
 	@Getter(AccessLevel.PRIVATE)
 	private final Predicate<ItemStack> matchingPredicate;
 	private final boolean hasTooltip;
@@ -43,7 +46,7 @@ public enum ItemBoon {
 	private IFormattableTextComponent name;
 	private IFormattableTextComponent tooltip;
 
-	ItemBoon(final Supplier<Attribute> attributeSupplier, final Supplier<AttributeModifier> supplier,
+	ItemBoon(final Supplier<Attribute> attributeSupplier, final Function<EquipmentSlotType, AttributeModifier> supplier,
 			final Predicate<ItemStack> matchingPredicate, final boolean hasTooltip, final EquipmentSlotType... equipmentSlotTypes) {
 		this.hasModifier = attributeSupplier != null;
 		this.attributeSupplier = attributeSupplier;

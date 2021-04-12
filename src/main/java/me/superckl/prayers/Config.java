@@ -81,6 +81,9 @@ public class Config {
 		builder.comment("Boon of Armor percentage bonus (default 0.5 (+50%))");
 		this.boonValues.put(ItemBoon.ARMOR, builder.defineInRange("Boon.Boon of Armor", 0.5, 0, Float.MAX_VALUE));
 
+		builder.comment("Boon of Speed percentage bonus (default 0.3 (+30%))");
+		this.boonValues.put(ItemBoon.SPEED, builder.defineInRange("Boon.Boon of Speed", 0.3, 0, Float.MAX_VALUE));
+
 		builder.comment("If true, Prayers will attempt to prevent 'cheesing' of upgraded withers by cancelling any damage from fake players (e.g., grinders)");
 		this.preventWitherCheese = builder.define("Prevent Wither Cheese", true);
 

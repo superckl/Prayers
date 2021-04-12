@@ -24,6 +24,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.WitherSkullEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -131,7 +132,7 @@ public class ItemEvents {
 		if(e.getSource().getDirectEntity() instanceof WitherSkullEntity && e.getSource().getEntity() instanceof WitherEntity)
 			RelicItem.getBoon(e.getSource().getEntity()).ifPresent(boon -> {
 				if(boon == ItemBoon.ATTACK_DAMAGE) {
-					final AttributeModifier mod = boon.getModifierSupplier().get();
+					final AttributeModifier mod = boon.getModifierSupplier().apply(EquipmentSlotType.MAINHAND);
 					switch(mod.getOperation()) {
 					case ADDITION:
 						e.setAmount((float) (e.getAmount()+mod.getAmount()));

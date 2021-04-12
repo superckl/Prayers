@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -46,7 +47,7 @@ public class RelicItem extends Item{
 		if(entity instanceof WitherEntity) {
 			if(!player.level.isClientSide && !RelicItem.isCharged(stack) && this.storeBoon(entity, stack)) {
 				if(this.type.isHasModifier())
-					entity.getAttribute(this.type.getAttributeSupplier().get()).addPermanentModifier(this.type.getModifierSupplier().get());
+					entity.getAttribute(this.type.getAttributeSupplier().get()).addPermanentModifier(this.type.getModifierSupplier().apply(EquipmentSlotType.MAINHAND));
 				final ITextComponent name = entity.hasCustomName() ? entity.getCustomName():entity.getName();
 				entity.setCustomName(new TranslationTextComponent(this.type.getNameId()+"_wither", name));
 			}
@@ -72,6 +73,7 @@ public class RelicItem extends Item{
 
 	@Override
 	public void appendHoverText(final ItemStack stack, final World level, final List<ITextComponent> tooltips, final ITooltipFlag flag) {
+		tooltips.add(this.type.getName().withStyle(TextFormatting.LIGHT_PURPLE));
 		if(RelicItem.isCharged(stack))
 			tooltips.add(new TranslationTextComponent(LangUtil.buildTextLoc("relic.apply")).withStyle(TextFormatting.GRAY));
 	}
