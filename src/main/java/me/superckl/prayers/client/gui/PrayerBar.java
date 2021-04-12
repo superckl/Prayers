@@ -3,21 +3,29 @@ package me.superckl.prayers.client.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import me.superckl.prayers.ClientConfig;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.client.ClientHelper;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PrayerBar {
 
 	public static final int HEIGHT = 16;
 
 	public final boolean leftJustified;
 	public final boolean inludeMax;
+
+	@Getter
+	@Setter
+	private boolean movable;
 
 	public void renderAt(final MatrixStack matrixStack, final int x, final int y) {
 		if(!ClientHelper.getPlayer().isAlive())
@@ -39,7 +47,7 @@ public class PrayerBar {
 		if(this.inludeMax)
 			builder.append('/').append(MathHelper.ceil(user.getMaxPrayerPoints()));
 		final String points = builder.toString();
-		final int width = 16+3+40+4+ClientHelper.getFontRenderer().width(points);
+		final int width = this.width(points);
 		final int startX = this.leftJustified ? x : x-width;
 		//We have to add (or subtract) 1 here to creates gaps of the desired size
 		final float textOffset = 8+1-(ClientHelper.getFontRenderer().lineHeight/2F-1); //Half of the texture height because font renderer takes in y for middle of text
@@ -59,6 +67,34 @@ public class PrayerBar {
 		RenderSystem.disableBlend();
 		RenderSystem.defaultBlendFunc();
 		ClientHelper.getFontRenderer().draw(matrixStack, points, startX+16+3+40+4, y+textOffset, color.getColor());
+		if(this.movable)
+			PrayerButton.drawOpenRect(matrixStack, startX-1, y-1, 1, width+2, PrayerBar.HEIGHT+2);
+	}
+
+	public int width() {
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer());
+		final StringBuilder builder= new StringBuilder().append(MathHelper.ceil(user.getCurrentPrayerPoints()));
+		if(this.inludeMax)
+			builder.append('/').append(MathHelper.ceil(user.getMaxPrayerPoints()));
+		final String points = builder.toString();
+		return this.width(points);
+	}
+
+	protected int width(final String points) {
+		return 16+3+40+4+ClientHelper.getFontRenderer().width(points);
+	}
+
+	public static final PrayerBar MAIN_BAR = new PrayerBar(true, false);
+
+	public static void renderMainPrayerBar(final MatrixStack stack, final MainWindow window) {
+		final int height = window.getGuiScaledHeight();
+		final int width = window.getGuiScaledWidth();
+		final int startY = height - 21 + (20 - PrayerBar.HEIGHT)/2;
+		PrayerBar.renderMainPrayerBarAt(stack, (int) (width*ClientConfig.getInstance().getWidgetX().get()), (int) (height*ClientConfig.getInstance().getWidgetY().get()));
+	}
+
+	public static void renderMainPrayerBarAt(final MatrixStack stack, final int x, final int y) {
+		PrayerBar.MAIN_BAR.renderAt(stack, x, y);
 	}
 
 }

@@ -3,17 +3,23 @@ package me.superckl.prayers.client.gui;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import it.unimi.dsi.fastutil.ints.IntComparators;
+import me.superckl.prayers.ClientConfig;
 import me.superckl.prayers.Prayers;
+import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.client.input.KeyBindings;
 import me.superckl.prayers.prayer.Prayer;
+import me.superckl.prayers.util.LangUtil;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class PrayerSelectGUI extends Screen{
@@ -26,6 +32,12 @@ public class PrayerSelectGUI extends Screen{
 	protected int guiTop;
 
 	protected PrayerBar prayerBar = new PrayerBar(true, true);
+
+	private boolean moving = false;
+	private double barX = -1;
+	private double barY = -1;
+	private double relX;
+	private double relY;
 
 	public PrayerSelectGUI() {
 		super(new StringTextComponent("Prayers"));
@@ -61,6 +73,13 @@ public class PrayerSelectGUI extends Screen{
 				x = startX;
 			}
 		}
+		PrayerBar.MAIN_BAR.setMovable(true);
+	}
+
+	@Override
+	public void onClose() {
+		PrayerBar.MAIN_BAR.setMovable(false);
+		super.onClose();
 	}
 
 	@Override
@@ -75,6 +94,12 @@ public class PrayerSelectGUI extends Screen{
 		this.blit(matrixStack, scrollBarX, scrollBarY, textureU, 0, 7, 9);
 		this.prayerBar.renderAt(matrixStack, this.guiLeft+5, this.guiTop+4);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		if(this.barX != -1 && this.barY != -1)
+			PrayerBar.renderMainPrayerBarAt(matrixStack, (int) this.barX, (int) this.barY);
+		else
+			PrayerBar.renderMainPrayerBar(matrixStack, ClientHelper.getWindow());
+		if(this.isInBar(mouseX, mouseY) && !this.moving)
+			this.renderTooltip(matrixStack, new TranslationTextComponent(LangUtil.buildTextLoc("prayer_bar.move")), mouseX, mouseY);
 	}
 
 	@Override
@@ -86,8 +111,53 @@ public class PrayerSelectGUI extends Screen{
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
+	@Override
+	public boolean mouseClicked(final double mouseX, final double mouseY, final int mouseButton) {
+		if(this.isInBar(mouseX, mouseY) && mouseButton == GLFW.GLFW_MOUSE_BUTTON_1) {
+			this.barX = (int) (this.width*ClientConfig.getInstance().getWidgetX().get());
+			this.barY = (int) (this.height*ClientConfig.getInstance().getWidgetY().get());
+			this.relX = this.barX - mouseX;
+			this.relY = this.barY - mouseY;
+			this.moving = true;
+			return true;
+		}
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	public boolean mouseDragged(final double newX, final double newY, final int button, final double deltaX, final double deltaY) {
+		if(this.moving && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+			this.barX = newX+this.relX;
+			this.barY = newY+this.relY;
+			return true;
+		}
+		return super.mouseDragged(newX, newY, button, deltaX, deltaY);
+	}
+
+	@Override
+	public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
+		if(this.moving && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+			ClientConfig.getInstance().getWidgetX().set(this.barX/this.width);
+			ClientConfig.getInstance().getWidgetY().set(this.barY/this.height);
+			ClientConfig.getInstance().getWidgetX().save();
+			ClientConfig.getInstance().getWidgetY().save();
+			this.barX = this.barY = -1;
+			this.moving = false;
+			return true;
+		}
+		return super.mouseReleased(mouseX, mouseY, button);
+	}
+
 	private boolean needsScrollBars() {
 		return this.buttons.size() > 6*4;
+	}
+
+	public boolean isInBar(final double mouseX, final double mouseY) {
+		final int barX = (int) (this.width*ClientConfig.getInstance().getWidgetX().get());
+		final int barY = (int) (this.height*ClientConfig.getInstance().getWidgetY().get());
+		final double relX = barX - mouseX;
+		final double relY = barY - mouseY;
+		return -relX >= 0 && -relX < PrayerBar.MAIN_BAR.width() && -relY >=0 && -relY < PrayerBar.HEIGHT;
 	}
 
 }

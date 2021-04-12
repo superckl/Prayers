@@ -106,6 +106,7 @@ public class Prayers {
 		bus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializer);
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientEvents::register);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.setup());
+		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.setup());
 
 		ModBlocks.REGISTER.register(bus);
 		ModItems.REGISTER.register(bus);

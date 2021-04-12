@@ -85,6 +85,7 @@
   "text.prayers.jei.wither_upgrade.wither_drop": "Upgraded wither drops upgraded item",
   "text.prayers.block.place_altar": "Place on a valid altar",
   "text.prayers.block.view_place": "Crouch to preview placement",
+  "text.prayers.prayer_bar.move": "Click and drag to reposition",
   "argument.boon.not_exist": "Boon does not exist",
   "prayer.prayers.effective": "Effective",
   "prayer.prayers.potent": "Potent",

@@ -21,6 +21,7 @@ import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.client.ClientHelper;
 import me.superckl.prayers.client.gui.PrayerBar;
+import me.superckl.prayers.client.gui.PrayerSelectGUI;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.prayer.Prayer;
@@ -63,18 +64,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class RenderEventHandler {
 
-	private final PrayerBar widget = new PrayerBar(true, false);
-
 	//This event renders the player's prayer points and overlays from looking at blocks
 	@SubscribeEvent
 	public void onRenderOverlay(final RenderGameOverlayEvent.Post e) {
 		//Render after all HUD elements have been rendered
 		final PlayerPrayerUser user = ClientHelper.getPlayer().isAlive() ? CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()):null;
-		if (e.getType() == ElementType.ALL && user != null && user.isUnlocked()) {
-			final int height = e.getWindow().getGuiScaledHeight();
-			final int startY = height - 21 + (20 - PrayerBar.HEIGHT)/2;
-			this.widget.renderAt(e.getMatrixStack(), 8, startY);
-		}
+		if (e.getType() == ElementType.ALL && !(ClientHelper.getScreen() instanceof PrayerSelectGUI) && user != null && user.isUnlocked())
+			PrayerBar.renderMainPrayerBar(e.getMatrixStack(), e.getWindow());
 		if(ClientHelper.getPlayer().isCrouching() && ClientHelper.getRayTrace().getType() == RayTraceResult.Type.BLOCK) {
 			final BlockPos hit = ((BlockRayTraceResult) ClientHelper.getRayTrace()).getBlockPos();
 			final Block hitBlock = ClientHelper.getLevel().getBlockState(hit).getBlock();
