@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.superckl.prayers.Config;
 import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.init.ModBlocks;
@@ -48,14 +49,26 @@ public class AltarBlock extends FourWayShapedBlock{
 	@RequiredArgsConstructor
 	@Getter
 	public enum AltarTypes{
-		SANDSTONE(100, 1F/72000F, 2/20F, 2),
-		GILDED_SANDSTONE(1000, 1F/48000F, 10/20F, 4),
-		MARBLE(100000, 1F/24000F, 100/20F, 5);
 
-		private final float maxPoints;
-		private final float rechargeRate;
-		private final float transferRate;
-		private final int maxConnected;
+		SANDSTONE,
+		GILDED_SANDSTONE,
+		MARBLE;
+
+		public int getMaxConnected() {
+			return Config.getInstance().getAltarConnected().get(this).get();
+		}
+
+		public double getMaxPoints() {
+			return Config.getInstance().getAltarPoints().get(this).get();
+		}
+
+		public double getRechargeRate() {
+			return Config.getInstance().getAltarRecharge().get(this).get();
+		}
+
+		public double getTransferRate() {
+			return Config.getInstance().getAltarTransfer().get(this).get();
+		}
 
 	}
 

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
+import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.item.decree.DecreeItem;
 import me.superckl.prayers.item.decree.DecreeItem.Type;
@@ -41,12 +42,20 @@ public class Config {
 	private final Map<ItemBoon, DoubleValue> boonValues = new EnumMap<>(ItemBoon.class);
 	private final BooleanValue preventWitherCheese;
 
+	//Talisman & Reliquary
 	private final DoubleValue talimsanPoints;
 	private final DoubleValue talismanLossFactor;
 	private final DoubleValue reliquaryPoints;
 	private final DoubleValue reliquaryLossFactor;
 
+	//Altars
+	private final Map<AltarTypes, DoubleValue> altarPoints = new EnumMap<>(AltarTypes.class);
+	private final Map<AltarTypes, DoubleValue> altarRecharge = new EnumMap<>(AltarTypes.class);
+	private final Map<AltarTypes, DoubleValue> altarTransfer = new EnumMap<>(AltarTypes.class);
+	private final Map<AltarTypes, IntValue> altarConnected = new EnumMap<>(AltarTypes.class);
+
 	private Config(final ForgeConfigSpec.Builder builder) {
+		//Prayers
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
 		final String[] comment = new String[prayerLocs.size()+1];
 		comment[0] = "List of prayer resource locations to disable. Defaults prayers are ";
@@ -55,6 +64,7 @@ public class Config {
 		builder.comment(comment);
 		this.prayers = builder.define("Prayers", Lists.newArrayList());
 
+		//Decrees
 		builder.comment("Radius, in blocks, of the decree of fertility. (default 9)");
 		this.decreeRanges.put(Type.FERTILITY, builder.defineInRange("Decree.Decree of Fertility Range", 9, 0, Integer.MAX_VALUE));
 		builder.comment("This controls how often the decree of fertility will apply bonemeal to crops within its radius. (default .0003125)",
@@ -75,6 +85,7 @@ public class Config {
 		builder.comment("Radius, in chunks, of the decree of persistence. (default 2)");
 		this.decreeRanges.put(Type.PERSISTENCE, builder.defineInRange("Decree.Decree of Persistence Range", 2, 0, Integer.MAX_VALUE));
 
+		//Boons
 		builder.comment("Boon of Damage percentage bonus (default 0.5 (+50%))");
 		this.boonValues.put(ItemBoon.ATTACK_DAMAGE, builder.defineInRange("Boon.Boon of Damage", 0.5, 0, Float.MAX_VALUE));
 
@@ -84,9 +95,11 @@ public class Config {
 		builder.comment("Boon of Speed percentage bonus (default 0.3 (+30%))");
 		this.boonValues.put(ItemBoon.SPEED, builder.defineInRange("Boon.Boon of Speed", 0.3, 0, Float.MAX_VALUE));
 
+		//Wither Cheese
 		builder.comment("If true, Prayers will attempt to prevent 'cheesing' of upgraded withers by cancelling any damage from fake players (e.g., grinders)");
 		this.preventWitherCheese = builder.define("Prevent Wither Cheese", true);
 
+		//Talisman and Reliquary
 		builder.comment("Maximum points that can be stored in a talisman (default 200)");
 		this.talimsanPoints = builder.defineInRange("Items.Talisman Points", 200, 0, Double.MAX_VALUE);
 
@@ -98,6 +111,43 @@ public class Config {
 
 		builder.comment("Loss factor for recharging reliquary. Applied inversely (default 2, so 1-1/2 -> 50% loss)");
 		this.reliquaryLossFactor = builder.defineInRange("Items.Talisman Loss", 2, 1, Double.MAX_VALUE);
+
+		//Altars
+		builder.comment("Base points stored by this altar type. (default 100)");
+		this.altarPoints.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Points", 100, 0, Double.MAX_VALUE));
+
+		builder.comment("Base points stored by this altar type. (default 1000)");
+		this.altarPoints.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Points", 1000, 0, Double.MAX_VALUE));
+
+		builder.comment("Base points stored by this altar type. (default 100000)");
+		this.altarPoints.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Points", 100000, 0, Double.MAX_VALUE));
+
+		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/72000)");
+		this.altarRecharge.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Recharge", 1D/72000D, 0, Double.MAX_VALUE));
+
+		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/48000)");
+		this.altarRecharge.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Recharge", 1D/48000D, 0, Double.MAX_VALUE));
+
+		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/24000)");
+		this.altarRecharge.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Recharge", 1D/24000D, 0, Double.MAX_VALUE));
+
+		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 1/10)");
+		this.altarTransfer.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Transfer", 2D/20D, 0, Double.MAX_VALUE));
+
+		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 1/2)");
+		this.altarTransfer.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Transfer", 10D/20D, 0, Double.MAX_VALUE));
+
+		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 5)");
+		this.altarTransfer.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Transfer", 100D/20D, 0, Double.MAX_VALUE));
+
+		builder.comment("Maximum number of connected altars for this altar type.(default 2)");
+		this.altarConnected.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Connected", 2, 0, Integer.MAX_VALUE));
+
+		builder.comment("Maximum number of connected altars for this altar type.(default 4)");
+		this.altarConnected.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Connected", 4, 0, Integer.MAX_VALUE));
+
+		builder.comment("Maximum number of connected altars for this altar type.(default 5)");
+		this.altarConnected.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Connected", 5, 0, Integer.MAX_VALUE));
 	}
 
 	public static ForgeConfigSpec setup() {
