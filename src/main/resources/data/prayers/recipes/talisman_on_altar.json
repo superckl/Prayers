@@ -1,7 +1,7 @@
 {
   "type": "prayers:altar_crafting",
   "group": "blessing",
-  "points": 4000,
+  "points": 1500,
   "ingredients": [
     {
       "item": "minecraft:diamond"

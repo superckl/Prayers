@@ -100,45 +100,45 @@ public class Config {
 		this.preventWitherCheese = builder.define("Prevent Wither Cheese", true);
 
 		//Talisman and Reliquary
-		builder.comment("Maximum points that can be stored in a talisman (default 200)");
-		this.talimsanPoints = builder.defineInRange("Items.Talisman Points", 200, 0, Double.MAX_VALUE);
+		builder.comment("Maximum points that can be stored in a talisman (default 300)");
+		this.talimsanPoints = builder.defineInRange("Items.Talisman Points", 300, 0, Double.MAX_VALUE);
 
-		builder.comment("Loss factor for recharging talisman. Applied inversely (default 10, so 1-1/5 -> 80% loss)");
+		builder.comment("Loss factor for recharging talisman. Applied inversely (default 5, so 1-1/5 -> 80% loss)");
 		this.talismanLossFactor = builder.defineInRange("Items.Talisman Loss", 5, 1, Double.MAX_VALUE);
 
-		builder.comment("Maximum points that can be stored in a reliquary (default 500)");
-		this.reliquaryPoints = builder.defineInRange("Items.Reliquary Points", 600, 0, Double.MAX_VALUE);
+		builder.comment("Maximum points that can be stored in a reliquary (default 1000)");
+		this.reliquaryPoints = builder.defineInRange("Items.Reliquary Points", 1000, 0, Double.MAX_VALUE);
 
-		builder.comment("Loss factor for recharging reliquary. Applied inversely (default 2, so 1-1/2 -> 50% loss)");
-		this.reliquaryLossFactor = builder.defineInRange("Items.Talisman Loss", 2, 1, Double.MAX_VALUE);
+		builder.comment("Loss factor for recharging reliquary. Applied inversely (default 2.5, so 1-1/2.5 -> 60% loss)");
+		this.reliquaryLossFactor = builder.defineInRange("Items.Talisman Loss", 2.5, 1, Double.MAX_VALUE);
 
 		//Altars
 		builder.comment("Base points stored by this altar type. (default 100)");
 		this.altarPoints.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Points", 100, 0, Double.MAX_VALUE));
 
-		builder.comment("Base points stored by this altar type. (default 1000)");
-		this.altarPoints.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Points", 1000, 0, Double.MAX_VALUE));
+		builder.comment("Base points stored by this altar type. (default 500)");
+		this.altarPoints.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Points", 500, 0, Double.MAX_VALUE));
 
-		builder.comment("Base points stored by this altar type. (default 100000)");
-		this.altarPoints.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Points", 100000, 0, Double.MAX_VALUE));
+		builder.comment("Base points stored by this altar type. (default 3000)");
+		this.altarPoints.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Points", 3000, 0, Double.MAX_VALUE));
 
-		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/72000)");
-		this.altarRecharge.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Recharge", 1D/72000D, 0, Double.MAX_VALUE));
+		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/24000, one day)");
+		this.altarRecharge.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Recharge", 1D/24000D, 0, Double.MAX_VALUE));
 
-		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/48000)");
-		this.altarRecharge.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Recharge", 1D/48000D, 0, Double.MAX_VALUE));
+		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/36000)");
+		this.altarRecharge.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Recharge", 1D/36000D, 0, Double.MAX_VALUE));
 
-		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/24000)");
-		this.altarRecharge.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Recharge", 1D/24000D, 0, Double.MAX_VALUE));
+		builder.comment("Recharge rate of this altar type. Applied per tick multiplied by the max points. (default 1/48000, two days)");
+		this.altarRecharge.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Recharge", 1D/48000D, 0, Double.MAX_VALUE));
 
 		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 1/10)");
 		this.altarTransfer.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Transfer", 2D/20D, 0, Double.MAX_VALUE));
 
-		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 1/2)");
-		this.altarTransfer.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Transfer", 10D/20D, 0, Double.MAX_VALUE));
+		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 3/10)");
+		this.altarTransfer.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Transfer", 6D/20D, 0, Double.MAX_VALUE));
 
-		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 5)");
-		this.altarTransfer.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Transfer", 100D/20D, 0, Double.MAX_VALUE));
+		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 1.5)");
+		this.altarTransfer.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Transfer", 30D/20D, 0, Double.MAX_VALUE));
 
 		builder.comment("Maximum number of connected altars for this altar type.(default 2)");
 		this.altarConnected.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Connected", 2, 0, Integer.MAX_VALUE));

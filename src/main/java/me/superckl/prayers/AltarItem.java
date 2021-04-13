@@ -19,13 +19,19 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 
 	public static DeferredRegister<AltarItem> REGISTER = DeferredRegister.create(AltarItem.class, Prayers.MOD_ID);
 
-	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(0.5F).sacrificeTicks(30)
-			.offerPoints(1).offerTicks(40).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.BONE)))::build);
+	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(0.5F).sacrificeTicks(20)
+			.offerPoints(1.5F).offerTicks(10).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.BONE)))::build);
 
-	public static RegistryObject<AltarItem> GILDED_BONE = AltarItem.REGISTER.register("gilded_bone", AltarItem.builder().sacrificeXP(10).sacrificeTicks(50)
-			.offerPoints(70).offerTicks(100).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONE::get)))::build);
+	public static RegistryObject<AltarItem> GILDED_BONE = AltarItem.REGISTER.register("gilded_bone", AltarItem.builder().sacrificeXP(10).sacrificeTicks(40)
+			.offerPoints(80).offerTicks(200).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONE::get)))::build);
 
-	public static RegistryObject<AltarItem> RELIC = AltarItem.REGISTER.register("relic", AltarItem.builder().sacrificeXP(300).sacrificeTicks(200)
+	public static RegistryObject<AltarItem> ROTTEN_FLESH = AltarItem.REGISTER.register("rotten_flesh", AltarItem.builder().sacrificeXP(0).sacrificeTicks(0)
+			.offerPoints(0.5F).offerTicks(5).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.ROTTEN_FLESH)))::build);
+
+	public static RegistryObject<AltarItem> GOLDEN_APPLE = AltarItem.REGISTER.register("golden_apple", AltarItem.builder().sacrificeXP(0).sacrificeTicks(0)
+			.offerPoints(50).offerTicks(200).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.GOLDEN_APPLE)))::build);
+
+	public static RegistryObject<AltarItem> RELIC = AltarItem.REGISTER.register("relic", AltarItem.builder().sacrificeXP(300).sacrificeTicks(100)
 			.offerPoints(0).offerTicks(0).matcher(stack -> {
 				for(final RegistryObject<RelicItem> items:ModItems.RELICS.values())
 					if(items.get() == stack.getItem() && !RelicItem.isCharged(stack))

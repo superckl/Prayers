@@ -1,7 +1,7 @@
 {
   "type": "prayers:altar_crafting",
   "group": "blessing",
-  "points": 5000,
+  "points": 2000,
   "ingredients": [
     {
       "item": "minecraft:totem_of_undying"
