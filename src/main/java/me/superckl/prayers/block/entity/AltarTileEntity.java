@@ -49,6 +49,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -58,6 +59,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	public static String ALTAR_KEY = "altar_data";
 	public static String VALID_KEY = "valid_multiblock";
 	public static String OWNER_KEY = "owner";
+	public static String OWNER_NAME_KEY = "owner_name";
 	public static String HAS_OWNER_KEY = "has_owner";
 	public static String CONNECTED_KEY = "connected";
 	public static String MAX_POINTS_KEY = "max_points";
@@ -72,6 +74,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	private final AltarTypes altarType;
 	private boolean validMultiblock = false;
 	private UUID owner;
+	private String ownerName;
 	private Set<BlockPos> connected = ImmutableSet.of();
 	private double maxPoints = 0;
 	private double currentPoints = 0;
@@ -444,6 +447,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		altarNBT.putBoolean(AltarTileEntity.VALID_KEY, this.validMultiblock);
 		if(this.owner != null)
 			altarNBT.putUUID(AltarTileEntity.OWNER_KEY, this.owner);
+		if(this.ownerName != null)
+			altarNBT.putString(AltarTileEntity.OWNER_NAME_KEY, this.ownerName);
 		altarNBT.putDouble(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
 		altarNBT.putDouble(AltarTileEntity.MAX_POINTS_KEY, this.maxPoints);
 		if(!this.altarItem.isEmpty()) {
@@ -477,6 +482,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		}
 		if(altarNBT.contains(AltarTileEntity.OWNER_KEY))
 			this.owner = altarNBT.getUUID(AltarTileEntity.OWNER_KEY);
+		if(altarNBT.contains(AltarTileEntity.OWNER_NAME_KEY))
+			this.ownerName = altarNBT.getString(AltarTileEntity.OWNER_NAME_KEY);
 		final ListNBT connectedList = altarNBT.getList(AltarTileEntity.CONNECTED_KEY, Constants.NBT.TAG_INT_ARRAY);
 		final Set<BlockPos> connected = Sets.newHashSet();
 		connectedList.stream().map(inbt -> ((IntArrayNBT) inbt).getAsIntArray()).forEach(array -> connected.add(new BlockPos(array[0], array[1], array[2])));
@@ -500,8 +507,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			return null;
 		final CompoundNBT nbt = new CompoundNBT();
 		nbt.putBoolean(AltarTileEntity.HAS_OWNER_KEY, this.owner != null);
-		if(this.owner!= null)
-			nbt.putUUID(AltarTileEntity.OWNER_KEY, this.owner);
+		if(this.owner != null)
+			nbt.putString(AltarTileEntity.OWNER_NAME_KEY, UsernameCache.containsUUID(this.owner) ? UsernameCache.getLastKnownUsername(this.owner):"Unknown");
 		nbt.putDouble(AltarTileEntity.CURRENT_POINTS_KEY, this.currentPoints);
 		return new SUpdateTileEntityPacket(this.worldPosition, -1, nbt);
 	}
@@ -512,9 +519,9 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			return;
 		final CompoundNBT nbt = pkt.getTag();
 		if(nbt.getBoolean(AltarTileEntity.HAS_OWNER_KEY))
-			this.owner = nbt.getUUID(AltarTileEntity.OWNER_KEY);
+			this.ownerName = nbt.getString(AltarTileEntity.OWNER_NAME_KEY);
 		else
-			this.owner = null;
+			this.ownerName = null;
 		this.currentPoints = nbt.getDouble(AltarTileEntity.CURRENT_POINTS_KEY);
 	}
 
