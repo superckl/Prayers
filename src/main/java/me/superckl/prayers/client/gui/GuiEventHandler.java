@@ -48,6 +48,8 @@ public class GuiEventHandler {
 
 	private Optional<SlotHelper> getHoveredSlot(final ContainerScreen<?> container){
 		final Slot slot = container.getSlotUnderMouse();
+		if(slot == null)
+			return Optional.empty();
 		if(container instanceof CreativeScreen && slot.container == ClientHelper.getPlayer().inventory)
 			return Optional.of(new MainInventorySlotHelper(slot.getSlotIndex()));
 		if(slot.mayPickup(ClientHelper.getPlayer()) && slot.mayPlace(slot.getItem()))
