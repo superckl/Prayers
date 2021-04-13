@@ -59,7 +59,6 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class RenderEventHandler {
@@ -81,7 +80,7 @@ public class RenderEventHandler {
 				final double max = altar.getMaxPoints();
 				final List<String> toWrite = Lists.newArrayList();
 				toWrite.add("Valid: "+altar.isValidMultiblock());
-				toWrite.add("Owner: "+(altar.getOwner() == null ? "None":UsernameCache.getLastKnownUsername(altar.getOwner())));
+				toWrite.add("Owner: "+(altar.getOwnerName() == null ? "None":altar.getOwnerName()));
 				toWrite.add("Points: "+String.format("%.2f/%.2f", current, max));
 				final int height = ClientHelper.getWindow().getGuiScaledHeight();
 				final int width = ClientHelper.getWindow().getGuiScaledWidth();
@@ -184,6 +183,8 @@ public class RenderEventHandler {
 
 	@SuppressWarnings("deprecation")
 	public <T extends LivingEntity> void renderOverheadPrayers(final T entity, final ActiveRenderInfo camera, final MatrixStack matrix, final int light, final float partialTicks) {
+		if(!entity.isAlive())
+			return;
 		final Collection<Prayer> prayers = CapabilityHandler.getPrayerCapability(entity).getActivePrayers();
 		prayers.removeIf(prayer -> !prayer.isOverhead());
 		if(prayers.isEmpty())
