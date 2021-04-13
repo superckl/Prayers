@@ -9,14 +9,14 @@ displayName="Prayers"
 authors="superckl"
 description="Adds (nostalgic) prayers to Minecraft."
 
-[[dependencies.biometweaker]]
+[[dependencies.prayers]]
     modId="forge"
     mandatory=true
     versionRange="${forge_version}"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.biometweaker]]
+[[dependencies.prayers]]
     modId="minecraft"
     mandatory=true
     versionRange="${minecraft_version}"
