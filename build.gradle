@@ -64,7 +64,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                biometweaker {
+                archivesBaseName {
                     source sourceSets.main
                 }
             }
@@ -77,7 +77,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                biometweaker {
+                archivesBaseName {
                     source sourceSets.main
                 }
             }
@@ -90,10 +90,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'prayers', '--all', '--output', file('src/generated/resources/')
+            args '--mod', archivesBaseName, '--all', '--output', file('src/generated/resources/')
 
             mods {
-                biometweaker {
+                archivesBaseName {
                     source sourceSets.main
                 }
             }
