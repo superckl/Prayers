@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import me.superckl.prayers.boon.BoonEventHandler;
+import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.DefaultLivingPrayerUser;
 import me.superckl.prayers.capability.DefaultPlayerPrayerUser;
@@ -52,15 +53,12 @@ import me.superckl.prayers.prayer.ActivationCondition;
 import me.superckl.prayers.prayer.Prayer;
 import me.superckl.prayers.recipe.FullVesselIngredient;
 import me.superckl.prayers.recipe.PotionIngredient;
-import me.superckl.prayers.server.BoonArgument;
 import me.superckl.prayers.server.CommandBoon;
 import me.superckl.prayers.server.CommandSet;
 import me.superckl.prayers.world.AltarsSavedData;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.ArgumentSerializer;
-import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -89,6 +87,7 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.server.command.EnumArgument;
 
 @Mod(Prayers.MOD_ID)
 public class Prayers {
@@ -138,8 +137,6 @@ public class Prayers {
 			CriteriaTriggers.register(OwnAltarCriteriaTrigger.INSTANCE);
 			CriteriaTriggers.register(ApplyBoonCriteria.INSTANCE);
 			CriteriaTriggers.register(PrayerLevelCriteria.INSTANCE);
-
-			ArgumentTypes.register("boon", BoonArgument.class, new ArgumentSerializer<>(BoonArgument::new));
 		});
 		CapabilityManager.INSTANCE.register(PlayerPrayerUser.class, new PlayerPrayerUser.Storage(), () -> new DefaultPlayerPrayerUser(null));
 		CapabilityManager.INSTANCE.register(DefaultLivingPrayerUser.class, new TickablePrayerProvider.Storage<DefaultLivingPrayerUser>(), () -> new DefaultLivingPrayerUser(null, 0));
@@ -216,7 +213,7 @@ public class Prayers {
 										.then(Commands.argument("targets", EntityArgument.players()).then(Commands.argument("level", IntegerArgumentType.integer(1))
 												.suggests(simpleNumberEx).executes(CommandSet::prayerLevel)))))
 				.then(Commands.literal("boon").then(Commands.argument("targets", EntityArgument.entities())
-						.then(Commands.argument("boon", new BoonArgument()).executes(CommandBoon::applyBoon))));
+						.then(Commands.argument("boon", EnumArgument.enumArgument(ItemBoon.class)).executes(CommandBoon::applyBoon))));
 
 		e.getDispatcher().register(root);
 	}
