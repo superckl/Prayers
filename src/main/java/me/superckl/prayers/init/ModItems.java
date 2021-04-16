@@ -13,6 +13,7 @@ import me.superckl.prayers.item.RelicItem;
 import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.item.TalismanItem;
 import me.superckl.prayers.item.VesselItem;
+import me.superckl.prayers.item.WaferItem;
 import me.superckl.prayers.item.decree.DecreeItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -58,6 +59,7 @@ public class ModItems {
 	public static final RegistryObject<TalismanItem> TALISMAN = ModItems.REGISTER.register("talisman", TalismanItem::new);
 	public static final RegistryObject<DivineTotemItem> DIVINE_TOTEM = ModItems.REGISTER.register("divine_totem", DivineTotemItem::new);
 	public static final RegistryObject<ReliquaryItem> RELIQUARY = ModItems.REGISTER.register("reliquary", ReliquaryItem::new);
+	public static final RegistryObject<WaferItem> WAFER = ModItems.REGISTER.register("wafer", WaferItem::new);
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())

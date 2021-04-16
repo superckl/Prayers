@@ -1,0 +1,13 @@
+{
+  "type": "prayers:altar_crafting",
+  "group": "blessing",
+  "points": 10,
+  "ingredients": [
+    {
+      "item": "minecraft:wheat"
+    }
+  ],
+  "result": {
+    "item": "prayers:wafer"
+  }
+}
