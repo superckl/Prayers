@@ -66,9 +66,10 @@ public class RenderEventHandler {
 	//This event renders the player's prayer points and overlays from looking at blocks
 	@SubscribeEvent
 	public void onRenderOverlay(final RenderGameOverlayEvent.Post e) {
-		//Render after all HUD elements have been rendered
+		if(e.getType() != ElementType.ALL)
+			return; //Render after all HUD elements have been rendered
 		final PlayerPrayerUser user = ClientHelper.getPlayer().isAlive() ? CapabilityHandler.getPrayerCapability(ClientHelper.getPlayer()):null;
-		if (e.getType() == ElementType.ALL && !(ClientHelper.getScreen() instanceof PrayerSelectGUI) && user != null && user.isUnlocked())
+		if (!(ClientHelper.getScreen() instanceof PrayerSelectGUI) && user != null && user.isUnlocked())
 			PrayerBar.renderMainPrayerBar(e.getMatrixStack(), e.getWindow());
 		if(ClientHelper.getPlayer().isCrouching() && ClientHelper.getRayTrace().getType() == RayTraceResult.Type.BLOCK) {
 			final BlockPos hit = ((BlockRayTraceResult) ClientHelper.getRayTrace()).getBlockPos();
