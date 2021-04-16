@@ -67,6 +67,16 @@ public class ReliquaryItem extends PrayerInventoryItem<ReliquaryPrayerProvider>{
 	public boolean isFoil(final ItemStack stack) {
 		return ReliquaryItem.isActive(stack);
 	}
+	
+	@Override
+	public boolean hasContainerItem(ItemStack stack) {
+		return true;
+	}
+	
+	@Override
+	public ItemStack getContainerItem(ItemStack itemStack) {
+		return itemStack.copy();
+	}
 
 	public static boolean applyState(final ItemStack stack, final TalismanItem.State state) {
 		final boolean isActive = ReliquaryItem.isActive(stack);
