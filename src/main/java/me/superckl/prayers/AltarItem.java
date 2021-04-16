@@ -19,13 +19,13 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 
 	public static DeferredRegister<AltarItem> REGISTER = DeferredRegister.create(AltarItem.class, Prayers.MOD_ID);
 
-	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(0.5F).sacrificeTicks(20)
+	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(1).sacrificeTicks(20)
 			.offerPoints(1.5F).offerTicks(10).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.BONE)))::build);
 
 	public static RegistryObject<AltarItem> GILDED_BONE = AltarItem.REGISTER.register("gilded_bone", AltarItem.builder().sacrificeXP(10).sacrificeTicks(40)
 			.offerPoints(80).offerTicks(200).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONE::get)))::build);
 
-	public static RegistryObject<AltarItem> ROTTEN_FLESH = AltarItem.REGISTER.register("rotten_flesh", AltarItem.builder().sacrificeXP(0).sacrificeTicks(0)
+	public static RegistryObject<AltarItem> ROTTEN_FLESH = AltarItem.REGISTER.register("rotten_flesh", AltarItem.builder().sacrificeXP(0.5F).sacrificeTicks(10)
 			.offerPoints(0.5F).offerTicks(5).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.ROTTEN_FLESH)))::build);
 
 	public static RegistryObject<AltarItem> GOLDEN_APPLE = AltarItem.REGISTER.register("golden_apple", AltarItem.builder().sacrificeXP(0).sacrificeTicks(0)
