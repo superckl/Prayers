@@ -50,9 +50,9 @@ public class PrayerBar {
 		final int width = this.width(points);
 		final int startX = this.leftJustified ? x : x-width;
 		//We have to add (or subtract) 1 here to creates gaps of the desired size
-		final float textOffset = 8+1-(ClientHelper.getFontRenderer().lineHeight/2F-1); //Half of the texture height because font renderer takes in y for middle of text
+		final float textOffset = 8-(ClientHelper.getFontRenderer().lineHeight/2F-1); //Half of the texture height because font renderer takes in y for middle of text
 		//This is 2+1 to create a gap of size 2
-		final int barOffset = 3;
+		final int barOffset = 2;
 
 		final double prayerPercentage = Math.min(user.getCurrentPrayerPoints()/user.getMaxPrayerPoints(), 1F);
 		final int barWidth = (int) Math.round(prayerPercentage*40);
@@ -60,10 +60,10 @@ public class PrayerBar {
 		//Bind texture and render text and icon
 		ClientHelper.getTextureManager().bind(PrayerSelectGUI.PRAYER_GUI_TEXTURE);
 		RenderSystem.enableBlend();
-		AbstractGui.blit(matrixStack, startX, y, 0, 140, 16, 16, 256, 256);
+		AbstractGui.blit(matrixStack, startX, y, 0, 167, 16, 16, 256, 256);
 		//Render the last two extra columns of the on with semi-transparency?
-		AbstractGui.blit(matrixStack, startX+16+3+barWidth, y+barOffset, barWidth, 116, 40-barWidth, 12, 256, 256);
-		AbstractGui.blit(matrixStack, startX+16+3, y+barOffset, 0, 116+12, barWidth, 12, 256, 256);
+		AbstractGui.blit(matrixStack, startX+16+3+barWidth, y+barOffset, barWidth, 143, 40-barWidth, 12, 256, 256);
+		AbstractGui.blit(matrixStack, startX+16+3, y+barOffset, 0, 143+12, barWidth, 12, 256, 256);
 		RenderSystem.disableBlend();
 		RenderSystem.defaultBlendFunc();
 		ClientHelper.getFontRenderer().draw(matrixStack, points, startX+16+3+40+4, y+textOffset, color.getColor());
