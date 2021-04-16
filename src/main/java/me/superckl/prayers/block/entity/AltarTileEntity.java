@@ -203,8 +203,14 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	 * @return If the owner was changed
 	 */
 	public boolean setOwner(UUID owner, final boolean propogate) {
-		if(owner != null && (!this.validMultiblock || this.owner != null && owner.equals(this.owner)))
-			return false;
+		if(owner != null) {
+			if(!this.validMultiblock)
+				return false; //Can't set owner of an invalid multiblock
+			else if(this.owner != null)
+				return false; //This altar is valid and already has an owner
+		}
+		if(this.owner != null && this.owner.equals(owner))
+			return false; //This altar is already owned by this person.
 		if(!this.level.isClientSide) {
 			final AltarsSavedData savedData = AltarsSavedData.get((ServerWorld) this.level);
 			if(owner == null && this.owner != null)
