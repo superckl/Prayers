@@ -2,7 +2,6 @@ package me.superckl.prayers.effects;
 
 import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.effects.entity.EntitySpecificEffect;
 import me.superckl.prayers.effects.entity.MovementSpeed;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
@@ -22,7 +21,7 @@ public class MovementSpeedEffect extends PrayerEffect{
 
 	@Override
 	public IFormattableTextComponent getDescription() {
-		return new TranslationTextComponent(Util.makeDescriptionId("prayer_effect", new ResourceLocation(Prayers.MOD_ID, "dig_speed")), this.modifier);
+		return new TranslationTextComponent(Util.makeDescriptionId("prayer_effect", new ResourceLocation(Prayers.MOD_ID, "movement_speed")), Math.round(this.modifier*100));
 	}
 
 	@Override
@@ -31,7 +30,7 @@ public class MovementSpeedEffect extends PrayerEffect{
 	}
 
 	@Override
-	public EntitySpecificEffect<?> attachTo(final LivingEntity entity) {
+	public MovementSpeed attachTo(final LivingEntity entity) {
 		return new MovementSpeed(entity, this.modifier);
 	}
 

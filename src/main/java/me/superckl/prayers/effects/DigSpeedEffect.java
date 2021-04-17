@@ -28,7 +28,7 @@ public class DigSpeedEffect extends PrayerEffect{
 
 	@Override
 	public IFormattableTextComponent getDescription() {
-		return new TranslationTextComponent(Util.makeDescriptionId("prayer_effect", new ResourceLocation(Prayers.MOD_ID, "dig_speed")), MathHelper.floor(this.modifier*100));
+		return new TranslationTextComponent(Util.makeDescriptionId("prayer_effect", new ResourceLocation(Prayers.MOD_ID, "dig_speed")), Math.round(this.modifier*100));
 	}
 
 }
