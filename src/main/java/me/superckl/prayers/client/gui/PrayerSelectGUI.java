@@ -22,7 +22,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class PrayerSelectGUI extends Screen{
 
@@ -59,6 +58,7 @@ public class PrayerSelectGUI extends Screen{
 
 	private void setupButtons() {
 		this.buttons.clear();
+		this.children.clear();
 
 		final int spacing = 4;
 		final int numCols = 6;
@@ -70,8 +70,7 @@ public class PrayerSelectGUI extends Screen{
 		int j = 0;
 		int i = 0;
 
-		final Iterator<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues().stream()
-				.filter(prayer -> prayer.isEnabled() && prayer.isIn(PrayerSelectGUI.SELECTED_GROUP))
+		final Iterator<Prayer> prayers = Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP)
 				.sorted((p1, p2) -> IntComparators.NATURAL_COMPARATOR.compare(p1.getLevel(), p2.getLevel())).iterator();
 		while(prayers.hasNext()) {
 			final Prayer prayer  = prayers.next();
@@ -209,7 +208,7 @@ public class PrayerSelectGUI extends Screen{
 	}
 
 	private boolean needsScrollBars() {
-		return this.buttons.size() > 6*4;
+		return Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP).count() > 6*4;
 	}
 
 	public boolean isInBar(final double mouseX, final double mouseY) {

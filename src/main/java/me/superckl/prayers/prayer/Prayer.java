@@ -3,6 +3,7 @@ package me.superckl.prayers.prayer;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 
@@ -20,6 +21,7 @@ import me.superckl.prayers.effects.DamageEffect.DamageType;
 import me.superckl.prayers.effects.DigSpeedEffect;
 import me.superckl.prayers.effects.FireProtEffect;
 import me.superckl.prayers.effects.FlightEffect;
+import me.superckl.prayers.effects.MovementSpeedEffect;
 import me.superckl.prayers.effects.PoisonProtEffect;
 import me.superckl.prayers.effects.PrayerEffect;
 import me.superckl.prayers.effects.TemptAnimalEffect;
@@ -36,6 +38,7 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -124,6 +127,16 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/digspeed3.png")).group(Group.UTILITY)
 			.effect(() -> new DigSpeedEffect(1.5F)).exclusionType("dig_speed")::build);
 
+	public static final RegistryObject<Prayer> MOVEMENT_SPEED_1 = Prayer.REGISTER.register("movement_speed_1", Prayer.builder().drain(0.1F).level(1)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/movementspeed1.png")).group(Group.UTILITY)
+			.effect(() -> new MovementSpeedEffect(0.2F)).exclusionType("movement_speed")::build);
+	public static final RegistryObject<Prayer> MOVEMENT_SPEED_2 = Prayer.REGISTER.register("movement_speed_2", Prayer.builder().drain(0.4F).level(10)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/movementspeed2.png")).group(Group.UTILITY)
+			.effect(() -> new MovementSpeedEffect(0.4F)).exclusionType("movement_speed")::build);
+	public static final RegistryObject<Prayer> MOVEMENT_SPEED_3 = Prayer.REGISTER.register("movement_speed_3", Prayer.builder().drain(1.5F).level(30)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/movementspeed3.png")).group(Group.UTILITY)
+			.effect(() -> new MovementSpeedEffect(0.6F)).exclusionType("movement_speed")::build);
+
 	private final float drain;
 	private final int level;
 	private final List<PrayerEffect> effects;
@@ -207,6 +220,13 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 
 	public static List<ResourceLocation> defaultLocations(){
 		return Prayer.defaultObjects().stream().map(RegistryObject::getId).collect(Collectors.toList());
+	}
+
+	public static Stream<Prayer> allForGroup(final Group group){
+		Stream<Prayer> stream =  GameRegistry.findRegistry(Prayer.class).getValues().stream().filter(Prayer::isEnabled);
+		if(group != Group.ALL)
+			stream = stream.filter(prayer -> group == Group.ALL || prayer.group == group);
+		return stream;
 	}
 
 	/*
