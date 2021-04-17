@@ -180,9 +180,7 @@ public class PrayerSelectGUI extends Screen{
 			return true;
 		}
 		if(this.isInScrollBar(mouseX, mouseY)) {
-			final int scrollBarX = this.guiLeft+134;
 			final int scrollBarY = this.guiTop+52+Math.round((84-9)*this.scrollBar);
-			double scrollBarRelX = scrollBarX - mouseX;
 			this.scrollBarRelY = scrollBarY - mouseY;
 			this.scrolling = true;
 			return true;
