@@ -103,6 +103,8 @@ public abstract class TickablePrayerProvider<T> {
 	protected double modifyDrain(final double drain) {return drain;}
 
 	public double addPoints(final double points) {
+		if(this.getCurrentPrayerPoints() >= this.getMaxPrayerPoints())
+			return 0;
 		final double toAdd = Math.min(points, this.getMaxPrayerPoints()-this.getCurrentPrayerPoints());
 		this.setCurrentPrayerPoints(this.getCurrentPrayerPoints()+toAdd);
 		return toAdd;
