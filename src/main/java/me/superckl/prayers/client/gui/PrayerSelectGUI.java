@@ -1,6 +1,7 @@
 package me.superckl.prayers.client.gui;
 
-import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -28,6 +29,8 @@ public class PrayerSelectGUI extends Screen{
 	public static ResourceLocation PRAYER_GUI_TEXTURE = new ResourceLocation(Prayers.MOD_ID, "textures/gui/select_gui.png");
 
 	private static Group SELECTED_GROUP = Group.ALL;
+	private static int NUM_ROWS = 4;
+	private static int NUM_COLS = 6;
 
 	protected int xSize = 147;
 	protected int ySize = 143;
@@ -36,11 +39,15 @@ public class PrayerSelectGUI extends Screen{
 
 	protected PrayerBar prayerBar = new PrayerBar(true, true);
 
-	private boolean moving = false;
-	private double barX = -1;
-	private double barY = -1;
-	private double relX;
-	private double relY;
+	private boolean movingPrayerBar = false;
+	private double prayerBarX = -1;
+	private double prayerBarY = -1;
+	private double prayerBarRelX;
+	private double prayerBarRelY;
+
+	private float scrollBar;
+	private boolean scrolling;
+	private double scrollBarRelY;
 
 	public PrayerSelectGUI() {
 		super(new StringTextComponent("Prayers"));
@@ -61,30 +68,30 @@ public class PrayerSelectGUI extends Screen{
 		this.children.clear();
 
 		final int spacing = 4;
-		final int numCols = 6;
-		final int numRows = 4;
 		final int startX = this.guiLeft+9;
 
 		int y = this.guiTop+56;
 		int x = startX;
 		int j = 0;
-		int i = 0;
 
-		final Iterator<Prayer> prayers = Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP)
-				.sorted((p1, p2) -> IntComparators.NATURAL_COMPARATOR.compare(p1.getLevel(), p2.getLevel())).iterator();
-		while(prayers.hasNext()) {
-			final Prayer prayer  = prayers.next();
+		List<Prayer> prayers = Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP)
+				.sorted((p1, p2) -> IntComparators.NATURAL_COMPARATOR.compare(p1.getLevel(), p2.getLevel()))
+				.collect(Collectors.toList());
+
+		final int toSkip = Math.round((this.getTotalRows()-PrayerSelectGUI.NUM_ROWS)*this.scrollBar);
+		final int startIndex = PrayerSelectGUI.NUM_COLS*toSkip;
+		final int endIndex = Math.min(prayers.size(), startIndex+PrayerSelectGUI.NUM_COLS*PrayerSelectGUI.NUM_ROWS);
+		prayers = prayers.subList(startIndex, endIndex);
+
+		for(final Prayer prayer:prayers) {
 			final Button prayerButton = new PrayerButton(prayer, x, y, 16, 16);
 			this.addButton(prayerButton);
 			x += 16+spacing;
 			j++;
-			if (j == numCols) {
+			if (j == PrayerSelectGUI.NUM_COLS) {
 				j = 0;
 				y += 20;
 				x = startX;
-				i++;
-				if(i == numRows)
-					break;
 			}
 		}
 	}
@@ -102,17 +109,17 @@ public class PrayerSelectGUI extends Screen{
 		RenderSystem.enableDepthTest();
 		this.blit(matrixStack, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 		final int scrollBarX = this.guiLeft+134;
-		final int scrollBarY = this.guiTop+52;
+		final int scrollBarY = this.guiTop+52+Math.round((84-9)*this.scrollBar);
 		final int textureU = this.needsScrollBars() ? 154:147;
 		this.blit(matrixStack, scrollBarX, scrollBarY, textureU, 0, 7, 9);
 		this.prayerBar.renderAt(matrixStack, this.guiLeft+5, this.guiTop+4);
 		this.renderTabs(matrixStack, mouseX, mouseY);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		if(this.barX != -1 && this.barY != -1)
-			PrayerBar.renderMainPrayerBarAt(matrixStack, (int) this.barX, (int) this.barY);
+		if(this.prayerBarX != -1 && this.prayerBarY != -1)
+			PrayerBar.renderMainPrayerBarAt(matrixStack, (int) this.prayerBarX, (int) this.prayerBarY);
 		else
 			PrayerBar.renderMainPrayerBar(matrixStack, ClientHelper.getWindow());
-		if(this.isInBar(mouseX, mouseY) && !this.moving)
+		if(this.isInPrayerBar(mouseX, mouseY) && !this.movingPrayerBar)
 			this.renderTooltip(matrixStack, new TranslationTextComponent(LangUtil.buildTextLoc("prayer_bar.move")), mouseX, mouseY);
 	}
 
@@ -134,10 +141,21 @@ public class PrayerSelectGUI extends Screen{
 				ClientHelper.getItemRenderer().renderGuiItemDecorations(ClientHelper.getFontRenderer(), stack, x+6, y+7);
 			}else
 				this.blit(matrixStack, x+6, y+7, 0, 168, 16, 16);
-			if(!this.moving && mouseX >= x && mouseX < x+width && mouseY >= y && mouseY < y+25)
+			if(!this.movingPrayerBar && mouseX >= x && mouseX < x+width && mouseY >= y && mouseY < y+25)
 				this.renderTooltip(matrixStack, group.getName(), mouseX, mouseY);
 			x += width;
 		}
+	}
+
+	@Override
+	public boolean mouseScrolled(final double mouseX, final double mouseY, final double scroll) {
+		if(!this.needsScrollBars())
+			return false;
+		final int numRows = this.getTotalRows();
+		this.scrollBar = (float) ((this.scrollBar-scroll)/(numRows-4));
+		this.scrollBar = MathHelper.clamp(this.scrollBar, 0, 1);
+		this.setupButtons();
+		return true;
 	}
 
 	@Override
@@ -151,12 +169,22 @@ public class PrayerSelectGUI extends Screen{
 
 	@Override
 	public boolean mouseClicked(final double mouseX, final double mouseY, final int mouseButton) {
-		if(this.isInBar(mouseX, mouseY) && mouseButton == GLFW.GLFW_MOUSE_BUTTON_1) {
-			this.barX = (int) (this.width*ClientConfig.getInstance().getWidgetX().get());
-			this.barY = (int) (this.height*ClientConfig.getInstance().getWidgetY().get());
-			this.relX = this.barX - mouseX;
-			this.relY = this.barY - mouseY;
-			this.moving = true;
+		if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_1)
+			return super.mouseClicked(mouseX, mouseY, mouseButton);
+		if(this.isInPrayerBar(mouseX, mouseY)) {
+			this.prayerBarX = (int) (this.width*ClientConfig.getInstance().getWidgetX().get());
+			this.prayerBarY = (int) (this.height*ClientConfig.getInstance().getWidgetY().get());
+			this.prayerBarRelX = this.prayerBarX - mouseX;
+			this.prayerBarRelY = this.prayerBarY - mouseY;
+			this.movingPrayerBar = true;
+			return true;
+		}
+		if(this.isInScrollBar(mouseX, mouseY)) {
+			final int scrollBarX = this.guiLeft+134;
+			final int scrollBarY = this.guiTop+52+Math.round((84-9)*this.scrollBar);
+			double scrollBarRelX = scrollBarX - mouseX;
+			this.scrollBarRelY = scrollBarY - mouseY;
+			this.scrolling = true;
 			return true;
 		}
 		return super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -164,9 +192,25 @@ public class PrayerSelectGUI extends Screen{
 
 	@Override
 	public boolean mouseDragged(final double newX, final double newY, final int button, final double deltaX, final double deltaY) {
-		if(this.moving && button == GLFW.GLFW_MOUSE_BUTTON_1) {
-			this.barX = newX+this.relX;
-			this.barY = newY+this.relY;
+		if(button != GLFW.GLFW_MOUSE_BUTTON_1)
+			return super.mouseDragged(newX, newY, button, deltaX, deltaY);
+		if(this.movingPrayerBar) {
+			this.prayerBarX = newX+this.prayerBarRelX;
+			this.prayerBarY = newY+this.prayerBarRelY;
+			return true;
+		}
+		if(this.scrolling) {
+			final int barMinY = this.guiTop+52;
+			final int barMaxY = barMinY+84-9;
+			final double newScrollY = MathHelper.clamp(newY+this.scrollBarRelY, barMinY, barMaxY);
+			final float prevScroll = this.scrollBar;
+			this.scrollBar = (float) ((newScrollY-barMinY)/(barMaxY-barMinY));
+
+			final int totalRows =this.getTotalRows();
+			final int toSkipBefore = Math.round((totalRows-PrayerSelectGUI.NUM_ROWS)*prevScroll);
+			final int toSkipNow = Math.round((totalRows-PrayerSelectGUI.NUM_ROWS)*this.scrollBar);
+			if(toSkipBefore != toSkipNow)
+				this.setupButtons();
 			return true;
 		}
 		return super.mouseDragged(newX, newY, button, deltaX, deltaY);
@@ -174,18 +218,25 @@ public class PrayerSelectGUI extends Screen{
 
 	@Override
 	public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
-		if(this.moving && button == GLFW.GLFW_MOUSE_BUTTON_1) {
-			ClientConfig.getInstance().getWidgetX().set(this.barX/this.width);
-			ClientConfig.getInstance().getWidgetY().set(this.barY/this.height);
+		if(button != GLFW.GLFW_MOUSE_BUTTON_1)
+			return super.mouseReleased(mouseX, mouseY, button);
+		if(this.movingPrayerBar) {
+			ClientConfig.getInstance().getWidgetX().set(this.prayerBarX/this.width);
+			ClientConfig.getInstance().getWidgetY().set(this.prayerBarY/this.height);
 			ClientConfig.getInstance().getWidgetX().save();
 			ClientConfig.getInstance().getWidgetY().save();
-			this.barX = this.barY = -1;
-			this.moving = false;
+			this.prayerBarX = this.prayerBarY = -1;
+			this.movingPrayerBar = false;
+			return true;
+		}
+		if(this.scrolling) {
+			this.scrolling = false;
 			return true;
 		}
 		final int i = this.getTabIndex(mouseX, mouseY);
 		if(i != -1) {
 			PrayerSelectGUI.SELECTED_GROUP = Group.values()[i];
+			this.scrollBar = 0;
 			this.setupButtons();
 			return true;
 		}
@@ -208,15 +259,25 @@ public class PrayerSelectGUI extends Screen{
 	}
 
 	private boolean needsScrollBars() {
-		return Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP).count() > 6*4;
+		return this.getTotalRows() > PrayerSelectGUI.NUM_ROWS;
 	}
 
-	public boolean isInBar(final double mouseX, final double mouseY) {
+	private int getTotalRows() {
+		return (int) (Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP).count()/PrayerSelectGUI.NUM_COLS)+1;
+	}
+
+	public boolean isInPrayerBar(final double mouseX, final double mouseY) {
 		final int barX = (int) (this.width*ClientConfig.getInstance().getWidgetX().get());
 		final int barY = (int) (this.height*ClientConfig.getInstance().getWidgetY().get());
 		final double relX = barX - mouseX;
 		final double relY = barY - mouseY;
 		return -relX >= 0 && -relX < PrayerBar.MAIN_BAR.width() && -relY >=0 && -relY < PrayerBar.HEIGHT;
+	}
+
+	public boolean isInScrollBar(final double mouseX, final double mouseY) {
+		final int scrollBarX = this.guiLeft+134;
+		final int scrollBarY = this.guiTop+52+Math.round((84-9)*this.scrollBar);
+		return mouseX >= scrollBarX && mouseX < scrollBarX + 7 && mouseY >= scrollBarY && mouseY < scrollBarY+9;
 	}
 
 }
