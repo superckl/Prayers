@@ -46,6 +46,7 @@ import me.superckl.prayers.network.packet.inventory.PacketTalismanState;
 import me.superckl.prayers.network.packet.user.PacketActivatePrayer;
 import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
+import me.superckl.prayers.network.packet.user.PacketSetEffects;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerLevel;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import me.superckl.prayers.network.packet.user.PacketSyncPrayerUser;
@@ -168,6 +169,8 @@ public class Prayers {
 				PacketSetInventoryItemPoints::encode, PacketSetInventoryItemPoints::decode, PacketSetInventoryItemPoints::handle);
 		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketDeactivateInventoryPrayer.class,
 				PacketDeactivateInventoryPrayer::encode, PacketDeactivateInventoryPrayer::decode, PacketDeactivateInventoryPrayer::handle);
+		PrayersPacketHandler.INSTANCE.registerMessage(pIndex++, PacketSetEffects.class,
+				PacketSetEffects::encode, PacketSetEffects::decode, PacketSetEffects::handle);
 
 		SlotHelper.registerHelper("main_inventory", MainInventorySlotHelper.class, MainInventorySlotHelper::deserialize);
 		SlotHelper.registerHelper("current_container", ContainerSlotHelper.class, ContainerSlotHelper::deserialize);

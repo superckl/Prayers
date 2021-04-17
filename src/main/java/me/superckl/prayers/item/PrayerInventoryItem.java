@@ -84,6 +84,12 @@ public abstract class PrayerInventoryItem<T extends InventoryPrayerProvider> ext
 	}
 
 	@Override
+	public boolean onDroppedByPlayer(final ItemStack item, final PlayerEntity player) {
+		CapabilityHandler.getPrayerCapability(item).dropped(player);
+		return true;
+	}
+
+	@Override
 	public CompoundNBT getShareTag(final ItemStack stack) {
 		CompoundNBT nbt = super.getShareTag(stack);
 		if(nbt == null)

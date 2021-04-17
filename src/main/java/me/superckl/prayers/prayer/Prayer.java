@@ -1,13 +1,11 @@
 package me.superckl.prayers.prayer;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,11 +17,13 @@ import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
 import me.superckl.prayers.effects.DamageEffect;
 import me.superckl.prayers.effects.DamageEffect.DamageType;
+import me.superckl.prayers.effects.DigSpeedEffect;
 import me.superckl.prayers.effects.FireProtEffect;
 import me.superckl.prayers.effects.FlightEffect;
 import me.superckl.prayers.effects.PoisonProtEffect;
 import me.superckl.prayers.effects.PrayerEffect;
 import me.superckl.prayers.effects.TemptAnimalEffect;
+import me.superckl.prayers.effects.entity.EntitySpecificEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -112,16 +112,21 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public static final RegistryObject<Prayer> ARK = Prayer.REGISTER.register("ark", Prayer.builder().drain(1F).level(15).group(Group.UTILITY)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/ark.png")).effect(TemptAnimalEffect::new)::build);
 	public static final RegistryObject<Prayer> FLIGHT = Prayer.REGISTER.register("flight", Prayer.builder().drain(10F).level(99).group(Group.UTILITY)
-			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/flight.png")).onActivate(PrayerActivationEffects::onActivateFlight)
-			.onDeactivate(PrayerActivationEffects::onDeactivateFlight).effect(FlightEffect::new).requiresTome(true)::build);
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/flight.png")).effect(FlightEffect::new).requiresTome(true)::build);
+
+	public static final RegistryObject<Prayer> DIG_SPEED_1 = Prayer.REGISTER.register("dig_speed_1", Prayer.builder().drain(0.12F).level(1)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/digspeed1.png")).group(Group.UTILITY)
+			.effect(() -> new DigSpeedEffect(.2F)).exclusionType("dig_speed")::build);
+	public static final RegistryObject<Prayer> DIG_SPEED_2 = Prayer.REGISTER.register("dig_speed_2", Prayer.builder().drain(0.5F).level(13)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/digspeed2.png")).group(Group.UTILITY)
+			.effect(() -> new DigSpeedEffect(.75F)).exclusionType("dig_speed")::build);
+	public static final RegistryObject<Prayer> DIG_SPEED_3 = Prayer.REGISTER.register("dig_speed_3", Prayer.builder().drain(2F).level(38)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/digspeed3.png")).group(Group.UTILITY)
+			.effect(() -> new DigSpeedEffect(1.5F)).exclusionType("dig_speed")::build);
 
 	private final float drain;
 	private final int level;
 	private final List<PrayerEffect> effects;
-	@Getter(AccessLevel.PRIVATE)
-	private final Consumer<LivingEntity> onActivate;
-	@Getter(AccessLevel.PRIVATE)
-	private final Consumer<LivingEntity> onDeactivate;
 	private final List<String> exclusionTypes;
 	private final boolean requiresTome;
 	private final boolean overhead;
@@ -135,8 +140,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	//We require a supplier for effects so that a new instance can be created every time the prayer is built.
 	@Builder
 	private Prayer(final float drain, final int level, @Singular final List<Supplier<PrayerEffect>> effects, @Singular final List<String> exclusionTypes,
-			Consumer<LivingEntity> onActivate, Consumer<LivingEntity> onDeactivate, final boolean requiresTome, final boolean overhead, Group group,
-			@NonNull final ResourceLocation texture) {
+			final boolean requiresTome, final boolean overhead, Group group,@NonNull final ResourceLocation texture) {
 		this.drain = drain;
 		this.level = level;
 		this.texture = texture;
@@ -146,19 +150,13 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 		if(group == null)
 			group = Group.ALL;
 		this.group = group;
-		if(onActivate == null)
-			onActivate = entity -> {};
-			if(onDeactivate == null)
-				onDeactivate = entity -> {};
-				this.onActivate = onActivate;
-				this.onDeactivate = onDeactivate;
 
-				this.effects = effects.stream().map(Supplier::get).collect(Collectors.toList());
-				this.effects.forEach(effect -> {
-					effect.setOwner(this);
-					if(effect.hasListener())
-						MinecraftForge.EVENT_BUS.register(effect);
-				});
+		this.effects = effects.stream().map(Supplier::get).collect(Collectors.toList());
+		this.effects.forEach(effect -> {
+			effect.setOwner(this);
+			if(effect.hasListener())
+				MinecraftForge.EVENT_BUS.register(effect);
+		});
 	}
 
 	public IFormattableTextComponent getName() {
@@ -184,12 +182,9 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 		return !user.isUnlocked() || this.requiresTome && !user.isUnlocked(this) || user.getPrayerLevel() < this.getLevel();
 	}
 
-	public void onActivate(final LivingEntity e) {
-		this.onActivate.accept(e);
-	}
-
-	public void onDeactivate(final LivingEntity e) {
-		this.onDeactivate.accept(e);
+	public List<EntitySpecificEffect<?>> attachEffects(final LivingEntity entity){
+		return this.effects.stream().filter(effect -> effect.canAttachTo(entity))
+				.map(effect -> effect.attachTo(entity)).collect(Collectors.toList());
 	}
 
 	public boolean isIn(final Group group) {
@@ -213,6 +208,12 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public static List<ResourceLocation> defaultLocations(){
 		return Prayer.defaultObjects().stream().map(RegistryObject::getId).collect(Collectors.toList());
 	}
+
+	/*
+	@Override
+	public int hashCode() {
+		return this.delegate.hashCode();
+	}*/
 
 	@RequiredArgsConstructor
 	public enum Group {

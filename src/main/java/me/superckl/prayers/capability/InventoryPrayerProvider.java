@@ -80,18 +80,18 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 
 	public boolean deactivatePrayer(final Prayer prayer, final PlayerEntity player) {
 		if(super.deactivatePrayer(prayer)) {
-			prayer.onDeactivate(player);
+			final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
+			user.itemDeactivated(prayer);
 			return true;
 		}
 		return false;
 	}
 
 	public boolean activatePrayer(final Prayer prayer, final PlayerEntity player) {
-		if(this.canActivatePrayer(player, prayer)) {
-			final boolean deactivated = CapabilityHandler.getPrayerCapability(player).deactivatePrayer(prayer);
-			super.activatePrayer(prayer);
-			if(deactivated)
-				prayer.onActivate(player);
+		if(this.canActivatePrayer(player, prayer) && super.activatePrayer(prayer)) {
+			final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
+			user.deactivatePrayer(prayer);
+			user.itemActivated(prayer);
 			return true;
 		}
 		return false;
@@ -99,11 +99,21 @@ public abstract class InventoryPrayerProvider extends TickablePrayerProvider<Ite
 
 	public boolean togglePrayer(final Prayer prayer, final PlayerEntity player) {
 		if (this.isPrayerActive(prayer))
-			return this.deactivatePrayer(prayer);
+			return this.deactivatePrayer(prayer, player);
 		return this.activatePrayer(prayer, player);
 	}
 
 	@Override
 	public void tick() {}
+
+	public void dropped(final PlayerEntity player) {
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
+		this.getActivePrayers().forEach(prayer -> user.itemDeactivated(prayer));
+	}
+
+	public void pickedUp(final PlayerEntity player) {
+		final PlayerPrayerUser user = CapabilityHandler.getPrayerCapability(player);
+		this.getActivePrayers().forEach(prayer -> user.itemActivated(prayer));
+	}
 
 }

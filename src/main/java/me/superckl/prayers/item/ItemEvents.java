@@ -3,6 +3,7 @@ package me.superckl.prayers.item;
 import me.superckl.prayers.Config;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.boon.ItemBoon;
+import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.criteria.ApplyBoonCriteria;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.inventory.PlayerInventoryHelper;
@@ -124,6 +125,12 @@ public class ItemEvents {
 				}
 			}
 		}
+	}
+
+	@SubscribeEvent
+	public void onItemPickup(final PlayerEvent.ItemPickupEvent e) {
+		if(e.getStack().getItem() instanceof PrayerInventoryItem<?>)
+			CapabilityHandler.getPrayerCapability(e.getStack()).pickedUp(e.getPlayer());
 	}
 
 	//We have to add boon damage manually since wither skulls don't check for damage modifiers on their source

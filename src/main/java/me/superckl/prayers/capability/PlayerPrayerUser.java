@@ -21,6 +21,7 @@ import me.superckl.prayers.item.ReliquaryItem;
 import me.superckl.prayers.network.packet.PrayersPacketHandler;
 import me.superckl.prayers.network.packet.user.PacketDeactivateAllPrayers;
 import me.superckl.prayers.network.packet.user.PacketDeactivatePrayer;
+import me.superckl.prayers.network.packet.user.PacketSetEffects;
 import me.superckl.prayers.network.packet.user.PacketSetPrayerPoints;
 import me.superckl.prayers.prayer.Prayer;
 import me.superckl.prayers.util.MathUtil;
@@ -45,6 +46,8 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	@Getter
 	@Setter
 	protected boolean unlocked;
+	private int updateCounter;
+	private Set<Prayer> activeItemCache;
 
 	public PlayerPrayerUser(final PlayerEntity ref) {
 		this(ref, true);
@@ -127,6 +130,13 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 
 	public abstract Collection<Prayer> getUnlockedPrayers();
 
+	@Override
+	public void tick() {
+		if(this.activeItemCache == null || this.updateCounter++ >= 20)
+			this.updateItemCache();
+		super.tick();
+	}
+
 	public void computeLevel() {
 		float xp = this.getXP();
 		while(xp >= this.xpForLevel()) {
@@ -208,18 +218,15 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 	}
 
 	public boolean hasActiveItem(final Prayer prayer) {
-		final Iterator<ItemStack> it = PlayerInventoryHelper.allItems(this.ref);
-		while(it.hasNext()) {
-			final ItemStack stack = it.next();
-			if(stack.isEmpty() || !(stack.getItem() instanceof PrayerInventoryItem))
-				continue;
-			if(CapabilityHandler.getPrayerCapability(stack).isPrayerActive(prayer))
-				return true;
-		}
-		return false;
+		//The client doesn't do ticking, so we have to iterate the inventory every time
+		if(this.ref.level.isClientSide)
+			return this.getActiveItems().contains(prayer);
+		if(this.activeItemCache == null)
+			this.updateItemCache();
+		return this.activeItemCache.contains(prayer);
 	}
 
-	public Set<Prayer> getActiveItems(){
+	protected Set<Prayer> getActiveItems(){
 		final Set<Prayer> active = Sets.newHashSet();
 		final Iterator<ItemStack> it = PlayerInventoryHelper.allItems(this.ref);
 		while(it.hasNext()) {
@@ -230,6 +237,45 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 		}
 		active.removeIf(prayer -> !this.canUseItemPrayer(prayer));
 		return active;
+	}
+
+	protected void updateItemCache() {
+		this.updateCounter = 0;
+		final Set<Prayer> previous = this.activeItemCache == null ? Sets.newHashSet():this.activeItemCache;
+		this.activeItemCache = this.getActiveItems();
+		//Only do this logic on server side
+		if(!this.ref.level.isClientSide && previous.size() != this.activeItemCache.size()) {
+			//Uh-oh, we're missing some information due to an item appearing/disappearing
+			//We'll have to do some work to establish the correct effects state
+			final Set<Prayer> missingItems = Sets.difference(previous, this.activeItemCache);
+			final Set<Prayer> newItems = Sets.difference(this.activeItemCache, previous);
+			missingItems.forEach(this::itemDeactivated);
+			newItems.forEach(this::itemActivated);
+		}
+	}
+
+	public void itemActivated(final Prayer prayer) {
+		if(this.activeItemCache == null)
+			this.updateItemCache();
+		this.activeItemCache.add(prayer);
+		this.attachEffects(prayer);
+		//This is one place where desync is possible since ticking only happens on server.
+		//Thus, we need to update the client.
+		if(!this.ref.level.isClientSide)
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this.ref),
+					PacketSetEffects.builder().entityID(this.ref.getId()).prayer(prayer).attach(true).build());
+	}
+
+	public void itemDeactivated(final Prayer prayer) {
+		if(this.activeItemCache == null)
+			this.updateItemCache();
+		this.activeItemCache.remove(prayer);
+		this.detachEffects(prayer);
+		//This is one place where desync is possible since ticking only happens on server.
+		//Thus, we need to update the client.
+		if(!this.ref.level.isClientSide)
+			PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this.ref),
+					PacketSetEffects.builder().entityID(this.ref.getId()).prayer(prayer).attach(false).build());
 	}
 
 	public static class Storage implements Capability.IStorage<PlayerPrayerUser>{

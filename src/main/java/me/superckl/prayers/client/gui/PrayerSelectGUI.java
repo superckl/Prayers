@@ -62,11 +62,13 @@ public class PrayerSelectGUI extends Screen{
 
 		final int spacing = 4;
 		final int numCols = 6;
+		final int numRows = 4;
 		final int startX = this.guiLeft+9;
 
 		int y = this.guiTop+56;
 		int x = startX;
 		int j = 0;
+		int i = 0;
 
 		final Iterator<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues().stream()
 				.filter(prayer -> prayer.isEnabled() && prayer.isIn(PrayerSelectGUI.SELECTED_GROUP))
@@ -81,6 +83,9 @@ public class PrayerSelectGUI extends Screen{
 				j = 0;
 				y += 20;
 				x = startX;
+				i++;
+				if(i == numRows)
+					break;
 			}
 		}
 	}
@@ -183,6 +188,7 @@ public class PrayerSelectGUI extends Screen{
 		if(i != -1) {
 			PrayerSelectGUI.SELECTED_GROUP = Group.values()[i];
 			this.setupButtons();
+			return true;
 		}
 		return super.mouseReleased(mouseX, mouseY, button);
 	}

@@ -1,7 +1,9 @@
 package me.superckl.prayers.effects;
 
 import lombok.Getter;
+import me.superckl.prayers.effects.entity.EntitySpecificEffect;
 import me.superckl.prayers.prayer.Prayer;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.text.IFormattableTextComponent;
 
 public abstract class PrayerEffect{
@@ -15,7 +17,9 @@ public abstract class PrayerEffect{
 		this.owner = owner;
 	}
 
-	public abstract boolean hasListener();
+	public boolean hasListener() {return false;}
+	public boolean canAttachTo(final LivingEntity entity) {return false;}
+	public EntitySpecificEffect<?> attachTo(final LivingEntity entity) {return EntitySpecificEffect.NONE;}
 
 	public abstract IFormattableTextComponent getDescription();
 
