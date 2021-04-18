@@ -137,7 +137,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	public static final RegistryObject<Prayer> MOVEMENT_SPEED_3 = Prayer.REGISTER.register("movement_speed_3", Prayer.builder().drain(1.5F).level(30)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/movementspeed3.png")).group(Group.UTILITY)
 			.effect(() -> new MovementSpeedEffect(0.6F)).exclusionType("movement_speed")::build);
-	
+
 	public static final RegistryObject<Prayer> GLOWING = Prayer.REGISTER.register("glowing", Prayer.builder().drain(.05F).level(2)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/glowing.png")).group(Group.UTILITY).effect(GlowingEffect::new)::build);
 

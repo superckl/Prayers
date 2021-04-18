@@ -7,7 +7,7 @@ public class Glowing extends EntitySpecificEffect<LivingEntity>{
 	public Glowing(final LivingEntity entity) {
 		super(entity);
 	}
-	
+
 	@Override
 	public void onActivate() {
 		this.entity.setGlowing(true);
@@ -17,5 +17,5 @@ public class Glowing extends EntitySpecificEffect<LivingEntity>{
 	public void onDeactivate() {
 		this.entity.setGlowing(false);
 	}
-	
+
 }

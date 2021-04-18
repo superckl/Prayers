@@ -54,6 +54,9 @@ public class Config {
 	private final Map<AltarTypes, DoubleValue> altarTransfer = new EnumMap<>(AltarTypes.class);
 	private final Map<AltarTypes, IntValue> altarConnected = new EnumMap<>(AltarTypes.class);
 
+	//Grenade
+	private final IntValue grenadeTime;
+
 	private Config(final ForgeConfigSpec.Builder builder) {
 		//Prayers
 		final List<String> prayerLocs = Prayer.defaultLocations().stream().map(ResourceLocation::toString).collect(Collectors.toList());
@@ -148,6 +151,10 @@ public class Config {
 
 		builder.comment("Maximum number of connected altars for this altar type.(default 5)");
 		this.altarConnected.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Connected", 5, 0, Integer.MAX_VALUE));
+
+		//Grenade
+		builder.comment("Time, in ticks, for grenade to explode.");
+		this.grenadeTime = builder.defineInRange("Grenade.Time", 80, 1, Integer.MAX_VALUE);
 	}
 
 	public static ForgeConfigSpec setup() {

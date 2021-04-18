@@ -23,6 +23,7 @@ import me.superckl.prayers.criteria.PrayerLevelCriteria;
 import me.superckl.prayers.entity.ai.EntityEventHandler;
 import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModEffects;
+import me.superckl.prayers.init.ModEntities;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModLoot;
 import me.superckl.prayers.init.ModParticles;
@@ -118,6 +119,7 @@ public class Prayers {
 		Prayer.REGISTER.register(bus);
 		AltarItem.REGISTER.register(bus);
 		ModLoot.REGISTER.register(bus);
+		ModEntities.REGISTER.register(bus);
 		ModLoot.registerConditions();
 
 		Prayers.hasCurios = ModList.get().isLoaded("curios");

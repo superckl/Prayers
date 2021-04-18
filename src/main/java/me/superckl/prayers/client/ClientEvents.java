@@ -14,10 +14,12 @@ import me.superckl.prayers.client.render.AltarRenderer;
 import me.superckl.prayers.client.render.CraftingStandRenderer;
 import me.superckl.prayers.client.render.OfferingStandRenderer;
 import me.superckl.prayers.client.render.RenderEventHandler;
+import me.superckl.prayers.init.ModEntities;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.init.ModParticles;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.LangUtil;
+import net.minecraft.client.renderer.entity.SpriteRenderer;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.ResourceLocation;
@@ -30,6 +32,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -69,6 +72,7 @@ public class ClientEvents {
 		ModTiles.ALTARS.values().forEach(tileTypeObj -> ClientRegistry.bindTileEntityRenderer(tileTypeObj.get(), AltarRenderer::new));
 		ClientRegistry.bindTileEntityRenderer(ModTiles.OFFERING_STAND.get(), OfferingStandRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(ModTiles.CRAFTING_STAND.get(), CraftingStandRenderer::new);
+		RenderingRegistry.registerEntityRenderingHandler(ModEntities.GRENADE.get(), manager -> new SpriteRenderer<>(manager, ClientHelper.getItemRenderer()));
 	}
 
 	private static void registerParticleFactory(final ParticleFactoryRegisterEvent e) {

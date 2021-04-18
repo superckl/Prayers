@@ -5,6 +5,7 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.criteria.ApplyBoonCriteria;
+import me.superckl.prayers.entity.GrenadeEntity;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.inventory.PlayerInventoryHelper;
 import me.superckl.prayers.item.decree.DecreeData;
@@ -22,6 +23,8 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.passive.RabbitEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.WitherSkullEntity;
@@ -156,12 +159,16 @@ public class ItemEvents {
 	}
 
 	//Cancel any damage from fake players to upgraded withers to prevent cheesing
+	//Also cancel damage to non-monster entities from grenade
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingAttack(final LivingAttackEvent e) {
 		if(Config.getInstance().getPreventWitherCheese().get() && e.getEntity() instanceof WitherEntity &&
 				e.getSource().getEntity() instanceof FakePlayer &&
 				(TalismanItem.hasStoredTalisman(e.getEntity()) || RelicItem.getBoon(e.getEntity()).isPresent()))
 			e.setCanceled(true);
+		if(e.getSource().isExplosion() && e.getSource().getEntity() instanceof GrenadeEntity)
+			if(!(e.getEntity() instanceof RabbitEntity) && !(e.getEntity() instanceof MonsterEntity))
+				e.setCanceled(true);
 	}
 
 	@SubscribeEvent
