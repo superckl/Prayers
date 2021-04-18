@@ -50,11 +50,11 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 
 	public static final RegistryObject<Prayer> POTENCY_1 = Prayer.REGISTER.register("effective", Prayer.builder().drain(2.5F).level(60)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/effective.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 0.3F))
+			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 0.5F))
 			.exclusionTypes(Lists.newArrayList("enhance_melee", "enhance_range", "enhance_magic"))::build);
 	public static final RegistryObject<Prayer> POTENCY_2 = Prayer.REGISTER.register("potent", Prayer.builder().drain(5F).level(80)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/potency.png")).requiresTome(true).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 0.5F))
+			.effect(() -> new DamageEffect(DamageType.ALL, false, true, 1F))
 			.exclusionTypes(Lists.newArrayList("enhance_melee", "enhance_range", "enhance_magic"))::build);
 
 	public static final RegistryObject<Prayer> PROTECT_MELEE = Prayer.REGISTER.register("protect_melee", Prayer.builder().drain(2.5F).level(43)
@@ -75,43 +75,43 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 
 	public static final RegistryObject<Prayer> ENHANCE_MELEE_1 = Prayer.REGISTER.register("enhance_melee_1", Prayer.builder().drain(0.2F).level(4)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemelee1.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.05F)).exclusionType("enhance_melee")::build);
+			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.1F)).exclusionType("enhance_melee")::build);
 	public static final RegistryObject<Prayer> ENHANCE_MELEE_2 = Prayer.REGISTER.register("enhance_melee_2", Prayer.builder().drain(1F).level(13)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemelee2.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.15F)).exclusionType("enhance_melee")::build);
+			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.25F)).exclusionType("enhance_melee")::build);
 	public static final RegistryObject<Prayer> ENHANCE_MELEE_3 = Prayer.REGISTER.register("enhance_melee_3", Prayer.builder().drain(3F).level(31)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemelee3.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.25F)).exclusionType("enhance_melee")::build);
+			.effect(() -> new DamageEffect(DamageType.MELEE, false, true, 0.4F)).exclusionType("enhance_melee")::build);
 
 	public static final RegistryObject<Prayer> ENHANCE_MAGIC_1 = Prayer.REGISTER.register("enhance_magic_1", Prayer.builder().drain(0.2F).level(9)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemagic1.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.05F)).exclusionType("enhance_magic")::build);
+			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.1F)).exclusionType("enhance_magic")::build);
 	public static final RegistryObject<Prayer> ENHANCE_MAGIC_2 = Prayer.REGISTER.register("enhance_magic_2", Prayer.builder().drain(1F).level(27)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemagic2.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.15F)).exclusionType("enhance_magic")::build);
+			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.25F)).exclusionType("enhance_magic")::build);
 	public static final RegistryObject<Prayer> ENHANCE_MAGIC_3 = Prayer.REGISTER.register("enhance_magic_3", Prayer.builder().drain(3F).level(45)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancemagic3.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.25F)).exclusionType("enhance_magic")::build);
+			.effect(() -> new DamageEffect(DamageType.MAGIC, false, true, 0.4F)).exclusionType("enhance_magic")::build);
 
 	public static final RegistryObject<Prayer> ENHANCE_RANGE_1 = Prayer.REGISTER.register("enhance_range_1", Prayer.builder().drain(0.2F).level(8)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancerange1.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.05F)).exclusionType("enhance_range")::build);
+			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.1F)).exclusionType("enhance_range")::build);
 	public static final RegistryObject<Prayer> ENHANCE_RANGE_2 = Prayer.REGISTER.register("enhance_range_2", Prayer.builder().drain(1F).level(26)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancerange2.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.15F)).exclusionType("enhance_range")::build);
+			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.25F)).exclusionType("enhance_range")::build);
 	public static final RegistryObject<Prayer> ENHANCE_RANGE_3 = Prayer.REGISTER.register("enhance_range_3", Prayer.builder().drain(3F).level(44)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancerange3.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.25F)).exclusionType("enhance_range")::build);
+			.effect(() -> new DamageEffect(DamageType.RANGE, false, true, 0.4F)).exclusionType("enhance_range")::build);
 
 	public static final RegistryObject<Prayer> ENHANCE_DEFENCE_1 = Prayer.REGISTER.register("enhance_defence_1", Prayer.builder().drain(0.16F).level(1)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancedefence1.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.05F)).exclusionType("enhance_defence")::build);
+			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.1F)).exclusionType("enhance_defence")::build);
 	public static final RegistryObject<Prayer> ENHANCE_DEFENCE_2 = Prayer.REGISTER.register("enhance_defence_2", Prayer.builder().drain(0.7F).level(10)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancedefence2.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.15F)).exclusionType("enhance_defence")::build);
+			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.2F)).exclusionType("enhance_defence")::build);
 	public static final RegistryObject<Prayer> ENHANCE_DEFENCE_3 = Prayer.REGISTER.register("enhance_defence_3", Prayer.builder().drain(2F).level(28)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/enhancedefence3.png")).group(Group.COMBAT)
-			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.25F)).exclusionType("enhance_defence")::build);
+			.effect(() -> new DamageEffect(DamageType.ALL, true, true, -0.3F)).exclusionType("enhance_defence")::build);
 
 	public static final RegistryObject<Prayer> ARK = Prayer.REGISTER.register("ark", Prayer.builder().drain(1F).level(15).group(Group.UTILITY)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/ark.png")).effect(TemptAnimalEffect::new)::build);
