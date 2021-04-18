@@ -1,0 +1,13 @@
+{
+  "type": "prayers:altar_crafting",
+  "group": "blessing",
+  "points": 50,
+  "ingredients": [
+    {
+      "tag": "prayers:fruit"
+    }
+  ],
+  "result": {
+    "item": "prayers:forbidden_fruit"
+  }
+}
