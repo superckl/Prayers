@@ -8,6 +8,7 @@ import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.item.BlessedWaterItem;
 import me.superckl.prayers.item.DivineTotemItem;
+import me.superckl.prayers.item.ForbiddenFruitItem;
 import me.superckl.prayers.item.GrenadeItem;
 import me.superckl.prayers.item.PrayerTomeItem;
 import me.superckl.prayers.item.RelicItem;
@@ -62,6 +63,7 @@ public class ModItems {
 	public static final RegistryObject<ReliquaryItem> RELIQUARY = ModItems.REGISTER.register("reliquary", ReliquaryItem::new);
 	public static final RegistryObject<WaferItem> WAFER = ModItems.REGISTER.register("wafer", WaferItem::new);
 	public static final RegistryObject<GrenadeItem> GRENADE = ModItems.REGISTER.register("grenade", GrenadeItem::new);
+	public static final RegistryObject<ForbiddenFruitItem> FORBIDDEN_FRUIT = ModItems.REGISTER.register("forbidden_fruit", ForbiddenFruitItem::new);
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())
