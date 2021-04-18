@@ -90,13 +90,19 @@ public class Config {
 
 		//Boons
 		builder.comment("Boon of Damage percentage bonus (default 0.5 (+50%))");
-		this.boonValues.put(ItemBoon.ATTACK_DAMAGE, builder.defineInRange("Boon.Boon of Damage", 0.5, 0, Float.MAX_VALUE));
+		this.boonValues.put(ItemBoon.ATTACK_DAMAGE, builder.defineInRange("Boon.Boon of Damage", 0.5, 0, Double.MAX_VALUE));
 
 		builder.comment("Boon of Armor percentage bonus (default 0.5 (+50%))");
-		this.boonValues.put(ItemBoon.ARMOR, builder.defineInRange("Boon.Boon of Armor", 0.5, 0, Float.MAX_VALUE));
+		this.boonValues.put(ItemBoon.ARMOR, builder.defineInRange("Boon.Boon of Armor", 0.5, 0, Double.MAX_VALUE));
 
 		builder.comment("Boon of Speed percentage bonus (default 0.3 (+30%))");
-		this.boonValues.put(ItemBoon.SPEED, builder.defineInRange("Boon.Boon of Speed", 0.3, 0, Float.MAX_VALUE));
+		this.boonValues.put(ItemBoon.SPEED, builder.defineInRange("Boon.Boon of Speed", 0.3, 0, Double.MAX_VALUE));
+
+		builder.comment("Boon of Rapidity percentage bonus (default 0.3 (+30%))");
+		this.boonValues.put(ItemBoon.ATTACK_SPEED, builder.defineInRange("Boon.Boon of Rapidity", 0.3, 0, Double.MAX_VALUE));
+
+		builder.comment("Boon of Excavation percentage bonus (default 0.75 (+75%))");
+		this.boonValues.put(ItemBoon.DIG_SPEED, builder.defineInRange("Boon.Boon of Excavation", 0.75, 0, Double.MAX_VALUE));
 
 		//Wither Cheese
 		builder.comment("If true, Prayers will attempt to prevent 'cheesing' of upgraded withers by cancelling any damage from fake players (e.g., grinders)");

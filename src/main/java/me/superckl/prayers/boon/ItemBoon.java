@@ -31,6 +31,9 @@ public enum ItemBoon {
 			ArmorSupplier.validSlots()),
 	SPEED(() -> Attributes.MOVEMENT_SPEED, new SpeedSupplier(), ItemStackPredicates.IS_ARMOR, false,
 			SpeedSupplier.validSlots()),
+	ATTACK_SPEED(() -> Attributes.ATTACK_SPEED, new AttackSpeedSupplier(), ItemStackPredicates.IS_WEAPON, false,
+			AttackSpeedSupplier.validSlots()),
+	DIG_SPEED(null, null, ItemStackPredicates.IS_TOOL, true),
 	PRAYER_DRAIN(null, null, ItemStackPredicates.IS_ARMOR, true),
 	CURIOS(null, null, ItemStackPredicates.IS_WEAPON, true);
 

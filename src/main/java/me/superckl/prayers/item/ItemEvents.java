@@ -2,9 +2,7 @@ package me.superckl.prayers.item;
 
 import me.superckl.prayers.Config;
 import me.superckl.prayers.Prayers;
-import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.capability.CapabilityHandler;
-import me.superckl.prayers.criteria.ApplyBoonCriteria;
 import me.superckl.prayers.entity.GrenadeEntity.GrenadeDamageSource;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.inventory.PlayerInventoryHelper;
@@ -20,15 +18,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.RabbitEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.WitherSkullEntity;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -43,7 +38,6 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -74,12 +68,6 @@ public class ItemEvents {
 	}
 
 	@SubscribeEvent
-	public void onCraft(final PlayerEvent.ItemCraftedEvent e) {
-		if(!e.getPlayer().level.isClientSide && ItemBoon.getBoon(e.getCrafting()).isPresent())
-			ApplyBoonCriteria.INSTANCE.trigger((ServerPlayerEntity) e.getPlayer());
-	}
-
-	@SubscribeEvent
 	public void onEntityDrops(final LivingDropsEvent e) {
 		final LivingEntity entity = e.getEntityLiving();
 		if(entity instanceof WitherEntity) {
@@ -90,13 +78,6 @@ public class ItemEvents {
 					final ItemStack talisman = ItemStack.of(nbt.getCompound(TalismanItem.TALISMAN_KEY));
 					TalismanItem.setAutoActivate(talisman);
 					final ItemEntity item = new ItemEntity(entity.level, entity.getX(), entity.getY(), entity.getZ(), talisman);
-					e.getDrops().add(item);
-				}
-				if(nbt.contains(RelicItem.BOON_KEY, Constants.NBT.TAG_STRING)) {
-					final ItemBoon boon = ItemBoon.valueOf(nbt.getString(RelicItem.BOON_KEY));
-					final ItemStack relic = new ItemStack(ModItems.RELICS.get(boon)::get);
-					RelicItem.setCharged(relic);
-					final ItemEntity item = new ItemEntity(entity.level, entity.getX(), entity.getY(), entity.getZ(), relic);
 					e.getDrops().add(item);
 				}
 			}
@@ -134,28 +115,6 @@ public class ItemEvents {
 	public void onItemPickup(final PlayerEvent.ItemPickupEvent e) {
 		if(e.getStack().getItem() instanceof PrayerInventoryItem<?>)
 			CapabilityHandler.getPrayerCapability(e.getStack()).pickedUp(e.getPlayer());
-	}
-
-	//We have to add boon damage manually since wither skulls don't check for damage modifiers on their source
-	@SubscribeEvent
-	public void onLivingHurt(final LivingHurtEvent e) {
-		if(e.getSource().getDirectEntity() instanceof WitherSkullEntity && e.getSource().getEntity() instanceof WitherEntity)
-			RelicItem.getBoon(e.getSource().getEntity()).ifPresent(boon -> {
-				if(boon == ItemBoon.ATTACK_DAMAGE) {
-					final AttributeModifier mod = boon.getModifierSupplier().apply(EquipmentSlotType.MAINHAND);
-					switch(mod.getOperation()) {
-					case ADDITION:
-						e.setAmount((float) (e.getAmount()+mod.getAmount()));
-						break;
-					case MULTIPLY_BASE:
-					case MULTIPLY_TOTAL:
-						e.setAmount((float) (e.getAmount()*mod.getAmount()));
-						break;
-					default:
-						break;
-					}
-				}
-			});
 	}
 
 	//Cancel any damage from fake players to upgraded withers to prevent cheesing
