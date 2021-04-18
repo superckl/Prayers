@@ -1,5 +1,5 @@
 {
   "type": "prayers:apply_boon",
   "group": "crafting",
-  "boon": "dig_speed"
+  "boon": "use_speed"
 }

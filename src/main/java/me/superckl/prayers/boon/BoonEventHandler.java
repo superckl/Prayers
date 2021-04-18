@@ -45,12 +45,12 @@ public class BoonEventHandler {
 	@SubscribeEvent
 	public void onDigSpeedCheck(final PlayerEvent.BreakSpeed e) {
 		int numActive = 0;
-		if(ItemBoon.DIG_SPEED.has(e.getPlayer().getMainHandItem()))
+		if(ItemBoon.USE_SPEED.has(e.getPlayer().getMainHandItem()))
 			numActive++;
-		if(ItemBoon.DIG_SPEED.has(e.getPlayer().getOffhandItem()))
+		if(ItemBoon.USE_SPEED.has(e.getPlayer().getOffhandItem()))
 			numActive++;
 		if(numActive > 0) {
-			final float modifier = Config.getInstance().getBoonValues().get(ItemBoon.DIG_SPEED).get().floatValue();
+			final float modifier = Config.getInstance().getDigBoon().get().floatValue();
 			e.setNewSpeed(e.getNewSpeed()*(1+numActive*modifier));
 		}
 	}

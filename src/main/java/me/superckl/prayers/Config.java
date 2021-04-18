@@ -40,6 +40,9 @@ public class Config {
 
 	//Boons
 	private final Map<ItemBoon, DoubleValue> boonValues = new EnumMap<>(ItemBoon.class);
+	private final DoubleValue digBoon;
+
+	//Wither Cheese
 	private final BooleanValue preventWitherCheese;
 
 	//Talisman & Reliquary
@@ -98,11 +101,11 @@ public class Config {
 		builder.comment("Boon of Speed percentage bonus (default 0.3 (+30%))");
 		this.boonValues.put(ItemBoon.SPEED, builder.defineInRange("Boon.Boon of Speed", 0.3, 0, Double.MAX_VALUE));
 
-		builder.comment("Boon of Rapidity percentage bonus (default 0.3 (+30%))");
-		this.boonValues.put(ItemBoon.ATTACK_SPEED, builder.defineInRange("Boon.Boon of Rapidity", 0.3, 0, Double.MAX_VALUE));
+		builder.comment("Boon of Rapidity attack speed percentage bonus (default 0.3 (+30%))");
+		this.boonValues.put(ItemBoon.USE_SPEED, builder.defineInRange("Boon.Boon of Rapidity Attack", 0.3, 0, Double.MAX_VALUE));
 
-		builder.comment("Boon of Excavation percentage bonus (default 0.75 (+75%))");
-		this.boonValues.put(ItemBoon.DIG_SPEED, builder.defineInRange("Boon.Boon of Excavation", 0.75, 0, Double.MAX_VALUE));
+		builder.comment("Boon of Rapidity block break speed percentage bonus (default 0.75 (+75%))");
+		this.digBoon = builder.defineInRange("Boon.Boon of Rapidity Dig", 0.75, 0, Double.MAX_VALUE);
 
 		//Wither Cheese
 		builder.comment("If true, Prayers will attempt to prevent 'cheesing' of upgraded withers by cancelling any damage from fake players (e.g., grinders)");

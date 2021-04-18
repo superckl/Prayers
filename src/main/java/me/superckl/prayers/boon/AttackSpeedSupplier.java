@@ -20,8 +20,8 @@ public class AttackSpeedSupplier implements Function<EquipmentSlotType, Attribut
 
 	@Override
 	public AttributeModifier apply(final EquipmentSlotType t) {
-		return new AttributeModifier(DamageSupplier.IDS.get(t), ItemBoon.ATTACK_SPEED.getName().getString(),
-				Config.getInstance().getBoonValues().get(ItemBoon.ATTACK_SPEED).get(), Operation.MULTIPLY_TOTAL);
+		return new AttributeModifier(DamageSupplier.IDS.get(t), ItemBoon.USE_SPEED.getName().getString(),
+				Config.getInstance().getBoonValues().get(ItemBoon.USE_SPEED).get(), Operation.MULTIPLY_TOTAL);
 	}
 
 	public static EquipmentSlotType[] validSlots() {
