@@ -56,6 +56,7 @@ public class Config {
 	private final Map<AltarTypes, DoubleValue> altarRecharge = new EnumMap<>(AltarTypes.class);
 	private final Map<AltarTypes, DoubleValue> altarTransfer = new EnumMap<>(AltarTypes.class);
 	private final Map<AltarTypes, IntValue> altarConnected = new EnumMap<>(AltarTypes.class);
+	private final Map<AltarTypes, IntValue> maxSacrificeStack = new EnumMap<>(AltarTypes.class);
 
 	//Grenade
 	private final IntValue grenadeTime;
@@ -152,14 +153,23 @@ public class Config {
 		builder.comment("Rate of point transfer to crafting stands of this altar type. Applied per tick. (default 1.5)");
 		this.altarTransfer.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Transfer", 30D/20D, 0, Double.MAX_VALUE));
 
-		builder.comment("Maximum number of connected altars for this altar type.(default 2)");
+		builder.comment("Maximum number of connected altars for this altar type. (default 2)");
 		this.altarConnected.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Connected", 2, 0, Integer.MAX_VALUE));
 
-		builder.comment("Maximum number of connected altars for this altar type.(default 4)");
+		builder.comment("Maximum number of connected altars for this altar type. (default 4)");
 		this.altarConnected.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Connected", 4, 0, Integer.MAX_VALUE));
 
-		builder.comment("Maximum number of connected altars for this altar type.(default 5)");
+		builder.comment("Maximum number of connected altars for this altar type. (default 5)");
 		this.altarConnected.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Connected", 5, 0, Integer.MAX_VALUE));
+
+		builder.comment("Maximum number of items that may be sacrified at a time on a sandstone altar. (default 0, no limit)");
+		this.maxSacrificeStack.put(AltarTypes.SANDSTONE, builder.defineInRange("Altar.Sandstone Altar Max Stack", 0, 0, Integer.MAX_VALUE));
+
+		builder.comment("Maximum number of items that may be sacrified at a time on a gilded sandstone altar. (default 0, no limit)");
+		this.maxSacrificeStack.put(AltarTypes.GILDED_SANDSTONE, builder.defineInRange("Altar.Gilded Sandstone Altar Max Stack", 0, 0, Integer.MAX_VALUE));
+
+		builder.comment("Maximum number of items that may be sacrified at a time on a marble altar. (default 0, no limit)");
+		this.maxSacrificeStack.put(AltarTypes.MARBLE, builder.defineInRange("Altar.Marble Altar Max Stack", 0, 0, Integer.MAX_VALUE));
 
 		//Grenade
 		builder.comment("Time, in ticks, for grenade to explode.");

@@ -18,6 +18,7 @@ import me.superckl.prayers.util.MathUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
@@ -43,8 +44,9 @@ import net.minecraft.world.World;
 //Much of this is inspired by FourWayBlock, it's just unfortunately not quite applicable here
 public class AltarBlock extends FourWayShapedBlock{
 
-	public static final Set<ResourceLocation> validTopBlocks = Sets.newHashSet(new ResourceLocation("minecraft", "torch"),
-			new ResourceLocation("minecraft", "air"), ModBlocks.OFFERING_STAND.getId(), ModBlocks.CRAFTING_STAND.getId());
+	public static final Set<ResourceLocation> validTopBlocks = Sets.newHashSet(Blocks.TORCH.getRegistryName(),
+			Blocks.AIR.getRegistryName(), ModBlocks.OFFERING_STAND.getId(), ModBlocks.CRAFTING_STAND.getId(),
+			Blocks.FLOWER_POT.getRegistryName());
 
 	@RequiredArgsConstructor
 	@Getter

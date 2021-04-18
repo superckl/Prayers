@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
@@ -21,7 +22,8 @@ public class AltarRenderer extends TileEntityRenderer<AltarTileEntity>{
 	@Override
 	public void render(final AltarTileEntity tileEntityIn, final float partialTicks, final MatrixStack matrixStackIn,
 			final IRenderTypeBuffer bufferIn, final int combinedLightIn, final int combinedOverlayIn) {
-		if(tileEntityIn.getAltarItem().isEmpty())
+		final ItemStack altarStack = tileEntityIn.getAltarItem();
+		if(altarStack.isEmpty())
 			return;
 		matrixStackIn.pushPose();
 		final Vector3f renderLoc = new Vector3f(0.5F, 1, 0.5F);
@@ -37,7 +39,13 @@ public class AltarRenderer extends TileEntityRenderer<AltarTileEntity>{
 		final float max = tileEntityIn.getReqTicks();
 		final float scale = 0.6F*(current == 0? 1:MathHelper.lerp(partialTicks, 1-previous/max, 1-current/max));
 		matrixStackIn.scale(scale, scale, scale);
-		ClientHelper.getItemRenderer().renderStatic(tileEntityIn.getAltarItem(), TransformType.FIXED, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
+		final int models = RenderHelper.getModelCount(altarStack);
+		final ItemStack renderStack = altarStack.copy();
+		renderStack.setCount(1);
+		for(int i = 0; i < models; i++) {
+			ClientHelper.getItemRenderer().renderStatic(renderStack, TransformType.FIXED, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
+			matrixStackIn.translate(0, 0, -1/16F);
+		}
 		matrixStackIn.popPose();
 	}
 

@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
+import me.superckl.prayers.Config;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.capability.CapabilityHandler;
@@ -320,18 +321,22 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 				final Vector3d altarTop = new Vector3d(this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5)
 						.add((2*this.rand.nextDouble()-1)*.15, this.rand.nextDouble()*.05, (2*this.rand.nextDouble()-1)*.15);
 				Vector3d toPlayer = player.position().add(0, player.getEyeHeight()-0.35, 0).subtract(altarTop);
-				final double mag = toPlayer.length();
-				toPlayer = toPlayer.scale(1/mag);
-				((ServerWorld)this.level).sendParticles(ModParticles.ITEM_SACRIFICE.get(), altarTop.x, altarTop.y, altarTop.z, 0, toPlayer.x, toPlayer.y, toPlayer.z, mag/20);
+				final double sqrMag = toPlayer.lengthSqr();
+				if(sqrMag <= 9) {
+					final double mag = Math.sqrt(sqrMag);
+					toPlayer = toPlayer.scale(1/mag);
+					((ServerWorld)this.level).sendParticles(ModParticles.ITEM_SACRIFICE.get(), altarTop.x, altarTop.y, altarTop.z, 0, toPlayer.x, toPlayer.y, toPlayer.z, mag/20);
+				}
 			}
 		}
 		if(++this.itemTicks >= this.reqTicks) {
 			final PlayerEntity player = this.level.getPlayerByUUID(this.altarItemOwner);
 			final AltarItem aItem = AltarItem.find(this.altarItem);
+			final float xp = aItem.getSacrificeXP()*this.altarItem.getCount();
 			if(player == null)
-				AltarsSavedData.get((ServerWorld) this.level).addPendingXP(this.altarItemOwner, aItem.getSacrificeXP());
+				AltarsSavedData.get((ServerWorld) this.level).addPendingXP(this.altarItemOwner, xp);
 			else {
-				CapabilityHandler.getPrayerCapability(player).giveXP(aItem.getSacrificeXP());
+				CapabilityHandler.getPrayerCapability(player).giveXP(xp);
 				PrayersPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), PacketSyncPrayerUser.from(player));
 			}
 			((ServerWorld)this.level).sendParticles(ParticleTypes.SMOKE, this.worldPosition.getX()+0.5, this.worldPosition.getY()+1, this.worldPosition.getZ()+0.5, 1+this.rand.nextInt(2), 0, 0, 0, 0);
@@ -390,10 +395,13 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			}
 		}else if(this.altarItem.isEmpty() && this.isTopClear(true)){
 			final ItemStack toPlace = player.getItemInHand(hand).copy();
-			toPlace.setCount(1);
+			final int confMaxStack = Config.getInstance().getMaxSacrificeStack().get(this.altarType).get();
+			final int maxStack = confMaxStack == 0 ? toPlace.getMaxStackSize():confMaxStack;
+			if(maxStack < toPlace.getCount())
+				toPlace.setCount(maxStack);
 			if(this.setItem(toPlace, player.getUUID(), Direction.fromYRot(player.yHeadRot))) {
 				if(!player.isCreative())
-					player.getItemInHand(hand).shrink(1);
+					player.setItemInHand(hand, ItemStack.EMPTY);
 				return ActionResultType.CONSUME;
 			}
 		}
@@ -410,7 +418,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		this.altarItem = item;
 		this.altarItemOwner = owner;
 		this.itemTicks = 0;
-		this.reqTicks = aItem.getSacrificeTicks();
+		this.reqTicks = aItem.getSacrificeTicks()*item.getCount();
 		this.itemDirection = dir;
 		this.setChanged();
 		this.syncItem();
@@ -480,7 +488,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			this.itemTicks = altarNBT.getInt(AltarTileEntity.ITEM_PROGRESS_KEY);
 			this.itemTicks0 = this.itemTicks;
 			this.altarItemOwner = altarNBT.getUUID(AltarTileEntity.ITEM_OWNER_KEY);
-			this.reqTicks = AltarItem.find(this.altarItem).getSacrificeTicks();
+			this.reqTicks = AltarItem.find(this.altarItem).getSacrificeTicks()*this.altarItem.getCount();
 		}
 		if(altarNBT.contains(AltarTileEntity.OWNER_KEY))
 			this.owner = altarNBT.getUUID(AltarTileEntity.OWNER_KEY);
