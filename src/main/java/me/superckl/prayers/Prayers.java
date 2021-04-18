@@ -34,6 +34,7 @@ import me.superckl.prayers.integration.curios.CuriosIntegration;
 import me.superckl.prayers.inventory.ContainerSlotHelper;
 import me.superckl.prayers.inventory.MainInventorySlotHelper;
 import me.superckl.prayers.inventory.SlotHelper;
+import me.superckl.prayers.item.BonesItem;
 import me.superckl.prayers.item.ItemEvents;
 import me.superckl.prayers.item.decree.ItemFrameTickManager;
 import me.superckl.prayers.network.packet.PacketSetAltarItem;
@@ -182,7 +183,7 @@ public class Prayers {
 
 	private void registerPotions() {
 		BrewingRecipeRegistry.addRecipe(Ingredient.of(new ItemStack(ModItems.BLESSED_WATER::get)),
-				Ingredient.of(new ItemStack(ModItems.GILDED_BONE::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
+				Ingredient.of(new ItemStack(ModItems.GILDED_BONES.get(BonesItem.Type.SMALL)::get)), PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.INSTANT_PRAYER.get()));
 		for(final Item item:new Item[] {Items.POTION, Items.LINGERING_POTION, Items.SPLASH_POTION}) {
 			BrewingRecipeRegistry.addRecipe(new PotionIngredient(item, ModPotions.INSTANT_PRAYER.get()),
 					Ingredient.of(Items.REDSTONE), PotionUtils.setPotion(new ItemStack(item), ModPotions.PRAYER_RENEWAL.get()));

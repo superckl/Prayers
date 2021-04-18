@@ -5,10 +5,10 @@
       "item": "prayers:gold_leaf"
     },
     {
-      "item": "minecraft:bone"
+      "item": "prayers:small_bones"
     }
   ],
   "result": {
-    "item": "prayers:gilded_bone"
+    "item": "prayers:gilded_small_bones"
   }
 }

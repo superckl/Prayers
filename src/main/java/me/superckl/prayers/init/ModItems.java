@@ -7,6 +7,7 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.item.BlessedWaterItem;
+import me.superckl.prayers.item.BonesItem;
 import me.superckl.prayers.item.DivineTotemItem;
 import me.superckl.prayers.item.ForbiddenFruitItem;
 import me.superckl.prayers.item.GrenadeItem;
@@ -53,8 +54,6 @@ public class ModItems {
 			() -> new BlockItem(ModBlocks.ORNATE_REDSTONE.get(), new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> GOLD_LEAF = ModItems.REGISTER.register("gold_leaf",
 			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
-	public static final RegistryObject<Item> GILDED_BONE = ModItems.REGISTER.register("gilded_bone",
-			() -> new Item(new Item.Properties().tab(ModItems.PRAYERS_GROUP)));
 	public static final RegistryObject<Item> BLESSED_WATER = ModItems.REGISTER.register("blessed_water", BlessedWaterItem::new);
 	public static final RegistryObject<VesselItem> VESSEL = ModItems.REGISTER.register("vessel", VesselItem::new);
 	public static final RegistryObject<PrayerTomeItem> PRAYER_TOME = ModItems.REGISTER.register("prayer_tome", PrayerTomeItem::new);
@@ -64,6 +63,8 @@ public class ModItems {
 	public static final RegistryObject<WaferItem> WAFER = ModItems.REGISTER.register("wafer", WaferItem::new);
 	public static final RegistryObject<GrenadeItem> GRENADE = ModItems.REGISTER.register("grenade", GrenadeItem::new);
 	public static final RegistryObject<ForbiddenFruitItem> FORBIDDEN_FRUIT = ModItems.REGISTER.register("forbidden_fruit", ForbiddenFruitItem::new);
+	public static final Map<BonesItem.Type, RegistryObject<BonesItem>> BONES = new EnumMap<>(BonesItem.Type.class);
+	public static final Map<BonesItem.Type, RegistryObject<BonesItem>> GILDED_BONES = new EnumMap<>(BonesItem.Type.class);
 
 	static {
 		for (final AltarTypes type : AltarTypes.values())
@@ -77,6 +78,13 @@ public class ModItems {
 		for(final ItemBoon boon:ItemBoon.values())
 			ModItems.RELICS.put(boon, ModItems.REGISTER.register("relic_"+boon.name().toLowerCase(),
 					() -> new RelicItem(boon)));
+
+		for(final BonesItem.Type type:BonesItem.Type.values()) {
+			ModItems.BONES.put(type, ModItems.REGISTER.register(type.name().toLowerCase()+"_bones",
+					() -> new BonesItem(type)));
+			ModItems.GILDED_BONES.put(type, ModItems.REGISTER.register("gilded_"+type.name().toLowerCase()+"_bones",
+					() -> new BonesItem(type)));
+		}
 	}
 
 }

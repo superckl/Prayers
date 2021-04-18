@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import me.superckl.prayers.init.ModItems;
+import me.superckl.prayers.item.BonesItem;
 import me.superckl.prayers.item.RelicItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,11 +20,24 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 
 	public static DeferredRegister<AltarItem> REGISTER = DeferredRegister.create(AltarItem.class, Prayers.MOD_ID);
 
-	public static RegistryObject<AltarItem> BONE = AltarItem.REGISTER.register("bone", AltarItem.builder().sacrificeXP(1).sacrificeTicks(20)
-			.offerPoints(1.5F).offerTicks(10).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.BONE)))::build);
+	public static RegistryObject<AltarItem> SMALL_BONE = AltarItem.REGISTER.register("small_bones", AltarItem.builder().sacrificeXP(1).sacrificeTicks(20)
+			.offerPoints(1.5F).offerTicks(10).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.BONE)) ||
+					ItemStack.isSame(stack, new ItemStack(ModItems.BONES.get(BonesItem.Type.SMALL)::get)))::build);
 
-	public static RegistryObject<AltarItem> GILDED_BONE = AltarItem.REGISTER.register("gilded_bone", AltarItem.builder().sacrificeXP(10).sacrificeTicks(40)
-			.offerPoints(80).offerTicks(200).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONE::get)))::build);
+	public static RegistryObject<AltarItem> LARGE_BONE = AltarItem.REGISTER.register("large_bones", AltarItem.builder().sacrificeXP(20).sacrificeTicks(40)
+			.offerPoints(30F).offerTicks(20).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.BONES.get(BonesItem.Type.LARGE)::get)))::build);
+
+	public static RegistryObject<AltarItem> ANCIENT_BONE = AltarItem.REGISTER.register("ancient_bones", AltarItem.builder().sacrificeXP(60).sacrificeTicks(60)
+			.offerPoints(100F).offerTicks(40).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.BONES.get(BonesItem.Type.ANCIENT)::get)))::build);
+
+	public static RegistryObject<AltarItem> GILDED_SMALL_BONE = AltarItem.REGISTER.register("gilded_small_bone", AltarItem.builder().sacrificeXP(10).sacrificeTicks(40)
+			.offerPoints(80).offerTicks(200).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONES.get(BonesItem.Type.SMALL)::get)))::build);
+
+	public static RegistryObject<AltarItem> GILDED_LARGE_BONE = AltarItem.REGISTER.register("gilded_large_bone", AltarItem.builder().sacrificeXP(200).sacrificeTicks(60)
+			.offerPoints(110).offerTicks(200).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONES.get(BonesItem.Type.LARGE)::get)))::build);
+
+	public static RegistryObject<AltarItem> GILDED_ANCIENT_BONE = AltarItem.REGISTER.register("gilded_ancient_bone", AltarItem.builder().sacrificeXP(600).sacrificeTicks(80)
+			.offerPoints(180).offerTicks(200).matcher(stack -> ItemStack.isSame(stack, new ItemStack(ModItems.GILDED_BONES.get(BonesItem.Type.ANCIENT)::get)))::build);
 
 	public static RegistryObject<AltarItem> ROTTEN_FLESH = AltarItem.REGISTER.register("rotten_flesh", AltarItem.builder().sacrificeXP(0.5F).sacrificeTicks(10)
 			.offerPoints(0.5F).offerTicks(5).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.ROTTEN_FLESH)))::build);

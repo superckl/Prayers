@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "prayers:gold_leaf"
+    },
+    {
+      "item": "prayers:ancient_bones"
+    }
+  ],
+  "result": {
+    "item": "prayers:gilded_ancient_bones"
+  }
+}
