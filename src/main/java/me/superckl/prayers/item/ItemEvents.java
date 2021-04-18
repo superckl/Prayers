@@ -5,7 +5,7 @@ import me.superckl.prayers.Prayers;
 import me.superckl.prayers.boon.ItemBoon;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.criteria.ApplyBoonCriteria;
-import me.superckl.prayers.entity.GrenadeEntity;
+import me.superckl.prayers.entity.GrenadeEntity.GrenadeDamageSource;
 import me.superckl.prayers.init.ModItems;
 import me.superckl.prayers.inventory.PlayerInventoryHelper;
 import me.superckl.prayers.item.decree.DecreeData;
@@ -166,7 +166,7 @@ public class ItemEvents {
 				e.getSource().getEntity() instanceof FakePlayer &&
 				(TalismanItem.hasStoredTalisman(e.getEntity()) || RelicItem.getBoon(e.getEntity()).isPresent()))
 			e.setCanceled(true);
-		if(e.getSource().isExplosion() && e.getSource().getEntity() instanceof GrenadeEntity)
+		if(e.getSource() instanceof GrenadeDamageSource && !((GrenadeDamageSource)e.getSource()).isDamageFriendly())
 			if(!(e.getEntity() instanceof RabbitEntity) && !(e.getEntity() instanceof MonsterEntity))
 				e.setCanceled(true);
 	}

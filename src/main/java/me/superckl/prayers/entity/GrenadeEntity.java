@@ -1,8 +1,10 @@
 package me.superckl.prayers.entity;
 
+import lombok.Getter;
 import me.superckl.prayers.Config;
 import me.superckl.prayers.init.ModItems;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
@@ -10,6 +12,7 @@ import net.minecraft.entity.projectile.ProjectileItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.network.IPacket;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
@@ -52,7 +55,7 @@ public class GrenadeEntity extends ProjectileItemEntity{
 	}
 
 	protected void explode() {
-		this.level.explode(this, this.getX(), this.getY(0.0625D), this.getZ(), 4.0F, Explosion.Mode.NONE);
+		this.level.explode(this, new GrenadeDamageSource("explosion.player", this.getOwner()), null, this.getX(), this.getY(0.0625D), this.getZ(), 4.0F, false, Explosion.Mode.NONE);
 	}
 
 	@Override
@@ -69,6 +72,23 @@ public class GrenadeEntity extends ProjectileItemEntity{
 	@Override
 	public IPacket<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
+	}
+
+	public static class GrenadeDamageSource extends EntityDamageSource{
+
+		@Getter
+		private final boolean damageFriendly;
+
+		public GrenadeDamageSource(final String name, final Entity owner) {
+			this(name, owner, false);
+		}
+
+		public GrenadeDamageSource(final String name, final Entity owner, final boolean damageFriendly) {
+			super(name, owner);
+			this.damageFriendly = damageFriendly;
+			this.setExplosion();
+		}
+
 	}
 
 }
