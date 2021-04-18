@@ -1,6 +1,10 @@
 package me.superckl.prayers.boon;
 
+import java.util.Set;
+
 import org.apache.commons.lang3.ArrayUtils;
+
+import com.google.common.collect.Sets;
 
 import me.superckl.prayers.Config;
 import me.superckl.prayers.Prayers;
@@ -11,15 +15,18 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.WitherSkullEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -46,6 +53,42 @@ public class BoonEventHandler {
 			final float modifier = Config.getInstance().getBoonValues().get(ItemBoon.DIG_SPEED).get().floatValue();
 			e.setNewSpeed(e.getNewSpeed()*(1+numActive*modifier));
 		}
+	}
+
+	private final Set<String> stepUpCache = Sets.newHashSet();
+
+	@SubscribeEvent
+	public void onLivingUpdate(final LivingUpdateEvent e) {
+		if(e.getEntity() instanceof PlayerEntity) {
+			final PlayerEntity player = (PlayerEntity) e.getEntity();
+			final String playerString = this.playerString(player);
+			final boolean shouldHaveStep = ItemBoon.STEP_UP.has(player.getItemBySlot(EquipmentSlotType.FEET));
+			if(this.stepUpCache.contains(playerString)) {
+				if(!shouldHaveStep) {
+					this.stepUpCache.remove(playerString);
+					player.maxUpStep = 0.6F;
+				}else
+					player.maxUpStep = player.isCrouching() ? .6001F : 1.25F;
+			}else if(shouldHaveStep) {
+				this.stepUpCache.add(playerString);
+				player.maxUpStep = player.isCrouching() ? .6001F : 1.25F;
+			}
+		}
+	}
+
+	private String playerString(final PlayerEntity player) {
+		return new StringBuilder(player.getGameProfile().getName()).append(':').append(player.level.isClientSide).toString();
+	}
+
+	@SubscribeEvent
+	public void serverLoggedOut(final PlayerEvent.PlayerLoggedOutEvent e) {
+		this.stepUpCache.remove(this.playerString(e.getPlayer()));
+	}
+
+	@SubscribeEvent
+	public void clientLoggedOut(final ClientPlayerNetworkEvent.LoggedOutEvent e) {
+		if(e.getPlayer() != null)
+			this.stepUpCache.remove(this.playerString(e.getPlayer()));
 	}
 
 	@SubscribeEvent
