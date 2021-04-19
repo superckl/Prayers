@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:spider",
+    "minecraft:zombie",
+    "minecraft:creeper",
+    "minecraft:cave_spider",
+    "minecraft:husk",
+    "minecraft:stray",
+    "minecraft:illusioner",
+    "minecraft:evoker",
+    "minecraft:pillager",
+    "minecraft:piglin",
+    "minecraft:zombified_piglin",
+    "minecraft:guardian"
+  ]
+}

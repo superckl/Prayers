@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:hoglin",
+    "minecraft:ravager",
+    "minecraft:piglin_brute"
+  ]
+}

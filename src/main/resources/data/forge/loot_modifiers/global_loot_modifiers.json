@@ -4,6 +4,9 @@
 		"prayers:prayer_tome",
 		"prayers:prayer_tome_low",
 		"prayers:relic",
-		"prayers:spawner_curio"
+		"prayers:spawner_curio",
+		"prayers:small_bones",
+		"prayers:large_bones",
+		"prayers:ancient_bones"
 	]
 }

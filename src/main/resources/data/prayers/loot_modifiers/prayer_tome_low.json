@@ -1,4 +1,5 @@
 {
+	"type": "prayers:prayer_tome",
 	"conditions": [
 		{
 			"condition": "minecraft:alternative",
