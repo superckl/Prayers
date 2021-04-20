@@ -261,7 +261,7 @@ public class PrayerSelectGUI extends Screen{
 	}
 
 	private int getTotalRows() {
-		return (int) (Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP).count()/PrayerSelectGUI.NUM_COLS)+1;
+		return MathHelper.ceil(Prayer.allForGroup(PrayerSelectGUI.SELECTED_GROUP).count()/PrayerSelectGUI.NUM_COLS);
 	}
 
 	public boolean isInPrayerBar(final double mouseX, final double mouseY) {

@@ -16,12 +16,13 @@ import lombok.Singular;
 import me.superckl.prayers.Prayers;
 import me.superckl.prayers.capability.CapabilityHandler;
 import me.superckl.prayers.capability.PlayerPrayerUser;
+import me.superckl.prayers.effects.ApplyOnHitEffect;
+import me.superckl.prayers.effects.ApplyToNearbyEffect;
 import me.superckl.prayers.effects.DamageEffect;
 import me.superckl.prayers.effects.DamageEffect.DamageType;
 import me.superckl.prayers.effects.DigSpeedEffect;
 import me.superckl.prayers.effects.FireProtEffect;
 import me.superckl.prayers.effects.FlightEffect;
-import me.superckl.prayers.effects.GlowingEffect;
 import me.superckl.prayers.effects.MovementSpeedEffect;
 import me.superckl.prayers.effects.PoisonProtEffect;
 import me.superckl.prayers.effects.PrayerEffect;
@@ -31,6 +32,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.IFormattableTextComponent;
@@ -70,7 +73,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	//			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectitem.png"))::build);
 	public static final RegistryObject<Prayer> PROTECT_POISON = Prayer.REGISTER.register("protect_poison", Prayer.builder().drain(1F).level(20).group(Group.UTILITY)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectpoison.png")).effect(PoisonProtEffect::new)::build);
-	public static final RegistryObject<Prayer> PROTECT_FIRE = Prayer.REGISTER.register("protect_fire", Prayer.builder().drain(2.5F).level(20).group(Group.UTILITY)
+	public static final RegistryObject<Prayer> PROTECT_FIRE = Prayer.REGISTER.register("protect_fire", Prayer.builder().drain(2F).level(20).group(Group.UTILITY)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/protectfire.png")).effect(FireProtEffect::new)::build);
 
 	public static final RegistryObject<Prayer> ENHANCE_MELEE_1 = Prayer.REGISTER.register("enhance_melee_1", Prayer.builder().drain(0.2F).level(4)
@@ -138,8 +141,15 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/movementspeed3.png")).group(Group.UTILITY)
 			.effect(() -> new MovementSpeedEffect(0.6F)).exclusionType("movement_speed")::build);
 
-	public static final RegistryObject<Prayer> GLOWING = Prayer.REGISTER.register("glowing", Prayer.builder().drain(.05F).level(2)
-			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/glowing.png")).group(Group.UTILITY).effect(GlowingEffect::new)::build);
+	public static final RegistryObject<Prayer> BURNING = Prayer.REGISTER.register("burning", Prayer.builder().drain(2.5F).level(21)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/burning.png")).group(Group.COMBAT)
+			.effect(() -> new ApplyToNearbyEffect(new PrayerEffect.ApplyBurningEffect(80), 3, 1/20F))::build);
+	public static final RegistryObject<Prayer> SLOWING = Prayer.REGISTER.register("slowing", Prayer.builder().drain(2.5F).level(21)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/slowing.png")).group(Group.COMBAT)
+			.effect(() -> new ApplyToNearbyEffect(new PrayerEffect.ApplyPotionEffect(() -> new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 40)), 3, 1/20F))::build);
+	public static final RegistryObject<Prayer> VENOM_BLOOD = Prayer.REGISTER.register("venom_blood", Prayer.builder().drain(2.5F).level(21)
+			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/venom_blood.png")).group(Group.COMBAT)
+			.effect(() -> new ApplyOnHitEffect(new PrayerEffect.ApplyPotionEffect(() -> new EffectInstance(Effects.POISON, 200)), true))::build);
 
 	private final float drain;
 	private final int level;
@@ -184,7 +194,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 
 	public List<ITextComponent> getTooltipDescription(){
 		if(this.tooltipDescription == null) {
-			this.tooltipDescription = Lists.newArrayList(this.getName());
+			this.tooltipDescription = Lists.newArrayList();
 			this.effects.forEach(effect -> this.tooltipDescription.add(effect.getDescription().setStyle(Style.EMPTY.withItalic(true))));
 		}
 		return this.tooltipDescription;

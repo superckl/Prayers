@@ -1,6 +1,7 @@
 package me.superckl.prayers.client.gui;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -78,29 +79,37 @@ public class PrayerButton extends ImageButton{
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("disabled")).withStyle(TextFormatting.DARK_RED));
 			break;
 		case NO_EXLCUDE:
-			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			tooltip.add(prayer.getName());
+			tooltip.addAll(prayer.getTooltipDescription());
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.excluded")).withStyle(TextFormatting.RED));
 			break;
 		case NO_LEVEL:
 			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
-			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.obfuscated")).withStyle(TextFormatting.GRAY));
+			tooltip.addAll(this.withStyle(prayer.getTooltipDescription(), TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.obfuscated")).withStyle(TextFormatting.DARK_GRAY));
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"),prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
 			break;
 		case NO_POINTS:
-			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			tooltip.add(prayer.getName());
+			tooltip.addAll(prayer.getTooltipDescription());
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.no_points")).withStyle(TextFormatting.RED));
 			break;
 		case NO_TOME:
 			tooltip.add(new StringTextComponent("Unknown").withStyle(TextFormatting.OBFUSCATED, TextFormatting.GRAY));
-			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.obfuscated")).withStyle(TextFormatting.GRAY));
+			tooltip.addAll(this.withStyle(prayer.getTooltipDescription(), TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.obfuscated")).withStyle(TextFormatting.DARK_GRAY));
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.tome")).withStyle(TextFormatting.DARK_GRAY));
+			if(prayer.getLevel() > user.getPrayerLevel())
+				tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.require_level"),prayer.getLevel()).withStyle(TextFormatting.DARK_GRAY));
 			break;
 		case NO_ITEM:
-			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			tooltip.add(prayer.getName());
+			tooltip.addAll(prayer.getTooltipDescription());
 			tooltip.add(new TranslationTextComponent(LangUtil.buildTextLoc("prayer.talisman")).withStyle(TextFormatting.GREEN));
 			break;
 		case YES:
-			tooltip.addAll(this.prayer.get().getTooltipDescription());
+			tooltip.add(prayer.getName());
+			tooltip.addAll(prayer.getTooltipDescription());
 			break;
 		case NO_LOCKED:
 			break;
@@ -129,6 +138,10 @@ public class PrayerButton extends ImageButton{
 	@Override
 	public void playDownSound(final SoundHandler handler) {
 		//Override so it doesn't play the sound
+	}
+
+	private final List<ITextComponent> withStyle(final List<ITextComponent> components, final TextFormatting style){
+		return components.stream().map(text-> text.copy().withStyle(style)).collect(Collectors.toList());
 	}
 
 }
