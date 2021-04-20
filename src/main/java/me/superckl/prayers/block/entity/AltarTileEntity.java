@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import me.superckl.prayers.AltarItem;
 import me.superckl.prayers.Config;
+import me.superckl.prayers.Prayers;
 import me.superckl.prayers.block.AltarBlock;
 import me.superckl.prayers.block.AltarBlock.AltarTypes;
 import me.superckl.prayers.capability.CapabilityHandler;
@@ -43,6 +44,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -69,6 +71,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	public static String DIRECTION_KEY = "item_direction";
 	public static String ITEM_PROGRESS_KEY = "item_progress";
 	public static String ITEM_OWNER_KEY = "item_owner";
+
+	public static ResourceLocation ALTAR_TOPPING = new ResourceLocation(Prayers.MOD_ID, "altar_topping");
 
 	private final Random rand = new Random();
 
@@ -444,7 +448,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	public boolean isTopClear(final boolean requireAir) {
 		final BlockPos up = this.worldPosition.above();
 		final BlockState state = this.level.getBlockState(up);
-		return requireAir ? state.getBlock().isAir(state, this.level, up):AltarBlock.validTopBlocks.contains(state.getBlock().delegate.name());
+		final boolean isAir = state.getBlock().isAir(state, this.level, up);
+		return !requireAir && state.getBlock().getTags().contains(AltarTileEntity.ALTAR_TOPPING) || isAir;
 	}
 
 	public boolean canRegen() {

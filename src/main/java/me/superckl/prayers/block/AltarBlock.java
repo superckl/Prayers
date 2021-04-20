@@ -12,13 +12,11 @@ import lombok.RequiredArgsConstructor;
 import me.superckl.prayers.Config;
 import me.superckl.prayers.block.entity.AltarTileEntity;
 import me.superckl.prayers.capability.CapabilityHandler;
-import me.superckl.prayers.init.ModBlocks;
 import me.superckl.prayers.init.ModTiles;
 import me.superckl.prayers.util.MathUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
@@ -32,7 +30,6 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -41,12 +38,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-//Much of this is inspired by FourWayBlock, it's just unfortunately not quite applicable here
 public class AltarBlock extends FourWayShapedBlock{
-
-	public static final Set<ResourceLocation> validTopBlocks = Sets.newHashSet(Blocks.TORCH.getRegistryName(),
-			Blocks.AIR.getRegistryName(), ModBlocks.OFFERING_STAND.getId(), ModBlocks.CRAFTING_STAND.getId(),
-			Blocks.FLOWER_POT.getRegistryName());
 
 	@RequiredArgsConstructor
 	@Getter
