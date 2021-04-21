@@ -23,7 +23,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IRegistryDelegate;
 
@@ -171,7 +170,7 @@ public abstract class TickablePrayerProvider<T> {
 			final CompoundNBT parent = (CompoundNBT) nbt;
 			instance.setCurrentPrayerPoints(parent.getDouble(Storage.CURRENT_POINTS_KEY));
 			instance.setShouldDrain(parent.getBoolean(Storage.SHOULD_DRAIN_KEY));
-			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
+			final IForgeRegistry<Prayer> registry = Prayer.REGISTRY.get();
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			enabled.forEach(stringNbt -> instance.activatePrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
 		}

@@ -28,7 +28,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class PrayerTomeItem extends Item{
 
@@ -99,7 +98,7 @@ public class PrayerTomeItem extends Item{
 	public static LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(PrayerTomeItem.PRAYER_KEY))
-			return LazyOptional.of(() -> GameRegistry.findRegistry(Prayer.class).getValue(new ResourceLocation(nbt.getString(PrayerTomeItem.PRAYER_KEY))));
+			return LazyOptional.of(() -> Prayer.REGISTRY.get().getValue(new ResourceLocation(nbt.getString(PrayerTomeItem.PRAYER_KEY))));
 		return LazyOptional.empty();
 	}
 
@@ -111,7 +110,7 @@ public class PrayerTomeItem extends Item{
 	@Override
 	public void fillItemCategory(final ItemGroup tab, final NonNullList<ItemStack> stacks) {
 		if(this.allowdedIn(tab))
-			for(final Prayer prayer:GameRegistry.findRegistry(Prayer.class).getValues())
+			for(final Prayer prayer:Prayer.REGISTRY.get().getValues())
 				if(prayer.isRequiresTome()) {
 					final ItemStack stack = new ItemStack(this);
 					PrayerTomeItem.storePrayer(stack, prayer);

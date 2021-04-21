@@ -21,7 +21,6 @@ import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -191,7 +190,7 @@ public class Config {
 
 	private void applyConfig() {
 		final List<String> disabled = this.prayers.get();
-		GameRegistry.findRegistry(Prayer.class).getValues().forEach(prayer ->
+		Prayer.REGISTRY.get().getValues().forEach(prayer ->
 		prayer.setEnabled(!disabled.contains(prayer.getRegistryName().toString())));
 	}
 

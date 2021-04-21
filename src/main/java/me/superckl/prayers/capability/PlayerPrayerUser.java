@@ -36,7 +36,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -315,7 +314,7 @@ public abstract class PlayerPrayerUser extends LivingPrayerUser<PlayerEntity>{
 			instance.setCurrentPrayerPoints(parent.getDouble(Storage.CURRENT_POINTS_KEY));
 			instance.setXP(parent.getFloat(Storage.XP_KEY));
 			instance.setUnlocked(parent.getBoolean(Storage.UNLOCKED_KEY));
-			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
+			final IForgeRegistry<Prayer> registry = Prayer.REGISTRY.get();
 			final ListNBT unlocked = parent.getList(Storage.UNLOCKED_PRAYERS_KEY, Constants.NBT.TAG_STRING);
 			unlocked.forEach(stringNbt -> instance.unlockPrayer(registry.getValue(new ResourceLocation(stringNbt.getAsString()))));
 			final ListNBT enabled = parent.getList(Storage.ENABLED_PRAYERS_KEY, Constants.NBT.TAG_STRING);

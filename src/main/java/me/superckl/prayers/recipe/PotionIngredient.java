@@ -13,7 +13,7 @@ import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.IIngredientSerializer;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class PotionIngredient extends Ingredient{
 
@@ -47,8 +47,8 @@ public class PotionIngredient extends Ingredient{
 
 		@Override
 		public PotionIngredient parse(final JsonObject json) {
-			final Item item = GameRegistry.findRegistry(Item.class).getValue(new ResourceLocation(JSONUtils.getAsString(json, "item")));
-			final Potion potion = GameRegistry.findRegistry(Potion.class).getValue(new ResourceLocation(JSONUtils.getAsString(json, "potion")));
+			final Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(JSONUtils.getAsString(json, "item")));
+			final Potion potion = ForgeRegistries.POTION_TYPES.getValue(new ResourceLocation(JSONUtils.getAsString(json, "potion")));
 			return new PotionIngredient(item, potion);
 		}
 

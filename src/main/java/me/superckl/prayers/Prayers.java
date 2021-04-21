@@ -89,7 +89,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.server.command.EnumArgument;
 
 @Mod(Prayers.MOD_ID)
@@ -103,7 +102,6 @@ public class Prayers {
 		LogHelper.setLogger(LogManager.getFormatterLogger(Prayers.MOD_ID));
 		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(this::commonSetup);
-		bus.addListener(this::createRegistry);
 		bus.addListener(this::enqueueIMC);
 		bus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializer);
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientEvents::register);
@@ -192,11 +190,6 @@ public class Prayers {
 			BrewingRecipeRegistry.addRecipe(new PotionIngredient(item, ModPotions.PRAYER_RENEWAL.get()),
 					Ingredient.of(Items.REDSTONE), PotionUtils.setPotion(new ItemStack(item), ModPotions.LONG_PRAYER_RENEWAL.get()));
 		}
-	}
-
-	private void createRegistry(final RegistryEvent.NewRegistry e) {
-		new RegistryBuilder<Prayer>().setName(new ResourceLocation(Prayers.MOD_ID, "prayers")).setType(Prayer.class).create();
-		new RegistryBuilder<AltarItem>().setName(new ResourceLocation(Prayers.MOD_ID, "altar_items")).setType(AltarItem.class).create();
 	}
 
 	public void registerRecipeSerializer(final RegistryEvent.Register<IRecipeSerializer<?>> e) {

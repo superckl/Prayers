@@ -41,7 +41,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 
@@ -208,7 +207,7 @@ public class TalismanItem extends PrayerInventoryItem<TalismanPrayerProvider>{
 	public static LazyOptional<Prayer> getStoredPrayer(final ItemStack stack) {
 		final CompoundNBT nbt = stack.getOrCreateTagElement(Prayers.MOD_ID);
 		if(nbt.contains(TalismanItem.PRAYER_KEY))
-			return LazyOptional.of(() -> GameRegistry.findRegistry(Prayer.class).getValue(new ResourceLocation(nbt.getString(TalismanItem.PRAYER_KEY))));
+			return LazyOptional.of(() -> Prayer.REGISTRY.get().getValue(new ResourceLocation(nbt.getString(TalismanItem.PRAYER_KEY))));
 		return LazyOptional.empty();
 	}
 

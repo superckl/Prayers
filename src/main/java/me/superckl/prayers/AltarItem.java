@@ -1,6 +1,7 @@
 package me.superckl.prayers;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -13,12 +14,15 @@ import net.minecraft.item.Items;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 
 @Builder
 @Getter
 public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 
 	public static DeferredRegister<AltarItem> REGISTER = DeferredRegister.create(AltarItem.class, Prayers.MOD_ID);
+	public static final Supplier<IForgeRegistry<AltarItem>> REGISTRY = AltarItem.REGISTER.makeRegistry("altar_items", RegistryBuilder::new);
 
 	public static RegistryObject<AltarItem> SMALL_BONE = AltarItem.REGISTER.register("small_bones", AltarItem.builder().sacrificeXP(1).sacrificeTicks(20)
 			.offerPoints(1.5F).offerTicks(10).matcher(stack -> ItemStack.isSame(stack, new ItemStack(Items.BONE)) ||
@@ -72,9 +76,9 @@ public class AltarItem extends ForgeRegistryEntry<AltarItem>{
 	}
 
 	public static AltarItem find(final ItemStack stack) {
-		for (final RegistryObject<AltarItem> altarItem : AltarItem.REGISTER.getEntries())
-			if(altarItem.get().matcher.test(stack))
-				return altarItem.get();
+		for (final AltarItem altarItem : AltarItem.REGISTRY.get().getValues())
+			if(altarItem.matcher.test(stack))
+				return altarItem;
 		return null;
 	}
 

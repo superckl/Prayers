@@ -42,14 +42,16 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 
 @Getter
 public class Prayer extends ForgeRegistryEntry<Prayer>{
 
 	public static final DeferredRegister<Prayer> REGISTER = DeferredRegister.create(Prayer.class, Prayers.MOD_ID);
+	public static final Supplier<IForgeRegistry<Prayer>> REGISTRY = Prayer.REGISTER.makeRegistry("prayers", RegistryBuilder::new);
 
 	public static final RegistryObject<Prayer> POTENCY_1 = Prayer.REGISTER.register("effective", Prayer.builder().drain(2.5F).level(60)
 			.texture(new ResourceLocation(Prayers.MOD_ID, "textures/prayer/effective.png")).group(Group.COMBAT)
@@ -237,7 +239,7 @@ public class Prayer extends ForgeRegistryEntry<Prayer>{
 	}
 
 	public static Stream<Prayer> allForGroup(final Group group){
-		Stream<Prayer> stream =  GameRegistry.findRegistry(Prayer.class).getValues().stream().filter(Prayer::isEnabled);
+		Stream<Prayer> stream =  Prayer.REGISTRY.get().getValues().stream().filter(Prayer::isEnabled);
 		if(group != Group.ALL)
 			stream = stream.filter(prayer -> group == Group.ALL || prayer.group == group);
 		return stream;

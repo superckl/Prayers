@@ -17,7 +17,6 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IRegistryDelegate;
 
@@ -32,7 +31,7 @@ public class PrayerTomeLoot extends LootModifier{
 
 	@Override
 	protected List<ItemStack> doApply(final List<ItemStack> generatedLoot, final LootContext context) {
-		final List<Prayer> prayers = GameRegistry.findRegistry(Prayer.class).getValues().stream()
+		final List<Prayer> prayers = Prayer.REGISTRY.get().getValues().stream()
 				.filter(Prayer::isRequiresTome).filter(prayer -> !this.disallowed.contains(prayer.delegate)).collect(Collectors.toCollection(Lists::newArrayList));
 		final Prayer prayer = prayers.get(context.getRandom().nextInt(prayers.size()));
 		final ItemStack stack = new ItemStack(ModItems.PRAYER_TOME::get);
@@ -49,7 +48,7 @@ public class PrayerTomeLoot extends LootModifier{
 		@Override
 		public PrayerTomeLoot read(final ResourceLocation location, final JsonObject object, final ILootCondition[] ailootcondition) {
 			final List<IRegistryDelegate<Prayer>> disallowed = Lists.newArrayList();
-			final IForgeRegistry<Prayer> registry = GameRegistry.findRegistry(Prayer.class);
+			final IForgeRegistry<Prayer> registry = Prayer.REGISTRY.get();
 			if(object.has(Serializer.DISALLOWED_PRAYERS)) {
 				final JsonArray allowedJson = JSONUtils.getAsJsonArray(object, Serializer.DISALLOWED_PRAYERS);
 				allowedJson.forEach(element -> disallowed.add(registry.getValue(new ResourceLocation(element.getAsString())).delegate));
