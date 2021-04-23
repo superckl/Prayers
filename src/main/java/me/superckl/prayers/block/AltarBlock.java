@@ -127,6 +127,17 @@ public class AltarBlock extends FourWayShapedBlock{
 	}
 
 	@Override
+	public boolean hasAnalogOutputSignal(final BlockState state) {
+		return true;
+	}
+
+	@Override
+	public int getAnalogOutputSignal(final BlockState state, final World level, final BlockPos pos) {
+		final AltarTileEntity te = (AltarTileEntity) level.getBlockEntity(pos);
+		return te.getRedstoneSignal();
+	}
+
+	@Override
 	public boolean canConnect(final BlockState state) {
 		return state.getBlock() instanceof AltarBlock && ((AltarBlock) state.getBlock()).type == this.type;
 	}

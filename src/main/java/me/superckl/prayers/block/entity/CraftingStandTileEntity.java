@@ -102,19 +102,23 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 	}
 
 	public void clearRecipe(final boolean clearPoints) {
+		final int signal = this.getRedstoneSignal();
 		this.activeRecipe = null;
 		this.recipeMapping = null;
 		this.lastPercentage = 0;
 		if(clearPoints)
 			this.consumedPoints = 0;
+		if(signal != this.getRedstoneSignal())
+			this.level.updateNeighbourForOutputSignal(this.getBlockPos(), this.getBlockState().getBlock());
 	}
 
 	protected void tickCrafting() {
-		if(this.level.isClientSide)
+		if(this.level.isClientSide || this.level.hasNeighborSignal(this.worldPosition))
 			return;
 		this.findValidAltar().ifPresent(altar -> {
 			if(!this.canRecipeOutput(this.activeRecipe))
 				return; //no room to output, don't tick
+			final int signal = this.getRedstoneSignal();
 			final double reqPoints = this.activeRecipe.getPoints();
 			final double transfer = altar.getAltarType().getTransferRate();
 			final double toTransfer = Math.min(transfer, reqPoints-this.consumedPoints);
@@ -139,6 +143,8 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 			this.lastPercentage = lastPercentage;
 			if(this.consumedPoints >= reqPoints)
 				this.finishCrafting();
+			else if(signal != this.getRedstoneSignal())
+				this.level.updateNeighbourForOutputSignal(this.getBlockPos(), this.getBlockState().getBlock());
 		});
 	}
 
@@ -171,6 +177,10 @@ public class CraftingStandTileEntity extends InteractableInventoryTileEntity imp
 		if(!this.isCrafting())
 			return 0;
 		return this.consumedPoints/this.activeRecipe.getPoints();
+	}
+
+	public int getRedstoneSignal() {
+		return (int) (this.getCraftingProgress()*15);
 	}
 
 	public boolean willCraftingConsume(final int slot) {

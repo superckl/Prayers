@@ -169,6 +169,7 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 	}
 
 	private double addPointsInternal(final double points) {
+		final int signal = this.getRedstoneSignal();
 		this.currentPoints += points;
 		if(this.currentPoints > this.maxPoints) {
 			final double diff = this.maxPoints - this.currentPoints;
@@ -180,7 +181,13 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 			this.currentPoints = 0;
 			return points - diff;
 		}
+		if(signal != this.getRedstoneSignal())
+			this.level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
 		return points;
+	}
+
+	public int getRedstoneSignal() {
+		return (int) (15*this.currentPoints/this.maxPoints);
 	}
 
 	private void invalidateMultiblock(final boolean reCheck) {
@@ -305,12 +312,8 @@ public class AltarTileEntity extends TileEntity implements ITickableTileEntity{
 		if (this.canRegen()) {
 			if(this.rand.nextDouble() < 0.015F)
 				this.spawnActiveParticle();
-			if(this.currentPoints < this.maxPoints) {
-				this.currentPoints += this.maxPoints*this.altarType.getRechargeRate();
-				if(this.currentPoints > this.maxPoints)
-					this.currentPoints = this.maxPoints;
+			if(this.addPointsInternal(this.altarType.getRechargeRate()) > 0)
 				this.setChanged();
-			}
 			this.updateItem();
 		}
 	}

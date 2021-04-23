@@ -42,7 +42,7 @@ public class OfferingStandTileEntity extends InteractableInventoryTileEntity imp
 
 	@Override
 	public void tick() {
-		if(this.level.isClientSide || this.itemHandler.getStackInSlot(0).isEmpty())
+		if(this.level.isClientSide || this.itemHandler.getStackInSlot(0).isEmpty() || this.level.hasNeighborSignal(this.worldPosition))
 			return;
 		this.findValidAltar().ifPresent(altar -> {
 			if(++this.itemTicks >= this.reqTicks) {

@@ -70,6 +70,17 @@ public class CraftingStandBlock extends FourWayShapedBlock{
 		return state;
 	}
 
+	@Override
+	public boolean hasAnalogOutputSignal(final BlockState state) {
+		return true;
+	}
+
+	@Override
+	public int getAnalogOutputSignal(final BlockState state, final World level, final BlockPos pos) {
+		final CraftingStandTileEntity te = (CraftingStandTileEntity) level.getBlockEntity(pos);
+		return te.getRedstoneSignal();
+	}
+
 	public BlockState subtractStands(BlockState from, final BlockState state) {
 		if(state.getValue(CraftingStandBlock.CENTER))
 			from = from.setValue(CraftingStandBlock.CENTER, false);
